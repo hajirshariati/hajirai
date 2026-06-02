@@ -506,6 +506,56 @@ function escapeRegex(s) {
   return String(s || "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
+// Read a single canonical string from any of several attribute
+// alias keys. Same logic the chat-tools categoryFromAttrs /
+// genderFromAttrs use, lifted so the engine doesn't depend on
+// extractProductCards-side projections.
+function pickAttr(attrs, aliases) {
+  if (!attrs) return null;
+  for (const k of aliases) {
+    const v = attrs[k];
+    if (v == null || v === "") continue;
+    if (Array.isArray(v)) {
+      const first = v.find((x) => x != null && x !== "");
+      if (first) return String(first).toLowerCase().trim();
+    } else {
+      return String(v).toLowerCase().trim();
+    }
+  }
+  return null;
+}
+
+// Build an anchor-scoped CTA from the similar-product result set.
+// The first result mirrors the anchor's category + gender because
+// find_similar_products already filtered to those — no separate
+// anchor lookup needed. Returns null when category or gender
+// can't be confidently read; we'd rather omit a CTA than ship one
+// rooted in stale memory.
+function deriveAnchorCTA(cardsWithFacts) {
+  const anchor = cardsWithFacts?.[0];
+  if (!anchor) return null;
+  const attrs = anchor.attributes || {};
+  const category = anchor?._claimFacts?.category?.value
+    || pickAttr(attrs, ["category", "Category", "category_for_filter", "subcategory"])
+    || (anchor.productType ? String(anchor.productType).toLowerCase().trim() : null);
+  const genderRaw = pickAttr(attrs, ["gender", "Gender", "gender_fallback"]);
+  // Normalize merchant gender label to "men" / "women" / "kids".
+  let gender = null;
+  if (genderRaw) {
+    if (genderRaw.startsWith("men") || genderRaw.startsWith("male") || genderRaw.startsWith("boy")) gender = "men";
+    else if (genderRaw.startsWith("women") || genderRaw.startsWith("female") || genderRaw.startsWith("girl") || genderRaw.startsWith("lad")) gender = "women";
+    else if (genderRaw.startsWith("kid") || genderRaw.startsWith("child") || genderRaw.startsWith("youth")) gender = "kids";
+    else if (genderRaw === "unisex") gender = "unisex";
+  }
+  if (!category || !gender) return null;
+  return {
+    label: `View more ${genderPossessive(gender)} ${category}`,
+    scopeSource: "anchor_product",
+    category,
+    gender,
+  };
+}
+
 // ─── Phase 2: named-product / similar-product path ──────────────
 //
 // Detects intent shapes like:
@@ -633,14 +683,30 @@ async function runSimilarProductTurn({
   });
 
   const displayCards = familiesToCards(families);
+
+  // CTA derived from the ANCHOR result product, NEVER from stale
+  // session memory. Live failure: prior turns set
+  // sessionMemory.gender=men, and the auto-search CTA shipped
+  // "View All Men's Footwear" on a Danika similar-product result
+  // that's women-only. By rooting CTA in the result-set scope (or
+  // omitting it when category/gender aren't both confidently
+  // known), stale memory can never leak into the link.
+  //
+  // The result set was filtered by find_similar_products to the
+  // anchor's category + gender, so the first similar product's
+  // scope mirrors the anchor's scope. Read category/gender out of
+  // attributes directly — engine cards don't carry _category /
+  // _gender (those are extractProductCards-side fields).
+  const cta = deriveAnchorCTA(cardsWithFacts);
+
   return {
     decline: false,
     scope,
     products: displayCards,
     facts: displayCards.map((c) => c._claimFacts),
     answerText: composed.text,
-    cta: composed.cta || null,
-    diagnostics: { ...diagnostics, composer: composed.reason },
+    cta,
+    diagnostics: { ...diagnostics, composer: composed.reason, ctaSource: cta ? "anchor_product" : "none" },
   };
 }
 

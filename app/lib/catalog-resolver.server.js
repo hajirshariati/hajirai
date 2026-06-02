@@ -731,3 +731,84 @@ export async function detectSpecificProduct(shop, message, { _testFacts } = {}) 
   if (candidates.size !== 1) return null;
   return Array.from(candidates)[0];
 }
+
+// Permissive named-product resolver for similar-product turns.
+//
+// detectSpecificProduct above requires the matched token to be
+// UNIQUE to one product family — a safety property when the caller
+// will route the entire turn based on the resolution. That's too
+// strict for "similar to X" / "same support as X" / "like the X"
+// anchors: catalogs frequently carry several products in one style
+// family (e.g. "Jillian Sport Sandal", "Jillian Braided", "Jillian
+// Antique Rose") and any single handle is a valid anchor — the
+// downstream find_similar_products handler excludes the entire
+// style family by titleStyleFamily anyway, so the customer never
+// sees the anchor itself recommended back.
+//
+// Stages:
+//   1. Pull a likely anchor phrase out of the message after
+//      "like (the)" / "as" / "similar to" / "comparable to" /
+//      "same (support|cushioning|fit|…) as" anchors.
+//   2. Whole-word match the anchor against catalog titles. Return
+//      the first handle whose title contains it.
+//   3. Fallback — scan the message for any meaningful token (4+
+//      chars, not a stopword) that appears in a catalog title and
+//      return the first such handle.
+//
+// Returns a productHandle string or null. _testFacts injects a
+// fixture array for offline tests (same shape as detectSpecificProduct).
+const SIMILAR_ANCHOR_EXTRACT_RE =
+  /\b(?:similar\s+to|comparable\s+to|like(?:\s+the)?|as|same\s+(?:as|support\s+as|cushioning\s+as|fit\s+as|feel\s+as|style\s+as))\s+(?:the\s+)?([a-z][\w'-]+(?:\s+[a-z][\w'-]+){0,3})/i;
+
+export async function findProductHandleForSimilarAnchor(shop, message, { _testFacts } = {}) {
+  if (!shop || !message || typeof message !== "string") return null;
+  const text = String(message).trim();
+  if (!text) return null;
+  const lcText = text.toLowerCase();
+
+  let facts;
+  if (Array.isArray(_testFacts)) {
+    facts = _testFacts;
+  } else {
+    facts = await prisma.catalogFact.findMany({
+      where: { shop, variantId: null },
+      select: { productHandle: true, title: true },
+      take: 1000,
+    });
+  }
+  if (!facts || facts.length === 0) return null;
+
+  // Stage 1: extract anchor phrase, match against titles.
+  const m = lcText.match(SIMILAR_ANCHOR_EXTRACT_RE);
+  if (m && m[1]) {
+    // Tokenize the captured phrase and try its longest meaningful
+    // word first (anchors like "the jillian sport sandal" should
+    // match before "the").
+    const phraseTokens = m[1]
+      .toLowerCase()
+      .split(/[^a-z0-9]+/)
+      .filter((t) => t && t.length >= 3 && !SPECIFIC_PRODUCT_STOPWORDS.has(t));
+    phraseTokens.sort((a, b) => b.length - a.length);
+    for (const tok of phraseTokens) {
+      const re = new RegExp(`\\b${tok.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "i");
+      for (const f of facts) {
+        if (re.test(String(f.title || ""))) return f.productHandle;
+      }
+    }
+  }
+
+  // Stage 2: any meaningful token in the whole message that appears
+  // in a title. Conservative — only fires when stage 1 found
+  // nothing.
+  const messageTokens = lcText
+    .split(/[^a-z0-9]+/)
+    .filter((t) => t && t.length >= 4 && !SPECIFIC_PRODUCT_STOPWORDS.has(t))
+    .sort((a, b) => b.length - a.length);
+  for (const tok of messageTokens) {
+    const re = new RegExp(`\\b${tok.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "i");
+    for (const f of facts) {
+      if (re.test(String(f.title || ""))) return f.productHandle;
+    }
+  }
+  return null;
+}

@@ -408,14 +408,26 @@ async function runProductTurnDispatch({ ctx, controller, encoder, claimConfig })
     }
   };
 
-  // resolveNamedProductFn — REUSE catalog-resolver.detectSpecificProduct
-  // so the engine doesn't re-implement named-anchor matching.
-  // Dynamic import for the same RR-client-bundler reason as the
-  // engine module itself.
-  const { detectSpecificProduct } = await import("../lib/catalog-resolver.server");
+  // resolveNamedProductFn — REUSE catalog-resolver named-product
+  // detectors. Two-stage resolution so we don't re-implement
+  // anchor matching:
+  //   1) detectSpecificProduct — strict (unique-token requirement)
+  //      for whole-name mentions like "the Jillian Sport Sandal".
+  //   2) findProductHandleForSimilarAnchor — permissive, returns
+  //      ANY matching handle from a style family. Live 2026-06-03
+  //      fix: "Which has most cushioning like the Jillian?" and
+  //      "same support as Danika" returned null from the strict
+  //      resolver because Aetrex carries multiple Jillian/Danika
+  //      products and the token wasn't unique. find_similar_products
+  //      excludes the entire style family anyway, so any handle is
+  //      a valid anchor.
+  const { detectSpecificProduct, findProductHandleForSimilarAnchor } =
+    await import("../lib/catalog-resolver.server");
   const resolveNamedProductFn = async (message) => {
     try {
-      return await detectSpecificProduct(ctx.shop, message);
+      const strict = await detectSpecificProduct(ctx.shop, message);
+      if (strict) return strict;
+      return await findProductHandleForSimilarAnchor(ctx.shop, message);
     } catch (err) {
       console.warn(`[product-turn-engine] anchor resolver failed: ${err?.message || err}`);
       return null;

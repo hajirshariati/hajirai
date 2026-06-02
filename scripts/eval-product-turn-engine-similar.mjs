@@ -324,6 +324,202 @@ await test("P2-13 — empty similar-product result composes a helpful 'try widen
   assert.equal(out.reason, "similar_empty");
 });
 
+// ─── live 2026-06-03 regressions ────────────────────────────────
+//
+// The strict detectSpecificProduct returned null for both anchors
+// because Aetrex carries multiple Jillian / multiple Danika
+// products. The new findProductHandleForSimilarAnchor (permissive)
+// picks ANY handle from the family — find_similar_products will
+// then exclude the entire style family on the return side.
+
+import {
+  findProductHandleForSimilarAnchor,
+  detectSpecificProduct,
+} from "../app/lib/catalog-resolver.server.js";
+
+const AETREX_CATALOG_FIXTURE = [
+  { productHandle: "jillian-sport-black-l8000w",     title: "Jillian Sport Sandal - Black" },
+  { productHandle: "jillian-antique-rose-sc443w",    title: "Jillian Braided Quarter Strap Sandal - Antique Rose" },
+  { productHandle: "jillian-shimmer-blush-sc440w",   title: "Jillian Shimmer Blush" },
+  { productHandle: "danika-white-ap101w",            title: "Danika Sneaker - White" },
+  { productHandle: "danika-navy-ap105w",             title: "Danika Sneaker - Navy" },
+  { productHandle: "maui-charcoal-l3100m",           title: "Maui Sandal - Charcoal" },
+];
+
+await test("P2-14 — live failure: 'most cushioning like the Jillian?' — strict resolver returns null", async () => {
+  // detectSpecificProduct returns null because "jillian" matches 3
+  // products → not unique. Lock this behavior so we don't
+  // accidentally regress to a wrong-product match.
+  const strict = await detectSpecificProduct(
+    "fixture.myshopify.com",
+    "Which of these has the most cushioning like the Jillian?",
+    { _testFacts: AETREX_CATALOG_FIXTURE },
+  );
+  assert.equal(strict, null, "strict resolver intentionally returns null for ambiguous Jillian");
+});
+
+await test("P2-15 — live failure: 'most cushioning like the Jillian?' — permissive resolver returns a Jillian handle", async () => {
+  const handle = await findProductHandleForSimilarAnchor(
+    "fixture.myshopify.com",
+    "Which of these has the most cushioning like the Jillian?",
+    { _testFacts: AETREX_CATALOG_FIXTURE },
+  );
+  assert.ok(handle, "permissive resolver must return a handle, not null");
+  assert.match(handle, /^jillian-/,
+    `expected a Jillian-family handle; got "${handle}"`);
+});
+
+await test("P2-16 — live failure: 'what other shoes have same support as Danika' — permissive returns a Danika handle", async () => {
+  const handle = await findProductHandleForSimilarAnchor(
+    "fixture.myshopify.com",
+    "what other shoes have same support as Danika",
+    { _testFacts: AETREX_CATALOG_FIXTURE },
+  );
+  assert.ok(handle, "permissive resolver must return a handle, not null");
+  assert.match(handle, /^danika-/,
+    `expected a Danika-family handle; got "${handle}"`);
+});
+
+await test("P2-17 — permissive resolver returns null when no catalog match exists", async () => {
+  const handle = await findProductHandleForSimilarAnchor(
+    "fixture.myshopify.com",
+    "similar to the Xyzzyzz",
+    { _testFacts: AETREX_CATALOG_FIXTURE },
+  );
+  assert.equal(handle, null);
+});
+
+await test("P2-18 — live failure end-to-end: Jillian turn now HANDLES via permissive resolver + similarFn", async () => {
+  // Simulate the dispatcher's two-stage resolver: strict → permissive.
+  const resolveFn = async (message) => {
+    const strict = await detectSpecificProduct(
+      "fixture.myshopify.com", message,
+      { _testFacts: AETREX_CATALOG_FIXTURE },
+    );
+    if (strict) return strict;
+    return findProductHandleForSimilarAnchor(
+      "fixture.myshopify.com", message,
+      { _testFacts: AETREX_CATALOG_FIXTURE },
+    );
+  };
+  const similar = spy({
+    reference: { handle: "jillian-sport-black-l8000w", title: "Jillian Sport Sandal - Black" },
+    products: SIMILAR_RESULT.products,
+  });
+  const out = await runProductTurn({
+    ...ctxBase,
+    latestUserMessage: "Which of these has the most cushioning like the Jillian?",
+    sessionMemory: { explicit: {}, inferred: {} },
+  }, {
+    forceEnable: true,
+    searchFn: async () => [],
+    similarFn: similar,
+    resolveNamedProductFn: resolveFn,
+    claimConfig: FIXTURE_CLAIM_CONFIG,
+  });
+  assert.ok(!out.decline,
+    `engine must handle Jillian similar-product turn; got rungs=${JSON.stringify(out.diagnostics?.rungs)}`);
+  assert.equal(similar.calls.length, 1, "similarFn must be called once");
+  assert.match(similar.calls[0][0].handle, /^jillian-/,
+    `expected a Jillian handle forwarded to similarFn; got "${similar.calls[0][0].handle}"`);
+  // The composer's caveat must still fire — cushioning isn't a
+  // configured attribute even with the resolver working.
+  assert.match(out.answerText, /don't have catalog data to rank.*cushioning/i,
+    `expected ranking caveat; got "${out.answerText}"`);
+});
+
+await test("P2-19 — live failure end-to-end: Danika turn handles + returns matched sneakers", async () => {
+  const resolveFn = async (message) => {
+    const strict = await detectSpecificProduct(
+      "fixture.myshopify.com", message,
+      { _testFacts: AETREX_CATALOG_FIXTURE },
+    );
+    if (strict) return strict;
+    return findProductHandleForSimilarAnchor(
+      "fixture.myshopify.com", message,
+      { _testFacts: AETREX_CATALOG_FIXTURE },
+    );
+  };
+  // Mirror the live log:
+  //   [similar] ref=danika-white-ap101w family=danika attrs=[footbed=ap] category=sneakers gender=women → 4
+  const danikaSimilar = {
+    reference: { handle: "danika-white-ap101w", title: "Danika Sneaker - White" },
+    products: [
+      {
+        title: "Chase Sneaker - Navy",
+        handle: "chase-navy-am206w",
+        productType: "Sneakers",
+        description: "Sneaker with arch support.",
+        tags: [],
+        attributes: { category: "Sneakers", gender: "Women", footbed: "ap" },
+        price: "139.95",
+        image: "https://cdn/chase.jpg",
+        url: "https://shop/products/chase",
+      },
+    ],
+  };
+  const similar = spy(danikaSimilar);
+  const out = await runProductTurn({
+    ...ctxBase,
+    latestUserMessage: "what other shoes have same support as Danika",
+    sessionMemory: { explicit: {}, inferred: {} },
+  }, {
+    forceEnable: true,
+    searchFn: async () => [],
+    similarFn: similar,
+    resolveNamedProductFn: resolveFn,
+    claimConfig: FIXTURE_CLAIM_CONFIG,
+  });
+  assert.ok(!out.decline,
+    `engine must handle Danika similar-product turn; got rungs=${JSON.stringify(out.diagnostics?.rungs)}`);
+  assert.match(similar.calls[0][0].handle, /^danika-/,
+    `expected Danika handle forwarded; got "${similar.calls[0][0].handle}"`);
+  assert.equal(out.products.length, 1);
+  assert.equal(out.products[0].title, "Chase Sneaker - Navy");
+});
+
+await test("P2-20 — CTA is derived from the ANCHOR product, never from stale session memory", async () => {
+  // Live failure 4: prior turns set sessionMemory.gender=men, and
+  // the auto-search CTA shipped "View All Men's Footwear" on a
+  // Danika women-only result. Engine CTA must be anchor-rooted.
+  const danikaSimilar = {
+    reference: { handle: "danika-white-ap101w", title: "Danika Sneaker - White" },
+    products: [
+      {
+        title: "Chase Sneaker - Navy",
+        handle: "chase-navy-am206w",
+        productType: "Sneakers",
+        description: "Sneaker with arch support.",
+        tags: [],
+        attributes: { category: "Sneakers", gender: "Women", footbed: "ap" },
+        price: "139.95",
+        image: "https://cdn/chase.jpg",
+        url: "https://shop/products/chase",
+      },
+    ],
+  };
+  const out = await runProductTurn({
+    ...ctxBase,
+    // STALE gender=men in session memory — engine must ignore it
+    // for CTA derivation when the anchor product is women's.
+    sessionMemory: { explicit: { gender: "men", category: "footwear" }, inferred: {} },
+    latestUserMessage: "what other shoes have same support as Danika",
+  }, {
+    forceEnable: true,
+    searchFn: async () => [],
+    similarFn: spy(danikaSimilar),
+    resolveNamedProductFn: async () => "danika-white-ap101w",
+    claimConfig: FIXTURE_CLAIM_CONFIG,
+  });
+  assert.ok(!out.decline);
+  assert.ok(out.cta, `expected an engine CTA; got ${JSON.stringify(out.cta)}`);
+  assert.equal(out.cta.gender, "women",
+    `CTA gender must come from anchor product (women), not stale memory (men); got ${out.cta.gender}`);
+  assert.equal(out.cta.category, "sneakers",
+    `CTA category must come from anchor (sneakers), not stale (footwear); got ${out.cta.category}`);
+  assert.equal(out.cta.scopeSource, "anchor_product");
+});
+
 // ──────────────────────────────────────────────────────────────
 console.log("");
 if (failed === 0) {
