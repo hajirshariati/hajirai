@@ -1,0 +1,346 @@
+// Policy / Knowledge Engine eval.
+//
+// Pure-offline. retrievedChunks are passed in directly so we
+// exercise the engine's intent classification, chunk selection,
+// and composer without touching the DB or the embedding service.
+//
+// Key invariants under test:
+//   1. Policy intent shapes are detected as policy turns (not
+//      product searches).
+//   2. The engine pulls answers FROM the chunks the caller
+//      provides — never invents fees, windows, or covered defects.
+//   3. When the relevant knowledge is missing or weakly matched,
+//      the engine admits the limit honestly and points at support.
+//   4. Patterns are GENERIC English — no merchant-specific terms.
+//   5. Non-policy turns (product searches) cleanly decline.
+
+import assert from "node:assert/strict";
+import {
+  runPolicyTurn,
+  detectPolicyIntent,
+  composePolicyAnswer,
+  selectRelevantChunks,
+  __internals,
+} from "../app/lib/policy-engine.server.js";
+
+let passed = 0;
+let failed = 0;
+const failures = [];
+
+async function test(name, fn) {
+  try {
+    await fn();
+    console.log(`  ✓ ${name}`);
+    passed++;
+  } catch (err) {
+    console.log(`  ✗ ${name} — ${err.message}`);
+    failures.push({ name, err });
+    failed++;
+  }
+}
+
+console.log("Policy / Knowledge Engine eval\n");
+
+const ctxBase = {
+  shop: "fixture.myshopify.com",
+  supportUrl: "https://example.com/support",
+  supportLabel: "our support team",
+};
+
+// Chunk fixture — the shape retrieveRelevantChunks returns. These
+// are NOT real Aetrex policies; they're test fixtures that prove
+// the engine reads FROM the chunks instead of from code constants.
+const chunk = ({ similarity, fileType = "faqs", sectionTitle = "", content }) => ({
+  id: `chunk-${Math.random().toString(36).slice(2, 8)}`,
+  fileType, sectionTitle, content,
+  similarity,
+});
+
+// ─── intent detection ─────────────────────────────────────────
+
+await test("PE-1 — detects return-policy shape", () => {
+  const i = detectPolicyIntent("what is your return policy?");
+  assert.equal(i?.primary, "return_policy");
+});
+
+await test("PE-2 — 'return fee' is detected as return_fee (more specific than return_policy)", () => {
+  const i = detectPolicyIntent("is there a return fee?");
+  assert.equal(i?.primary, "return_fee");
+});
+
+await test("PE-3 — shipping shapes detect shipping intent", () => {
+  for (const q of [
+    "how long does shipping take?",
+    "what's the shipping cost?",
+    "do you offer free shipping?",
+    "how much is delivery?",
+  ]) {
+    const i = detectPolicyIntent(q);
+    assert.equal(i?.primary, "shipping", `failed for "${q}"`);
+  }
+});
+
+await test("PE-4 — warranty / guarantee shapes detect warranty", () => {
+  for (const q of [
+    "do you have a warranty?",
+    "what's your guarantee?",
+    "are the shoes guaranteed against defects?",
+  ]) {
+    const i = detectPolicyIntent(q);
+    assert.equal(i?.primary, "warranty", `failed for "${q}"`);
+  }
+});
+
+await test("PE-5 — 'do you offer discounts?' detects discounts", () => {
+  const i = detectPolicyIntent("do you offer any discount?");
+  assert.equal(i?.primary, "discounts");
+});
+
+await test("PE-6 — 'do you have returns?' (yes/no shape) still detects return_policy", () => {
+  const i = detectPolicyIntent("do you have returns?");
+  assert.equal(i?.primary, "return_policy");
+});
+
+await test("PE-7 — non-policy turns are NOT detected", () => {
+  for (const q of [
+    "show me sandals for plantar fasciitis",
+    "i want pink sandals with arch support",
+    "which has the most cushioning like the Jillian?",
+    "what other shoes have same support as Danika",
+  ]) {
+    assert.equal(detectPolicyIntent(q), null, `false positive for "${q}"`);
+  }
+});
+
+// ─── engine reads FROM chunks (not hardcoded) ──────────────────
+
+await test("PE-8 — return-policy turn quotes the merchant's chunk verbatim", async () => {
+  // Fixture: merchant-specific policy. Engine output MUST contain
+  // the merchant's wording. If the engine made up a 30-day window
+  // instead, this test would fail.
+  const merchantPolicy = "We accept returns within 45 days of delivery. A $9 restocking fee applies to non-defective returns.";
+  const chunks = [
+    chunk({
+      similarity: 0.72,
+      fileType: "faqs",
+      sectionTitle: "RETURN POLICY",
+      content: merchantPolicy,
+    }),
+  ];
+  const out = await runPolicyTurn(
+    { ...ctxBase, latestUserMessage: "what is your return policy?" },
+    { forceEnable: true, retrievedChunks: chunks },
+  );
+  assert.ok(!out.decline);
+  assert.ok(out.answerText.includes(merchantPolicy),
+    `merchant policy text must appear verbatim; got "${out.answerText}"`);
+  assert.equal(out.products.length, 0, "policy turns must NOT carry product cards");
+});
+
+await test("PE-9 — return-fee question pulls a different merchant chunk (different fee number)", async () => {
+  // Different merchant → different fee → composer output differs.
+  // Proves the engine never substitutes hardcoded policy facts.
+  const chunks = [
+    chunk({
+      similarity: 0.68,
+      fileType: "faqs",
+      sectionTitle: "RETURN FEES",
+      content: "Returns are free for defective items. A $15 restocking fee applies otherwise.",
+    }),
+  ];
+  const out = await runPolicyTurn(
+    { ...ctxBase, latestUserMessage: "is there a return fee?" },
+    { forceEnable: true, retrievedChunks: chunks },
+  );
+  assert.ok(out.answerText.includes("$15"));
+});
+
+await test("PE-10 — different merchant data → different composer output", async () => {
+  // Same intent, different merchant chunks → different answer.
+  // No hardcoded shipping window survives anywhere in the engine.
+  const a = await runPolicyTurn(
+    { ...ctxBase, latestUserMessage: "shipping?" },
+    {
+      forceEnable: true,
+      retrievedChunks: [
+        chunk({
+          similarity: 0.7,
+          fileType: "faqs",
+          sectionTitle: "SHIPPING",
+          content: "Standard shipping is 3-5 business days within the US.",
+        }),
+      ],
+    },
+  );
+  const b = await runPolicyTurn(
+    { ...ctxBase, latestUserMessage: "shipping?" },
+    {
+      forceEnable: true,
+      retrievedChunks: [
+        chunk({
+          similarity: 0.7,
+          fileType: "faqs",
+          sectionTitle: "SHIPPING",
+          content: "Express shipping arrives in 1-2 business days for a $25 fee.",
+        }),
+      ],
+    },
+  );
+  assert.match(a.answerText, /3-5 business days/);
+  assert.match(b.answerText, /1-2 business days/);
+  assert.notEqual(a.answerText, b.answerText);
+});
+
+// ─── honest admission when knowledge is missing ────────────────
+
+await test("PE-11 — discount question with NO matching chunks → admits + points to support", async () => {
+  const out = await runPolicyTurn(
+    { ...ctxBase, latestUserMessage: "do you offer any discounts?" },
+    { forceEnable: true, retrievedChunks: [] },
+  );
+  assert.ok(!out.decline);
+  assert.match(out.answerText, /don't have/i);
+  assert.match(out.answerText, /discounts and promotions/i);
+  assert.match(out.answerText, /support/i);
+  assert.match(out.answerText, /example\.com\/support/);
+  assert.equal(out.diagnostics.composer, "no_relevant_knowledge");
+});
+
+await test("PE-12 — weak similarity (below floor) → admits", async () => {
+  const out = await runPolicyTurn(
+    { ...ctxBase, latestUserMessage: "what's your warranty?" },
+    {
+      forceEnable: true,
+      retrievedChunks: [
+        chunk({
+          similarity: 0.22, // below LOW_CONFIDENCE
+          fileType: "faqs",
+          sectionTitle: "PRODUCT DETAILS",
+          content: "Made with premium leather and rubber outsoles.",
+        }),
+      ],
+    },
+  );
+  assert.match(out.answerText, /don't have/i);
+});
+
+await test("PE-13 — weak-but-above-floor → uses with caveat phrasing", async () => {
+  const out = await runPolicyTurn(
+    { ...ctxBase, latestUserMessage: "what's your warranty?" },
+    {
+      forceEnable: true,
+      retrievedChunks: [
+        chunk({
+          similarity: 0.44, // between LOW and HIGH
+          fileType: "faqs",
+          sectionTitle: "WARRANTY",
+          content: "Defects covered for 12 months from purchase.",
+        }),
+      ],
+    },
+  );
+  assert.match(out.answerText, /closest detail/i);
+  assert.match(out.answerText, /12 months/);
+  assert.equal(out.diagnostics.composer, "knowledge_weak_match");
+});
+
+// ─── chunk selection prefers policy-adjacent fileType ───────────
+
+await test("PE-14 — policy-adjacent fileType outranks a higher-sim non-policy chunk", () => {
+  const ranked = selectRelevantChunks(
+    [
+      // Higher raw similarity but non-policy fileType.
+      chunk({ similarity: 0.62, fileType: "product_descriptions", sectionTitle: "Maui Sandal", content: "Returns? Sure, the Maui returns to the same fit every time." }),
+      // Lower raw similarity but a faqs chunk titled "Returns".
+      chunk({ similarity: 0.55, fileType: "faqs", sectionTitle: "Returns", content: "30-day return window…" }),
+    ],
+    { primary: "return_policy" },
+  );
+  assert.equal(ranked.length, 2);
+  assert.equal(ranked[0].fileType, "faqs", "policy-adjacent chunk should rank first via adjacency boost");
+});
+
+// ─── flag OFF → null ───────────────────────────────────────────
+
+await test("PE-15 — flag unset returns null (production unchanged)", async () => {
+  const prev = process.env.PRODUCT_TURN_ENGINE_ENABLED;
+  delete process.env.PRODUCT_TURN_ENGINE_ENABLED;
+  try {
+    const out = await runPolicyTurn(
+      { ...ctxBase, latestUserMessage: "what is your return policy?" },
+      { retrievedChunks: [chunk({ similarity: 0.9, content: "yo" })] },
+    );
+    assert.equal(out, null);
+  } finally {
+    if (prev === undefined) delete process.env.PRODUCT_TURN_ENGINE_ENABLED;
+    else process.env.PRODUCT_TURN_ENGINE_ENABLED = prev;
+  }
+});
+
+// ─── product turn must decline cleanly ──────────────────────────
+
+await test("PE-16 — product-search turn cleanly declines (so product engine takes over)", async () => {
+  const out = await runPolicyTurn(
+    { ...ctxBase, latestUserMessage: "i want pink sandals with arch support" },
+    { forceEnable: true, retrievedChunks: [] },
+  );
+  assert.ok(out.decline);
+  assert.ok(out.diagnostics.rungs.includes("declined:not_policy"));
+});
+
+// ─── support link omitted gracefully when not configured ────────
+
+await test("PE-17 — no supportUrl configured → still admits, generic suffix", async () => {
+  const out = await runPolicyTurn(
+    { shop: "fixture.myshopify.com", latestUserMessage: "do you have a return policy?" },
+    { forceEnable: true, retrievedChunks: [] },
+  );
+  assert.ok(!out.decline);
+  assert.match(out.answerText, /contact support directly/i);
+  assert.doesNotMatch(out.answerText, /https?:\/\//, "must not invent a support URL");
+});
+
+// ─── intent priority — fee beats general policy ─────────────────
+
+await test("PE-18 — 'do you charge a return fee?' is return_fee, not return_policy", () => {
+  const i = detectPolicyIntent("do you charge a return fee?");
+  assert.equal(i?.primary, "return_fee");
+});
+
+// ─── compose API direct tests ──────────────────────────────────
+
+await test("PE-19 — composePolicyAnswer with relevant chunk renders title + content", () => {
+  const out = composePolicyAnswer({
+    intent: { primary: "return_policy" },
+    relevant: [
+      chunk({ similarity: 0.72, sectionTitle: "RETURN POLICY", content: "Our 30-day window applies." }),
+    ],
+    supportUrl: "",
+    supportLabel: "",
+  });
+  assert.match(out.text, /RETURN POLICY/);
+  assert.match(out.text, /Our 30-day window applies\./);
+  assert.equal(out.reason, "knowledge_confident");
+});
+
+await test("PE-20 — composePolicyAnswer empty + supportUrl emits link", () => {
+  const out = composePolicyAnswer({
+    intent: { primary: "return_policy" },
+    relevant: [],
+    supportUrl: "https://shop.example/support",
+    supportLabel: "Customer Care",
+  });
+  assert.match(out.text, /Customer Care/);
+  assert.match(out.text, /shop\.example\/support/);
+});
+
+// ──────────────────────────────────────────────────────────────
+console.log("");
+if (failed === 0) {
+  console.log(`PASS  ${passed} passed, 0 failed\n`);
+  process.exit(0);
+} else {
+  console.log(`FAIL  ${passed} passed, ${failed} failed\n`);
+  for (const f of failures) console.log(`  ${f.name}:\n    ${f.err?.stack || f.err}`);
+  process.exit(1);
+}

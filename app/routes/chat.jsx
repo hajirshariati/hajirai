@@ -467,6 +467,46 @@ async function runProductTurnDispatch({ ctx, controller, encoder, claimConfig })
   };
 }
 
+// Phase 3 — Policy / Knowledge dispatcher. Same flag, same
+// short-circuit semantics as the product engine. Always emits
+// products=[] so the widget clears any stale product cards from a
+// previous turn. Engine reuses the retrievedChunks the request
+// already resolved upstream — no second RAG query.
+async function runPolicyTurnDispatch({ ctx, controller, encoder, retrievedChunks }) {
+  const enabled = String(process.env.PRODUCT_TURN_ENGINE_ENABLED || "").toLowerCase() === "true";
+  if (!enabled) return null;
+
+  // Dynamic import keeps RR's client bundler from following the
+  // prisma chain into the client build.
+  const { runPolicyTurn } = await import("../lib/policy-engine.server");
+
+  let out;
+  try {
+    out = await runPolicyTurn(ctx, { retrievedChunks });
+  } catch (err) {
+    console.error(`[policy-engine] runPolicyTurn threw: ${err?.stack || err?.message || err}`);
+    return null;
+  }
+  if (!out) return null;
+  if (out.decline) return { declined: true, diagnostics: out.diagnostics };
+
+  // Emit text → products(empty) → done. products empty so any
+  // stale cards left over from a prior product turn clear.
+  // Policy answers never carry cards.
+  const text = String(out.answerText || "").trim();
+  controller.enqueue(encoder.encode(sseChunk({ type: "text", text })));
+  controller.enqueue(encoder.encode(sseChunk({ type: "products", products: [] })));
+  if (out.cta) {
+    controller.enqueue(encoder.encode(sseChunk({ type: "cta", cta: out.cta })));
+  }
+  controller.enqueue(encoder.encode(sseChunk({ type: "done" })));
+  return {
+    handled: true,
+    answerText: text,
+    diagnostics: out.diagnostics,
+  };
+}
+
 // Guard against denial-recovery firing on policy/discount/return
 // questions where the AI's "we don't have/offer X" is a legitimate
 // answer about merchant policy, NOT a hallucinated product
@@ -3301,6 +3341,42 @@ export const action = async ({ request }) => {
           // …) so we don't build a second search system.
           //
           // ──────────────────────────────────────────────────────────
+          // ──────────────────────────────────────────────────────────
+          // Phase 3 — Policy / Knowledge dispatcher.
+          //
+          // Policy / service / knowledge questions (return policy,
+          // shipping, warranty, exchanges, tracking, discounts,
+          // services, terms) come BEFORE the product engine — they
+          // must NEVER trigger a product search. Answers are
+          // composed from the merchant's admin-uploaded
+          // KnowledgeFile content (via the already-resolved
+          // retrievedChunks for this request). Engine declines
+          // and falls through if no policy intent is detected.
+          // ──────────────────────────────────────────────────────────
+          const policyResult = await runPolicyTurnDispatch({
+            ctx, controller, encoder, retrievedChunks,
+          });
+          if (policyResult && policyResult.handled) {
+            console.log(
+              `[policy-engine] handled shop=${ctx.shop} ` +
+                `intent=${policyResult.diagnostics?.intent?.primary || "-"} ` +
+                `composer=${policyResult.diagnostics?.composer || "-"} ` +
+                `topSim=${policyResult.diagnostics?.topSimilarity?.toFixed?.(2) || "-"} ` +
+                `textLen=${policyResult.answerText?.length || 0}`,
+            );
+            return; // policy emitted text/products(empty)/done; no agent loop.
+          }
+          if (policyResult && policyResult.declined && policyResult.diagnostics?.intent) {
+            // Intent classified but knowledge was empty AND we
+            // chose to fall through (rare — composer normally
+            // composes the honest-admit line). Log for visibility.
+            console.log(
+              `[policy-engine] declined shop=${ctx.shop} ` +
+                `intent=${policyResult.diagnostics.intent.primary} ` +
+                `— falling through to agent path`,
+            );
+          }
+
           const engineResult = await runProductTurnDispatch({
             ctx, controller, encoder, claimConfig,
           });

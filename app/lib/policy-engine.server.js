@@ -1,0 +1,263 @@
+// Policy / Knowledge Engine.
+//
+// Owns turns where the customer is asking about merchant policy or
+// service information — return policy, shipping, warranty,
+// exchanges, tracking, discounts, services, store terms. The
+// answer comes from the merchant's admin-uploaded KnowledgeFile /
+// KnowledgeChunk rows (via the existing retrieveRelevantChunks
+// path), NEVER from hardcoded code constants and NEVER from a
+// product search. If the relevant knowledge is absent or weakly
+// matched, the engine says so honestly and points the customer at
+// support — it does NOT invent specifics like fee amounts or
+// return windows.
+//
+// Flag PRODUCT_TURN_ENGINE_ENABLED gates production use (same flag
+// as the product engine). Default OFF.
+//
+// Pipeline:
+//   1. detectPolicyIntent — classify the turn shape (generic
+//      patterns, no shop-specific terms).
+//   2. retrieveFn — caller supplies the chunks (the existing
+//      retrieveRelevantChunks call already runs once per request;
+//      caller passes its result in via options.retrievedChunks
+//      OR via options.retrieveFn for fixture tests).
+//   3. selectRelevantChunks — pick the chunk(s) whose similarity
+//      crosses a confidence floor AND whose fileType is policy-
+//      adjacent (faqs / policy / shipping / returns / etc).
+//   4. composePolicyAnswer — name the topic, quote the strongest
+//      match, cite the source section title, OR admit gracefully.
+
+const POLICY_INTENT_PATTERNS = {
+  return_policy: /\b(?:return\s+policy|can\s+i\s+return|how\s+(?:do\s+i\s+)?return|do\s+you\s+(?:have|accept|allow|take|do)\s+returns?|returns?\s+(?:work|process|window|period|policy)|how\s+long\s+(?:do\s+i\s+have\s+)?to\s+return)\b/i,
+  return_fee:    /\b(?:return\s+fee|restocking\s+fee|returns?\s+(?:charge|cost)|do\s+you\s+charge\s+(?:a\s+)?(?:fee|for\s+returns?)|free\s+returns?|return\s+shipping\s+cost)\b/i,
+  shipping:      /\b(?:shipping(?:\s+(?:policy|cost|fee|time|takes?|options?|rate))?|how\s+(?:long|much)\s+(?:does\s+|is\s+)?(?:shipping|delivery)|delivery(?:\s+(?:time|cost|fee))?|how\s+long\s+(?:does\s+it\s+take|until\s+(?:i\s+get|it\s+arrives?))|free\s+shipping)\b/i,
+  warranty:      /\b(?:warranty|guarantee(?:d)?\b|defects?|covered\s+for|how\s+long\s+(?:is|does)\s+(?:the\s+)?warranty)\b/i,
+  exchanges:     /\b(?:exchange|swap|trade(?:\s+in)?|wrong\s+size\s+(?:can\s+i|do\s+i)|different\s+size)\b/i,
+  tracking:      /\b(?:track(?:ing)?\s+(?:my\s+)?(?:order|package|shipment)|where(?:'s|\s+is)\s+my\s+order|order\s+(?:status|tracking)|tracking\s+(?:number|info))\b/i,
+  discounts:     /\b(?:discounts?\b|promo(?:tion)?s?\s+code|coupons?|sales?\b|markdowns?|first[\s-]?(?:time\s+)?(?:order|customer)\s+(?:discount|off)|do\s+you\s+offer\s+(?:any\s+)?(?:discount|promo|coupon))\b/i,
+  services:      /\b(?:do\s+you\s+(?:offer|have)\s+(?:fitting|measurement|consultation|service|in[\s-]store)|services?\b|fittings?|consultation|in[\s-]store\s+(?:experience|visit|pickup))\b/i,
+  terms:         /\b(?:terms\s+(?:of\s+(?:service|use)|and\s+conditions)|privacy\s+policy|cookie\s+policy|legal)\b/i,
+};
+
+// Keys that map to the KnowledgeFile.fileType / KnowledgeChunk.fileType
+// the chunks live under. Defaults — merchant can upload knowledge
+// under any fileType; the policy engine accepts a chunk as
+// policy-adjacent if its fileType is in this list OR if its
+// section title obviously matches the intent.
+const POLICY_FILE_TYPES = new Set([
+  "faqs", "policy", "policies", "returns", "shipping", "warranty",
+  "terms", "support", "info", "service",
+]);
+
+// Similarity floors. Above HIGH we treat the chunk as a confident
+// answer and quote it. Between LOW and HIGH we use it but caveat.
+// Below LOW we admit we don't have the specific detail.
+const HIGH_CONFIDENCE = 0.55;
+const LOW_CONFIDENCE  = 0.35;
+
+export function detectPolicyIntent(message) {
+  const text = String(message || "").trim();
+  if (!text) return null;
+  const matches = [];
+  for (const [key, re] of Object.entries(POLICY_INTENT_PATTERNS)) {
+    if (re.test(text)) matches.push(key);
+  }
+  if (matches.length === 0) return null;
+  // Most specific first when multiple match (e.g. "return fee"
+  // also matches return_policy). Order via the keys array so the
+  // more-specific intents win.
+  const priority = ["return_fee", "return_policy", "exchanges", "tracking", "discounts", "shipping", "warranty", "services", "terms"];
+  const primary = priority.find((k) => matches.includes(k)) || matches[0];
+  return { primary, matches };
+}
+
+// Public entry.
+// Args:
+//   ctx                 — { shop, latestUserMessage, ... }
+//   options.retrievedChunks — chunks the request already retrieved
+//                             (chat.jsx runs retrieveRelevantChunks
+//                             once per request and forwards the
+//                             result).
+//   options.retrieveFn  — optional async (query) => chunks[],
+//                         used by the fixture tests. Falls back
+//                         to retrievedChunks when absent.
+//   options.forceEnable — bypass env flag for eval mode.
+export async function runPolicyTurn(ctx = {}, options = {}) {
+  const forceEnable = !!options.forceEnable;
+  if (!forceEnable && String(process.env.PRODUCT_TURN_ENGINE_ENABLED || "").toLowerCase() !== "true") {
+    return null;
+  }
+
+  const diagnostics = { rungs: [] };
+  const intent = detectPolicyIntent(ctx.latestUserMessage || "");
+  if (!intent) {
+    diagnostics.rungs.push("declined:not_policy");
+    return { decline: true, diagnostics };
+  }
+  diagnostics.intent = intent;
+
+  // Pull chunks. Caller passes the pre-resolved result OR a fetch
+  // function for offline tests.
+  let chunks = Array.isArray(options.retrievedChunks) ? options.retrievedChunks : null;
+  if (chunks == null && typeof options.retrieveFn === "function") {
+    try {
+      chunks = await options.retrieveFn(ctx.latestUserMessage || "");
+    } catch (err) {
+      console.warn(`[policy-engine] retrieveFn failed: ${err?.message || err}`);
+      chunks = [];
+    }
+  }
+  if (!Array.isArray(chunks)) chunks = [];
+  diagnostics.rungs.push(`chunks:${chunks.length}`);
+
+  const relevant = selectRelevantChunks(chunks, intent);
+  diagnostics.rungs.push(`relevant:${relevant.length}`);
+  diagnostics.topSimilarity = relevant[0]?.similarity ?? null;
+
+  const composed = composePolicyAnswer({
+    intent,
+    relevant,
+    supportUrl: ctx.supportUrl || "",
+    supportLabel: ctx.supportLabel || "",
+  });
+  diagnostics.composer = composed.reason;
+
+  // Policy turns NEVER emit product cards. Always set products=[]
+  // so the SSE stream clears any stale carded state.
+  return {
+    decline: false,
+    intent,
+    products: [],
+    answerText: composed.text,
+    cta: composed.cta || null,
+    diagnostics,
+  };
+}
+
+export function selectRelevantChunks(chunks = [], intent) {
+  if (!Array.isArray(chunks) || chunks.length === 0) return [];
+  const ranked = chunks
+    .filter((c) => {
+      // Treat any chunk that scored above LOW_CONFIDENCE as a
+      // candidate. Then prefer policy-adjacent fileTypes / titles.
+      const sim = Number(c?.similarity);
+      return Number.isFinite(sim) && sim >= LOW_CONFIDENCE;
+    })
+    .map((c) => {
+      const sim = Number(c.similarity);
+      const ftype = String(c.fileType || "").toLowerCase().trim();
+      const title = String(c.sectionTitle || "").toLowerCase();
+      const policyAdjacent =
+        POLICY_FILE_TYPES.has(ftype) ||
+        intentMatchesTitle(intent.primary, title);
+      // Boost policy-adjacent chunks so a returns FAQ section
+      // ranks above a product description that incidentally
+      // mentioned "return."
+      return { ...c, _adjBoost: policyAdjacent ? 0.15 : 0, _score: sim + (policyAdjacent ? 0.15 : 0) };
+    })
+    .sort((a, b) => b._score - a._score);
+  return ranked.slice(0, 3);
+}
+
+function intentMatchesTitle(intentKey, lowerTitle) {
+  if (!lowerTitle) return false;
+  const map = {
+    return_policy: /returns?\b/,
+    return_fee:    /returns?\s+(?:fee|cost|charge)|restocking/,
+    shipping:      /shipping|delivery/,
+    warranty:      /warranty|guarantee/,
+    exchanges:     /exchange/,
+    tracking:      /track|order\s+status/,
+    discounts:     /discount|promo|coupon|sale/,
+    services:      /service|fitting|in[\s-]?store/,
+    terms:         /terms|privacy|legal/,
+  };
+  const re = map[intentKey];
+  return re ? re.test(lowerTitle) : false;
+}
+
+export function composePolicyAnswer({
+  intent, relevant, supportUrl = "", supportLabel = "",
+}) {
+  // No relevant chunks → honest "I don't have that specific
+  // detail" line + a pointer to support if a URL is configured.
+  // NEVER invent fees, windows, or covered defects.
+  if (!relevant || relevant.length === 0) {
+    const supportSuffix = supportUrl
+      ? ` For an authoritative answer, please reach out to ${supportLabel || "our support team"}: ${supportUrl}`
+      : ` For an authoritative answer, please contact support directly.`;
+    const topic = humanizeIntent(intent.primary);
+    return {
+      text:
+        `I don't have the specific ${topic} detail in my notes.` +
+        supportSuffix,
+      reason: "no_relevant_knowledge",
+      cta: null,
+    };
+  }
+
+  const top = relevant[0];
+  const topSim = Number(top.similarity);
+  const confident = topSim >= HIGH_CONFIDENCE;
+
+  // Build the answer from the strongest chunk(s). The chunk
+  // content is authoritative — we don't summarize aggressively
+  // because the merchant's own wording is what they want shown.
+  // Cap at a reasonable length so very long policies don't dump
+  // the whole file into the chat.
+  const body = stitchChunkContent(relevant, { maxChars: 600 });
+
+  const lead = confident
+    ? `Here's what we have on ${humanizeIntent(intent.primary)}:`
+    : `Here's the closest detail I have on ${humanizeIntent(intent.primary)} — let me know if you want me to confirm anything specifically:`;
+
+  const text = `${lead}\n\n${body}`.replace(/\n{3,}/g, "\n\n").trim();
+  return {
+    text,
+    reason: confident ? "knowledge_confident" : "knowledge_weak_match",
+    cta: null,
+  };
+}
+
+function stitchChunkContent(relevant, { maxChars = 600 } = {}) {
+  const parts = [];
+  let used = 0;
+  for (const c of relevant) {
+    const heading = c.sectionTitle ? `**${c.sectionTitle}**\n` : "";
+    const content = String(c.content || "").trim();
+    if (!content) continue;
+    const segment = heading + content;
+    if (used + segment.length > maxChars && parts.length > 0) break;
+    parts.push(segment);
+    used += segment.length;
+    if (used >= maxChars) break;
+  }
+  return parts.join("\n\n");
+}
+
+function humanizeIntent(intentKey) {
+  const map = {
+    return_policy: "our return policy",
+    return_fee:    "return fees",
+    shipping:      "shipping",
+    warranty:      "warranty",
+    exchanges:     "exchanges",
+    tracking:      "order tracking",
+    discounts:     "discounts and promotions",
+    services:      "our services",
+    terms:         "terms of service",
+  };
+  return map[intentKey] || "that topic";
+}
+
+// Exported for tests.
+export const __internals = {
+  POLICY_INTENT_PATTERNS,
+  POLICY_FILE_TYPES,
+  HIGH_CONFIDENCE,
+  LOW_CONFIDENCE,
+  selectRelevantChunks,
+  composePolicyAnswer,
+  intentMatchesTitle,
+  humanizeIntent,
+};
