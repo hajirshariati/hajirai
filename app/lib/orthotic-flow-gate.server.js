@@ -284,7 +284,7 @@ function looksLikeGreetingLead(text) {
 //
 // Phrasing stays plain and short. The goal is warmth, not narration:
 // confirm what we heard, then ask the next question.
-function buildAcknowledgmentPrefix({ latestExtracted, rawUserText, answers }) {
+export function buildAcknowledgmentPrefix({ latestExtracted, rawUserText, answers }) {
   const parts = [];
   const greeted = looksLikeGreetingLead(rawUserText);
   if (greeted) parts.push("Hi there!");
@@ -295,14 +295,19 @@ function buildAcknowledgmentPrefix({ latestExtracted, rawUserText, answers }) {
   }
 
   const bits = [];
+  let mentionedHelpableProblem = false;
   const cond = latestExtracted.condition;
   if (typeof cond === "string" && cond && cond !== "none") {
     bits.push(humanizeCondition(cond));
+    mentionedHelpableProblem = true;
   }
   const useCase = latestExtracted.useCase;
   if (typeof useCase === "string" && useCase) {
     const phrase = humanizeUseCase(useCase);
-    if (phrase) bits.push(phrase);
+    if (phrase) {
+      bits.push(phrase);
+      mentionedHelpableProblem = true;
+    }
   }
   const gender = latestExtracted.gender;
   if (
@@ -326,7 +331,14 @@ function buildAcknowledgmentPrefix({ latestExtracted, rawUserText, answers }) {
     : bits.length === 2
       ? `${bits[0]} and ${bits[1]}`
       : `${bits.slice(0, -1).join(", ")}, and ${bits[bits.length - 1]}`;
-  parts.push(`${lead} ${joined}. An orthotic can definitely help with that.`);
+  // "An orthotic can definitely help with that" only reads correctly
+  // when `bits` named something an orthotic actually helps with —
+  // a condition (plantar fasciitis) or a use case (running). Gender
+  // alone is not a "that" — adding the tail produces nonsense like
+  // "Got it — women's. An orthotic can definitely help with that."
+  // which is what a customer saw in the wild.
+  const tail = mentionedHelpableProblem ? " An orthotic can definitely help with that." : "";
+  parts.push(`${lead} ${joined}.${tail}`);
   return parts.join(" ");
 }
 

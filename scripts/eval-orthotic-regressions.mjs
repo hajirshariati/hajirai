@@ -14,7 +14,10 @@ import { readFileSync } from "node:fs";
 import { resolve as resolvePath, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { maybeRunOrthoticFlow } from "../app/lib/orthotic-flow-gate.server.js";
+import {
+  maybeRunOrthoticFlow,
+  buildAcknowledgmentPrefix,
+} from "../app/lib/orthotic-flow-gate.server.js";
 import { resolveTree } from "../app/lib/decision-tree-resolver.server.js";
 import { classifyOrthoticTurn } from "../app/lib/orthotic-classifier.server.js";
 import { isYesNoAnswer, isYesNoQuestion } from "../app/lib/chat-postprocessing.js";
@@ -1281,6 +1284,55 @@ await test("24b — isBrandOrInfoQuestion does NOT match product searches", () =
   assert.equal(isBrandOrInfoQuestion("recommend an orthotic"), false);
   assert.equal(isBrandOrInfoQuestion(""), false);
   assert.equal(isBrandOrInfoQuestion("are these good for hiking"), false);
+});
+
+// ──────────────────────────────────────────────────────────────
+// Acknowledgment-prefix: "An orthotic can definitely help with that"
+// only when bits include a condition or use-case. Live failure:
+// after the customer answered the gender clarifier with "Women's",
+// the recommender prefixed the next ask with "Got it — women's. An
+// orthotic can definitely help with that." — "that" had no referent.
+// ──────────────────────────────────────────────────────────────
+
+await test("25a — gender-only ack does NOT append 'orthotic can help with that'", () => {
+  const out = buildAcknowledgmentPrefix({
+    latestExtracted: { gender: "women" },
+    rawUserText: "Women's",
+    answers: {},
+  });
+  assert.match(out, /Got it — women'?s\.?$/, `expected gender-only ack; got "${out}"`);
+  assert.doesNotMatch(out, /orthotic can definitely help with that/i,
+    `gender-only ack must not append the orthotic-can-help tail; got "${out}"`);
+});
+
+await test("25b — condition ack STILL appends 'orthotic can help with that'", () => {
+  const out = buildAcknowledgmentPrefix({
+    latestExtracted: { condition: "plantar_fasciitis" },
+    rawUserText: "I have plantar fasciitis",
+    answers: {},
+  });
+  assert.match(out, /plantar fasciitis/i);
+  assert.match(out, /orthotic can definitely help with that/i,
+    `condition ack should keep the orthotic-can-help tail; got "${out}"`);
+});
+
+await test("25c — useCase ack STILL appends 'orthotic can help with that'", () => {
+  const out = buildAcknowledgmentPrefix({
+    latestExtracted: { useCase: "running" },
+    rawUserText: "running shoes",
+    answers: {},
+  });
+  assert.match(out, /orthotic can definitely help with that/i,
+    `useCase ack should keep the orthotic-can-help tail; got "${out}"`);
+});
+
+await test("25d — empty extracted produces no acknowledgment", () => {
+  const out = buildAcknowledgmentPrefix({
+    latestExtracted: {},
+    rawUserText: "hmm",
+    answers: {},
+  });
+  assert.equal(out, "");
 });
 
 // ──────────────────────────────────────────────────────────────
