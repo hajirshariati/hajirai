@@ -142,6 +142,115 @@ function extractTagsByKeywords(text, mapping) {
   return Array.from(out);
 }
 
+// =====================================================================
+// Structured-merchant-tag preference
+// =====================================================================
+// The description-corpus regex tagger above is the FALLBACK. Aetrex
+// (and most footwear shops) maintain explicit per-product condition
+// tags ("Bunions", "Plantar Fasciitis", "Heel Pain") and a structured
+// occasion/activity metafield (`attr_activity_shoe_type_for_filter`).
+// Those signals are an order of magnitude cleaner than scanning
+// marketing boilerplate: e.g. Aetrex's standard description includes
+// "Arch support helps to relieve common foot pain & plantar fasciitis"
+// on EVERY product, which makes the corpus regex tag 95% of the
+// catalog with plantar_fasciitis — far above the 77% that are
+// merchant-tagged. The fix: trust merchant data first.
+
+// Maps the merchant's free-text condition tag (case-insensitive) to a
+// canonical conditionTag value the resolver / claim verifier uses.
+const MERCHANT_CONDITION_TAG_MAP = {
+  "bunions": "bunions",
+  "plantar fasciitis": "plantar_fasciitis",
+  "flat feet": "flat_feet",
+  "high arch": "high_arch",
+  "metatarsalgia": "metatarsalgia",
+  "ball of foot pain": "metatarsalgia",
+  "ball-of-foot pain": "metatarsalgia",
+  "morton's neuroma": "mortons_neuroma",
+  "mortons neuroma": "mortons_neuroma",
+  "diabetic": "diabetic",
+  "arthritis": "arthritis",
+  "heel spur": "heel_spur",
+  "heel spurs": "heel_spur",
+  "heel pain": "heel_pain",
+  "arch pain": "arch_pain",
+  "hammer toes": "hammer_toes",
+  "high instep": "high_instep",
+};
+
+function extractMerchantConditionTags(product) {
+  const tags = Array.isArray(product?.tags) ? product.tags : [];
+  const out = new Set();
+  for (const raw of tags) {
+    const key = String(raw || "").toLowerCase().trim();
+    if (MERCHANT_CONDITION_TAG_MAP[key]) out.add(MERCHANT_CONDITION_TAG_MAP[key]);
+  }
+  return Array.from(out);
+}
+
+// Maps the merchant's structured occasion values (e.g. Aetrex's
+// `attr_activity_shoe_type_for_filter` metafield) to canonical
+// use-case tags. Falls back to a slug of the raw label when not in
+// the map (so downstream consumers still get a verifiable value, just
+// in raw form).
+const MERCHANT_USECASE_TAG_MAP = {
+  "walking": "walking",
+  "running": "running",
+  "hiking": "hiking",
+  "beach": "beach",
+  "winter": "winter",
+  "office work": "dress",
+  "office": "dress",
+  "everyday comfort": "casual",
+  "exercise or fitness": "athletic",
+  "gym & training": "athletic",
+  "gym and training": "athletic",
+  "training": "athletic",
+  "athletic": "athletic",
+  "work": "standing_all_day",
+  "skating": "skating",
+};
+
+function readActivityMetafield(attributes) {
+  if (!attributes || typeof attributes !== "object") return [];
+  const raw =
+    attributes.attr_activity_shoe_type_for_filter ??
+    attributes.attr_activity_shoe_type ??
+    attributes.activity ??
+    null;
+  if (raw == null) return [];
+  let arr;
+  if (Array.isArray(raw)) arr = raw;
+  else if (typeof raw === "string") {
+    const t = raw.trim();
+    if (t.startsWith("[")) {
+      try { arr = JSON.parse(t); } catch { arr = [t]; }
+    } else {
+      arr = [t];
+    }
+  } else {
+    arr = [String(raw)];
+  }
+  return arr.map((s) => String(s || "").toLowerCase().trim()).filter(Boolean);
+}
+
+function extractMerchantUseCaseTags(product) {
+  const attrs = (() => {
+    try {
+      const j = product?.attributesJson;
+      if (!j) return null;
+      return typeof j === "string" ? JSON.parse(j) : j;
+    } catch { return null; }
+  })();
+  const raw = readActivityMetafield(attrs);
+  const out = new Set();
+  for (const v of raw) {
+    if (MERCHANT_USECASE_TAG_MAP[v]) out.add(MERCHANT_USECASE_TAG_MAP[v]);
+    else if (v) out.add(v.replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, ""));
+  }
+  return Array.from(out);
+}
+
 // Extract a "search corpus" from a product — title + description +
 // tags + productType — so heuristic taggers can scan everything.
 function buildCorpus(product) {
@@ -396,8 +505,22 @@ export async function rebuildCatalogFactsForProduct(shop, productId) {
   const colors = extractColors(product);
   const sizes = extractSizes(product);
   const widths = extractWidths(product);
-  const conditionTags = extractTagsByKeywords(corpus, CONDITION_KEYWORDS);
-  const useCaseTags = extractTagsByKeywords(corpus, USE_CASE_KEYWORDS);
+
+  // Prefer structured merchant data; fall back to corpus regex only
+  // when the merchant didn't tag the product. This avoids the
+  // boilerplate-description false positive (e.g. Aetrex products tag
+  // 77.7% with merchant "Plantar Fasciitis" but the corpus regex would
+  // hit 95% because PF appears in the standard description for every
+  // product). When merchant data is present, it's authoritative.
+  const merchantConditions = extractMerchantConditionTags(product);
+  const conditionTags = merchantConditions.length > 0
+    ? merchantConditions
+    : extractTagsByKeywords(corpus, CONDITION_KEYWORDS);
+  const merchantUseCases = extractMerchantUseCaseTags(product);
+  const useCaseTags = merchantUseCases.length > 0
+    ? merchantUseCases
+    : extractTagsByKeywords(corpus, USE_CASE_KEYWORDS);
+
   const availability = computeAvailability(product);
   const priceRange = computePriceRange(product);
 
@@ -569,7 +692,11 @@ export const __internals = {
   extractGender,
   extractCategory,
   extractTagsByKeywords,
+  extractMerchantConditionTags,
+  extractMerchantUseCaseTags,
   CONDITION_KEYWORDS,
   USE_CASE_KEYWORDS,
+  MERCHANT_CONDITION_TAG_MAP,
+  MERCHANT_USECASE_TAG_MAP,
   computeAvailability,
 };

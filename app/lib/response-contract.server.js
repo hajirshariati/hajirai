@@ -765,6 +765,19 @@ export function repairProductTurnAssembly({ text, pool = [], ctx = {}, relaxedFi
     }
   }
 
+  // Claim verifier — single accuracy pass against per-card facts
+  // (`_conditionTags` / `_useCaseTags` / `_onSale` / `_removableInsole`
+  // attached by chat-tools.extractProductCards). Catches universal
+  // feature claims, unverifiable concepts (waterproof / roomy toe box
+  // / hiking when the merchant didn't tag for it), and sale claims
+  // that don't hold across the displayed pool.
+  const claimRepair = verifyClaimsAgainstCards({ text: nextText, cards: pool });
+  if (claimRepair.changed) {
+    nextText = claimRepair.text;
+    changed = true;
+    logs.push(`verified_claims(${claimRepair.logs.join(",")})`);
+  }
+
   // Per-product enumeration covering only some of the displayed cards
   // looks contradictory next to the cards the customer sees. Hunter
   // trace (color-iteration): bot wrote "Danika comes in… Carly comes
@@ -1107,6 +1120,202 @@ function repairPositiveColorClaims(text, cards) {
 // single neutral line — the cards already display each product's name
 // and colors, no enumeration needed.
 //
+// =====================================================================
+// Claim verifier — single accuracy-checking path for visible text
+// =====================================================================
+// Reads the per-card facts attached by chat-tools (`_conditionTags`,
+// `_useCaseTags`, `_onSale`, `_removableInsole`) and verifies any
+// product-text claims the AI emits against them.
+//
+// Three claim shapes are handled:
+//   1. Universal-quantifier feature claims ("all of these are tagged
+//      for plantar fasciitis", "both have arch support", "every pair
+//      is on sale"). Verified against EVERY card; soften to "some of
+//      these" when any card lacks the claimed feature.
+//   2. Sale claims ("currently on sale", "both discounted"). Strip
+//      the sale clause when none of the displayed cards is `_onSale`.
+//   3. Unverifiable feature claims ("hiking", "travel", "waterproof",
+//      "roomy toe box", "wide toe box", "rocker bottom", "orthotic-
+//      compatible"). Strip the claim when no displayed card has the
+//      corresponding structured tag (or when the catalog has no
+//      structured field for the concept at all).
+//
+// Per-card claims (e.g. "the Maui is great for bunions") are left
+// alone unless they make a universal assertion across the pool.
+// The AI is allowed to be specific about a single product when the
+// fact is present on that card.
+
+// Map AI-text feature words to the canonical card-fact tag we'd
+// check against. When the value is null, the claim is structurally
+// unverifiable in this catalog and must be stripped.
+const CLAIM_FEATURE_TO_FACT = {
+  // ConditionTags
+  "plantar fasciitis": { kind: "condition", tag: "plantar_fasciitis" },
+  "bunion": { kind: "condition", tag: "bunions" },
+  "bunions": { kind: "condition", tag: "bunions" },
+  "flat feet": { kind: "condition", tag: "flat_feet" },
+  "high arch": { kind: "condition", tag: "high_arch" },
+  "high arches": { kind: "condition", tag: "high_arch" },
+  "metatarsalgia": { kind: "condition", tag: "metatarsalgia" },
+  "ball of foot pain": { kind: "condition", tag: "metatarsalgia" },
+  "ball-of-foot pain": { kind: "condition", tag: "metatarsalgia" },
+  "morton's neuroma": { kind: "condition", tag: "mortons_neuroma" },
+  "mortons neuroma": { kind: "condition", tag: "mortons_neuroma" },
+  "diabetic": { kind: "condition", tag: "diabetic" },
+  "arthritis": { kind: "condition", tag: "arthritis" },
+  "heel spur": { kind: "condition", tag: "heel_spur" },
+  "heel spurs": { kind: "condition", tag: "heel_spur" },
+  // UseCases
+  "walking": { kind: "useCase", tag: "walking" },
+  "running": { kind: "useCase", tag: "running" },
+  "hiking": { kind: "useCase", tag: "hiking" },
+  "trail": { kind: "useCase", tag: "hiking" },
+  "trails": { kind: "useCase", tag: "hiking" },
+  "travel": { kind: "useCase", tag: "travel" },
+  "vacation": { kind: "useCase", tag: "travel" },
+  "trip": { kind: "useCase", tag: "travel" },
+  "beach": { kind: "useCase", tag: "beach" },
+  "winter": { kind: "useCase", tag: "winter" },
+  "athletic": { kind: "useCase", tag: "athletic" },
+  "gym": { kind: "useCase", tag: "athletic" },
+  "standing all day": { kind: "useCase", tag: "standing_all_day" },
+  "on your feet all day": { kind: "useCase", tag: "standing_all_day" },
+  // Catalog has NO structured field for these; never claim.
+  "waterproof": { kind: "absent" },
+  "water-resistant": { kind: "absent" },
+  "roomy toe box": { kind: "absent" },
+  "wide toe box": { kind: "absent" },
+  "rocker bottom": { kind: "absent" },
+  "orthotic-compatible": { kind: "absent" },
+  "orthotic compatible": { kind: "absent" },
+  // Removable insole — boolean check
+  "removable insole": { kind: "removableInsole" },
+};
+
+// Universal quantifier phrasing: "all/every/both/each X have/are <feature>"
+const UNIVERSAL_QUANTIFIER_RE =
+  /\b(all|every|both|each)\b\s+(?:of\s+(?:these|those|them)\s+)?(?:\w+\s+){0,4}?(?:are|have|come(?:s)?|feature|features|support|supports|include(?:s)?|offer(?:s)?|tagged|built|made|designed)\b/i;
+
+// Sale phrasing
+const SALE_CLAIM_RE =
+  /\b(?:both|all|every|each)\b[^.!?\n]{0,60}\b(?:on\s+sale|discounted|reduced|marked\s+down|currently\s+(?:on\s+sale|reduced))\b/i;
+
+function cardHasFeature(card, claim) {
+  if (!card || !claim) return false;
+  if (claim.kind === "absent") return false;
+  if (claim.kind === "condition") {
+    const arr = card._conditionTags || [];
+    return Array.isArray(arr) && arr.includes(claim.tag);
+  }
+  if (claim.kind === "useCase") {
+    const arr = card._useCaseTags || [];
+    return Array.isArray(arr) && arr.includes(claim.tag);
+  }
+  if (claim.kind === "removableInsole") {
+    return card._removableInsole === true;
+  }
+  return false;
+}
+
+function poolSupportsClaim(cards, claim, { universal = false } = {}) {
+  if (!Array.isArray(cards) || cards.length === 0) return false;
+  if (claim.kind === "absent") return false;
+  if (universal) {
+    return cards.every((c) => cardHasFeature(c, claim));
+  }
+  return cards.some((c) => cardHasFeature(c, claim));
+}
+
+// Iterate sentences in the AI text. For each, look for feature words
+// from CLAIM_FEATURE_TO_FACT. If the sentence ALSO contains a
+// universal quantifier, the claim must hold across every card.
+// Otherwise it's a single-product or general statement, and as long
+// as ANY card supports it (or the concept is structurally claimable)
+// it stays.
+//
+// On failure:
+//   - "absent" concepts (waterproof, roomy toe box, rocker bottom,
+//     orthotic-compatible) → drop the whole sentence.
+//   - Universal-failure conditions → drop the sentence.
+//   - Universal-failure use-cases that the catalog COULD verify but
+//     no card matches → drop the sentence.
+//
+// Sentence drop is preferred over surgical word edits because a
+// broken half-sentence reads worse than a missing line.
+export function verifyClaimsAgainstCards({ text, cards } = {}) {
+  const input = String(text || "");
+  if (!input.trim()) return { text: input, changed: false, logs: [] };
+  const pool = Array.isArray(cards) ? cards : [];
+
+  // No facts available to verify against — leave the text alone
+  // (degrades to legacy behavior for tests that don't pass cards).
+  const haveAnyFacts = pool.some(
+    (c) =>
+      c && (
+        Array.isArray(c._conditionTags) ||
+        Array.isArray(c._useCaseTags) ||
+        c._onSale === true ||
+        c._onSale === false
+      ),
+  );
+  if (!haveAnyFacts) return { text: input, changed: false, logs: [] };
+
+  const sentences = input.split(/(?<=[.!?])\s+/);
+  const out = [];
+  const logs = [];
+
+  for (const s of sentences) {
+    const lower = s.toLowerCase();
+    let drop = false;
+    let reason = null;
+
+    // 1. Sale claim verification
+    if (SALE_CLAIM_RE.test(s)) {
+      const onSaleCount = pool.filter((c) => c?._onSale === true).length;
+      const universal = /\b(all|every|both|each)\b/i.test(s);
+      if (universal ? onSaleCount < pool.length : onSaleCount === 0) {
+        drop = true;
+        reason = "unverified_sale_claim";
+      }
+    }
+
+    // 2. Feature claim verification
+    if (!drop) {
+      const universal = UNIVERSAL_QUANTIFIER_RE.test(s);
+      // Find the first feature word present in the sentence.
+      for (const [phrase, claim] of Object.entries(CLAIM_FEATURE_TO_FACT)) {
+        if (!lower.includes(phrase)) continue;
+        if (claim.kind === "absent") {
+          drop = true;
+          reason = `unverifiable_feature:${phrase}`;
+          break;
+        }
+        const supported = poolSupportsClaim(pool, claim, { universal });
+        if (!supported) {
+          drop = true;
+          reason = universal
+            ? `unverified_universal:${phrase}`
+            : `unverified_feature:${phrase}`;
+          break;
+        }
+      }
+    }
+
+    if (drop) {
+      logs.push(reason);
+      continue;
+    }
+    out.push(s);
+  }
+
+  const next = out.join(" ").replace(/\s{2,}/g, " ").trim();
+  return {
+    text: next,
+    changed: next !== input.trim(),
+    logs,
+  };
+}
+
 // Conservative gating: must be a multi-card pool (≥3) AND the prose
 // must name 2-N-1 distinct cards via the "comes in" pattern AND at
 // least one displayed card must be UNNAMED in the prose. Anything

@@ -4,6 +4,8 @@ import { fetchCustomerContext } from "./customer-context.server";
 import { embedText, vectorLiteral, resolveShopEmbedding } from "./embeddings.server";
 import { normalizeGenderChipAnswer } from "./chat-helpers.server";
 import { textIntentDivergesFromGroup } from "./category-intent.server";
+import { __internals as catalogFactInternals } from "./catalog-facts.server.js";
+const { extractMerchantConditionTags, extractMerchantUseCaseTags } = catalogFactInternals;
 import { TOOLS, FIT_PREDICTOR_TOOL, CUSTOMER_ORDERS_TOOL } from "./chat-tool-schemas.js";
 import {
   canonicalizeCatalogConstraints,
@@ -2431,6 +2433,40 @@ export function extractProductCards(name, result) {
     return String(v || "").toLowerCase().trim();
   };
 
+  // Verifiable claim facts surfaced on every card so response-contract's
+  // single claim verifier can check AI text against catalog data without
+  // re-deriving. See catalog-facts.server.js for the merchant-tag-first
+  // extraction logic — these helpers mirror it on the card side.
+  const conditionTagsFromCard = (p) => extractMerchantConditionTags({
+    tags: Array.isArray(p.tags) ? p.tags : [],
+  });
+  const useCaseTagsFromCard = (p) => extractMerchantUseCaseTags({
+    attributesJson: p.attributes || null,
+  });
+  const onSaleFromCard = (p) => {
+    const price = parseFloat(p.price);
+    const compareAt = parseFloat(p.compareAtPrice);
+    return Number.isFinite(price) && Number.isFinite(compareAt) && compareAt > price;
+  };
+  // Only set true/false when the description explicitly states it.
+  // Aetrex (and most merchants) keep this in the description body as
+  // "Removable Insole: Yes" / "Removable Insole: No". Anything fuzzier
+  // returns null so the verifier doesn't make assumptions.
+  const removableInsoleFromCard = (p) => {
+    const text = String(p.descriptionSnippet || p.description || "");
+    if (!text) return null;
+    if (/removable\s+insole\s*[:\-]\s*(?:yes|removable)\b/i.test(text)) return true;
+    if (/removable\s+insole\s*[:\-]\s*(?:no|none)\b/i.test(text)) return false;
+    return null;
+  };
+
+  const claimFacts = (p) => ({
+    _conditionTags: conditionTagsFromCard(p),
+    _useCaseTags: useCaseTagsFromCard(p),
+    _onSale: onSaleFromCard(p),
+    _removableInsole: removableInsoleFromCard(p),
+  });
+
   if (name === "search_products" && Array.isArray(result.products)) {
     const query = result.query || "";
     return result.products.slice(0, MAX_PRODUCT_CARDS).map((p) => ({
@@ -2448,6 +2484,7 @@ export function extractProductCards(name, result) {
       _variantFacts: p.variantFacts || {},
       _variantScope: result.variantScope || undefined,
       _relaxedFilters: result.relaxedFilters || undefined,
+      ...claimFacts(p),
     }));
   }
   if (name === "find_similar_products" && Array.isArray(result.products)) {
@@ -2465,6 +2502,7 @@ export function extractProductCards(name, result) {
       _gender: genderFromAttrs(p),
       _attributes: p.attributes || {},
       _variantFacts: p.variantFacts || {},
+      ...claimFacts(p),
     }));
   }
   if (name === "get_product_details" && result.handle) {
@@ -2479,6 +2517,7 @@ export function extractProductCards(name, result) {
       _gender: genderFromAttrs(result),
       _attributes: result.attributes || {},
       _variantFacts: result.variantFacts || {},
+      ...claimFacts(result),
     }];
   }
   if (name === "lookup_sku" && Array.isArray(result.found)) {

@@ -25,6 +25,8 @@ const {
   extractColors,
   extractGender,
   extractCategory,
+  extractMerchantConditionTags,
+  extractMerchantUseCaseTags,
 } = __internals;
 
 let passed = 0;
@@ -328,6 +330,66 @@ await test("BLOCKER — resolver does NOT no_match for men's white sneakers when
   assert.equal(out.matched_constraints.gender, "men");
   assert.equal(out.matched_constraints.category, "sneakers");
   assert.equal(out.impossible_constraints.length, 0);
+});
+
+// ---------------------------------------------------------------------------
+// Merchant-tag-first condition / use-case extraction
+// ---------------------------------------------------------------------------
+
+await test("Merchant tags — Aetrex 'Bunions' / 'Plantar Fasciitis' yield canonical condition tags", () => {
+  const conds = extractMerchantConditionTags({
+    tags: ["Arch Pain", "Bunions", "Plantar Fasciitis", "Heel Pain", "YGroup_VANIA"],
+  });
+  assert.ok(conds.includes("bunions"), `expected bunions; got ${conds.join(",")}`);
+  assert.ok(conds.includes("plantar_fasciitis"));
+  assert.ok(conds.includes("heel_pain"));
+});
+
+await test("Merchant tags — 'Ball of Foot Pain' canonicalizes to metatarsalgia", () => {
+  const conds = extractMerchantConditionTags({
+    tags: ["Ball of Foot Pain", "Wide Feet"],
+  });
+  assert.ok(conds.includes("metatarsalgia"));
+});
+
+await test("Merchant tags — products without condition tags return empty list (corpus fallback kicks in upstream)", () => {
+  const conds = extractMerchantConditionTags({
+    tags: ["YGroup_SILICONE_HEEL"],
+  });
+  assert.deepEqual(conds, []);
+});
+
+await test("Use-case from attr_activity_shoe_type_for_filter — canonicalizes Aetrex values", () => {
+  const uses = extractMerchantUseCaseTags({
+    attributesJson: {
+      attr_activity_shoe_type_for_filter: ["Walking", "Beach", "Office Work"],
+    },
+  });
+  assert.ok(uses.includes("walking"), `expected walking; got ${uses.join(",")}`);
+  assert.ok(uses.includes("beach"));
+  assert.ok(uses.includes("dress"), "Office Work maps to dress");
+});
+
+await test("Use-case — JSON-stringified metafield array still parses", () => {
+  const uses = extractMerchantUseCaseTags({
+    attributesJson: {
+      attr_activity_shoe_type_for_filter: '["Running","Hiking"]',
+    },
+  });
+  assert.ok(uses.includes("running"));
+  assert.ok(uses.includes("hiking"));
+});
+
+await test("Use-case — no activity metafield returns empty", () => {
+  const uses = extractMerchantUseCaseTags({ attributesJson: { color: "black" } });
+  assert.deepEqual(uses, []);
+});
+
+await test("Use-case — unknown merchant label falls back to slug", () => {
+  const uses = extractMerchantUseCaseTags({
+    attributesJson: { attr_activity_shoe_type_for_filter: ["Special Occasion"] },
+  });
+  assert.ok(uses.includes("special_occasion"));
 });
 
 console.log("");

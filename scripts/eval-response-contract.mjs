@@ -11,6 +11,7 @@ import {
   stripMissingSkus,
   createTurnResult,
   extractGenericCTA,
+  verifyClaimsAgainstCards,
 } from "../app/lib/response-contract.server.js";
 
 let passed = 0;
@@ -683,6 +684,142 @@ test("R29 — 'any pink ones?' (color refinement) still produces color-aware lis
   });
   // Color-aware listing should mention pink.
   assert.match(out.text, /pink/i, `expected color-aware listing to mention pink; got "${out.text}"`);
+});
+
+// ---------------------------------------------------------------------------
+// Claim-accuracy verifier — visible product text must match per-card facts.
+// ---------------------------------------------------------------------------
+
+// Helper: build a card with the fact fields the verifier reads.
+const card = ({
+  title = "X",
+  conditionTags = [],
+  useCaseTags = [],
+  onSale = false,
+  removableInsole = null,
+} = {}) => ({
+  title,
+  _conditionTags: conditionTags,
+  _useCaseTags: useCaseTags,
+  _onSale: onSale,
+  _removableInsole: removableInsole,
+});
+
+test("R30 — universal PF claim is softened when not every card is PF-tagged (noisy corpus → safe)", () => {
+  // Production trace: corpus regex tags 95% of Aetrex with PF
+  // (boilerplate description). Merchant tags only 77%. When the AI
+  // says "all of these are tagged for plantar fasciitis" but one
+  // shown card actually isn't, that universal claim must drop.
+  const cards = [
+    card({ title: "A", conditionTags: ["plantar_fasciitis"] }),
+    card({ title: "B", conditionTags: ["plantar_fasciitis"] }),
+    card({ title: "C", conditionTags: ["bunions"] }),
+  ];
+  const out = verifyClaimsAgainstCards({
+    text: "Great options. All of these are tagged for plantar fasciitis and feature arch support.",
+    cards,
+  });
+  assert.ok(out.changed, "verifier must change the text");
+  assert.doesNotMatch(out.text, /all of these are tagged for plantar fasciitis/i,
+    `universal PF claim should have been stripped; got "${out.text}"`);
+});
+
+test("R31 — merchant Bunions tag allows per-product bunion claim", () => {
+  const cards = [card({ title: "Maui", conditionTags: ["bunions"] })];
+  const out = verifyClaimsAgainstCards({
+    text: "The Maui is a great pick for bunions.",
+    cards,
+  });
+  assert.equal(out.changed, false, `per-product claim should stand; logs=${out.logs.join(",")}`);
+  assert.match(out.text, /bunions/i);
+});
+
+test("R32 — 'hiking' claim with no merchant tag is stripped", () => {
+  // No card has hiking in _useCaseTags — even though corpus might
+  // pick up "outdoor" in the description, the structured signal
+  // doesn't support it.
+  const cards = [
+    card({ title: "Boot", useCaseTags: ["walking"] }),
+    card({ title: "Boot2", useCaseTags: ["walking"] }),
+  ];
+  const out = verifyClaimsAgainstCards({
+    text: "These are great for hiking on rocky trails.",
+    cards,
+  });
+  assert.ok(out.changed, "hiking claim must be stripped");
+  assert.doesNotMatch(out.text, /hiking/i);
+});
+
+test("R33 — 'travel' / 'Italy' claim with no merchant travel tag is stripped", () => {
+  const cards = [
+    card({ title: "X", useCaseTags: ["walking", "casual"] }),
+    card({ title: "Y", useCaseTags: ["beach"] }),
+  ];
+  const out = verifyClaimsAgainstCards({
+    text: "Perfect for travel and your Italy trip.",
+    cards,
+  });
+  assert.ok(out.changed);
+  assert.doesNotMatch(out.text, /travel|trip/i);
+});
+
+test("R34 — 'waterproof' / 'roomy toe box' / 'rocker bottom' are stripped (catalog has no field)", () => {
+  const cards = [
+    card({ title: "X", conditionTags: ["bunions"], useCaseTags: ["walking"] }),
+    card({ title: "Y", conditionTags: ["bunions"], useCaseTags: ["walking"] }),
+  ];
+  for (const phrase of ["waterproof", "roomy toe box", "rocker bottom", "orthotic-compatible"]) {
+    const out = verifyClaimsAgainstCards({
+      text: `These are ${phrase} and great for bunions.`,
+      cards,
+    });
+    assert.ok(out.changed, `${phrase} sentence must be stripped`);
+    assert.doesNotMatch(out.text, new RegExp(phrase, "i"), `"${phrase}" leaked`);
+  }
+});
+
+test("R35 — universal sale claim is stripped when not every card is on sale", () => {
+  const cards = [
+    card({ title: "A", onSale: true }),
+    card({ title: "B", onSale: false }),
+  ];
+  const out = verifyClaimsAgainstCards({
+    text: "Both are currently on sale.",
+    cards,
+  });
+  assert.ok(out.changed, "false universal sale claim must be stripped");
+  assert.doesNotMatch(out.text, /on sale/i);
+});
+
+test("R36 — universal sale claim survives when every card is on sale", () => {
+  const cards = [
+    card({ title: "A", onSale: true }),
+    card({ title: "B", onSale: true }),
+  ];
+  const out = verifyClaimsAgainstCards({
+    text: "Both are currently on sale.",
+    cards,
+  });
+  assert.equal(out.changed, false);
+});
+
+test("R37 — verifier is no-op when cards have no fact fields (degrades to legacy)", () => {
+  const out = verifyClaimsAgainstCards({
+    text: "All of these are great for hiking and waterproof.",
+    cards: [{ title: "X" }, { title: "Y" }],
+  });
+  assert.equal(out.changed, false, "no fact fields → no change");
+});
+
+test("R38 — per-product 'great for hiking' is still stripped if NO card has hiking tag", () => {
+  const cards = [
+    card({ title: "Hannah Boot", useCaseTags: ["walking"] }),
+  ];
+  const out = verifyClaimsAgainstCards({
+    text: "The Hannah is great for hiking.",
+    cards,
+  });
+  assert.ok(out.changed);
 });
 
 if (failed > 0) {
