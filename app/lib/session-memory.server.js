@@ -262,8 +262,18 @@ export function buildSessionMemory({ messages, classifiedIntent, resolverState }
     //    conflict, pronoun back-reference) all live inside that
     //    function now. The session-memory loop just applies the
     //    decision.
+    // Include INFERRED gender in previousScope so a resolver-inferred
+    // gender (e.g. inferred=women from a "pink sandals" turn) still
+    // triggers the gender-pivot rule when the next turn names a new
+    // gender. Without this, prev.gender was null and rule 7 missed
+    // pivots like "best dress shoes for men" carrying over sandals/
+    // pink/bunions from the previous women-inferred turn. See live
+    // failure 2026-06-02 17:53:49.
     const previousScope = { ...memory.explicit };
     delete previousScope.rejectedCategories;
+    if (previousScope.gender == null && memory.inferred?.gender != null) {
+      previousScope.gender = memory.inferred.gender;
+    }
     const intent = resolveTurnIntent({
       latestUserText: text,
       previousScope,

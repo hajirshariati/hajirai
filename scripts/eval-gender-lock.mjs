@@ -87,6 +87,24 @@ await test("G6 — no map available → conservative, override stands", async ()
   assert.equal(out.input.filters.gender, "men", "no map → keep existing lock behavior");
 });
 
+// 2026-06-02 Railway live failure: live category map keyed
+// "wedges heels" (raw merchant label, lowercased with space). Lookup
+// received the canonical hyphenated form "wedges-heels" and missed
+// both the full key and per-token entries. Gender-lock then
+// overrode women → men three times in a row on a women-only category.
+await test("G7 — map keyed with SPACE only (no hyphen, no per-token entries) still resolves canonical hyphenated category", async () => {
+  // No "wedges" or "heels" individual keys — only the space-joined
+  // raw label, which mirrors the f031fc-3 production catalog.
+  const spaceOnlyMap = {
+    "wedges heels": { display: "Wedges Heels", genders: ["women"] },
+    sneakers: { display: "Sneakers", genders: ["men", "women"] },
+  };
+  const ctx = { sessionGender: "men", categoryGenderMap: spaceOnlyMap };
+  const out = injectLockedGender(call({ gender: "women", category: "wedges-heels" }), ctx);
+  assert.equal(out.input.filters.gender, "women",
+    `gender-lock must yield to women-only category even when only space-form key exists; got ${out.input.filters.gender}`);
+});
+
 console.log("");
 if (failed > 0) {
   console.log(`FAIL  ${passed} passed, ${failed} failed`);

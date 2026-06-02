@@ -31,9 +31,32 @@ const {
 // literally name "arch support". Aetrex's brand positioning
 // guarantees built-in arch support on every footwear product, but
 // older catalog rows have sparse descriptions and lose the proof.
-const BRAND_RULES = {
-  "aetrex.myshopify.com": { archSupportFromFootwearCategory: true },
+//
+// Aetrex installs use multiple myshopify domains across prod and
+// staging (e.g. "f031fc-3.myshopify.com" surfaced in the 2026-06-02
+// Railway logs). The static keys below cover the known ones; new
+// shops can be added without a deploy via the env var
+// PRODUCT_CLAIM_FACTS_ARCH_SUPPORT_SHOPS (comma-separated).
+const STATIC_BRAND_RULES = {
+  "aetrex.myshopify.com":   { archSupportFromFootwearCategory: true },
+  "f031fc-3.myshopify.com": { archSupportFromFootwearCategory: true },
 };
+
+function envArchSupportShops() {
+  const raw = String(process.env.PRODUCT_CLAIM_FACTS_ARCH_SUPPORT_SHOPS || "").trim();
+  if (!raw) return [];
+  return raw.split(",").map((s) => s.toLowerCase().trim()).filter(Boolean);
+}
+
+function effectiveBrandRules() {
+  const map = { ...STATIC_BRAND_RULES };
+  for (const shop of envArchSupportShops()) {
+    map[shop] = { ...(map[shop] || {}), archSupportFromFootwearCategory: true };
+  }
+  return map;
+}
+
+const BRAND_RULES = effectiveBrandRules();
 
 const FOOTWEAR_CATEGORIES = new Set([
   "sneakers",
@@ -52,7 +75,11 @@ const NON_FOOTWEAR_CATEGORIES = new Set(["orthotics", "accessories"]);
 
 function brandRule(shopContext) {
   const shop = String(shopContext?.shop || "").toLowerCase();
-  return BRAND_RULES[shop] || {};
+  // Re-read at call time so an env-var change is picked up without
+  // a process restart (also lets tests set PRODUCT_CLAIM_FACTS_…
+  // and call buildProductClaimFacts directly).
+  const rules = effectiveBrandRules();
+  return rules[shop] || {};
 }
 
 // Canonical product shape expected by the builder:

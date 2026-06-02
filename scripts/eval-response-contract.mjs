@@ -1377,6 +1377,174 @@ test("R70 — attachClaimFactsToCard projects facts onto legacy _field keys", ()
   assert.equal(card._claimFacts.archSupport.value, card._archSupport);
 });
 
+// ---------------------------------------------------------------------------
+// 2026-06-02 Railway failures: brand rule wasn't firing for the Aetrex
+// staging/prod shop "f031fc-3.myshopify.com" because BRAND_RULES only
+// keyed "aetrex.myshopify.com". Live log: "Jillian Sport Sandal - Black
+// cat=sandals archSupport.value=false source=none" — should be true via
+// brand_rule_footwear_category.
+// ---------------------------------------------------------------------------
+
+test("R71 — Aetrex staging shop f031fc-3.myshopify.com triggers brand rule (Jillian Sport Sandal)", () => {
+  // Live failure: Jillian Sport Sandal - Black, cat=sandals, no
+  // "arch support" in title/description, no footbed attribute.
+  // Brand rule must promote archSupport to true.
+  const p = product({
+    title: "Jillian Sport Sandal - Black",
+    handle: "jillian-sport-black-l8000w",
+    description: "Comfortable everyday sport sandal.",
+    productType: "Sandals",
+    tags: ["Plantar Fasciitis"],
+    attributes: { category: "Sandals", gender: "Women" },
+  });
+  const facts = buildProductClaimFacts(p, { shop: "f031fc-3.myshopify.com" });
+  assert.equal(facts.archSupport.value, true,
+    `staging shop must inherit Aetrex brand rule; got source=${facts.archSupport.source}`);
+  assert.equal(facts.archSupport.source, "brand_rule_footwear_category");
+  assert.equal(facts.archSupport.evidence.category, "sandals");
+});
+
+test("R72 — env var PRODUCT_CLAIM_FACTS_ARCH_SUPPORT_SHOPS extends the rule list", () => {
+  // Set env var on the fly. brandRule() re-reads at call time so
+  // this doesn't require module reload.
+  const prev = process.env.PRODUCT_CLAIM_FACTS_ARCH_SUPPORT_SHOPS;
+  process.env.PRODUCT_CLAIM_FACTS_ARCH_SUPPORT_SHOPS = "extra-shop.myshopify.com";
+  try {
+    const p = product({
+      description: "Plain sandal.",
+      attributes: { category: "Sandals", gender: "Women" },
+    });
+    const facts = buildProductClaimFacts(p, { shop: "extra-shop.myshopify.com" });
+    assert.equal(facts.archSupport.value, true);
+    assert.equal(facts.archSupport.source, "brand_rule_footwear_category");
+  } finally {
+    if (prev === undefined) delete process.env.PRODUCT_CLAIM_FACTS_ARCH_SUPPORT_SHOPS;
+    else process.env.PRODUCT_CLAIM_FACTS_ARCH_SUPPORT_SHOPS = prev;
+  }
+});
+
+// ---------------------------------------------------------------------------
+// 2026-06-02 Railway failure: same product through a card pool reached
+// verifyClaimsAgainstCards with `_claimFacts` present but the missing-proof
+// log printed "(no _claimFacts on card)" because the lookup used claim.kind
+// ("condition") to read facts["condition"] instead of facts["conditionTags"].
+// Lock the kind→key mapping with a live-shaped pool test.
+// ---------------------------------------------------------------------------
+
+test("R73 — live-path pool: cards carry _claimFacts after attachClaimFactsToCard", () => {
+  // Mirror the live-failure pool: three sandals from search_products,
+  // each funneled through the canonical builder. Every card MUST
+  // carry _claimFacts.condition* / archSupport / etc. so the verifier
+  // sees the proof — not an empty card.
+  const cards = [
+    product({ title: "Piper Arch Support Strap Sandal - Terracotta", handle: "piper-terracotta-au1305w", description: "Sandal with Built-In Arch Support.", tags: ["Bunions"], attributes: { category: "Sandals", gender: "Women" } }),
+    product({ title: "Vicki Braided Thong Sandal - Light Pink Gloss", handle: "vicki-light-pink-gloss-st3519w", description: "Sandal with Built-In Arch Support.", tags: ["Bunions"], attributes: { category: "Sandals", gender: "Women" } }),
+    product({ title: "Jillian Braided Quarter Strap Sandal - Antique Rose", handle: "jillian-antique-rose-sc443w", description: "Sandal with Built-In Arch Support.", tags: ["Bunions"], attributes: { category: "Sandals", gender: "Women" } }),
+  ].map((p) => attachClaimFactsToCard(p, { shop: "f031fc-3.myshopify.com" }));
+
+  for (const c of cards) {
+    assert.ok(c._claimFacts, `card ${c.handle} missing _claimFacts`);
+    assert.ok(Array.isArray(c._conditionTags), `card ${c.handle} missing _conditionTags`);
+    assert.ok(c._conditionTags.includes("bunions"), `card ${c.handle} should have bunions tag`);
+    assert.equal(c._archSupport, true, `card ${c.handle} should have archSupport=true`);
+  }
+
+  // And the verifier should ACCEPT a universal bunion claim against
+  // this pool (since every card carries the tag).
+  const out = verifyClaimsAgainstCards({
+    text: "All of these are designed to ease bunion discomfort.",
+    cards,
+  });
+  assert.equal(out.changed, false, `verifier should accept universal bunion claim; logs=${out.logs.join(",")}`);
+});
+
+// ---------------------------------------------------------------------------
+// 2026-06-02 Railway failure: "Which of these has the most cushioning
+// like the Jillian?" pool contained Jillian Shimmer Blush + Jillian Coral.
+// The compare path treated them as distinct styles. They are the same
+// base style in different colors — same support/fit/construction.
+// ---------------------------------------------------------------------------
+
+test("R74 — comparison dedupes same-base-style color variants (Jillian × 2)", () => {
+  const cards = [
+    { title: "Jillian Shimmer Blush", handle: "jillian-shimmer-blush-sc440w", _category: "sandals" },
+    { title: "Jillian Coral",         handle: "jillian-coral-sc441w",         _category: "sandals" },
+  ];
+  const out = buildCodeOwnedComparisonText({ text: "", cards });
+  assert.equal(out.reason, "code_owned_comparison_same_family",
+    `expected same-family dedupe path; got reason=${out.reason}`);
+  assert.match(out.text, /same\s+\w+\s+style/i);
+  assert.match(out.text, /different colors/i);
+});
+
+test("R75 — comparison keeps distinct base styles (Jillian vs Maui)", () => {
+  const cards = [
+    { title: "Jillian Coral",  handle: "jillian-coral",  _category: "sandals" },
+    { title: "Maui Charcoal",  handle: "maui-charcoal",  _category: "sandals" },
+  ];
+  const out = buildCodeOwnedComparisonText({ text: "", cards });
+  assert.equal(out.reason, "code_owned_comparison",
+    `expected normal comparison path; got reason=${out.reason}`);
+  assert.match(out.text, /Jillian Coral/i);
+  assert.match(out.text, /Maui Charcoal/i);
+});
+
+// ---------------------------------------------------------------------------
+// 2026-06-02 spec: replace the bland "Here are the matching styles I found."
+// fallback with a seller-spirit line built from verified facts only.
+// ---------------------------------------------------------------------------
+
+test("R76 — seller-spirit fallback uses count + category, no invented claims", () => {
+  // Empty AI text + pool of 3 → fallback fires. Must mention the
+  // count and category, not invent comfort/medical claims.
+  const cards = [
+    attachClaimFactsToCard(product({ title: "Whit Sport Sandal", handle: "a" }), { shop: "f031fc-3.myshopify.com" }),
+    attachClaimFactsToCard(product({ title: "Jillian Sport Sandal", handle: "b" }), { shop: "f031fc-3.myshopify.com" }),
+    attachClaimFactsToCard(product({ title: "Jess Adjustable Sandal", handle: "c" }), { shop: "f031fc-3.myshopify.com" }),
+  ];
+  const out = buildCodeOwnedProductListingText({
+    text: "",
+    cards,
+    ctx: { sessionMemory: {} },
+    recommenderInvoked: false,
+  });
+  assert.ok(out.text && out.text.length > 0);
+  assert.match(out.text, /(?:\b3\b|\bthree\b)/i, `expected count in line; got "${out.text}"`);
+  assert.doesNotMatch(out.text, /plantar fasciitis|bunion|comfort\b|cushioning\b/i,
+    `must not invent medical/comfort claims; got "${out.text}"`);
+});
+
+test("R77 — seller-spirit fallback hints at adjustable when verified in title", () => {
+  // 1 of 3 has "adjustable" in title — hint should mention it.
+  const cards = [
+    { title: "Whit Sport Sandal", handle: "a" },
+    { title: "Jess Adjustable Quarter Strap Sandal", handle: "b" },
+    { title: "Maui Sandal", handle: "c" },
+  ];
+  const out = buildCodeOwnedProductListingText({
+    text: "",
+    cards,
+    ctx: { sessionMemory: {} },
+    recommenderInvoked: false,
+  });
+  assert.match(out.text, /adjustable/i, `expected adjustability hint; got "${out.text}"`);
+});
+
+test("R78 — seller-spirit fallback flags 'on sale' only when EVERY card is on sale", () => {
+  const allOnSale = [
+    { title: "A", handle: "a", _onSale: true },
+    { title: "B", handle: "b", _onSale: true },
+  ];
+  const mixed = [
+    { title: "A", handle: "a", _onSale: true },
+    { title: "B", handle: "b", _onSale: false },
+  ];
+  const a = buildCodeOwnedProductListingText({ text: "", cards: allOnSale, ctx: {}, recommenderInvoked: false });
+  const b = buildCodeOwnedProductListingText({ text: "", cards: mixed,     ctx: {}, recommenderInvoked: false });
+  assert.match(a.text, /on sale/i,         `all-on-sale pool should mention sale; got "${a.text}"`);
+  assert.doesNotMatch(b.text, /on sale/i,  `mixed pool must not generalize sale; got "${b.text}"`);
+});
+
 if (failed > 0) {
   console.error("\nFailures:");
   for (const f of failures) console.error(`- ${f.name}: ${f.err.stack || f.err.message}`);

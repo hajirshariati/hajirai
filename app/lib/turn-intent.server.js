@@ -148,7 +148,14 @@ const USECASE_CATEGORY_CONFLICTS = {
   hiking: new Set(ATHLETIC_INCOMPATIBLE_CATEGORIES),
   running: new Set(ATHLETIC_INCOMPATIBLE_CATEGORIES),
   athletic: new Set(ATHLETIC_INCOMPATIBLE_CATEGORIES),
-  dress: new Set(["sneakers", "slippers", "clogs", "slip-ons"]),
+  // "Dress shoes" after a casual/open-toe carry-over should pivot.
+  // Sandals/slippers/clogs/slip-ons are open or casual silhouettes
+  // — dress-occasion intent invalidates them as the carried scope.
+  // 2026-06-02 prod: "best dress shoes for men" inherited
+  // category=sandals because sandals wasn't in the dress conflict
+  // set; the search ran "dress sandals bunions arch support" and
+  // returned 2 results that weren't what the customer asked for.
+  dress: new Set(["sneakers", "sandals", "slippers", "clogs", "slip-ons"]),
 };
 
 // ---------------------------------------------------------------------------

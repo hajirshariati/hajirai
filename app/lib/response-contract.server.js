@@ -1309,9 +1309,27 @@ function poolSupportsClaim(cards, claim, { universal = false } = {}) {
 //     card="Maui Charcoal" handle=maui-charcoal cat=sneakers checked=title_description_scan,footbed_attribute,brand_rule_footwear_category
 //     archSupport.value=false archSupport.source=none
 // One log line per card, capped at 3 cards to avoid runaway noise.
+//
+// Map verifier claim.kind onto the canonical fact-bag key. Without
+// this, lookups like facts["condition"] miss the fact stored at
+// facts["conditionTags"] and the log lies "(no _claimFacts on
+// card)" even when _claimFacts is present. See live failure
+// 2026-06-02 17:52:48 for the symptom.
+const CLAIM_KIND_TO_FACT_KEY = {
+  condition: "conditionTags",
+  useCase: "useCaseTags",
+  archSupport: "archSupport",
+  waterFriendly: "waterFriendly",
+  onSale: "onSale",
+  removableInsole: "removableInsole",
+  footbedSubstring: "footbed",
+  badgeSubstring: "badge",
+};
+
 function logMissingProof({ claim, sentence, pool }) {
   const phrase = claim?.phrase || "?";
   const kind = claim?.claim?.kind || "?";
+  const factKey = CLAIM_KIND_TO_FACT_KEY[kind] || kind;
   const universal = !!claim?.universal;
   const checked = claimSourcesChecked(kind, pool?.[0] || {}).join(",") || "(no-facts-attached)";
   const sentencePreview = String(sentence || "").slice(0, 100).replace(/\s+/g, " ");
@@ -1322,7 +1340,7 @@ function logMissingProof({ claim, sentence, pool }) {
   const sample = Array.isArray(pool) ? pool.slice(0, 3) : [];
   for (const card of sample) {
     const facts = card?._claimFacts || null;
-    const factEntry = facts ? facts[kind] : null;
+    const factEntry = facts ? facts[factKey] : null;
     const factValue = factEntry ? JSON.stringify(factEntry.value) : "(no _claimFacts on card)";
     const factSource = factEntry ? factEntry.source : "(none)";
     const title = String(card?.title || "?").slice(0, 60);
@@ -1664,6 +1682,62 @@ function templateIndex(cards = [], base = "") {
   return hash % 3;
 }
 
+// Build a short, conversion-leaning fallback line that stays
+// strictly inside facts we can prove from the displayed cards:
+// count, category, sale ratio (if every card is on sale), and
+// adjustable mention (when the title literally contains
+// "adjustable"). Never invents medical/comfort/support claims —
+// the verifier already strips those when AI prose makes them
+// unsupported, so the fallback must NOT reintroduce them.
+//
+// 2026-06-02 spec request: replace the bland "Here are the matching
+// styles I found." baseline with something a real concierge would
+// say. Verified-only signals: count + category + sale callout +
+// adjustability hint.
+function sellerSpiritListingLine({ cards = [], base = "", variantText = "" } = {}) {
+  const pool = Array.isArray(cards) ? cards : [];
+  const n = pool.length;
+  const baseLabel = (base || "styles").trim();
+  if (n === 0) return `Here are the matching styles I found.`;
+
+  const allOnSale = n > 0 && pool.every((c) => c?._onSale === true);
+  const adjustableCount = pool.filter((c) =>
+    /\badjust/i.test(String(c?.title || ""))
+  ).length;
+  const hasAdjustable = adjustableCount > 0 && adjustableCount < n;
+  const allAdjustable = adjustableCount === n && n >= 2;
+
+  let lead;
+  if (n === 1) {
+    lead = `I found one ${trimTrailingS(baseLabel)}${variantText} that fits your request.`;
+  } else {
+    lead = `I found ${n} ${baseLabel}${variantText} that match your request.`;
+  }
+
+  // Optional second sentence — only when a verified differentiator
+  // exists. Otherwise close with a soft prompt to open cards.
+  let hint;
+  if (allOnSale) {
+    hint = n === 1
+      ? `It's currently on sale — open the card for size and color availability.`
+      : `All of them are currently on sale — open a card to check size and color.`;
+  } else if (allAdjustable) {
+    hint = `They all have adjustable straps if you want easier fit control — open a card for size and color.`;
+  } else if (hasAdjustable) {
+    hint = `Start with the adjustable styles if you want easier fit control, then open a card to check size and color.`;
+  } else {
+    hint = `Open a card to check size and color availability.`;
+  }
+
+  return `${lead} ${hint}`.replace(/\s{2,}/g, " ").trim();
+}
+
+function trimTrailingS(s) {
+  const t = String(s || "").trim();
+  if (t.length > 3 && t.toLowerCase().endsWith("s")) return t.slice(0, -1);
+  return t;
+}
+
 export function buildSoftBrowseFallbackText({ input = {}, hasProducts = true, repeated = false, repeatIndex = 0 } = {}) {
   if (!hasProducts) {
     return "No problem — we can browse first and narrow later. Tell me a style, color, or price range and I'll pull options.";
@@ -1723,8 +1797,40 @@ function shortCardDescription(card = {}) {
 }
 
 export function buildCodeOwnedComparisonText({ text = "", cards = [] } = {}) {
-  const list = Array.isArray(cards) ? cards.filter(Boolean).slice(0, 2) : [];
-  if (list.length < 2) return { text, changed: false, reason: "" };
+  const raw = Array.isArray(cards) ? cards.filter(Boolean) : [];
+  // Same-base-style dedupe. The catalog stores color variants as
+  // separate products ("Jillian Shimmer Blush" vs "Jillian Coral")
+  // and the comparison prompt would otherwise treat them as
+  // different styles — bot would invent feature differences
+  // between cards that share every attribute except color. Group
+  // by titleStyleFamily and keep only the first per family. See
+  // 2026-06-02 prod: "Which of these has the most cushioning like
+  // the Jillian?" compared two Jillian color variants as distinct.
+  const seenFamily = new Set();
+  const list = [];
+  for (const c of raw) {
+    const fam = titleStyleFamily(c?.title || "");
+    if (fam && seenFamily.has(fam)) continue;
+    if (fam) seenFamily.add(fam);
+    list.push(c);
+    if (list.length === 2) break;
+  }
+  if (list.length < 2) {
+    // Every card was the same base style. Tell the customer plainly
+    // instead of inventing a comparison that doesn't exist.
+    if (raw.length >= 2) {
+      const fam = titleStyleFamily(raw[0]?.title || "") || "style";
+      const next =
+        `These are all the same ${fam} style in different colors — the support, fit, and construction are identical. ` +
+        `Pick whichever color you prefer.`;
+      return {
+        text: next.replace(/\s{2,}/g, " ").trim(),
+        changed: next.trim() !== String(text || "").trim(),
+        reason: "code_owned_comparison_same_family",
+      };
+    }
+    return { text, changed: false, reason: "" };
+  }
   const [a, b] = list;
   const next =
     `Quick comparison of the first two: **${a.title}** is ${shortCardDescription(a)}; ` +
@@ -1915,12 +2021,7 @@ export function buildCodeOwnedProductListingText({ text = "", cards = [], ctx = 
     if (isUseful && !countMismatch) {
       return { text: aiText, changed: false, reason: "ai_text_kept" };
     }
-    const templates = [
-      `Here are the ${base}${variantText} I found.`,
-      `Found these ${base}${variantText} for you.`,
-      `Here's what I found for ${base}${variantText}.`,
-    ];
-    next = templates[templateIndex(cards, base)];
+    next = sellerSpiritListingLine({ cards, base, variantText });
   }
 
   return {

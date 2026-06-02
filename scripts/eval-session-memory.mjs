@@ -543,6 +543,42 @@ await test("R4 — lastClarifyingQuestion tracks the most recent gender ask by s
   assert.equal(mem.lastClarifyingQuestion?.type, "gender");
 });
 
+// ──────────────────────────────────────────────────────────────
+// 2026-06-02 Railway live failure: turn 1 inferred gender=women from
+// "pink sandals for bunions". Turn 2 said "best dress shoes for men".
+// The gender pivot rule didn't fire because previousScope.gender was
+// null (inferred-only). Fix: session-memory now injects inferred.gender
+// into the previousScope passed to resolveTurnIntent.
+// ──────────────────────────────────────────────────────────────
+
+await test("S10 — inferred-gender + explicit-new-gender pivot drops carried subject-bound scope", async () => {
+  // Simulate the live path: turn 1 establishes pink+sandals+bunions
+  // (gender stays inferred=women — never marked explicit because the
+  // customer didn't type "women" / "for me"). Turn 2 names a new
+  // explicit gender (men) + use-case (dress shoes). The gender pivot
+  // MUST fire and drop the carried category/color/condition.
+  const mem = buildSessionMemory({
+    messages: [
+      u("i want pink sandals with arch support and i have bunions"),
+      a("Here are some pink sandals."),
+      u("best dress shoes for men"),
+    ],
+    // Simulate the resolver having inferred gender=women on turn 1.
+    resolverStatePerTurn: [
+      null,
+      { inferred: { gender: "women" } },
+      null,
+    ],
+  });
+  assert.equal(mem.explicit.gender, "men",
+    `explicit gender must pivot to men; got ${JSON.stringify(mem.explicit)}`);
+  // The whole point: stale must record the previous category/color/condition.
+  for (const key of ["category", "color", "condition"]) {
+    assert.equal(mem.explicit[key], undefined,
+      `${key} must be cleared from explicit on pivot; got ${JSON.stringify(mem.explicit)}`);
+  }
+});
+
 console.log("");
 if (failed === 0) {
   console.log(`PASS  ${passed} passed, 0 failed`);

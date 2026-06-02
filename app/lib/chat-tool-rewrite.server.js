@@ -293,7 +293,16 @@ export function lookupCategoryGenders(categoryGenderMap, category) {
       for (const g of entry.genders) genders.add(g);
     }
   };
+  // The catalog map keys on the merchant's raw category label
+  // ("wedges heels", lowercased), while filters arrive in the
+  // canonicalized hyphenated form ("wedges-heels"). Try both
+  // shapes plus per-token before giving up. 2026-06-02 prod: the
+  // gender-lock guard kept overriding women→men on a wedges-heels
+  // search because lookup("wedges-heels") missed the map key
+  // "wedges heels".
   consider(norm);
+  consider(norm.replace(/-/g, " "));
+  consider(norm.replace(/\s+/g, "-"));
   for (const part of norm.split(/[-/\s]+/)) {
     if (part) consider(part);
   }

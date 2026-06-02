@@ -360,6 +360,47 @@ await test("T20-compare — 'show me sandals' is NOT compare", () => {
 });
 
 // ---------------------------------------------------------------------------
+// 2026-06-02 Railway live failure: turn 1 = "pink sandals for bunions",
+// turn 2 = "best dress shoes for men". Memory carried sandals/pink/bunions
+// over and the search ran "dress sandals bunions arch support". The
+// gender-pivot rule didn't fire because prev.gender was INFERRED on
+// turn 1 (not explicit) so previousScope.gender was null when turn 2
+// arrived. session-memory now injects inferred.gender into previousScope
+// — and the dress-conflict set now includes "sandals".
+// ---------------------------------------------------------------------------
+
+await test("T21 — dress + carried sandals → usecase_category_conflict drops scope", () => {
+  const intent = resolveTurnIntent({
+    latestUserText: "best dress shoes for men",
+    previousScope: { gender: "women", category: "sandals", color: "pink", condition: "bunions" },
+  });
+  // Either the gender pivot OR the dress conflict must fire — both
+  // are valid drops; both lead to scope being cleaned. The gender
+  // pivot fires first (rule 7 before rule 8) so reason should be
+  // gender_pivot. Either way, category/color/condition must be
+  // dropped.
+  assert.notEqual(intent.staleKeysToDrop.length, 0,
+    `expected scope drops on "dress shoes for men" with carried sandals/pink/bunions; got staleKeysToDrop=${JSON.stringify(intent.staleKeysToDrop)}`);
+  for (const key of ["category", "color", "condition"]) {
+    assert.ok(intent.staleKeysToDrop.includes(key),
+      `expected ${key} to be dropped; got staleKeysToDrop=${JSON.stringify(intent.staleKeysToDrop)}`);
+  }
+});
+
+await test("T22 — dress useCase alone (no new gender) + carried sandals → dress conflict pivots", () => {
+  const intent = resolveTurnIntent({
+    latestUserText: "what about something dressy",
+    previousScope: { gender: "women", category: "sandals", color: "pink" },
+    extractedUserConstraints: { useCase: "dress" },
+  });
+  assert.equal(intent.reason, "usecase_category_conflict");
+  for (const key of ["category", "color"]) {
+    assert.ok(intent.staleKeysToDrop.includes(key),
+      `expected ${key} dropped on dress+sandals conflict`);
+  }
+});
+
+// ---------------------------------------------------------------------------
 // Summary
 // ---------------------------------------------------------------------------
 console.log(`\n${passed} passed, ${failed} failed`);
