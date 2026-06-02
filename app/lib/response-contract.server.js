@@ -1195,52 +1195,13 @@ export function isDirectProductFactQuestion(message = "") {
   return DIRECT_PRODUCT_FACT_RE.test(text);
 }
 
-// Conversational / meta questions where the customer is NOT asking
-// for a product search — they're asking about pricing/ranking of a
-// specific item, calling out the bot's confusion, or expressing
-// frustration. These turns must let the AI's natural text stand;
-// dropping a "Here are the X I found" template under them feels
-// robotic and ignores what the customer actually said.
-//
-// Production traces:
-//   - "so tatiana is your cheapest shoe on your website?"
-//     (yes/no fact question about a specific named product)
-//   - "do you even understand what i'm saying?"
-//     (frustration check — AI's empathy response got wiped)
-const META_CONVERSATIONAL_RE = /\b(?:do\s+you\s+(?:even\s+|actually\s+)?(?:understand|get|hear|see|listen|know\s+what)|what\s+do\s+you\s+mean|what'?s\s+wrong|are\s+you\s+(?:serious|broken|kidding|joking|listening|paying\s+attention|okay|alright)|why\s+(?:are\s+you|did\s+you|aren'?t\s+you|do\s+you\s+keep)|that'?s\s+not\s+what|you'?re\s+not\s+(?:listening|understanding|getting)|i\s+(?:just|already)\s+(?:said|told|asked))\b/i;
-// Inverted ("Is tatiana the cheapest?", "Does Maui run small?") and
-// non-inverted ("So tatiana is your cheapest?") yes/no fact-question
-// shapes. The message must end in a question mark.
-const YES_NO_INVERTED_RE = /^\s*(?:so\s+|wait\s*,?\s*|actually\s*,?\s*|hmm\s*,?\s*|hey\s*,?\s*)?(?:is|are|isn'?t|aren'?t|does|do|doesn'?t|don'?t|will|won'?t|can|can'?t|did|didn'?t|was|wasn'?t|were|weren'?t)\s+[A-Za-z][\w'-]{1,30}\b[^?]{0,120}\?\s*$/i;
-const YES_NO_NON_INVERTED_RE = /^\s*(?:so\s+|wait\s*,?\s*|actually\s*,?\s*|hmm\s*,?\s*|hey\s*,?\s*)?[A-Za-z][\w'-]{1,30}\s+(?:is|are|isn'?t|aren'?t|was|wasn'?t|were|weren'?t|will\s+be|won'?t\s+be)\s+[^?]{0,120}\?\s*$/i;
-
-export function isMetaOrFactConversationalTurn(message = "") {
-  const text = String(message || "").trim();
-  if (!text) return false;
-  if (META_CONVERSATIONAL_RE.test(text)) return true;
-  if (YES_NO_INVERTED_RE.test(text)) return true;
-  if (YES_NO_NON_INVERTED_RE.test(text)) return true;
-  return false;
-}
-
-// Does the customer's CURRENT message restate a color intent? Used
-// to decide whether stale scope.color from prior turns should drive
-// the color-aware listing template. If the customer pivoted away
-// from color this turn, the stale scope shouldn't dictate the reply
-// shape — fall through to the neutral path.
-//
-// Triggers on the specific requested color word OR generic color
-// vocabulary ("other colors", "different color", "in <color>").
-const COLOR_VOCAB_RE = /\b(?:colou?rs?|colorways?|shades?|red|blue|black|white|pink|navy|tan|brown|gray|grey|beige|olive|cream|nude|gold|silver|bronze|burgundy|cognac|charcoal|ivory|metallic|mocha|taupe|eggplant|purple|orange|yellow|green)\b/i;
-function customerMentionsColorThisTurn(message, requestedColor) {
-  const t = String(message || "").toLowerCase();
-  if (!t) return false;
-  if (requestedColor) {
-    const re = new RegExp(`\\b${requestedColor}\\b`, "i");
-    if (re.test(t)) return true;
-  }
-  return COLOR_VOCAB_RE.test(t);
-}
+// Meta-conversational and stale-color detection both live in
+// turn-intent.server.js now; response-contract reads the resolved
+// signal off `ctx.sessionMemory.latestTurnIntent` rather than
+// re-deriving from text. The previous regexes (META_CONVERSATIONAL_RE,
+// YES_NO_INVERTED_RE, YES_NO_NON_INVERTED_RE, COLOR_VOCAB_RE) and the
+// helpers `isMetaOrFactConversationalTurn` / `customerMentionsColorThisTurn`
+// were removed as part of that consolidation.
 
 function cardGender(card) {
   return normalizeGender(card?._gender) ||
@@ -1496,28 +1457,39 @@ export function buildCodeOwnedProductListingText({ text = "", cards = [], ctx = 
   if (isDirectProductFactQuestion(ctx?.latestUserMessage)) {
     return { text, changed: false, reason: "direct_product_fact_question" };
   }
+  // ONE shared intent signal — read what session-memory already
+  // resolved for this turn instead of re-detecting in two places.
+  // When the upstream signal isn't available (e.g. a legacy caller
+  // that hasn't built session memory yet), behavior degrades to
+  // the pre-consolidation default: scope.color drives the template
+  // and no meta short-circuit fires.
+  const turnIntent = ctx?.sessionMemory?.latestTurnIntent || null;
+  const aiTextLen = String(text || "").trim().length;
+
   // Conversational / meta turn — customer is asking a yes/no fact
   // question about a specific product ("is tatiana your cheapest?"),
-  // calling out the bot ("do you even understand?"), or expressing
-  // frustration. A substantive AI response addresses that directly;
-  // overriding with a product-listing template is the worst possible
-  // failure mode (looks like the bot ignored them). Keep the AI text.
-  const aiTextLen = String(text || "").trim().length;
-  if (isMetaOrFactConversationalTurn(ctx?.latestUserMessage) && aiTextLen >= 40) {
+  // calling out the bot ("do you even understand?"), or asking the
+  // bot to compare what's on screen. A substantive AI response
+  // addresses that directly; overriding with a product-listing
+  // template is the worst possible failure mode.
+  if (turnIntent?.label === "meta" && aiTextLen >= 40) {
     return { text, changed: false, reason: "meta_conversational_turn" };
   }
 
   const scope = currentCatalogScopeFromContext(ctx);
   const base = listingBaseLabel({ cards, ctx });
-  // requestedColor honors scope.color ONLY when the customer's CURRENT
-  // message actually restates color intent (mentions the color or
-  // generic color vocabulary). Stale scope.color from prior turns
-  // shouldn't dictate a "couldn't find exact white..." rewrite when
-  // this turn is about price, sizing, or anything else.
+  // requestedColor honors scope.color only when the customer touched
+  // color THIS turn. Stale scope.color from prior turns shouldn't
+  // dictate a "couldn't find exact white..." rewrite when this turn
+  // is about price, sizing, or anything else. Source of truth: the
+  // intent resolver's `extractedThisTurn` (what the customer literally
+  // mentioned) and `reason` (whether the prior color was restated).
   const rawScopeColor = normalizeKnownTextColor(scope.color);
-  const requestedColor = rawScopeColor && customerMentionsColorThisTurn(ctx?.latestUserMessage, rawScopeColor)
-    ? rawScopeColor
-    : null;
+  const colorTouchedThisTurn = turnIntent
+    ? Boolean(turnIntent.extractedThisTurn?.color) ||
+      /color/i.test(turnIntent.reason || "")
+    : true; // No intent signal → legacy behavior (treat as touched).
+  const requestedColor = rawScopeColor && colorTouchedThisTurn ? rawScopeColor : null;
   const variantText = variantScopeLabel(scope);
   let next;
 

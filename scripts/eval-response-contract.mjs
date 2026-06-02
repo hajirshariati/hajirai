@@ -552,6 +552,139 @@ test("R25 — link extraction collapses double spaces and dangling punctuation",
   assert.match(out.text, /pickup info: Would you like more\?/);
 });
 
+// ---------------------------------------------------------------------------
+// Shared intent signal: response-contract reads latestTurnIntent off
+// session-memory instead of re-detecting meta / stale-color from text.
+// ---------------------------------------------------------------------------
+
+// (1) "compare the first two" — META intent → listing template MUST NOT
+// overwrite a substantive AI reply. This is the comparison/meta path.
+test("R26 — 'compare the first two' (meta intent) keeps AI text; no listing rewrite", () => {
+  const aiText = "Both styles share the Aetrex Lynco footbed and arch support. " +
+    "The Vania has a slightly higher heel; the Maui sits flatter to the ground. " +
+    "Same width range, same price. Either is a comfortable all-day pick.";
+  const cards = [
+    { handle: "vania-black", title: "Vania - Black", _gender: "women", _category: "sandals" },
+    { handle: "maui-charcoal", title: "Maui - Charcoal", _gender: "women", _category: "sandals" },
+  ];
+  const out = buildCodeOwnedProductListingText({
+    text: aiText,
+    cards,
+    ctx: {
+      latestUserMessage: "compare the first two",
+      sessionMemory: {
+        explicit: { gender: "women", category: "sandals" },
+        latestTurnIntent: {
+          label: "meta",
+          confidence: 0.9,
+          reason: "compare_request",
+          staleKeysToDrop: [],
+          extractedThisTurn: {},
+        },
+      },
+    },
+  });
+  assert.equal(out.changed, false, `meta turn must keep AI text; got changed=${out.changed} reason=${out.reason}`);
+  assert.equal(out.reason, "meta_conversational_turn");
+});
+
+// (2) "are there other colors?" stays in the direct product fact path —
+// stale scope.color must NOT drive a listing rewrite. The direct-fact
+// gate fires before listing logic; verify it.
+test("R27 — 'are there other colors?' stays direct product fact path (no stale-color rewrite)", () => {
+  const aiText = "These come in Pewter, Black, and Bronze. Pewter and Black are in stock; Bronze is on backorder.";
+  const cards = [
+    { handle: "x", title: "X - Pewter", _gender: "women", _category: "sandals" },
+  ];
+  const out = buildCodeOwnedProductListingText({
+    text: aiText,
+    cards,
+    ctx: {
+      // Stale scope.color from an earlier turn.
+      latestUserMessage: "are there other colors?",
+      sessionMemory: {
+        explicit: { gender: "women", category: "sandals", color: "white" },
+        latestTurnIntent: {
+          label: "meta", // the question asks about variants, not a search
+          confidence: 0.85,
+          reason: "yes_no_fact_question",
+          staleKeysToDrop: [],
+          extractedThisTurn: {},
+        },
+      },
+    },
+  });
+  // Either path is acceptable as long as the AI's variant-fact answer
+  // is NOT replaced with a stale-white-color listing line.
+  assert.ok(
+    out.changed === false ||
+      out.reason === "direct_product_fact_question",
+    `expected AI text preserved or direct-fact short-circuit; got changed=${out.changed} reason=${out.reason}`,
+  );
+  assert.doesNotMatch(
+    out.text,
+    /couldn'?t\s+find\s+(?:exact\s+)?white/i,
+    "must not emit stale-white denial",
+  );
+});
+
+// (3) "do you even understand?" — META intent → AI text preserved.
+test("R28 — 'do you even understand?' (meta) is not overwritten by product listing", () => {
+  const aiText = "I apologize for the confusion. Let me re-read what you've told me and start over.";
+  const cards = [{ handle: "p1", title: "Tatiana - Ivory", _gender: "women", _category: "wedges-heels" }];
+  const out = buildCodeOwnedProductListingText({
+    text: aiText,
+    cards,
+    ctx: {
+      latestUserMessage: "do you even understand what i'm saying?",
+      sessionMemory: {
+        explicit: { gender: "women", category: "wedges-heels", color: "white" },
+        latestTurnIntent: {
+          label: "meta",
+          confidence: 0.9,
+          reason: "meta_conversational",
+          staleKeysToDrop: [],
+          extractedThisTurn: {},
+        },
+      },
+    },
+  });
+  assert.equal(out.changed, false, `meta keeps AI text; got reason=${out.reason}`);
+  assert.equal(out.reason, "meta_conversational_turn");
+  assert.doesNotMatch(out.text, /couldn'?t\s+find\s+exact\s+white/i);
+});
+
+// (4) "any pink ones?" — color extracted THIS turn → normal color-aware
+// listing fires (color refinement). The same prior-scope shape that
+// would have produced a stale-color rewrite for an unrelated turn
+// here legitimately produces a pink listing because the customer
+// actually mentioned pink.
+test("R29 — 'any pink ones?' (color refinement) still produces color-aware listing", () => {
+  const aiText = ""; // empty AI text forces listing template
+  const cards = [
+    { handle: "p", title: "Vania - Pink", _gender: "women", _category: "sandals", _colors: ["pink"] },
+  ];
+  const out = buildCodeOwnedProductListingText({
+    text: aiText,
+    cards,
+    ctx: {
+      latestUserMessage: "any pink ones?",
+      sessionMemory: {
+        explicit: { gender: "women", category: "sandals", color: "pink" },
+        latestTurnIntent: {
+          label: "pivot_color",
+          confidence: 0.9,
+          reason: "color_pivot",
+          staleKeysToDrop: ["color"],
+          extractedThisTurn: { color: "pink" },
+        },
+      },
+    },
+  });
+  // Color-aware listing should mention pink.
+  assert.match(out.text, /pink/i, `expected color-aware listing to mention pink; got "${out.text}"`);
+});
+
 if (failed > 0) {
   console.error("\nFailures:");
   for (const f of failures) console.error(`- ${f.name}: ${f.err.stack || f.err.message}`);

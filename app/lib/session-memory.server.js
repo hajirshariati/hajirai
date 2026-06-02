@@ -202,6 +202,13 @@ export function buildSessionMemory({ messages, classifiedIntent, resolverState }
     stale: {},
     facts: [],
     lastClarifyingQuestion: null,
+    // Set after the per-turn loop to the intent of the LAST user
+    // turn. Downstream consumers (response-contract listing
+    // template, suggestion validator, future logging) read this
+    // instead of re-deriving intent from text. Shape:
+    //   { label, confidence, reason, staleKeysToDrop,
+    //     extractedThisTurn: { gender?, category?, color?, ... } }
+    latestTurnIntent: null,
   };
 
   if (!Array.isArray(messages) || messages.length === 0) return memory;
@@ -213,6 +220,11 @@ export function buildSessionMemory({ messages, classifiedIntent, resolverState }
     list.push(event);
     choiceEventsByTurn.set(event.userTurnIndex, list);
   }
+  // The intent + extracted constraints for the LAST user turn — we
+  // capture them inside the loop and expose them as
+  // `memory.latestTurnIntent` after the loop completes.
+  let latestIntent = null;
+  let latestExtracted = null;
 
   messages.forEach((msg, i) => {
     if (!msg) return;
@@ -260,6 +272,12 @@ export function buildSessionMemory({ messages, classifiedIntent, resolverState }
       turnIndex: i,
     });
     applyStaleDrops(memory, intent.staleKeysToDrop);
+    // The intent from the LAST user turn becomes the published
+    // signal. Each iteration overwrites — by definition only the
+    // most recent user turn matters for downstream "what does the
+    // customer want right now" decisions.
+    latestIntent = intent;
+    latestExtracted = extracted;
 
     // 3b. Recipient pivot without a derived gender ("for my
     //     partner"). This is a recipient-specific signal — the
@@ -310,6 +328,19 @@ export function buildSessionMemory({ messages, classifiedIntent, resolverState }
   });
 
   memory.explicit.rejectedCategories = Array.from(rejectedSet);
+
+  // Publish the LAST user turn's intent + extracted constraints.
+  // Single shared signal — response-contract / suggestion-validator
+  // read this instead of re-deriving intent from text.
+  if (latestIntent) {
+    memory.latestTurnIntent = {
+      label: latestIntent.label,
+      confidence: latestIntent.confidence,
+      reason: latestIntent.reason,
+      staleKeysToDrop: latestIntent.staleKeysToDrop,
+      extractedThisTurn: latestExtracted || {},
+    };
+  }
 
   // 7. Layer classifier attrs as INFERRED, not explicit. The classifier
   //    is a Haiku that READS conversation context; its output is a guess
