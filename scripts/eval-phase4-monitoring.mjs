@@ -193,18 +193,13 @@ await test("P4-1 — pink sandals + arch support + bunions: text, products, CTA,
   assert.equal(out.products.length, 3);
   assert.ok(out.cta, "expected a storefront CTA");
   assert.equal(out.cta.kind, "storefront_search");
-  // The text MUST honestly mention bunions (verified) and refer
-  // the customer to the View All button now that CTA fires.
+  // The text MUST honestly mention bunions (verified). The "View
+  // All button" boilerplate sentence was removed (customer feedback
+  // 2026-06-03 — narrating visible UI just added length without
+  // information). The button still renders separately via the CTA.
   assert.match(out.answerText, /bunions/i);
-  assert.match(out.answerText, /view all button/i);
-  // Sentence 2 must read as parallel alternatives, NOT a sequence.
-  // Live 2026-06-04 feedback: "Open a card to check size and color,
-  // then use the View All button..." sounded like instructions to do
-  // both in order. Rewrite asserts the OR phrasing.
-  assert.doesNotMatch(out.answerText, /,\s*then\s+use\s+the\s+view\s+all/i,
-    `composer must not chain card → button as a sequence; got "${out.answerText}"`);
-  assert.match(out.answerText, /\bor\s+use\s+the\s+view\s+all\s+button\b/i,
-    `composer must phrase card vs button as alternatives; got "${out.answerText}"`);
+  assert.doesNotMatch(out.answerText, /tap\s+(?:a|the|any)\s+card/i,
+    `boilerplate 'Tap a card for details' must NOT appear; got "${out.answerText}"`);
   // Follow-ups present (3 chips).
   assert.ok(Array.isArray(out.followUps) && out.followUps.length >= 2);
   // Compare must be one of the chips.
@@ -391,16 +386,14 @@ await test("P4-10 — composer NEVER emits the bland 'Here are the matching styl
   );
   assert.notEqual(out.answerText.trim(), "Here are the matching styles I found.",
     `composer must produce richer copy; got "${out.answerText}"`);
-  // The View All hint must appear (scope is gender+category → CTA fires).
-  assert.match(out.answerText, /view all button/i);
-  // Sentence 2 must read as parallel alternatives, NOT a sequence.
-  // Live 2026-06-04 feedback: "Open a card to check size and color,
-  // then use the View All button..." sounded like instructions to do
-  // both in order. Rewrite asserts the OR phrasing.
-  assert.doesNotMatch(out.answerText, /,\s*then\s+use\s+the\s+view\s+all/i,
-    `composer must not chain card → button as a sequence; got "${out.answerText}"`);
-  assert.match(out.answerText, /\bor\s+use\s+the\s+view\s+all\s+button\b/i,
-    `composer must phrase card vs button as alternatives; got "${out.answerText}"`);
+  // Sentence-2 boilerplate removed (customer feedback 2026-06-03).
+  // Verify the visible-UI narration is gone — the cards and View
+  // All button render separately; describing them adds length
+  // without information.
+  assert.doesNotMatch(out.answerText, /tap\s+(?:a|the|any)\s+card/i,
+    `'Tap a card for details' boilerplate must NOT appear; got "${out.answerText}"`);
+  assert.doesNotMatch(out.answerText, /view\s+all\s+button/i,
+    `'View All button' narration must NOT appear; got "${out.answerText}"`);
 });
 
 await test("P4-10b — every follow-up chip is a customer-shaped QUESTION, not a widget directive", async () => {

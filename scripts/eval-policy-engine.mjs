@@ -343,8 +343,8 @@ await test("PE-18 — 'do you charge a return fee?' is return_fee, not return_po
 
 // ─── compose API direct tests ──────────────────────────────────
 
-await test("PE-19 — composePolicyAnswer with relevant chunk renders title + content", () => {
-  const out = composePolicyAnswer({
+await test("PE-19 — composePolicyAnswer with relevant chunk renders title + content (verbatim fallback when no synthesizeFn)", async () => {
+  const out = await composePolicyAnswer({
     intent: { primary: "return_policy" },
     relevant: [
       chunk({ similarity: 0.72, sectionTitle: "RETURN POLICY", content: "Our 30-day window applies." }),
@@ -357,8 +357,8 @@ await test("PE-19 — composePolicyAnswer with relevant chunk renders title + co
   assert.equal(out.reason, "knowledge_confident");
 });
 
-await test("PE-20 — composePolicyAnswer empty + supportUrl emits CTA, no raw URL in text", () => {
-  const out = composePolicyAnswer({
+await test("PE-20 — composePolicyAnswer empty + supportUrl emits CTA, no raw URL in text", async () => {
+  const out = await composePolicyAnswer({
     intent: { primary: "return_policy" },
     relevant: [],
     supportUrl: "https://shop.example/support",
@@ -597,6 +597,75 @@ await test("PE-31 — tracking without trackingPageUrl can still use tracking-sp
   assert.equal(out.diagnostics?.composer, "knowledge_confident");
   assert.match(out.answerText, /ORDER STATUS/);
   assert.match(out.answerText, /tracking number we email/i);
+});
+
+// Customer feedback 2026-06-03 (Daisy Sunflower screenshot):
+// "instead of copy pasting the return policy, can you have AI make
+//  it better and related to person question? no matter what i ask
+//  it just give me the full thing".
+// composePolicyAnswer now takes an optional synthesizeFn. When
+// provided, it produces a SHORT targeted answer that addresses the
+// customer's specific question(s) instead of the verbatim Q&A
+// block dump. Falls back to the stitched chunks if synth returns
+// empty / throws.
+await test("PE-33 — synthesizeFn output replaces the verbatim Q&A dump", async () => {
+  let synthCalls = 0;
+  const out = await composePolicyAnswer({
+    intent: { primary: "exchanges" },
+    relevant: [
+      chunk({ similarity: 0.72, sectionTitle: "RETURNS & EXCHANGES", content: "30 days from delivery. $5.95 fee. Damaged orders handled by support." }),
+    ],
+    latestUserMessage: "the strap broke after one wear, can I exchange for a different style and do I pay return shipping?",
+    supportUrl: "https://shop.example/support",
+    supportLabel: "Contact customer service",
+    synthesizeFn: async ({ latestUserMessage, intent, relevantChunks }) => {
+      synthCalls++;
+      assert.equal(intent.primary, "exchanges");
+      assert.match(latestUserMessage, /strap broke/);
+      assert.ok(relevantChunks.length >= 1);
+      return "Defective items are covered — our support team will handle the exchange and waive the return fee. Use the contact button to share your order number.";
+    },
+  });
+  assert.equal(synthCalls, 1, "synthesizeFn must be invoked when provided");
+  assert.equal(out.reason, "knowledge_synthesized");
+  assert.match(out.text, /Defective items are covered/);
+  // Must NOT include the verbatim Q&A block leadership lines.
+  assert.doesNotMatch(out.text, /Here's what we have on/i,
+    `synthesized output must not include the verbatim lead`);
+  assert.doesNotMatch(out.text, /RETURNS & EXCHANGES/,
+    `synthesized output must not include the verbatim Q&A block heading`);
+  // CTA still emitted.
+  assert.equal(out.cta?.kind, "external_link");
+});
+
+await test("PE-34 — synthesizeFn throwing falls back to verbatim stitch", async () => {
+  const out = await composePolicyAnswer({
+    intent: { primary: "return_policy" },
+    relevant: [
+      chunk({ similarity: 0.72, sectionTitle: "RETURN POLICY", content: "Our 30-day window applies." }),
+    ],
+    latestUserMessage: "whats your return policy?",
+    supportUrl: "",
+    supportLabel: "",
+    synthesizeFn: async () => { throw new Error("haiku timeout"); },
+  });
+  // Falls back to the verbatim stitch — must still answer.
+  assert.match(out.text, /RETURN POLICY/);
+  assert.match(out.text, /Our 30-day window applies\./);
+});
+
+await test("PE-35 — synthesizeFn returning empty falls back to verbatim stitch", async () => {
+  const out = await composePolicyAnswer({
+    intent: { primary: "return_policy" },
+    relevant: [
+      chunk({ similarity: 0.72, sectionTitle: "RETURN POLICY", content: "Our 30-day window applies." }),
+    ],
+    latestUserMessage: "whats your return policy?",
+    supportUrl: "",
+    supportLabel: "",
+    synthesizeFn: async () => "",
+  });
+  assert.match(out.text, /Our 30-day window applies\./);
 });
 
 // Live failure 2026-06-03 19:28:33 — customer asked

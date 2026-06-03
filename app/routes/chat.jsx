@@ -582,7 +582,7 @@ async function convertEngineCtaToLink(cta, ctx) {
 // products=[] so the widget clears any stale product cards from a
 // previous turn. Engine reuses the retrievedChunks the request
 // already resolved upstream — no second RAG query.
-async function runPolicyTurnDispatch({ ctx, controller, encoder, retrievedChunks }) {
+async function runPolicyTurnDispatch({ ctx, controller, encoder, retrievedChunks, anthropic }) {
   const enabled = String(process.env.PRODUCT_TURN_ENGINE_ENABLED || "").toLowerCase() === "true";
   if (!enabled) return null;
 
@@ -590,9 +590,56 @@ async function runPolicyTurnDispatch({ ctx, controller, encoder, retrievedChunks
   // prisma chain into the client build.
   const { runPolicyTurn } = await import("../lib/policy-engine.server");
 
+  // Haiku-backed answer synthesizer. Reads the merchant policy
+  // chunks and the customer's specific question, returns a SHORT
+  // targeted answer. Replaces the verbatim Q&A block-dump customers
+  // complained about 2026-06-03. Falls back to the verbatim stitch
+  // inside the engine if this throws / times out / returns empty.
+  const synthesizeFn = anthropic
+    ? async ({ latestUserMessage, intent, relevantChunks, haveContactButton }) => {
+        const chunksBody = relevantChunks
+          .slice(0, 4)
+          .map((c) => {
+            const title = c.sectionTitle ? `[${c.sectionTitle}]\n` : "";
+            return `${title}${String(c.content || "").trim()}`;
+          })
+          .filter(Boolean)
+          .join("\n\n---\n\n")
+          .slice(0, 2400);
+        const contactLine = haveContactButton
+          ? "\n- If a detail isn't covered in the policy, say so briefly and tell the customer to use the contact button below — DO NOT invent details."
+          : "\n- If a detail isn't covered in the policy, say so briefly. DO NOT invent details.";
+        const prompt =
+          `You are answering a customer's question about ${intent?.primary || "store policy"} for a Shopify store.\n\n` +
+          `CUSTOMER QUESTION:\n"${String(latestUserMessage).slice(0, 500)}"\n\n` +
+          `STORE POLICY (authoritative — only use facts from here):\n${chunksBody}\n\n` +
+          `Write a short, direct answer to the customer's SPECIFIC question(s).\n` +
+          `RULES:\n` +
+          `- 1-3 sentences. Friendly but concise. No greetings, no sign-offs.\n` +
+          `- Answer ONLY what they asked. Don't dump the whole policy.\n` +
+          `- If they asked compound questions (e.g. warranty AND exchange AND shipping), answer each in ONE clause.\n` +
+          `- Use plain prose, NOT bullet lists, NOT Q/A format.\n` +
+          `- Never invent numbers, time windows, fees, or URLs that aren't in the policy text above.${contactLine}\n` +
+          `- Don't say "Tap the button below" or describe UI — the button renders separately.\n\n` +
+          `Customer-facing answer:`;
+        try {
+          const r = await anthropic.messages.create({
+            model: HAIKU_MODEL,
+            max_tokens: 220,
+            messages: [{ role: "user", content: prompt }],
+          });
+          const text = r?.content?.[0]?.text?.trim() || "";
+          return text;
+        } catch (err) {
+          console.warn(`[policy-engine] synth haiku failed: ${err?.message || err}`);
+          return null;
+        }
+      }
+    : null;
+
   let out;
   try {
-    out = await runPolicyTurn(ctx, { retrievedChunks });
+    out = await runPolicyTurn(ctx, { retrievedChunks, synthesizeFn });
   } catch (err) {
     console.error(`[policy-engine] runPolicyTurn threw: ${err?.stack || err?.message || err}`);
     return null;
@@ -3544,7 +3591,7 @@ export const action = async ({ request }) => {
           // and falls through if no policy intent is detected.
           // ──────────────────────────────────────────────────────────
           const policyResult = await runPolicyTurnDispatch({
-            ctx, controller, encoder, retrievedChunks,
+            ctx, controller, encoder, retrievedChunks, anthropic,
           });
           if (policyResult && policyResult.handled) {
             // final_path log overrides any earlier "final_path=llm"

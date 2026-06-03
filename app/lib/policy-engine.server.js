@@ -133,12 +133,14 @@ export async function runPolicyTurn(ctx = {}, options = {}) {
   diagnostics.rungs.push(`relevant:${relevant.length}`);
   diagnostics.topSimilarity = relevant[0]?.similarity ?? null;
 
-  const composed = composePolicyAnswer({
+  const composed = await composePolicyAnswer({
     intent,
     relevant,
+    latestUserMessage: ctx.latestUserMessage || "",
     supportUrl: ctx.supportUrl || "",
     supportLabel: ctx.supportLabel || "",
     trackingPageUrl: ctx.trackingPageUrl || "",
+    synthesizeFn: typeof options.synthesizeFn === "function" ? options.synthesizeFn : null,
   });
   diagnostics.composer = composed.reason;
 
@@ -264,8 +266,9 @@ function intentMatchesTitle(intentKey, lowerTitle) {
   return re ? re.test(lowerTitle) : false;
 }
 
-export function composePolicyAnswer({
+export async function composePolicyAnswer({
   intent, relevant, supportUrl = "", supportLabel = "", trackingPageUrl = "",
+  latestUserMessage = "", synthesizeFn = null,
 }) {
   // Contact-support CTA (rendered as a button by the widget).
   // ONLY when supportUrl is configured — we NEVER invent a URL.
@@ -330,11 +333,41 @@ export function composePolicyAnswer({
   const topSim = Number(top.similarity);
   const confident = topSim >= HIGH_CONFIDENCE;
 
-  // Build the answer from the strongest chunk(s). The chunk
-  // content is authoritative — we don't summarize aggressively
-  // because the merchant's own wording is what they want shown.
-  // Cap at a reasonable length so very long policies don't dump
-  // the whole file into the chat.
+  // Targeted synthesis. When the dispatcher provides a synth function
+  // (Haiku-backed in production), use it to author a SHORT answer
+  // that addresses the customer's specific question instead of dumping
+  // the entire Q&A block. Customer feedback 2026-06-03: verbatim
+  // policy block-dumps read as walls of text and don't answer
+  // compound questions ("warranty + exchange + return shipping") in
+  // a focused way. Falls back to the verbatim stitch when synth is
+  // unavailable, errors, or returns nothing.
+  if (typeof synthesizeFn === "function" && latestUserMessage) {
+    try {
+      const synth = await synthesizeFn({
+        latestUserMessage,
+        intent,
+        relevantChunks: relevant,
+        haveContactButton: !!contactCta,
+      });
+      const synthText = String(synth || "").trim();
+      if (synthText && synthText.length >= 20) {
+        return {
+          text: synthText,
+          reason: confident ? "knowledge_synthesized" : "knowledge_synthesized_weak",
+          cta: contactCta,
+        };
+      }
+    } catch (err) {
+      // Synth failure falls through to verbatim stitch — never
+      // blocks the answer.
+      console.warn(`[policy-engine] synthesizeFn failed: ${err?.message || err}`);
+    }
+  }
+
+  // Fallback: stitch chunks verbatim with a short lead. Authoritative
+  // merchant wording, capped so very long policies don't dump the
+  // whole file. Reached when synth isn't configured (eval mode) or
+  // synth threw.
   const body = stitchChunkContent(relevant, { maxChars: 600 });
 
   const lead = confident

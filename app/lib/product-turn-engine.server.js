@@ -601,27 +601,12 @@ export function composeAnswer({ scope, selected, deferred, selectionReason, will
       : `I found ${countWord(familyCount)} ${label}${why ? ` — ${why}` : ""}.`;
   }
 
-  // Sentence 2 — WHAT to do next. Phrased as ALTERNATIVES (card OR
-  // button), not a sequence. Live 2026-06-04 feedback: the prior
-  // "Open a card, then use the View All button to browse the full
-  // set" read like a 2-step instruction — customer assumed they
-  // had to do both in order. Rewrite as parallel options.
-  let sentence2;
-  if (familyCount === 1) {
-    // Single card — no "View All" alternative narrative needed.
-    sentence2 = willHaveCta
-      ? `Tap the card for details — or use the View All button to browse the full set.`
-      : `Tap the card for details.`;
-  } else {
-    const cardChoice = familyCount > 3
-      ? `Tap any card for details (start with the first few for the closest match)`
-      : `Tap a card for details`;
-    sentence2 = willHaveCta
-      ? `${cardChoice}, or use the View All button to browse the full set.`
-      : `${cardChoice}.`;
-  }
-
-  const text = `${sentence1} ${sentence2}`.replace(/\s{2,}/g, " ").trim();
+  // Sentence 2 was a "Tap a card / use the View All button" hint
+  // that read as boilerplate over every product turn. Customer
+  // feedback 2026-06-03: the cards and the View All button are
+  // already visible — narrating them just adds length without
+  // adding information. Keep the warm sentence 1 only.
+  const text = `${sentence1}`.replace(/\s{2,}/g, " ").trim();
 
   return {
     text,
@@ -1086,15 +1071,10 @@ export function composeSimilarAnswer({
     ? ` They share the configured similarity attributes (${configuredAttrs.join(", ")}) plus category and gender, and exclude the ${anchorTitle} family.`
     : (rankingCaveat ? "" : ` They share the merchant's configured similarity attributes plus category and gender.`);
 
-  // Phrased as a single action, not a multi-step instruction. See
-  // 2026-06-04 feedback on the retrieval composer.
-  const cta = total === 1
-    ? ` Tap the card for details.`
-    : total > 3
-      ? ` Tap any card for details — start with the first for the closest match.`
-      : ` Tap a card for details.`;
-
-  const text = `${lead}${rankingCaveat || why}${cta}`.replace(/\s{2,}/g, " ").trim();
+  // "Tap a card" boilerplate removed (customer feedback 2026-06-03):
+  // the cards are visible, telling them what to do with them just
+  // adds length. Lead + why is the whole answer.
+  const text = `${lead}${rankingCaveat || why}`.replace(/\s{2,}/g, " ").trim();
   return { text, reason: rankingCaveat ? "similar_ranking_caveat" : "similar_matched", cta: null };
 }
 
