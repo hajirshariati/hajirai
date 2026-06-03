@@ -262,6 +262,45 @@ export function titleStyleFamily(title) {
   return "";
 }
 
+// Detect bold product references in AI text and check whether ANY
+// pool card shares a family with them. Used by the named-product
+// mismatch guard in chat.jsx — when the AI bolds a product name
+// (e.g. "**Andrea Quarter Strap Wedge - Black**") but no pool card
+// matches that family, the displayed cards belong to a different
+// product than the text describes. Better to wipe than render.
+//
+// Returns { textFamilies: string[], poolFamilies: string[],
+//           overlap: boolean }
+// Pure title-token math — no merchant-specific vocabulary.
+export function detectNamedProductMismatch(text, pool) {
+  const out = { textFamilies: [], poolFamilies: [], overlap: true };
+  if (!text || !Array.isArray(pool) || pool.length === 0) return out;
+  const boldMatches = String(text).match(/\*\*([^*]{3,80})\*\*/g) || [];
+  const productNames = boldMatches
+    .map((b) => b.replace(/^\*\*|\*\*$/g, "").trim())
+    .filter((n) => {
+      if (n.length < 5) return false;
+      if (!/[A-Z]/.test(n)) return false;
+      // Skip generic emphasis bolds — "Great news!" / "Important" etc.
+      if (/^(?:yes|no|note|important|warning|tip|here|now|today|great)\b/i.test(n)) return false;
+      return true;
+    });
+  const textFamilies = new Set(
+    productNames.map((name) => titleStyleFamily(name)).filter(Boolean),
+  );
+  const poolFamilies = new Set(
+    pool.map((card) => titleStyleFamily(card?.title || "")).filter(Boolean),
+  );
+  out.textFamilies = [...textFamilies];
+  out.poolFamilies = [...poolFamilies];
+  if (textFamilies.size === 0) {
+    out.overlap = true; // no bold names → nothing to compare against
+    return out;
+  }
+  out.overlap = [...textFamilies].some((fam) => poolFamilies.has(fam));
+  return out;
+}
+
 const FOOTWEAR_HYPERNYMS = ["shoe", "shoes", "footwear"];
 const FOOTWEAR_CATEGORY_SET = new Set([
   "footwear", "sneakers", "sneaker", "boots", "boot", "sandals", "sandal",

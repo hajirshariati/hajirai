@@ -63,6 +63,7 @@ import {
   skusFromCardText,
   stripMissingSkus,
   titleStyleFamily,
+  detectNamedProductMismatch,
   validateTurnResult,
 } from "../lib/response-contract.server";
 import {
@@ -2340,6 +2341,30 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
         focusedHandles.has(String(card.handle || "").toLowerCase()),
       );
       if (focused.length > 0) filteredPool = focused;
+    }
+
+    // Named-product / card-pool mismatch guard.
+    //
+    // Live 2026-06-04: customer asked "do you have andrea in size 9?".
+    // AI used lookup_sku, wrote great text about the Andrea Quarter
+    // Strap Wedge — Black, but the displayed card was a Mila Low
+    // Boot from a prior turn's pool. Customer reads two contradictory
+    // products on the same turn.
+    //
+    // detectNamedProductMismatch extracts bold product references
+    // from the AI's text (markdown **X**) and checks whether ANY
+    // pool card shares a style family with them. When there's no
+    // overlap, wipe the pool — better to show no card than the
+    // wrong one. Pure title-token math, no merchant vocabulary.
+    if (filteredPool.length > 0 && fullResponseText) {
+      const m = detectNamedProductMismatch(fullResponseText, filteredPool);
+      if (m.textFamilies.length > 0 && !m.overlap) {
+        console.log(
+          `[chat] ${ctx.shop} named-product mismatch guard: text bolds [${m.textFamilies.join(",")}] ` +
+            `but pool families [${m.poolFamilies.join(",")}] don't overlap — wiping ${filteredPool.length} card(s)`,
+        );
+        filteredPool = [];
+      }
     }
 
     const userTextLower = (ctx.userText || "").toLowerCase();

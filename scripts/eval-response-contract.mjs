@@ -12,6 +12,7 @@ import {
   createTurnResult,
   extractGenericCTA,
   verifyClaimsAgainstCards,
+  detectNamedProductMismatch,
 } from "../app/lib/response-contract.server.js";
 import {
   buildProductClaimFacts,
@@ -1576,6 +1577,60 @@ test("R78 — seller-spirit fallback flags 'on sale' only when EVERY card is on 
   const b = buildCodeOwnedProductListingText({ text: "", cards: mixed,     ctx: {}, recommenderInvoked: false });
   assert.match(a.text, /on sale/i,         `all-on-sale pool should mention sale; got "${a.text}"`);
   assert.doesNotMatch(b.text, /on sale/i,  `mixed pool must not generalize sale; got "${b.text}"`);
+});
+
+// ──────────────────────────────────────────────────────────────
+// R79..R83 — detectNamedProductMismatch
+//
+// Live 2026-06-04: AI text bolded "Andrea Quarter Strap Wedge - Black"
+// but the displayed card was a stale Mila Low Boot. Customer reads two
+// contradictory products on the same turn. The helper extracts bold
+// product names and checks against the pool's titleStyleFamily set.
+// ──────────────────────────────────────────────────────────────
+
+test("R79 — Andrea bolded in text + Mila in pool → no overlap detected", () => {
+  const text = "**Andrea Quarter Strap Wedge - Black** is available in size 9.";
+  const pool = [{ title: "Mila Low Boot - Taupe", handle: "mila-taupe" }];
+  const out = detectNamedProductMismatch(text, pool);
+  assert.deepEqual(out.textFamilies, ["andrea"]);
+  assert.deepEqual(out.poolFamilies, ["mila"]);
+  assert.equal(out.overlap, false);
+});
+
+test("R80 — Andrea bolded in text + Andrea variant in pool → overlap detected", () => {
+  const text = "**Andrea Quarter Strap Wedge - Black** is available.";
+  const pool = [{ title: "Andrea Quarter Strap Wedge - Walnut", handle: "andrea-walnut" }];
+  const out = detectNamedProductMismatch(text, pool);
+  assert.deepEqual(out.textFamilies, ["andrea"]);
+  assert.deepEqual(out.poolFamilies, ["andrea"]);
+  assert.equal(out.overlap, true);
+});
+
+test("R81 — generic emphasis bolds ('Great news!') do NOT trigger mismatch", () => {
+  // Customers see "**Great news, Hajir!**" all the time. That's
+  // not a product name — must not produce a textFamily.
+  const text = "**Great news, Hajir!** Here are some sandals.";
+  const pool = [{ title: "Maui Sandal - Charcoal", handle: "maui" }];
+  const out = detectNamedProductMismatch(text, pool);
+  assert.deepEqual(out.textFamilies, []);
+  assert.equal(out.overlap, true); // nothing to compare
+});
+
+test("R82 — empty / null inputs return overlap=true (no false positives)", () => {
+  assert.equal(detectNamedProductMismatch("", []).overlap, true);
+  assert.equal(detectNamedProductMismatch(null, null).overlap, true);
+  assert.equal(detectNamedProductMismatch("**Andrea**", []).overlap, true);
+});
+
+test("R83 — multiple bolded products: overlap=true when ANY card matches ANY name", () => {
+  // AI compares two named products; one is in the pool, one isn't.
+  // Still considered overlapping — at least one card is correct.
+  const text = "**Jillian Sport Sandal** is similar to the **Maui Sandal**.";
+  const pool = [{ title: "Jillian Antique Rose", handle: "jillian-rose" }];
+  const out = detectNamedProductMismatch(text, pool);
+  assert.ok(out.textFamilies.includes("jillian"));
+  assert.ok(out.textFamilies.includes("maui"));
+  assert.equal(out.overlap, true);
 });
 
 if (failed > 0) {
