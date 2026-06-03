@@ -535,6 +535,57 @@ await test("D14 — engine reads resolverState category when memory has only cla
   assert.ok(out.products.length > 0);
 });
 
+await test("D15 — resolver-picked kids orthotic candidates do not trigger named-product decline", async () => {
+  let searchCalls = 0;
+  const kidsCandidates = [
+    uiCandidate({
+      title: "Kids Orthotics",
+      handle: "l1700y-m",
+      productType: "Orthotics",
+      attributes: { category: "Orthotics", gender: "Kids" },
+    }),
+    uiCandidate({
+      title: "Kids Posted Orthotics",
+      handle: "l1720y-m",
+      productType: "Orthotics",
+      attributes: { category: "Orthotics", gender: "Kids" },
+    }),
+    uiCandidate({
+      title: "Kids Orthotics W/ Metatarsal Support",
+      handle: "l1750y-m",
+      productType: "Orthotics",
+      attributes: { category: "Orthotics", gender: "Kids" },
+    }),
+  ];
+  const out = await runProductTurn({
+    ...ctxBase,
+    latestUserMessage: "Do you have kids orthotics?",
+    sessionMemory: {
+      explicit: { gender: "kids", category: "orthotics", specificProduct: "l1700y-m" },
+      inferred: {},
+    },
+    resolverState: {
+      type: "resolver_state",
+      matched_constraints: { gender: "kids", category: "orthotics", specificProduct: "l1700y-m" },
+      inferred_constraints: {},
+      candidate_products: kidsCandidates.map(({ handle, title }) => ({ handle, title })),
+      recommended_next_action: { type: "recommend", reason: "3 products match" },
+    },
+  }, {
+    forceEnable: true,
+    searchFn: async () => {
+      searchCalls += 1;
+      return kidsCandidates;
+    },
+    claimConfig: FIXTURE_CLAIM_CONFIG,
+  });
+  assert.ok(out && !out.decline,
+    `resolver-backed specificProduct must not decline; diagnostics=${JSON.stringify(out?.diagnostics)}`);
+  assert.equal(searchCalls, 1);
+  assert.deepEqual(out.products.map((p) => p.handle), ["l1700y-m", "l1720y-m", "l1750y-m"]);
+  assert.match(out.answerText, /kids'?|orthotic/i);
+});
+
 await test("D10 — non-empty pool DOES emit a CTA (regression check)", async () => {
   // Sanity: the new gate must not break the normal happy path.
   const out = await runProductTurn({

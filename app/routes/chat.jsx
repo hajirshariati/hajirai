@@ -367,6 +367,27 @@ async function runProductTurnDispatch({ ctx, controller, encoder, claimConfig })
 
   const searchFn = async (scope) => {
     const limit = ctx?.productCardCap || 6;
+    if (resolverPromisedRecommendation(ctx.resolverState)) {
+      const handles = (ctx.resolverState.candidate_products || [])
+        .map((p) => p?.handle)
+        .filter(Boolean)
+        .slice(0, limit);
+      const candidateCards = [];
+      for (const handle of handles) {
+        try {
+          const details = await dispatchTool("get_product_details", { handle }, ctx);
+          candidateCards.push(...extractProductCards("get_product_details", details, ctx));
+        } catch (err) {
+          console.warn(`[product-turn-engine] resolver candidate ${handle} lookup failed: ${err?.message || err}`);
+        }
+      }
+      if (candidateCards.length > 0) {
+        console.log(
+          `[product-turn-engine] searchFn using ${candidateCards.length} resolver candidate card(s) before semantic search`,
+        );
+        return candidateCards;
+      }
+    }
     const filters = {};
     if (scope.gender) filters.gender = scope.gender;
     if (scope.category) filters.category = scope.category;

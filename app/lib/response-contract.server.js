@@ -677,6 +677,22 @@ export async function ensureProductTurnCards({
     return { products, attached, searchAttempted, diagnostics };
   }
 
+  if (resolverPromisedRecommendation(ctx.resolverState) && dispatchTool && extractProductCards) {
+    attached += await attachResolverCandidateCards({
+      ctx,
+      allProductPool,
+      dispatchTool,
+      extractProductCards,
+      reason: "product-turn cards",
+    });
+    products = scopedProducts();
+    if (products.length > 0) {
+      diagnostics.rung = "resolver-candidates";
+      console.log(`[chat] product-turn cards: attached ${attached} card(s); final=${products.length}; rung=${diagnostics.rung}`);
+      return { products, attached, searchAttempted, diagnostics };
+    }
+  }
+
   const input = searchInput?.input || searchInput || {};
   const scope = searchInput?.scope || diagnostics.scope || {};
   if (dispatchTool && extractProductCards) {

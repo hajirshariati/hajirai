@@ -109,7 +109,7 @@ export async function runProductTurn(ctx = {}, options = {}) {
     });
   }
 
-  if (!engineWantsThisTurn(scope)) {
+  if (!engineWantsThisTurn(scope, ctx.resolverState)) {
     diagnostics.rungs.push("declined:scope-too-thin");
     return { decline: true, diagnostics };
   }
@@ -307,18 +307,25 @@ const NAMED_PRODUCT_ANCHOR_RE =
 const COMPARE_SHAPE_RE =
   /\b(?:which\s+(?:of\s+(?:these|those|them)|one|is\s+(?:better|more|the\s+most))|compare\s+(?:the\s+)?(?:first|top|two|these)|side[\s-]?by[\s-]?side)\b/i;
 
-function engineWantsThisTurn(scope) {
+function engineWantsThisTurn(scope, resolverState = null) {
+  const hasResolverCandidates = resolverHasCandidateRecommendation(resolverState);
   // V1 gate: handle clear claim-carrying retrieval shapes only.
   // Decline named-product lookups (compare/similar/specific-product)
   // and turns missing a category — those still go through the LLM
   // agent so it can ask clarifying questions or run catalog-
   // resolver paths the engine doesn't own yet.
-  if (!scope.category && !scope.badge && !scope.onSale && !scope.modifier) return false;
-  if (scope.namedProduct) return false;
+  if (!scope.category && !scope.badge && !scope.onSale && !scope.modifier && !hasResolverCandidates) return false;
+  if (scope.namedProduct && !hasResolverCandidates) return false;
   const raw = scope.rawMessage || "";
   if (NAMED_PRODUCT_ANCHOR_RE.test(raw)) return false;
   if (COMPARE_SHAPE_RE.test(raw)) return false;
   return true;
+}
+
+function resolverHasCandidateRecommendation(resolverState) {
+  if (!resolverState || resolverState.type !== "resolver_state") return false;
+  if (resolverState.recommended_next_action?.type !== "recommend") return false;
+  return Array.isArray(resolverState.candidate_products) && resolverState.candidate_products.length > 0;
 }
 
 // ─── 4. Variant family grouping ─────────────────────────────────

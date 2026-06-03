@@ -6,6 +6,7 @@ import {
   buildCodeOwnedProductListingText,
   buildCodeOwnedComparisonText,
   buildSoftBrowseFallbackText,
+  ensureProductTurnCards,
   repairProductTurnAssembly,
   repairProductResponseText,
   stripMissingSkus,
@@ -28,6 +29,18 @@ const failures = [];
 function test(name, fn) {
   try {
     fn();
+    console.log(`  ✓ ${name}`);
+    passed++;
+  } catch (err) {
+    console.log(`  ✗ ${name} — ${err.message}`);
+    failures.push({ name, err });
+    failed++;
+  }
+}
+
+async function testAsync(name, fn) {
+  try {
+    await fn();
     console.log(`  ✓ ${name}`);
     passed++;
   } catch (err) {
@@ -1658,6 +1671,48 @@ test("R84 — listing fallback never returns bare gender as the product noun", (
     `must not produce bare possessive gender copy; got: ${out.text}`);
   assert.match(out.text, /black women's (?:sneakers|slip-ons|styles)/i,
     `must include a product noun after gender; got: ${out.text}`);
+});
+
+await testAsync("R85 — resolver candidates attach before broad scoped search", async () => {
+  const calls = [];
+  const cardsByHandle = new Map([
+    ["l1700y-m", { handle: "l1700y-m", title: "Kids Orthotics", _gender: "kids", _category: "orthotics" }],
+    ["l1720y-m", { handle: "l1720y-m", title: "Kids Posted Orthotics", _gender: "kids", _category: "orthotics" }],
+    ["l1750y-m", { handle: "l1750y-m", title: "Kids Orthotics W/ Metatarsal Support", _gender: "kids", _category: "orthotics" }],
+  ]);
+  const allProductPool = new Map();
+  const out = await ensureProductTurnCards({
+    ctx: {
+      latestUserMessage: "Do you have kids orthotics?",
+      sessionGender: "kids",
+      sessionMemory: { explicit: { gender: "kids", category: "orthotics" } },
+      resolverState: {
+        type: "resolver_state",
+        matched_constraints: { gender: "kids", category: "orthotics" },
+        inferred_constraints: {},
+        candidate_products: [...cardsByHandle.values()].map(({ handle, title }) => ({ handle, title })),
+        recommended_next_action: { type: "recommend", reason: "3 products match" },
+      },
+    },
+    allProductPool,
+    shouldAttach: true,
+    searchInput: {
+      scope: { gender: "kids", category: "orthotics" },
+      input: { query: "orthotics", filters: { gender: "kids", category: "orthotics" } },
+    },
+    dispatchTool: async (name, input) => {
+      calls.push({ name, input });
+      if (name === "search_products") throw new Error("must not run broad search before resolver candidates");
+      if (name !== "get_product_details") throw new Error(`unexpected tool ${name}`);
+      return cardsByHandle.get(input.handle);
+    },
+    extractProductCards: (_name, result) => [result],
+  });
+
+  assert.equal(out.diagnostics.rung, "resolver-candidates");
+  assert.equal(out.searchAttempted, false);
+  assert.deepEqual(calls.map((c) => c.name), ["get_product_details", "get_product_details", "get_product_details"]);
+  assert.deepEqual(out.products.map((p) => p.handle), ["l1700y-m", "l1720y-m", "l1750y-m"]);
 });
 
 if (failed > 0) {
