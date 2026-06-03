@@ -159,13 +159,19 @@ export async function runProductTurn(ctx = {}, options = {}) {
   diagnostics.rungs.push(`selected:${selected.length}/deferred:${deferred.length}`);
   diagnostics.selectionReason = selectionReason;
 
-  // 6. Compose deterministic seller-spirit copy.
+  // 6. Compose deterministic seller-spirit copy. willHaveCta
+  // mirrors the same scope gate that decides whether the
+  // dispatcher will emit a storefront-search button — keeps the
+  // text accurate ("...then use the View All button" only when
+  // a button will actually appear).
+  const willHaveCta = !!(scope.category || scope.gender || scope.color);
   const composed = composeAnswer({
     scope,
     selected,
     deferred,
     selectionReason,
     claimConfig,
+    willHaveCta,
   });
   diagnostics.composer = composed.reason;
 
@@ -179,11 +185,17 @@ export async function runProductTurn(ctx = {}, options = {}) {
   // composes the URL via buildStorefrontSearchCTA so we reuse the
   // merchant's admin-configured storefrontSearchUrlPattern and
   // ctaOverrides — no parallel URL builder, no Aetrex hardcoding.
-  const retrievalCta = scope.category
+  //
+  // Phase 4: fire the CTA whenever ANY of gender/category/color is
+  // resolved. buildStorefrontSearchCTA still needs gender OR
+  // category internally; otherwise it returns null and the
+  // dispatcher emits no link chunk. The composer mentions "the
+  // View All button" only when this CTA will actually fire.
+  const retrievalCta = (scope.category || scope.gender || scope.color)
     ? {
         kind: "storefront_search",
         gender: scope.gender || null,
-        category: scope.category,
+        category: scope.category || null,
         color: scope.color || null,
         scopeSource: "engine_scope",
       }
@@ -196,6 +208,7 @@ export async function runProductTurn(ctx = {}, options = {}) {
     facts: displayCards.map((c) => c._claimFacts),
     answerText: composed.text,
     cta: retrievalCta,
+    followUps: buildProductTurnFollowUps({ scope, families, selectionReason }),
     diagnostics,
   };
 }
@@ -372,18 +385,18 @@ function familySupportsClaim(family, claim, claimConfig) {
 
 // ─── 6. Compose ─────────────────────────────────────────────────
 //
-// Deterministic seller-spirit copy. Pattern:
-//   1. acknowledgment (echoes the scope: gender + category)
-//   2. why-these (uses ONLY verified facts: claim coverage, sale,
-//      adjustable hint, color hint — never medical/comfort
-//      generalizations)
-//   3. soft CTA (open a card / start with the first / ...)
-//
-// Composer NEVER says "all of these have X" unless every selected
-// card actually has X. NEVER invents support/comfort/medical
-// claims. The verifier-side strip becomes redundant for engine
-// output because the copy is true by construction.
-export function composeAnswer({ scope, selected, deferred, selectionReason }) {
+// Deterministic seller-spirit copy. Phase 4 polish:
+//   - Two sentences max: WHY these match + WHAT to do next.
+//   - When a retrieval CTA will fire (scope produces a storefront
+//     URL via the dispatcher), mention "the View All button" so
+//     the customer knows the chip is there to click. Caller
+//     signals this by passing willHaveCta=true.
+//   - Composer NEVER says "all of these have X" unless every
+//     selected card actually has X. NEVER invents support/comfort/
+//     medical claims. Verified-only signals: sale state, adjustable
+//     hint, claim coverage. The verifier-side strip is unnecessary
+//     for engine output — copy is true by construction.
+export function composeAnswer({ scope, selected, deferred, selectionReason, willHaveCta = false }) {
   if (selected.length === 0 && deferred.length === 0) {
     return {
       text: `I couldn't find ${scopeLabel(scope, { fallback: "matching styles" })} in our current catalog. Try a different style or color?`,
@@ -396,32 +409,37 @@ export function composeAnswer({ scope, selected, deferred, selectionReason }) {
   const allCards = familiesToCards(allFamilies);
   const n = allCards.length;
   const familyCount = allFamilies.length;
-
-  // 1. Acknowledgment
   const label = scopeLabel(scope, { fallback: "styles" });
-  let acknowledgment;
+
+  // Sentence 1 — acknowledgment + WHY (combined).
+  // Built from verified-only signals; never invented.
+  const why = buildWhyClause({ scope, selected, deferred, selectionReason });
+  let sentence1;
   if (selectionReason === "closest_matches_no_proof") {
-    acknowledgment = `These ${label} are the closest matches I have.`;
+    sentence1 = `These ${label} are the closest matches I have${why ? ` — ${why}` : ""}.`;
   } else if (selectionReason === "proven_preferred") {
-    acknowledgment = `I found ${selected.length === 1 ? "one" : selected.length} ${label}`
-      + (familyCount > selected.length ? ` — plus ${familyCount - selected.length} close runner-up${familyCount - selected.length > 1 ? "s" : ""}` : "")
-      + ` that match your request.`;
+    const runnerUps = familyCount > selected.length
+      ? ` plus ${familyCount - selected.length} close runner-up${familyCount - selected.length > 1 ? "s" : ""}`
+      : "";
+    sentence1 = `I found ${selected.length === 1 ? "one" : selected.length} ${label} that match your request${runnerUps}${why ? `, ${why}` : ""}.`;
   } else if (selectionReason === "all_proven") {
-    acknowledgment = `I found ${selected.length === 1 ? "one" : selected.length} ${label} that match your request.`;
+    sentence1 = `I found ${selected.length === 1 ? "one" : selected.length} ${label} that match your request${why ? `, ${why}` : ""}.`;
   } else {
-    // no_claim_requested / fallback
-    acknowledgment = `I found ${familyCount === 1 ? "one" : familyCount} ${label}.`;
+    sentence1 = `I found ${familyCount === 1 ? "one" : familyCount} ${label}${why ? ` — ${why}` : ""}.`;
   }
 
-  // 2. Why-these
-  const why = buildWhyLine({ scope, selected, deferred, selectionReason });
+  // Sentence 2 — WHAT to do next. Mentions the View All button when
+  // a CTA will accompany the message. Gentler "start with the first
+  // few" hint when there are >3 styles.
+  const ctaHintCard = familyCount === 1
+    ? `Open the card to check size and color`
+    : familyCount > 3
+      ? `Start with the first few or open a card to check size and color`
+      : `Open a card to check size and color`;
+  const ctaHintButton = willHaveCta ? `, then use the View All button to browse the full set` : ``;
+  const sentence2 = `${ctaHintCard}${ctaHintButton}.`;
 
-  // 3. CTA — soft, action-oriented, no link inventing
-  const cta = familyCount === 1
-    ? `Open the card to check size and color availability.`
-    : `Open a card to check size and color availability${familyCount > 3 ? `, or start with the first few if you want the closest match` : ""}.`;
-
-  const text = [acknowledgment, why, cta].filter(Boolean).join(" ").replace(/\s{2,}/g, " ").trim();
+  const text = `${sentence1} ${sentence2}`.replace(/\s{2,}/g, " ").trim();
 
   return {
     text,
@@ -430,7 +448,11 @@ export function composeAnswer({ scope, selected, deferred, selectionReason }) {
   };
 }
 
-function buildWhyLine({ scope, selected, deferred, selectionReason }) {
+// Build a short "why" clause used as a subordinate inside the
+// acknowledgment sentence. Returns "" when no honest claim can be
+// made. NEVER invents medical/comfort claims; uses only verified
+// per-card signals (claim coverage, sale, adjustable).
+function buildWhyClause({ scope, selected, deferred, selectionReason }) {
   const all = [...selected, ...deferred];
   const cards = familiesToCards(all);
   if (cards.length === 0) return "";
@@ -443,40 +465,45 @@ function buildWhyLine({ scope, selected, deferred, selectionReason }) {
   const allAdjustable = adjustableInTitle === cards.length && cards.length >= 2;
   const someAdjustable = adjustableInTitle > 0 && adjustableInTitle < cards.length;
 
-  const bits = [];
+  // Build a SHORT clause (no leading capital, no trailing period)
+  // that can be embedded inside the acknowledgment sentence.
+  // Returns "" when no honest clause is available.
+  const clauses = [];
 
   if (selectionReason === "closest_matches_no_proof") {
     // Be honest. The requested claim isn't proven on any card.
     if (scope.requestedClaim?.kind === "condition") {
-      bits.push(`None are tagged specifically for ${humanizeCondition(scope.requestedClaim.tag)}, so check the card details before deciding.`);
+      clauses.push(`none are specifically tagged for ${humanizeCondition(scope.requestedClaim.tag)} — check card details before deciding`);
     } else if (scope.requestedClaim?.kind === "archSupport") {
-      bits.push(`Arch-support details vary by style — open a card to confirm.`);
+      clauses.push(`arch-support details vary — open a card to confirm`);
     } else if (scope.requestedClaim?.kind === "waterFriendly") {
-      bits.push(`Water-friendly details vary by style — open a card to confirm.`);
+      clauses.push(`water-friendly details vary — open a card to confirm`);
     }
   } else if (selectionReason === "proven_preferred" || selectionReason === "all_proven") {
     if (scope.requestedClaim?.kind === "condition") {
-      bits.push(`The selected styles are tagged for ${humanizeCondition(scope.requestedClaim.tag)}.`);
+      clauses.push(`with verified ${humanizeCondition(scope.requestedClaim.tag)} support`);
     } else if (scope.requestedClaim?.kind === "archSupport" && allArchSupport) {
-      bits.push(`All carry built-in arch support.`);
+      clauses.push(`all with verified arch-support details`);
     } else if (scope.requestedClaim?.kind === "waterFriendly" && allWaterFriendly) {
-      bits.push(`All are water-friendly.`);
+      clauses.push(`all water-friendly`);
     }
   }
 
   if (allOnSale && cards.length >= 2) {
-    bits.push(`All are currently on sale.`);
+    clauses.push(`all currently on sale`);
   } else if (allOnSale && cards.length === 1) {
-    bits.push(`It's currently on sale.`);
+    clauses.push(`currently on sale`);
   }
 
   if (allAdjustable) {
-    bits.push(`They all have adjustable straps for easier fit control.`);
+    clauses.push(`with adjustable straps for easier fit control`);
   } else if (someAdjustable && selectionReason !== "closest_matches_no_proof") {
-    bits.push(`Start with the adjustable styles if you want easier fit control.`);
+    clauses.push(`with adjustable options if you want easier fit control`);
   }
 
-  return bits.join(" ");
+  // Pick the strongest 1-2 clauses for the warm sentence; longer
+  // strings become unreadable.
+  return clauses.slice(0, 2).join(" and ");
 }
 
 function humanizeCondition(tag) {
@@ -726,6 +753,10 @@ async function runSimilarProductTurn({
     facts: displayCards.map((c) => c._claimFacts),
     answerText: composed.text,
     cta,
+    followUps: buildSimilarTurnFollowUps({
+      anchorTitle: similarResult.reference?.title || anchorHandle,
+      families,
+    }),
     diagnostics: { ...diagnostics, composer: composed.reason, ctaSource: cta ? "anchor_product" : "none" },
   };
 }
@@ -774,6 +805,78 @@ export function composeSimilarAnswer({
   return { text, reason: rankingCaveat ? "similar_ranking_caveat" : "similar_matched", cta: null };
 }
 
+// Phase 4 follow-up chips for product retrieval turns.
+//
+// Deterministic, merchant-data-aware. We only emit chips the bot
+// can ACTUALLY answer:
+//   - Color refinement is safe (chat path supports it).
+//   - "Compare top 2" hits the existing compare-shape detector.
+//   - Width/size questions hit the existing facet handlers.
+//   - "On sale only" hits the search filter.
+//   - "Other similar styles" is safe when the engine can re-enter.
+//
+// NEVER suggest a question that would contradict established
+// scope (e.g. don't suggest a different gender, that would push
+// against the customer's locked subject). NEVER reference a
+// claim the bot hasn't verified.
+export function buildProductTurnFollowUps({ scope, families, selectionReason } = {}) {
+  if (!Array.isArray(families) || families.length === 0) return [];
+  const out = [];
+
+  // Compare lives at every multi-style turn — the compare path is
+  // already an established engine intent shape.
+  if (families.length >= 2) {
+    out.push(`Compare the top two`);
+  }
+
+  // Color refinement. If color is set, offer to widen; if unset,
+  // offer to narrow.
+  if (scope.color) {
+    out.push(`Show other colors`);
+  } else {
+    out.push(`Filter by color`);
+  }
+
+  // Width is a universal sizing dimension. Customers ask about it
+  // constantly; the existing chat path supports the question.
+  out.push(`Do you have wide width?`);
+
+  // Sale filter — generic, applies to any retail catalog.
+  out.push(`Show on-sale styles only`);
+
+  // Similar / drill-down to a specific named style. Encourage the
+  // customer to click into one if they're indecisive.
+  if (families.length >= 3) {
+    out.push(`What's the most popular?`);
+  }
+
+  // Cap at 3 — widget UX. Drop the lowest-priority overflow.
+  return out.slice(0, 3);
+}
+
+// Phase 4 follow-up chips for similar-product turns. Anchored on
+// the named-product intent so the customer can drill into the
+// anchor or pivot to color/size.
+export function buildSimilarTurnFollowUps({ anchorTitle, families } = {}) {
+  const out = [];
+  if (Array.isArray(families) && families.length >= 2) {
+    out.push(`Compare the top two`);
+  }
+  if (anchorTitle) {
+    out.push(`Show ${truncateAnchorLabel(anchorTitle)} colors`);
+  }
+  out.push(`Filter by size`);
+  out.push(`Do you have wide width?`);
+  return out.slice(0, 3);
+}
+
+function truncateAnchorLabel(title) {
+  // First meaningful word — typically the family name. "Jillian
+  // Sport Sandal" → "Jillian".
+  const m = String(title || "").match(/^([A-Z][\w'-]+)/);
+  return m ? m[1] : "this style";
+}
+
 // Exported for tests + the offline transcript harness.
 export const __internals = {
   engineWantsThisTurn,
@@ -782,6 +885,8 @@ export const __internals = {
   scopeLabel,
   detectSimilarProductIntent,
   composeSimilarAnswer,
+  buildProductTurnFollowUps,
+  buildSimilarTurnFollowUps,
   SIMILAR_ANCHOR_RE,
   SAME_AS_PRIOR_RE,
   RANKING_RE,

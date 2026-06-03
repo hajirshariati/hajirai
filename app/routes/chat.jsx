@@ -481,12 +481,22 @@ async function runProductTurnDispatch({ ctx, controller, encoder, claimConfig })
       label: linkPayload.label,
     })));
   }
+  if (Array.isArray(out.followUps) && out.followUps.length > 0) {
+    controller.enqueue(encoder.encode(sseChunk({
+      type: "suggestions",
+      questions: out.followUps,
+    })));
+  }
   controller.enqueue(encoder.encode(sseChunk({ type: "done" })));
   return {
     handled: true,
     answerText: text,
     products,
-    diagnostics: { ...out.diagnostics, cta: linkPayload ? linkPayload.label : null },
+    diagnostics: {
+      ...out.diagnostics,
+      cta: linkPayload ? linkPayload.label : null,
+      followUps: Array.isArray(out.followUps) ? out.followUps.length : 0,
+    },
   };
 }
 
