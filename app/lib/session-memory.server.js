@@ -53,7 +53,7 @@ const SCALAR_KEYS = [
 const SUBJECT_PIVOT_KEYS = [
   "category", "color", "size", "width",
   "condition", "useCase", "arch", "overpronation",
-  "specificProduct",
+  "specificProduct", "modifier", "badge", "onSale",
 ];
 
 // Recipient → gender heuristic. The mapping is deliberately
@@ -117,6 +117,35 @@ function detectMerchandisingScope(text) {
   else if (modifier === "bestseller") out.badge = "best";
   else if (modifier === "sale") out.onSale = true;
   return out;
+}
+
+const ORTHOTIC_WORD_RE = /\b(?:orthotics?|orthotic\s+insoles?|insoles?|inserts?)\b/i;
+const SHOE_WORD_RE = /\b(?:shoes?|footwear)\b/i;
+const FOOTWEAR_BEFORE_ORTHOTICS_RE =
+  /\b(?:supportive\s+(?:shoes?|footwear)\s+first|(?:try|start\s+with|look\s+at|find)\s+(?:supportive\s+)?(?:shoes?|footwear)\s+first|rather\s+(?:try|start\s+with)\s+(?:supportive\s+)?(?:shoes?|footwear)|before\s+(?:going\s+)?(?:that\s+route|orthotics?|orthotic\s+insoles?|insoles?|inserts?)|not\s+(?:ready\s+for\s+)?(?:orthotics?|orthotic\s+insoles?|insoles?|inserts?))\b/i;
+
+function prefersFootwearBeforeOrthotics(text) {
+  const value = String(text || "");
+  return ORTHOTIC_WORD_RE.test(value)
+    && SHOE_WORD_RE.test(value)
+    && FOOTWEAR_BEFORE_ORTHOTICS_RE.test(value);
+}
+
+function moveExplicitToStale(memory, key) {
+  if (memory?.explicit?.[key] == null) return;
+  memory.stale[key] = memory.explicit[key];
+  delete memory.explicit[key];
+}
+
+function normalizeMerchandisingScope(memory, extracted) {
+  const modifier = extracted?.modifier || memory?.explicit?.modifier;
+  if (modifier === "sale" || extracted?.onSale === true) {
+    moveExplicitToStale(memory, "badge");
+    return;
+  }
+  if (modifier === "new" || modifier === "bestseller") {
+    moveExplicitToStale(memory, "onSale");
+  }
 }
 
 function pushFact(memory, key, value, source, turnIndex, confidence) {
@@ -261,6 +290,10 @@ export function buildSessionMemory({ messages, classifiedIntent, resolverState }
       ...detectMerchandisingScope(text),
     };
 
+    if (extracted.category === "orthotics" && prefersFootwearBeforeOrthotics(text)) {
+      extracted.category = "footwear";
+    }
+
     // 2. Recipient → gender pivot. Recipient phrasing implies the
     //    shopping subject changed; override extracted gender.
     const recipient = detectRecipient(text);
@@ -339,6 +372,8 @@ export function buildSessionMemory({ messages, classifiedIntent, resolverState }
         );
       }
     }
+
+    normalizeMerchandisingScope(memory, extracted);
 
     // 6. Rejections. They persist across turns, but an explicit later
     // category request overrides the earlier rejection for that exact

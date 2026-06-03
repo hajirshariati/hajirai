@@ -612,6 +612,48 @@ await test("S11 — kids orthotics then first-person hiking shoe request drops k
     `latest intent should expose gender drop for route-level sessionGender guard; got ${JSON.stringify(mem.latestTurnIntent)}`);
 });
 
+await test("S12 — kids supportive shoes before orthotics routes to footwear, not orthotics", async () => {
+  const mem = buildSessionMemory({
+    messages: [
+      u("My 7-year-old son has flat feet, the pediatrician said he might need orthotics but we want to try supportive shoes first before going that route — what do you carry for kids that has real arch support?"),
+    ],
+  });
+  assert.equal(mem.explicit.gender, "kids", `son should establish kids; got ${JSON.stringify(mem.explicit)}`);
+  assert.equal(mem.explicit.category, "footwear",
+    `supportive-shoes-first wording must not become category=orthotics; got ${JSON.stringify(mem.explicit)}`);
+  assert.equal(mem.explicit.condition, "flat_feet");
+});
+
+await test("S13 — sale request after new-arrivals scope clears stale badge=new", async () => {
+  const mem = buildSessionMemory({
+    messages: [
+      u("Show me what's new"),
+      a("Which styles would you like to browse? <<Men's>><<Women's>><<Kids>>"),
+      u("Women's"),
+      a("Here are new women's styles."),
+      u("Show me sale shoes"),
+    ],
+  });
+  assert.equal(mem.explicit.modifier, "sale", `sale modifier should win; got ${JSON.stringify(mem.explicit)}`);
+  assert.equal(mem.explicit.onSale, true, `onSale should be active; got ${JSON.stringify(mem.explicit)}`);
+  assert.equal(mem.explicit.badge, undefined, `stale badge=new must not constrain sale search; got ${JSON.stringify(mem.explicit)}`);
+});
+
+await test("S14 — category pivot from new sandals to white sneakers clears stale merchandising scope", async () => {
+  const mem = buildSessionMemory({
+    messages: [
+      u("show me new women's sandals"),
+      a("Here are new sandals."),
+      u("it was a white women's sneaker around $140 with a removable insole"),
+    ],
+  });
+  assert.equal(mem.explicit.gender, "women");
+  assert.equal(mem.explicit.category, "sneakers");
+  assert.equal(mem.explicit.color, "white");
+  assert.equal(mem.explicit.modifier, undefined, `new modifier should not leak into sneaker-finding; got ${JSON.stringify(mem.explicit)}`);
+  assert.equal(mem.explicit.badge, undefined, `new badge should not leak into sneaker-finding; got ${JSON.stringify(mem.explicit)}`);
+});
+
 console.log("");
 if (failed === 0) {
   console.log(`PASS  ${passed} passed, 0 failed`);

@@ -258,9 +258,16 @@ export function resolveTurnScope({ latestUserMessage, sessionMemory, resolverSta
   const latestModifier = detectStorefrontSearchModifier(scope.rawMessage);
   if (latestModifier) {
     scope.modifier = latestModifier;
-    if (latestModifier === "new") scope.badge = "new";
-    else if (latestModifier === "bestseller") scope.badge = "best";
-    else if (latestModifier === "sale") scope.onSale = true;
+    if (latestModifier === "new") {
+      scope.badge = "new";
+      scope.onSale = false;
+    } else if (latestModifier === "bestseller") {
+      scope.badge = "best";
+      scope.onSale = false;
+    } else if (latestModifier === "sale") {
+      scope.onSale = true;
+      scope.badge = null;
+    }
   }
 
   // Map condition / use-case mentions into a "requested claim" the
@@ -305,7 +312,7 @@ const NAMED_PRODUCT_ANCHOR_RE =
 // Compare-shape phrasing ("which of these", "compare the first
 // two") — engine declines and the agent path handles the compare.
 const COMPARE_SHAPE_RE =
-  /\b(?:which\s+(?:of\s+(?:these|those|them)|one|is\s+(?:better|more|the\s+most))|compare\s+(?:the\s+)?(?:first|top|two|these)|side[\s-]?by[\s-]?side)\b/i;
+  /\b(?:which\s+of\s+(?:these|those|them)|which\s+(?:is|one\s+is)\s+(?:better|worse|more|best|the\s+most)|compare\s+(?:the\s+)?(?:first|top|two|these)|side[\s-]?by[\s-]?side)\b/i;
 
 function engineWantsThisTurn(scope, resolverState = null) {
   const hasResolverCandidates = resolverHasCandidateRecommendation(resolverState);

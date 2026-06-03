@@ -301,6 +301,39 @@ await test("D6 — 'other shoes with same support as Danika' DECLINES (old path 
   assert.ok(out.decline, "named-anchor turn must decline in Phase 1");
 });
 
+await test("D6b — 'which one had the removable insole' is NOT a compare-shape decline", async () => {
+  const candidates = [
+    uiCandidate({
+      title: "Darcy Arch Support Slip-On Sneaker - White",
+      handle: "darcy-white",
+      productType: "Sneakers",
+      attributes: { category: "Sneakers", gender: "Women", color: "White" },
+      price: "129.95",
+    }),
+    uiCandidate({
+      title: "Carly Arch Support Sneaker - White Sparkle",
+      handle: "carly-white-sparkle",
+      productType: "Sneakers",
+      attributes: { category: "Sneakers", gender: "Women", color: "White Sparkle" },
+      price: "139.95",
+    }),
+  ];
+  const out = await runProductTurn({
+    ...ctxBase,
+    latestUserMessage: "which one had the removable insole — it was a white women's sneaker around $140",
+    sessionMemory: {
+      explicit: { gender: "women", category: "sneakers", color: "white" },
+      inferred: {},
+    },
+  }, {
+    forceEnable: true,
+    searchFn: async () => candidates,
+    claimConfig: FIXTURE_CLAIM_CONFIG,
+  });
+  assert.ok(out && !out.decline, `ordinary product-finding 'which one had' must not decline as compare; got ${JSON.stringify(out?.diagnostics)}`);
+  assert.equal(out.products.length, 2);
+});
+
 // ─── Decline path: turn missing a category still falls back ─────
 
 await test("D7 — bare 'show me shoes' (no category resolved yet) DECLINES so the agent can clarify", async () => {

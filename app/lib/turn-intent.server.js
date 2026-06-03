@@ -82,7 +82,7 @@ const YES_NO_NON_INVERTED_RE =
 // "difference between" / "between X and Y", and back-references to
 // shown cards ("the first two / the top two").
 export const COMPARE_RE =
-  /\b(?:compare|comparison|vs\.?|versus|difference\s+between|better\s+between|between\s+[a-z0-9'-]+\s+(?:and|or)\s+[a-z0-9'-]+|which\s+(?:is|one\s+is)\s+(?:better|worse)|side[- ]by[- ]side|tell\s+me\s+the\s+difference|the\s+(?:first|top)\s+two|which\s+(?:is|one|of))\b/i;
+  /\b(?:compare|comparison|vs\.?|versus|difference\s+between|better\s+between|between\s+[a-z0-9'-]+\s+(?:and|or)\s+[a-z0-9'-]+|which\s+(?:is|one\s+is)\s+(?:better|worse|more|best|the\s+most)|which\s+of\s+(?:these|those|them)|side[- ]by[- ]side|tell\s+me\s+the\s+difference|the\s+(?:first|top)\s+two)\b/i;
 
 // Refinement vocabulary — customer is narrowing the existing ask
 // rather than starting over.
@@ -140,6 +140,7 @@ const LABEL = Object.freeze({
 // new category the condition pairing is no longer guaranteed.
 const CATEGORY_BOUND_KEYS = [
   "color", "size", "width", "condition", "useCase", "arch", "overpronation", "specificProduct",
+  "modifier", "badge", "onSale",
 ];
 
 // Keys that belong to "the current subject (gender)" — if the
@@ -148,6 +149,7 @@ const CATEGORY_BOUND_KEYS = [
 const SUBJECT_BOUND_KEYS = [
   "category", "color", "size", "width",
   "condition", "useCase", "arch", "overpronation", "specificProduct",
+  "modifier", "badge", "onSale",
 ];
 
 // Use-cases that are physically incompatible with certain

@@ -392,6 +392,22 @@ await test("T20-compare — 'show me sandals' is NOT compare", () => {
   assert.notEqual(intent.reason, "compare_request");
 });
 
+await test("T20-compare — 'which one had the removable insole' is product-finding, NOT compare", () => {
+  const intent = resolveTurnIntent({
+    latestUserText: "which one had the removable insole — it was a white women's sneaker around $140",
+    previousScope: { gender: "women", category: "sneakers" },
+  });
+  assert.notEqual(intent.reason, "compare_request");
+});
+
+await test("T20-compare — 'which one is better' remains compare", () => {
+  const intent = resolveTurnIntent({
+    latestUserText: "which one is better?",
+    previousScope: { gender: "women", category: "sneakers" },
+  });
+  assert.equal(intent.reason, "compare_request");
+});
+
 // ---------------------------------------------------------------------------
 // 2026-06-02 Railway live failure: turn 1 = "pink sandals for bunions",
 // turn 2 = "best dress shoes for men". Memory carried sandals/pink/bunions
