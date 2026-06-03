@@ -384,6 +384,17 @@ export function selectByProvenFacts({ families, scope, claimConfig }) {
     return { selected: proven, deferred: [], selectionReason: "all_proven" };
   }
   if (proven.length > 0) {
+    // Condition claims (plantar_fasciitis, flat_feet, bunions, etc.)
+    // are a real fit criterion — the customer specifically asked for
+    // products that address that condition. Mixing unrelated
+    // "runner-ups" into the carousel surfaces sport-specific or
+    // unrelated SKUs (kids' flat-feet query returned cleats and
+    // skate orthotics alongside one tagged-flat-feet match). Drop
+    // deferred entirely for condition claims so the carousel is
+    // wall-to-wall proven matches.
+    if (scope.requestedClaim?.kind === "condition") {
+      return { selected: proven, deferred: [], selectionReason: "all_proven" };
+    }
     return { selected: proven, deferred: partial, selectionReason: "proven_preferred" };
   }
   // No proven candidates — engine surfaces all as "closest matches"
@@ -747,6 +758,21 @@ const SIMILAR_ANCHOR_RE =
 const SAME_AS_PRIOR_RE =
   /\bsame\s+(?:support|cushioning|fit|feel|style)\b/i;
 
+// Variant/inventory questions about a named product —
+//   "do you have the Jillian in wide width"
+//   "what colors does the Andrea come in"
+//   "is the Carly available in black"
+//   "does the Maui come in size 9"
+// These are anchored to a specific product even though the customer
+// didn't say "similar to". Routing them through the regular product-
+// turn engine produces a generic category carousel that doesn't
+// answer the variant question. Routing through the similar-product
+// path uses the anchor + merchant similarMatchAttributes (e.g.
+// footbed) so the carousel surfaces close styles when the exact
+// variant isn't carried.
+const NAMED_PRODUCT_VARIANT_QUESTION_RE =
+  /\b(?:do\s+you\s+(?:have|carry|stock|sell)|is\s+(?:the|there)|does\s+the|what\s+(?:colors?|sizes?|widths?)\s+(?:does|do))\b[^?!.]{1,80}\b(?:in\s+(?:wide|narrow|extra[\s-]wide|medium|size|black|white|brown|tan|red|blue|green|yellow|pink|orange|purple|navy|gray|grey|silver|gold|beige|ivory|taupe|cognac|cream|champagne|coral|nude|olive|burgundy|charcoal|teal|mint|sage|rose|blush)|come(?:s)?\s+in|available\s+(?:in|with)|carry\s+(?:it|that|this)|in\s+stock|in\s+(?:my|a)\s+size)\b/i;
+
 // Generic ranking phrasing — used by the composer to decide
 // whether to honestly admit "we can't rank exactly" when the
 // requested ranking criterion isn't in the merchant's configured
@@ -768,7 +794,13 @@ export function detectSimilarProductIntent(scope, ctx) {
   //     last shown product.
   const hasAnchorWord = SIMILAR_ANCHOR_RE.test(rawMessage);
   const hasSameAs = SAME_AS_PRIOR_RE.test(rawMessage);
-  if (!hasAnchorWord && !hasSameAs) return null;
+  // Variant/inventory questions about a named product also count as
+  // anchor intent — resolveNamedProductFn will confirm whether a
+  // product name is actually present. If it can't resolve, the
+  // similar-turn path declines and the engine falls back to the
+  // generic search.
+  const hasVariantAnchor = NAMED_PRODUCT_VARIANT_QUESTION_RE.test(rawMessage);
+  if (!hasAnchorWord && !hasSameAs && !hasVariantAnchor) return null;
 
   // Ranking criterion (if any) — composer uses this to decide
   // whether to admit "we don't have data to rank exactly."
@@ -777,7 +809,10 @@ export function detectSimilarProductIntent(scope, ctx) {
 
   return {
     rawMessage,
-    anchorInMessage: hasAnchorWord,
+    // Treat variant-shaped questions the same as explicit anchor
+    // mentions — the resolver will try to find the product name in
+    // the message; if it can't, the similar-turn declines cleanly.
+    anchorInMessage: hasAnchorWord || hasVariantAnchor,
     rankingCriterion,
     priorAnchorHandle:
       ctx?.sessionMemory?.explicit?.specificProduct || null,
@@ -1028,4 +1063,5 @@ export const __internals = {
   SIMILAR_ANCHOR_RE,
   SAME_AS_PRIOR_RE,
   RANKING_RE,
+  NAMED_PRODUCT_VARIANT_QUESTION_RE,
 };

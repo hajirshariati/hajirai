@@ -600,6 +600,85 @@ await test("P2-22 — similar CTA uses reference gender/category when cards disa
 });
 
 // ──────────────────────────────────────────────────────────────
+// Bug-3 regression: a customer asking a variant/inventory question
+// about a named product ("do you have the Jillian in wide width?",
+// "what colors does the Andrea come in?") must route to the
+// similar-product path so the merchant's similarMatchAttributes
+// (e.g. footbed) drive matching — not the generic category carousel.
+
+await test("P2-23 — 'do you have the Jillian in wide width' detected as anchor intent", () => {
+  const intent = detectSimilarProductIntent(
+    { rawMessage: "do you have the Jillian in wide width" },
+    { sessionMemory: {} },
+  );
+  assert.ok(intent, "should detect anchor intent on a variant question");
+  assert.equal(intent.anchorInMessage, true,
+    "anchorInMessage should be true so the resolver runs");
+});
+
+await test("P2-24 — 'what colors does the Andrea come in' detected as anchor intent", () => {
+  const intent = detectSimilarProductIntent(
+    { rawMessage: "what colors does the Andrea come in" },
+    { sessionMemory: {} },
+  );
+  assert.ok(intent, "should detect anchor intent on a colors question");
+  assert.equal(intent.anchorInMessage, true);
+});
+
+await test("P2-25 — generic 'show me pink sandals' is NOT detected as anchor intent", () => {
+  const intent = detectSimilarProductIntent(
+    { rawMessage: "show me pink sandals for bunions" },
+    { sessionMemory: {} },
+  );
+  assert.equal(intent, null,
+    "generic category browse must not trigger anchor path");
+});
+
+await test("P2-26 — variant question routes through similar path end-to-end", async () => {
+  // The husband-gift query verbatim from live testing. The customer
+  // names the Jillian and asks about wide width + colors. With Bug 3
+  // fixed, this should NOT decline as scope-too-thin OR fall to the
+  // generic category carousel.
+  const out = await runProductTurn(
+    {
+      shop: "fixture.myshopify.com",
+      latestUserMessage:
+        "do you carry the Jillian in wide width and what colors does it come in this season?",
+      similarMatchAttributes: ADMIN_CONFIGURED_ATTRS,
+      sessionMemory: {},
+    },
+    {
+      forceEnable: true,
+      searchFn: async () => [],
+      similarFn: async ({ handle }) => ({
+        reference: { handle, gender: "women", category: "sandals", title: "Jillian Sport Sandal" },
+        products: [
+          {
+            title: "Jillian Braided Quarter Strap Sandal - Navy",
+            handle: "jillian-navy-sf177w",
+            productType: "Sandals",
+            tags: [],
+            attributes: { category: "Sandals", gender: "Women", footbed: "jillian" },
+            price: "139.95",
+            image: "https://cdn/jb.jpg",
+            url: "https://shop/products/jb",
+          },
+        ],
+      }),
+      resolveNamedProductFn: async () => "jillian-sport-coral-sf170w",
+      claimConfig: FIXTURE_CLAIM_CONFIG,
+    },
+  );
+  assert.ok(!out.decline,
+    `expected similar path to handle the Jillian variant question; got decline ` +
+      `with rungs=${out.diagnostics?.rungs?.join("|")}`);
+  assert.ok(
+    out.diagnostics?.rungs?.some((r) => r.startsWith("entered:similar_product_path")),
+    "must enter similar path, not generic product path",
+  );
+});
+
+// ──────────────────────────────────────────────────────────────
 console.log("");
 if (failed === 0) {
   console.log(`PASS  ${passed} passed, 0 failed\n`);

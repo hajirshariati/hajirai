@@ -376,6 +376,58 @@ await test("D9 — empty pool does NOT emit a misleading View All CTA", async ()
   assert.match(out.answerText, /couldn't find/i);
 });
 
+await test("D11 — condition claim drops unproven runner-ups from the carousel", async () => {
+  // Bug 2 regression. Live failure (2026-06-03 kids flat-feet query):
+  // engine showed 10 orthotics — 1 tagged for flat_feet + 9 unrelated
+  // (cleats, skate, accessories). When the customer asks for a
+  // specific condition, the carousel should be wall-to-wall proven
+  // matches; no padding with off-condition SKUs.
+  const flatFeetMatch = uiCandidate({
+    title: "L1320 Thinsoles Posted Orthotics",
+    handle: "l1320-thinsoles",
+    productType: "Orthotics",
+    attributes: { category: "Orthotics", gender: "Kids" },
+    tags: ["flat feet"],
+  });
+  const cleats = uiCandidate({
+    title: "L1220 Cleats Posted Orthotics",
+    handle: "l1220-cleats",
+    productType: "Orthotics",
+    attributes: { category: "Orthotics", gender: "Kids" },
+    tags: ["high arch"],
+  });
+  const skate = uiCandidate({
+    title: "Bauer Skate Aetrex Insole",
+    handle: "bauer-skate",
+    productType: "Orthotics",
+    attributes: { category: "Orthotics", gender: "Kids" },
+    tags: [],
+  });
+  const out = await runProductTurn({
+    ...ctxBase,
+    latestUserMessage: "what orthotics do you have for kids with flat feet",
+    sessionMemory: {
+      explicit: { gender: "kids", category: "orthotics", condition: "flat_feet" },
+      inferred: {},
+    },
+  }, {
+    forceEnable: true,
+    searchFn: async () => [flatFeetMatch, cleats, skate],
+    claimConfig: FIXTURE_CLAIM_CONFIG,
+  });
+  assert.ok(!out.decline,
+    `engine must handle kids flat-feet orthotics; got decline ` +
+      `rungs=${out.diagnostics?.rungs?.join("|")}`);
+  // Only the flat-feet-tagged card should display. Cleats + skate
+  // are dropped because the customer asked for a specific condition.
+  assert.equal(out.products.length, 1,
+    `expected only the flat-feet match; got ${out.products.length} cards: ` +
+      out.products.map((p) => p.handle).join(","));
+  assert.equal(out.products[0].handle, "l1320-thinsoles");
+  assert.equal(out.diagnostics?.selectionReason, "all_proven",
+    "condition-claim selection must reach all_proven (deferred dropped)");
+});
+
 await test("D10 — non-empty pool DOES emit a CTA (regression check)", async () => {
   // Sanity: the new gate must not break the normal happy path.
   const out = await runProductTurn({

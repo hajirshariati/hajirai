@@ -619,7 +619,16 @@ async function runPolicyTurnDispatch({ ctx, controller, encoder, retrievedChunks
 // "I don't have info on bundle discounts" → AVAILABILITY_DENIAL_RE
 // matches "don't have" → recovery forces a product search and
 // shows random orthotic cards under a discount question.
-const POLICY_QUESTION_RE = /\b(discount|coupon|promo(?:tion)?|refund|return|exchange|warranty|guarantee|policy|polic(?:ies|y)|ship(?:ping|ment)?|deliver(?:y|ies)?|bundle|payment|installment|hours|track(?:ing)?|order (?:status|number|history)|account|sign\s*in|log\s*in|coupon|support\s+team|contact\s+(?:you|your|support|us|customer)|customer\s+service|gov\s*x|teacher\s+discount|military\s+discount|first\s+responder|nurse\s+discount|student\s+discount|senior\s+discount)\b/i;
+// "hours" only matches when shaped as business/store hours — bare
+// `\bhours\b` previously caught "9 hours a day" in a product question
+// ("I stand on concrete floors 9 hours a day as a nurse…"), which
+// kicked the turn into the compound-policy branch and pasted a
+// customer-service preamble in front of the product listing.
+// "support" is intentionally NOT a top-level alternate here — it
+// matches "arch support" as often as "customer support". Customer-
+// support intents are caught via "support\s+team" / "contact\s+…" /
+// "customer\s+service".
+const POLICY_QUESTION_RE = /\b(discount|coupon|promo(?:tion)?|refund|return|exchange|warranty|guarantee|policy|polic(?:ies|y)|ship(?:ping|ment)?|deliver(?:y|ies)?|bundle|payment|installment|(?:store|business|operating|opening|closing|service)\s+hours|hours\s+(?:of\s+operation|today|open|closed)|track(?:ing)?|order (?:status|number|history)|account|sign\s*in|log\s*in|coupon|support\s+team|contact\s+(?:you|your|support|us|customer)|customer\s+service|gov\s*x|teacher\s+discount|military\s+discount|first\s+responder|nurse\s+discount|student\s+discount|senior\s+discount)\b/i;
 function isPolicyOrServiceQuestion(text) {
   return Boolean(text) && POLICY_QUESTION_RE.test(text);
 }
@@ -702,7 +711,11 @@ function compoundPolicyFallbackText(latestMessage = "") {
   if (/\b(track|tracking|order\s+(?:status|number|history)|where\s+is\s+my\s+order)\b/i.test(latest)) {
     return "For order tracking, use your tracking email or the support link so Aetrex can look up the order directly.";
   }
-  if (/\b(contact|support|customer service|account|log\s*in|sign\s*in)\b/i.test(latest)) {
+  // "support" alone matches "arch support" in product questions —
+  // require customer-support shape (customer service / support team /
+  // contact us / account help) so the compound branch doesn't paste
+  // a service preamble in front of a product turn.
+  if (/\b(?:customer\s+(?:service|support)|support\s+team|contact\s+(?:you|your|support|us|customer)|account|log\s*in|sign\s*in|help\s+desk|reach\s+(?:out|customer))\b/i.test(latest)) {
     return "For account or support questions, use the support link to contact Aetrex customer service.";
   }
   return "For the service question, the support page has the current Aetrex details.";
@@ -728,7 +741,7 @@ function policyOnlyFallbackText(latestMessage = "") {
   if (/\b(track|tracking|order\s+(?:status|number|history)|where\s+is\s+my\s+order)\b/i.test(latest)) {
     return "For order status or tracking, use your tracking email or the support link below so Aetrex can look up the order directly.";
   }
-  if (/\b(contact|support|customer service|account|log\s*in|sign\s*in)\b/i.test(latest)) {
+  if (/\b(?:customer\s+(?:service|support)|support\s+team|contact\s+(?:you|your|support|us|customer)|account|log\s*in|sign\s*in|help\s+desk|reach\s+(?:out|customer))\b/i.test(latest)) {
     return "Aetrex support can help with account and order questions. Use the support link below to contact customer service.";
   }
   return "";
