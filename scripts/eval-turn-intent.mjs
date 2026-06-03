@@ -509,6 +509,20 @@ await test("T27 — useCase change without color mention also triggers claim_ref
   assert.ok(intent.staleKeysToDrop.includes("color"));
 });
 
+await test("T28 — kids scope → first-person hiking shoe turn drops kids subject", () => {
+  const intent = resolveTurnIntent({
+    latestUserText: "i'm going to mountain and i need a comfortable shoe for hiking",
+    previousScope: { gender: "kids", category: "orthotics", condition: "flat_feet" },
+    extractedUserConstraints: { useCase: "hiking" },
+  });
+  assert.equal(intent.reason, "self_directed_after_kids",
+    `expected self_directed_after_kids; got reason=${intent.reason}`);
+  for (const key of ["gender", "category", "condition"]) {
+    assert.ok(intent.staleKeysToDrop.includes(key),
+      `expected ${key} dropped; got ${JSON.stringify(intent.staleKeysToDrop)}`);
+  }
+});
+
 // ---------------------------------------------------------------------------
 // Summary
 // ---------------------------------------------------------------------------

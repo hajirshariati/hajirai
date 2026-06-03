@@ -594,6 +594,24 @@ await test("S10 — inferred-gender + explicit-new-gender pivot drops carried su
   }
 });
 
+await test("S11 — kids orthotics then first-person hiking shoe request drops kids gender", async () => {
+  const mem = buildSessionMemory({
+    messages: [
+      u("do you have orthotics that would be good for kids?"),
+      a("Here are kids orthotics."),
+      u("i'm going to mountain and i need a comfortable shoe for hiking"),
+    ],
+  });
+  assert.equal(mem.explicit.gender, undefined,
+    `kids gender must not carry into first-person adult hiking request; got ${JSON.stringify(mem.explicit)}`);
+  assert.equal(mem.explicit.category, undefined,
+    `orthotics category must not carry into first-person shoe request; got ${JSON.stringify(mem.explicit)}`);
+  assert.equal(mem.explicit.useCase, "hiking",
+    `latest hiking use-case should apply after stale drop; got ${JSON.stringify(mem.explicit)}`);
+  assert.ok(mem.latestTurnIntent?.staleKeysToDrop?.includes("gender"),
+    `latest intent should expose gender drop for route-level sessionGender guard; got ${JSON.stringify(mem.latestTurnIntent)}`);
+});
+
 console.log("");
 if (failed === 0) {
   console.log(`PASS  ${passed} passed, 0 failed`);

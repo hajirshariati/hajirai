@@ -2779,6 +2779,9 @@ export const action = async ({ request }) => {
           `("${latestUserMessage.slice(0, 60)}")`,
       );
     }
+    const earlySessionMemory = buildSessionMemory({ messages, classifiedIntent: null, resolverState: null });
+    const latestTurnDroppedGender =
+      earlySessionMemory?.latestTurnIntent?.staleKeysToDrop?.includes("gender") === true;
     // Pivot wins. When the latest message has a clear pivot signal,
     // that's the source of truth for this turn forward — catalog
     // scoping, ctx.sessionGender, search filters, all flow from this
@@ -2789,11 +2792,16 @@ export const action = async ({ request }) => {
     // used for catalog chip scoping. After the LLM classifier runs it
     // is reconciled via reconcileSessionGender so the authoritative
     // adult gender (classifier-owned) drives the search / gender-lock.
-    let sessionGender = latestPivotedGender || historicalSessionGender;
+    let sessionGender = latestPivotedGender || (latestTurnDroppedGender ? null : historicalSessionGender);
     if (latestPivotedGender && latestPivotedGender !== historicalSessionGender) {
       console.log(
         `[chat] gender-pivot: history=${historicalSessionGender || "-"} → latest=${latestPivotedGender} ` +
           `(triggered by "${latestUserMessage.slice(0, 60)}")`,
+      );
+    } else if (latestTurnDroppedGender && historicalSessionGender) {
+      console.log(
+        `[chat] gender-memory: dropped stale sessionGender="${historicalSessionGender}" ` +
+          `for latest turn reason=${earlySessionMemory?.latestTurnIntent?.reason || "-"}`,
       );
     }
     const answeredChoices = extractAnsweredChoices(messages);
@@ -3336,12 +3344,18 @@ export const action = async ({ request }) => {
               });
               ctx.sessionMemory = memory;
               const sessionMemory = { explicit: { ...memory.explicit } };
+              const memoryDroppedGender =
+                memory?.latestTurnIntent?.staleKeysToDrop?.includes("gender") === true;
+              if (memoryDroppedGender && !latestPivotedGender && !genderAuthorityFromClassifier) {
+                sessionGender = null;
+                ctx.sessionGender = null;
+              }
               // Fill from the authoritative session gender when memory
               // has none, OR overwrite when the classifier just took
               // authority over a stale regex value — otherwise the
               // resolver would see the regex gender while the search
               // uses the classifier's (split-brain).
-              if (sessionGender && (!sessionMemory.explicit.gender || genderAuthorityFromClassifier)) {
+              if (sessionGender && !memoryDroppedGender && (!sessionMemory.explicit.gender || genderAuthorityFromClassifier)) {
                 sessionMemory.explicit.gender = sessionGender;
               }
               const resolverState = await resolveCatalogTurn({
@@ -3356,8 +3370,11 @@ export const action = async ({ request }) => {
                 classifiedIntent,
                 resolverState,
               });
+              const resolvedMemoryDroppedGender =
+                ctx.sessionMemory?.latestTurnIntent?.staleKeysToDrop?.includes("gender") === true;
               if (
                 sessionGender &&
+                !resolvedMemoryDroppedGender &&
                 (!ctx.sessionMemory.explicit?.gender ||
                   latestPivotedGender ||
                   genderAuthorityFromClassifier)

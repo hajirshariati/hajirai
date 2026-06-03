@@ -107,6 +107,13 @@ const COLOR_VOCAB_RE =
 const GENDER_ONLY_CONTINUATION_RE =
   /^\s*(?:how|what|and|or|any)\s*(?:about|for)?\s+(?:the\s+)?(?:men|mens|men['’]?s|women|womens|women['’]?s|male|female|boys?|girls?|kids?|children)\??\s*$/i;
 
+// A prior kids/children scope should not latch onto a fresh first-person
+// adult shopping/activity turn. "I'm going hiking" after "kids orthotics"
+// means the subject reset unless the latest turn still mentions kids.
+const KIDS_SIGNAL_RE = /\b(?:kid|kids|child|children|youth|toddler|boys?|girls?|son|daughter|grandson|granddaughter|nephew|niece)\b/i;
+const SELF_DIRECTED_ACTIVITY_RE =
+  /\b(?:i'?m|i\s+am|i\s+(?:need|want|have|am|work|walk|stand|go|going|travel|wear)|my\s+(?:feet|foot|job|work|trip|shoes?)|for\s+me)\b[^.!?\n]{0,120}\b(?:hiking|walking|running|travel|trip|mountain|work|standing|nurse|scrubs|concrete|comfortable|shoe|shoes|sneaker|sneakers|boot|boots|loafer|loafers|sandal|sandals)\b/i;
+
 // Short conversational acknowledgments — "yes", "ok", "sure",
 // "thanks", "go on", "next". These continue the prior context.
 const SHORT_ACK_RE = /^\s*(?:yes|yeah|yep|yup|sure|ok(?:ay)?|alright|cool|got\s+it|next|go\s+on|continue|thanks|thank\s+you|ty|please|please\s+do|sounds\s+good|that\s+works|nice|great|perfect)\s*[.!?]*\s*$/i;
@@ -409,6 +416,27 @@ export function resolveTurnIntent({
       label: LABEL.PIVOT_FULL,
       confidence: 0.85,
       reason: "gender_pivot",
+      staleKeysToDrop: drop,
+    };
+  }
+
+  // -----------------------------------------------------------------------
+  // 7b. Kids → self-directed adult/activity reset. If a previous kids
+  //     shopping subject exists and the latest turn is a first-person adult
+  //     activity/shoe request with no kids signal, drop the kids subject
+  //     and its bound scope before any use-case logic can reuse it.
+  // -----------------------------------------------------------------------
+  if (
+    prevGender === "kids" &&
+    !newGender &&
+    !KIDS_SIGNAL_RE.test(text) &&
+    SELF_DIRECTED_ACTIVITY_RE.test(text)
+  ) {
+    const drop = ["gender", ...SUBJECT_BOUND_KEYS].filter((k) => prev[k] != null);
+    return {
+      label: LABEL.PIVOT_FULL,
+      confidence: 0.85,
+      reason: "self_directed_after_kids",
       staleKeysToDrop: drop,
     };
   }

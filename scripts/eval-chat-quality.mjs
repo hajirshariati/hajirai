@@ -844,6 +844,36 @@ cases.push({
   },
 });
 
+cases.push({
+  name: "orthotic-routing: availability browse stays search_products",
+  run: () => {
+    const out = rewriteToolCall(
+      search({ query: "kids orthotics", filters: { gender: "kids", category: "orthotics" } }),
+      {
+        latestUserMessage: "do you have orthotics that would be good for kids?",
+        recommenderTrees: [{ intent: "orthotic" }],
+        classifiedIntent: { isOrthoticRequest: true },
+      },
+    );
+    assert.equal(out.name, "search_products");
+  },
+});
+
+cases.push({
+  name: "orthotic-routing: clinical recommendation still rewrites to recommender",
+  run: () => {
+    const out = rewriteToolCall(
+      search({ query: "orthotics for plantar fasciitis", filters: { category: "orthotics" } }),
+      {
+        latestUserMessage: "what orthotic is best for plantar fasciitis?",
+        recommenderTrees: [{ intent: "orthotic" }],
+        classifiedIntent: { isOrthoticRequest: true },
+      },
+    );
+    assert.equal(out.name, "recommend_orthotic");
+  },
+});
+
 // forceComparisonLookup ──────────────────────────────────────────────
 cases.push({
   name: "comparison-routing: 2 SKUs + 'compare' → lookup_sku",

@@ -501,6 +501,40 @@ await test("D13 — all-unisex pool under specific gender drops gender from labe
   );
 });
 
+await test("D14 — engine reads resolverState category when memory has only claim/color/gender", async () => {
+  let observedScope = null;
+  const out = await runProductTurn({
+    ...ctxBase,
+    latestUserMessage: "52 year old nurse, black slip on, plantar fasciitis",
+    sessionMemory: {
+      explicit: { gender: "women", color: "black", condition: "plantar_fasciitis" },
+      inferred: {},
+    },
+    resolverState: {
+      matched_constraints: { gender: "women", color: "black", condition: "plantar_fasciitis" },
+      inferred_constraints: { category: { value: "slip-ons", reason: "resolver_candidates" } },
+    },
+  }, {
+    forceEnable: true,
+    searchFn: async (scope) => {
+      observedScope = scope;
+      return [
+        uiCandidate({
+          title: "Emma Slip-On - Black",
+          handle: "emma-black",
+          productType: "Slip Ons",
+          attributes: { category: "Slip Ons", gender: "Women", color: "Black" },
+          tags: ["Plantar Fasciitis"],
+        }),
+      ];
+    },
+    claimConfig: FIXTURE_CLAIM_CONFIG,
+  });
+  assert.ok(!out.decline, `engine should not decline when resolver supplied category; diagnostics=${JSON.stringify(out.diagnostics)}`);
+  assert.equal(observedScope.category, "slip-ons");
+  assert.ok(out.products.length > 0);
+});
+
 await test("D10 — non-empty pool DOES emit a CTA (regression check)", async () => {
   // Sanity: the new gate must not break the normal happy path.
   const out = await runProductTurn({

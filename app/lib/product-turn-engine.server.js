@@ -87,6 +87,8 @@ export async function runProductTurn(ctx = {}, options = {}) {
   const scope = resolveTurnScope({
     latestUserMessage: ctx.latestUserMessage || "",
     sessionMemory: ctx.sessionMemory || null,
+    resolverState: ctx.resolverState || null,
+    classifiedIntent: ctx.classifiedIntent || null,
     claimConfig,
   });
   diagnostics.scope = scope;
@@ -230,23 +232,27 @@ export async function runProductTurn(ctx = {}, options = {}) {
 // pivot/stale logic. The engine's job is to read the cleaned
 // memory and surface the scope it'll use for retrieval/selection,
 // not to redo that logic.
-export function resolveTurnScope({ latestUserMessage, sessionMemory, claimConfig }) {
+export function resolveTurnScope({ latestUserMessage, sessionMemory, resolverState, classifiedIntent, claimConfig }) {
   const explicit = sessionMemory?.explicit || {};
+  const classified = classifiedIntent?.attributes || {};
+  const matched = resolverState?.matched_constraints || {};
+  const inferred = resolverState?.inferred_constraints || {};
+  const inferredValue = (key) => inferred?.[key]?.value || null;
   const scope = {
     rawMessage: String(latestUserMessage || "").trim(),
-    gender: explicit.gender || null,
-    category: explicit.category || null,
-    color: explicit.color || null,
+    gender: explicit.gender || classified.gender || matched.gender || inferredValue("gender"),
+    category: explicit.category || classified.category || matched.category || inferredValue("category"),
+    color: explicit.color || classified.color || matched.color || inferredValue("color"),
     colorFamily: null,
-    condition: explicit.condition || null,
-    useCase: explicit.useCase || null,
-    width: explicit.width || null,
-    size: explicit.size || null,
-    modifier: explicit.modifier || null,
-    badge: explicit.badge || null,
-    onSale: explicit.onSale === true,
+    condition: explicit.condition || classified.condition || matched.condition || inferredValue("condition"),
+    useCase: explicit.useCase || classified.useCase || matched.useCase || inferredValue("useCase"),
+    width: explicit.width || matched.width || inferredValue("width"),
+    size: explicit.size || matched.size || inferredValue("size"),
+    modifier: explicit.modifier || matched.modifier || inferredValue("modifier"),
+    badge: explicit.badge || matched.badge || inferredValue("badge"),
+    onSale: explicit.onSale === true || matched.onSale === true || inferredValue("onSale") === true,
     requestedClaim: null,
-    namedProduct: explicit.specificProduct || null,
+    namedProduct: explicit.specificProduct || matched.specificProduct || inferredValue("specificProduct"),
   };
 
   const latestModifier = detectStorefrontSearchModifier(scope.rawMessage);

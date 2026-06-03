@@ -1633,6 +1633,33 @@ test("R83 — multiple bolded products: overlap=true when ANY card matches ANY n
   assert.equal(out.overlap, true);
 });
 
+test("R84 — listing fallback never returns bare gender as the product noun", () => {
+  const out = buildCodeOwnedProductListingText({
+    text: "",
+    cards: [
+      { handle: "one", title: "A Sneaker", _gender: "women", _category: "sneakers", _colors: ["black"] },
+      { handle: "two", title: "A Slip-On", _gender: "women", _category: "slip-ons", _colors: ["black"] },
+    ],
+    ctx: {
+      latestUserMessage: "black shoes",
+      sessionMemory: {
+        explicit: { gender: "women", color: "black" },
+        latestTurnIntent: {
+          label: "refine",
+          confidence: 0.9,
+          reason: "color_refine_first_mention",
+          staleKeysToDrop: [],
+          extractedThisTurn: { color: "black" },
+        },
+      },
+    },
+  });
+  assert.doesNotMatch(out.text, /black women's\s+(?:I|that|,|\.|$)/i,
+    `must not produce bare possessive gender copy; got: ${out.text}`);
+  assert.match(out.text, /black women's (?:sneakers|slip-ons|styles)/i,
+    `must include a product noun after gender; got: ${out.text}`);
+});
+
 if (failed > 0) {
   console.error("\nFailures:");
   for (const f of failures) console.error(`- ${f.name}: ${f.err.stack || f.err.message}`);

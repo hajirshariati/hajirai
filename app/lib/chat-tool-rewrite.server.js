@@ -560,6 +560,10 @@ export function injectOccasionCategory(toolCall, ctx) {
 // the gate's needMoreInfo response will tell the LLM what to
 // actually ask.
 const ORTHOTIC_DOMAIN_RE = /\b(orthotic|orthotics|insole|insoles|footbed|footbeds)\b/i;
+const ORTHOTIC_BROWSE_RE =
+  /\b(?:do\s+you\s+have|do\s+you\s+carry|do\s+you\s+sell|carry|sell|show\s+me|browse|available|any|what(?:'s|\s+is)\s+available|looking\s+for)\b/i;
+const ORTHOTIC_CLINICAL_RE =
+  /\b(?:recommend|best|which|what\s+should|right\s+for|plantar|fasciitis|flat\s+feet?|high\s+arch|low\s+arch|overpronat|supinat|metatarsal|metatarsalgia|neuroma|heel\s+pain|foot\s+pain|ball[-\s]?of[-\s]?foot|arch\s+pain|diabetes|diabetic)\b/i;
 
 export function redirectOrthoticSearchToRecommender(toolCall, ctx) {
   if (toolCall.name !== "search_products") return toolCall;
@@ -646,6 +650,19 @@ export function redirectOrthoticSearchToRecommender(toolCall, ctx) {
     console.log(
       `[chat] orthotic-routing: skipped redirect — customer mentioned sandals + orthotic ` +
         `(orthotic inserts don't fit sandals; letting search_products run for honest framing)`,
+    );
+    return toolCall;
+  }
+
+  // Availability/browse questions should stay as catalog search.
+  // "Do you have orthotics for kids?" is asking what exists, not asking
+  // the decision tree to choose an insole from pain/use-case inputs. The
+  // recommender can still own clinical recommendation turns such as
+  // "what orthotic is best for plantar fasciitis?"
+  if (ORTHOTIC_BROWSE_RE.test(latest) && !ORTHOTIC_CLINICAL_RE.test(latest)) {
+    console.log(
+      `[chat] orthotic-routing: skipped redirect — orthotic availability/browse turn; ` +
+        `letting search_products surface catalog matches.`,
     );
     return toolCall;
   }

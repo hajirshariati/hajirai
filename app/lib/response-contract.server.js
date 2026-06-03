@@ -1688,18 +1688,36 @@ function listingBaseLabel({ cards = [], ctx = {} } = {}) {
   const scope = currentCatalogScopeFromContext(ctx);
   const scopedGender = normalizeGender(scope.gender);
   const scopedCategory = normalizeCategory(scope.category);
+  const dominantCategory = dominantCardValue(cards, cardCategory);
+  const allSameDominantCategory = dominantCategory && allCardsMatch(cards, (card) => {
+    const c = cardCategory(card);
+    return !c || c === dominantCategory;
+  });
   const gender = scopedGender && allCardsMatch(cards, (card) => {
     const g = cardGender(card);
     return !g || g === scopedGender || g === "unisex";
   })
     ? scopedGender
     : "";
-  const category = scopedCategory && allCardsMatch(cards, (card) => {
+  let category = scopedCategory && allCardsMatch(cards, (card) => {
     const c = cardCategory(card);
     return !c || c === scopedCategory;
   })
     ? scopedCategory
-    : "";
+    : allSameDominantCategory
+      ? dominantCategory
+      : "";
+
+  // Never return a bare possessive gender label ("women's") as the noun.
+  // Recovery text may prepend color, producing broken copy like
+  // "Here are the black women's I found." Use the scoped category when
+  // available, otherwise fall back to a generic product noun.
+  if (!category && gender) {
+    const scopedCategoryLabel = displayCategory(scopedCategory);
+    return scopedCategoryLabel
+      ? `${displayGender(gender)} ${scopedCategoryLabel}`
+      : `${displayGender(gender)} styles`;
+  }
 
   const parts = [displayGender(gender), displayCategory(category)].filter(Boolean);
   return parts.length > 0 ? parts.join(" ") : "styles";
