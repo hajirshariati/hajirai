@@ -251,10 +251,21 @@ export function composePolicyAnswer({
   // ONLY when supportUrl is configured — we NEVER invent a URL.
   // Kind "external_link" tells the dispatcher to forward this
   // {url,label} verbatim into the SSE link chunk (no URL building).
+  //
+  // Label normalization (2026-06-03 live failure: button rendered
+  // "Contact Contact customer service" because the merchant's
+  // supportLabel already starts with "Contact"):
+  //   - If supportLabel is configured AND begins with "Contact",
+  //     use it verbatim (no double-prefix).
+  //   - If supportLabel is configured but doesn't start with
+  //     "Contact", prepend "Contact " so the button reads as a
+  //     call to action.
+  //   - If supportLabel is missing, fall back to a neutral
+  //     "Contact customer support".
   const contactCta = supportUrl
     ? {
         kind: "external_link",
-        label: `Contact ${supportLabel || "customer support"}`,
+        label: normalizeContactLabel(supportLabel),
         url: supportUrl,
         scopeSource: "policy_support_url",
       }
@@ -316,6 +327,18 @@ function stitchChunkContent(relevant, { maxChars = 600 } = {}) {
     if (used >= maxChars) break;
   }
   return parts.join("\n\n");
+}
+
+// Normalize a merchant's support label into a button-ready string.
+// Used by composePolicyAnswer + the dispatcher fallback. Pure
+// string handling — no env reads, no other dependencies.
+export function normalizeContactLabel(supportLabel) {
+  const raw = String(supportLabel || "").trim();
+  if (!raw) return "Contact customer support";
+  // Merchant configured "Contact …" already — use verbatim. Covers
+  // "Contact us", "Contact customer service", "Contact support", etc.
+  if (/^contact\b/i.test(raw)) return raw;
+  return `Contact ${raw}`;
 }
 
 function humanizeIntent(intentKey) {

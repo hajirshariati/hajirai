@@ -13,6 +13,73 @@ function chipTokens(inner) {
   return tokens;
 }
 
+// "What type/kind/style of shoes/footwear" generic detector. Used to
+// decide whether the chip allow-list should be NARROWED to a single
+// merchant-configured group (e.g. Footwear) before the broader
+// filterForbiddenCategoryChips strip. Pure English — no shop-
+// specific category names anywhere in the regex.
+//
+// 2026-06-03 live failure: men's catalog includes Accessories +
+// Orthotics + Footwear sub-categories. When the AI asked "What
+// type of men's shoes are you looking for?" it offered
+// <<Accessories>>, <<Orthotics>> chips alongside <<Sneakers>>,
+// <<Sandals>>, <<Clogs>>. filterForbiddenCategoryChips treats
+// Accessories / Orthotics as in-catalog (true) and lets them
+// survive. Narrowing the allow-list to the Footwear group's
+// categories first fixes the leak.
+// Allow up to 2 intervening words between "of" and the shoe noun
+// so phrasings like "what type of men's shoes" / "what kind of
+// your favorite footwear" / "what style of women's casual shoes"
+// still match. Anchor on the question-word and the noun.
+const SHOE_QUESTION_RE =
+  /\b(?:what|which)\s+(?:type|kind|sort|style|category)\s+of\s+(?:[\w'-]+\s+){0,3}(?:shoes?|footwear)\b|\bwhat\s+(?:[\w'-]+\s+){0,2}(?:shoes?|footwear)\b|\bwhich\s+(?:[\w'-]+\s+){0,2}(?:shoes?|footwear)\b/i;
+
+export function looksLikeShoeTypeQuestion(text) {
+  return SHOE_QUESTION_RE.test(String(text || ""));
+}
+
+// Narrow the chip allow-list to a single merchant-configured group's
+// categories when the assistant's question scope warrants it.
+//
+// Inputs:
+//   text          — assistant text (chip question).
+//   currentAllow  — current allow-list (e.g. ctx.catalogCategories,
+//                   gender-scoped).
+//   merchantGroups — array of {name, categories[]} from
+//                    ctx.merchantGroups.
+//   groupName     — which group to narrow to (default "Footwear").
+//
+// Behavior:
+//   - When `looksLikeShoeTypeQuestion(text)` is true AND the group
+//     exists AND the group has categories AND it intersects with
+//     currentAllow, return the intersection.
+//   - Otherwise return currentAllow unchanged.
+//
+// Pure data: caller supplies the group name and merchant-uploaded
+// categories. No hardcoded "Sneakers/Sandals/Clogs" list anywhere.
+export function narrowChipAllowListForGroup(text, currentAllow, merchantGroups, groupName = "Footwear") {
+  if (!looksLikeShoeTypeQuestion(text)) return currentAllow;
+  if (!Array.isArray(merchantGroups) || merchantGroups.length === 0) return currentAllow;
+  const target = merchantGroups.find((g) => String(g?.name || "").toLowerCase() === String(groupName).toLowerCase());
+  if (!target || !Array.isArray(target.categories) || target.categories.length === 0) return currentAllow;
+
+  const allowSet = new Set((currentAllow || []).map(normalize).filter(Boolean));
+  const groupSet = new Set(target.categories.map(normalize).filter(Boolean));
+  // Intersection: keep only categories that are BOTH in the gender-
+  // scoped allow AND in the group's categories.
+  const narrowed = (currentAllow || []).filter((c) => groupSet.has(normalize(c)));
+  if (narrowed.length === 0) {
+    // Group has no overlap with current allow (e.g. shop with zero
+    // footwear). Return original allow — better than emitting no
+    // chips at all.
+    return currentAllow;
+  }
+  // Sanity check the intersection actually narrowed something —
+  // otherwise no-op (avoids spurious logging upstream).
+  if (narrowed.length === allowSet.size) return currentAllow;
+  return narrowed;
+}
+
 // A chip is considered a "category chip" only if one of its tokens matches
 // a category that exists somewhere in THIS shop's catalog (fullKnownCategories).
 // This is fully data-driven — no hardcoded shoe/footwear vocabulary. Works for

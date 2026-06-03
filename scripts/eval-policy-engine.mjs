@@ -453,6 +453,55 @@ function synthMessage(intentKey) {
 // the dispatcher will emit and the widget consumes.
 // ──────────────────────────────────────────────────────────────
 
+// ──────────────────────────────────────────────────────────────
+// PE-26..PE-29 — Live 2026-06-03 button label duplication.
+// Merchant's supportLabel was "Contact customer service".
+// Composer was `Contact ${supportLabel}` → rendered as
+// "Contact Contact customer service". Fix normalizes labels that
+// already start with "Contact".
+// ──────────────────────────────────────────────────────────────
+
+await test("PE-26 — supportLabel='Contact customer service' renders verbatim (no double prefix)", async () => {
+  const out = await runPolicyTurn(
+    { ...ctxBase, supportLabel: "Contact customer service", latestUserMessage: "what is your return policy?" },
+    { forceEnable: true, retrievedChunks: [
+      chunk({ similarity: 0.7, fileType: "faqs", sectionTitle: "Returns", content: "30-day return window." }),
+    ] },
+  );
+  assert.equal(out.cta?.label, "Contact customer service",
+    `label must not be double-prefixed; got "${out.cta?.label}"`);
+});
+
+await test("PE-27 — supportLabel='customer service' (no Contact prefix) → 'Contact customer service'", async () => {
+  const out = await runPolicyTurn(
+    { ...ctxBase, supportLabel: "customer service", latestUserMessage: "what is your return policy?" },
+    { forceEnable: true, retrievedChunks: [
+      chunk({ similarity: 0.7, fileType: "faqs", sectionTitle: "Returns", content: "30-day return window." }),
+    ] },
+  );
+  assert.equal(out.cta?.label, "Contact customer service");
+});
+
+await test("PE-28 — missing supportLabel → default 'Contact customer support'", async () => {
+  const out = await runPolicyTurn(
+    { shop: "fixture.myshopify.com", supportUrl: "https://x/support", latestUserMessage: "return policy?" },
+    { forceEnable: true, retrievedChunks: [
+      chunk({ similarity: 0.7, fileType: "faqs", sectionTitle: "Returns", content: "30-day window." }),
+    ] },
+  );
+  assert.equal(out.cta?.label, "Contact customer support");
+});
+
+await test("PE-29 — supportLabel='Contact Us' (capital U) renders verbatim", async () => {
+  const out = await runPolicyTurn(
+    { ...ctxBase, supportLabel: "Contact Us", latestUserMessage: "return policy?" },
+    { forceEnable: true, retrievedChunks: [
+      chunk({ similarity: 0.7, fileType: "faqs", sectionTitle: "Returns", content: "30-day." }),
+    ] },
+  );
+  assert.equal(out.cta?.label, "Contact Us");
+});
+
 await test("PE-25 — engine CTA shape must be convertible to widget-renderable {type:link,url,label}", async () => {
   const out = await runPolicyTurn(
     { ...ctxBase, latestUserMessage: "what is your return policy?" },

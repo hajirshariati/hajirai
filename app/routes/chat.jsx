@@ -6,7 +6,7 @@ import { getCatalogCategories, getAllCatalogCategories, getCategoryGenderAvailab
 import { getActiveCampaigns, formatCampaignsForCS } from "../models/Campaign.server";
 import { buildSystemPrompt } from "../lib/chat-prompt.server";
 import { retrieveRelevantChunks } from "../lib/knowledge-chunks.server";
-import { filterForbiddenCategoryChips, filterContradictingGenderChips } from "../lib/chip-filter.server";
+import { filterForbiddenCategoryChips, filterContradictingGenderChips, narrowChipAllowListForGroup } from "../lib/chip-filter.server";
 import { analyzeCategoryIntent, cardMatchesActiveGroup, textIntentDivergesFromGroup, matchingGroupsForText } from "../lib/category-intent.server";
 import { extractAnsweredChoices } from "../lib/conversation-memory.server";
 import {
@@ -553,10 +553,15 @@ async function runPolicyTurnDispatch({ ctx, controller, encoder, retrievedChunks
   controller.enqueue(encoder.encode(sseChunk({ type: "text", text })));
   controller.enqueue(encoder.encode(sseChunk({ type: "products", products: [] })));
   if (out.cta && out.cta.url) {
+    // Reuse normalizeContactLabel so the fallback path doesn't
+    // double-prefix "Contact" when the merchant's supportLabel
+    // already starts with "Contact" (live failure 2026-06-03:
+    // button read "Contact Contact customer service").
+    const { normalizeContactLabel } = await import("../lib/policy-engine.server");
     controller.enqueue(encoder.encode(sseChunk({
       type: "link",
       url: out.cta.url,
-      label: out.cta.label || `Contact ${ctx.supportLabel || "support"}`,
+      label: out.cta.label || normalizeContactLabel(ctx.supportLabel),
     })));
   }
   if (Array.isArray(out.followUps) && out.followUps.length > 0) {
@@ -1678,9 +1683,32 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
         extraChipAllow = container.categories;
       }
     }
-    const filtered = filterForbiddenCategoryChips(fullResponseText, ctx.catalogCategories, ctx.fullCatalogCategories, extraChipAllow);
+    // 2026-06-03 narrow-by-question-scope: when the assistant's
+    // question is about shoes/footwear specifically, narrow the
+    // chip allow-list to categories that live inside the merchant-
+    // configured Footwear group only. Without this, gender-scoped
+    // `catalogCategories` includes Accessories and Orthotics
+    // (valid catalog categories — but not shoe types), and they
+    // survive the broader filterForbiddenCategoryChips strip.
+    // Purely data-driven: pulls the Footwear group's categories
+    // from ctx.merchantGroups; no hardcoded shoe vocabulary.
+    let scopedAllow = ctx.catalogCategories;
+    if (Array.isArray(ctx.merchantGroups) && ctx.merchantGroups.length > 0) {
+      const narrowed = narrowChipAllowListForGroup(
+        fullResponseText, ctx.catalogCategories, ctx.merchantGroups, "Footwear",
+      );
+      if (narrowed !== ctx.catalogCategories) {
+        scopedAllow = narrowed;
+        console.log(
+          `[chat] ${ctx.shop} narrowed chip allow-list to Footwear group ` +
+            `(${ctx.catalogCategories?.length || 0}→${narrowed.length}) ` +
+            `for shoe-type question`,
+        );
+      }
+    }
+    const filtered = filterForbiddenCategoryChips(fullResponseText, scopedAllow, ctx.fullCatalogCategories, extraChipAllow);
     if (filtered.stripped.length > 0) {
-      console.log(`[chat] ${ctx.shop} stripped off-catalog chips:`, filtered.stripped, "allowed:", ctx.catalogCategories, extraChipAllow.length > 0 ? `extra(via goesInsideOf):${extraChipAllow.join(",")}` : "");
+      console.log(`[chat] ${ctx.shop} stripped off-catalog chips:`, filtered.stripped, "allowed:", scopedAllow, extraChipAllow.length > 0 ? `extra(via goesInsideOf):${extraChipAllow.join(",")}` : "");
     }
     fullResponseText = filtered.text;
 
