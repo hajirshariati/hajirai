@@ -428,6 +428,79 @@ await test("D11 — condition claim drops unproven runner-ups from the carousel"
     "condition-claim selection must reach all_proven (deferred dropped)");
 });
 
+await test("D12 — exact-gender families outrank unisex fallbacks in selection", async () => {
+  // Bug A regression (2026-06-03 kids flat-feet): unisex cleats
+  // orthotic (L1220u) surfaced ahead of the merchant's
+  // kid-gender-tagged orthotics. Unisex is a fit FALLBACK; when an
+  // exact-gender match exists, it must win.
+  const kidsTagged = uiCandidate({
+    title: "L1320 Kids Posted Orthotics",
+    handle: "l1320-kids",
+    productType: "Orthotics",
+    attributes: { category: "Orthotics", gender: "Kid" },
+    tags: ["flat feet"],
+  });
+  const unisexCleats = uiCandidate({
+    title: "L1220 Unisex Cleats Posted Orthotics",
+    handle: "l1220-unisex",
+    productType: "Orthotics",
+    attributes: { category: "Orthotics", gender: "Unisex" },
+    tags: ["flat feet"],
+  });
+  const out = await runProductTurn({
+    ...ctxBase,
+    latestUserMessage: "kids' orthotics for flat feet",
+    sessionMemory: {
+      explicit: { gender: "kid", category: "orthotics", condition: "flat_feet" },
+      inferred: {},
+    },
+  }, {
+    forceEnable: true,
+    searchFn: async () => [kidsTagged, unisexCleats],
+    claimConfig: FIXTURE_CLAIM_CONFIG,
+  });
+  assert.ok(!out.decline);
+  assert.equal(out.products.length, 1,
+    `unisex fallback must drop when an exact-gender match exists; got cards: ` +
+      out.products.map((p) => p.handle).join(","));
+  assert.equal(out.products[0].handle, "l1320-kids");
+});
+
+await test("D13 — all-unisex pool under specific gender drops gender from label", async () => {
+  // Bug B regression: when no exact-gender SKUs exist in the catalog
+  // and only unisex cards remain, the composer must NOT label them
+  // "kid orthotics" — the card title literally says "Unisex".
+  const unisexCleats = uiCandidate({
+    title: "L1220 Unisex Cleats Posted Orthotics",
+    handle: "l1220-unisex",
+    productType: "Orthotics",
+    attributes: { category: "Orthotics", gender: "Unisex" },
+    tags: ["flat feet"],
+  });
+  const out = await runProductTurn({
+    ...ctxBase,
+    latestUserMessage: "kids' orthotics for flat feet",
+    sessionMemory: {
+      explicit: { gender: "kid", category: "orthotics", condition: "flat_feet" },
+      inferred: {},
+    },
+  }, {
+    forceEnable: true,
+    searchFn: async () => [unisexCleats],
+    claimConfig: FIXTURE_CLAIM_CONFIG,
+  });
+  assert.ok(!out.decline);
+  assert.equal(out.products.length, 1);
+  assert.ok(
+    !/\bkids?'?\s+orthotic/i.test(out.answerText),
+    `composer must not say "kid orthotics" over a Unisex card; got: ${out.answerText}`,
+  );
+  assert.ok(
+    /\borthotic/i.test(out.answerText),
+    `composer must still say "orthotics" — just without the kid prefix; got: ${out.answerText}`,
+  );
+});
+
 await test("D10 — non-empty pool DOES emit a CTA (regression check)", async () => {
   // Sanity: the new gate must not break the normal happy path.
   const out = await runProductTurn({

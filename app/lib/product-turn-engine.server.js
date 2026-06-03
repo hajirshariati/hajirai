@@ -372,7 +372,11 @@ export function selectByProvenFacts({ families, scope, claimConfig }) {
     return { selected: [], deferred: [], selectionReason: "empty_pool" };
   }
   if (!scope.requestedClaim) {
-    return { selected: families, deferred: [], selectionReason: "no_claim_requested" };
+    return {
+      selected: preferExactGenderOverUnisex(families, scope.gender),
+      deferred: [],
+      selectionReason: "no_claim_requested",
+    };
   }
 
   const supports = (family) => familySupportsClaim(family, scope.requestedClaim, claimConfig);
@@ -381,9 +385,21 @@ export function selectByProvenFacts({ families, scope, claimConfig }) {
   const partial = families.filter((f) => !supports(f));
 
   if (proven.length === families.length) {
-    return { selected: proven, deferred: [], selectionReason: "all_proven" };
+    return {
+      selected: preferExactGenderOverUnisex(proven, scope.gender),
+      deferred: [],
+      selectionReason: "all_proven",
+    };
   }
   if (proven.length > 0) {
+    // Within proven, prefer families whose cards are tagged with the
+    // exact requested gender over families that are only unisex.
+    // Live trace (2026-06-03 kids flat-feet): unisex cleats orthotic
+    // (L1220u) ranked into the carousel even though kid-gender
+    // orthotics exist — unisex is a fallback fit, not a kid-specific
+    // recommendation. Same logic helps women/men queries surface
+    // gender-specific cards ahead of unisex catch-alls.
+    const provenAfterGender = preferExactGenderOverUnisex(proven, scope.gender);
     // Condition claims (plantar_fasciitis, flat_feet, bunions, etc.)
     // are a real fit criterion — the customer specifically asked for
     // products that address that condition. Mixing unrelated
@@ -393,14 +409,67 @@ export function selectByProvenFacts({ families, scope, claimConfig }) {
     // deferred entirely for condition claims so the carousel is
     // wall-to-wall proven matches.
     if (scope.requestedClaim?.kind === "condition") {
-      return { selected: proven, deferred: [], selectionReason: "all_proven" };
+      return { selected: provenAfterGender, deferred: [], selectionReason: "all_proven" };
     }
-    return { selected: proven, deferred: partial, selectionReason: "proven_preferred" };
+    return { selected: provenAfterGender, deferred: partial, selectionReason: "proven_preferred" };
   }
   // No proven candidates — engine surfaces all as "closest matches"
   // and the composer phrases honestly. NEVER says "all of these
   // have X" when none do.
-  return { selected: families, deferred: [], selectionReason: "closest_matches_no_proof" };
+  return {
+    selected: preferExactGenderOverUnisex(families, scope.gender),
+    deferred: [],
+    selectionReason: "closest_matches_no_proof",
+  };
+}
+
+// Drop unisex-only families when at least one family carries the
+// exact requested gender on its variants. Unisex is a fit FALLBACK,
+// not a specific recommendation — surfacing a unisex catch-all in
+// place of (or alongside) the gender-specific product reads as
+// imprecise and, in the kids case, mislabels the card outright
+// ("kid orthotics" preamble over a "Unisex Cleats" title). When the
+// requested gender is itself "unisex" or unset, this is a no-op.
+function preferExactGenderOverUnisex(families, wantGender) {
+  const want = String(wantGender || "").toLowerCase().trim();
+  if (!want || want === "unisex") return families;
+  const hasExact = (family) => {
+    const cards = Array.isArray(family?.variants) ? family.variants : [];
+    return cards.some((c) => {
+      const g = cardGender(c);
+      if (!g) return false;
+      // Exact match on the requested gender. Treat "kids" and "kid"
+      // as equivalent, and accept gendered kid sub-buckets (boy/girl).
+      if (g === want) return true;
+      if (want === "kid" && (g === "kids" || g === "boy" || g === "girl")) return true;
+      if (want === "kids" && (g === "kid" || g === "boy" || g === "girl")) return true;
+      return false;
+    });
+  };
+  const exact = families.filter(hasExact);
+  return exact.length > 0 ? exact : families;
+}
+
+// Read a card's gender from the projected _gender field (set by
+// extractProductCards in production), falling back to the raw
+// `attributes.gender` attribute. Fixture-mode candidates that
+// haven't been projected still carry attributes — so the engine
+// can rank/label correctly in tests too.
+function cardGender(card) {
+  const direct = String(card?._gender || "").toLowerCase().trim();
+  if (direct) return direct;
+  const attrs = card?.attributes || card?._attributes || {};
+  for (const k of ["gender", "Gender", "gender_fallback"]) {
+    const v = attrs?.[k];
+    if (v == null || v === "") continue;
+    if (Array.isArray(v)) {
+      const first = v.find((x) => x != null && x !== "");
+      if (first) return String(first).toLowerCase().trim();
+    } else {
+      return String(v).toLowerCase().trim();
+    }
+  }
+  return "";
 }
 
 function familySupportsClaim(family, claim, claimConfig) {
@@ -452,7 +521,15 @@ export function composeAnswer({ scope, selected, deferred, selectionReason, will
   const allCards = familiesToCards(allFamilies);
   const n = allCards.length;
   const familyCount = allFamilies.length;
-  const label = scopeLabel(scope, { fallback: "styles" });
+  // When the displayed cards are all unisex but the customer asked
+  // about a specific gender (kid/men/women), "kid orthotics style"
+  // reads wrong over a "Unisex Cleats Posted Orthotics" card title.
+  // Drop the gender from the label in that case — the card title
+  // itself names the gender accurately.
+  const label = scopeLabel(
+    computeEffectiveLabelScope(scope, allCards),
+    { fallback: "styles" },
+  );
 
   // Sentence 1 — acknowledgment + WHY (combined).
   // Built from verified-only signals; never invented.
@@ -627,6 +704,19 @@ function scopeLabel(scope, { fallback = "styles" } = {}) {
   if (scope.modifier === "sale" || scope.onSale) label = `${label} on sale`;
   if (scope.modifier === "bestseller") label = `${label} best sellers`;
   return label;
+}
+
+// Effective scope for label-building. When every displayed card is
+// unisex AND the customer asked about a specific gender, drop the
+// gender from the label so the composer doesn't say "kid orthotics
+// style" over a "Unisex Cleats" card. The card title carries the
+// honest gender signal in that case.
+function computeEffectiveLabelScope(scope, cards = []) {
+  if (!scope?.gender || scope.gender === "unisex") return scope;
+  if (!Array.isArray(cards) || cards.length === 0) return scope;
+  const allUnisex = cards.every((c) => cardGender(c) === "unisex");
+  if (!allUnisex) return scope;
+  return { ...scope, gender: null };
 }
 
 function genderPossessive(g) {
