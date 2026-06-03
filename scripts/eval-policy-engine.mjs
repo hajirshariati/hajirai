@@ -599,6 +599,31 @@ await test("PE-31 — tracking without trackingPageUrl can still use tracking-sp
   assert.match(out.answerText, /tracking number we email/i);
 });
 
+// Live failure 2026-06-03 19:28:33 — customer asked
+// "I ordered the wrong size on Monday, the package hasn't shipped
+//  yet according to the email, can I change the size on my existing
+//  order or do I have to cancel and reorder, and if I cancel will
+//  the refund show up before the new order charges my card"
+// → policy engine returned NO match (regex was too narrow), so the
+// LLM fell through, called search_products(query="new"), got 0
+// cards, and the product engine emitted "I couldn't find new in
+// our current catalog. Try a different style or color?" — a
+// product-listing miss in place of an exchanges policy answer.
+await test("PE-32 — order-change / cancel-and-reorder / refund timing routes to exchanges", () => {
+  const { detectPolicyIntent } = __internals;
+  const cases = [
+    "I ordered the wrong size on Monday, can I change the size on my existing order or do I have to cancel and reorder, and if I cancel will the refund show up before the new order charges my card",
+    "I need to cancel my order",
+    "Can I change the size on my existing order?",
+    "How do I modify my order before it ships?",
+  ];
+  for (const msg of cases) {
+    const intent = detectPolicyIntent(msg);
+    assert.equal(intent?.primary, "exchanges",
+      `expected exchanges intent on "${msg.slice(0, 60)}…"; got ${intent?.primary || "null"}`);
+  }
+});
+
 // ──────────────────────────────────────────────────────────────
 console.log("");
 if (failed === 0) {

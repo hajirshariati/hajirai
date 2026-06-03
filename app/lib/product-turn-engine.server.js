@@ -530,6 +530,21 @@ function familySupportsClaim(family, claim, claimConfig) {
 //     for engine output — copy is true by construction.
 export function composeAnswer({ scope, selected, deferred, selectionReason, willHaveCta = false }) {
   if (selected.length === 0 && deferred.length === 0) {
+    // Kids-no-footwear structural gap: the catalog doesn't carry
+    // kid-gender shoes at all (only kids orthotics + accessories).
+    // The generic "try a different style or color" is wrong here —
+    // no style/color change will surface kids footwear that doesn't
+    // exist. Emit an honest message that points to the actual kids
+    // coverage we DO offer. Live trace 2026-06-03 19:28:27.
+    const wantKid = String(scope?.gender || "").toLowerCase().trim();
+    const cat = String(scope?.category || "").toLowerCase().trim();
+    if ((wantKid === "kid" || wantKid === "kids") && (cat === "footwear" || cat === "shoes")) {
+      return {
+        text: `We don't carry kids' shoes — for kids we make orthotics and accessories that fit into shoes your child already owns. Want me to show you the kids' orthotics?`,
+        reason: "empty_pool_kids_no_footwear",
+        cta: null,
+      };
+    }
     return {
       text: `I couldn't find ${scopeLabel(scope, { fallback: "matching styles" })} in our current catalog. Try a different style or color?`,
       reason: "empty_pool",

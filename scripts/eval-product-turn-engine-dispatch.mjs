@@ -619,6 +619,39 @@ await test("D15 — resolver-picked kids orthotic candidates do not trigger name
   assert.match(out.answerText, /kids'?|orthotic/i);
 });
 
+await test("D16 — kids+footwear empty pool emits honest coverage message, not 'try a different style or color'", async () => {
+  // Live failure 2026-06-03 19:28:27 — customer asked
+  // "My 7-year-old son has flat feet, the pediatrician said he might
+  //  need orthotics but we want to try supportive shoes first…"
+  // The catalog has NO kids footwear (only kids orthotics +
+  // accessories). The generic empty_pool composer emitted
+  // "I couldn't find kid footwear in our current catalog. Try a
+  //  different style or color?" — a misleading dead-end. Customer
+  // changing style or color won't surface kids shoes that don't
+  // exist. Engine should acknowledge the structural gap honestly
+  // and offer the kids orthotics we DO carry.
+  const out = await runProductTurn({
+    ...ctxBase,
+    latestUserMessage: "supportive shoes for my 7-year-old with flat feet",
+    sessionMemory: {
+      explicit: { gender: "kid", category: "footwear", condition: "flat_feet" },
+      inferred: {},
+    },
+  }, {
+    forceEnable: true,
+    searchFn: async () => [],
+    claimConfig: FIXTURE_CLAIM_CONFIG,
+  });
+  assert.ok(!out.decline);
+  assert.equal(out.products.length, 0);
+  assert.match(out.answerText, /don't\s+carry\s+kids/i,
+    `expected honest 'don't carry kids' shoes' message; got: ${out.answerText}`);
+  assert.match(out.answerText, /orthotic/i,
+    `expected the message to point to kids orthotics; got: ${out.answerText}`);
+  assert.doesNotMatch(out.answerText, /try\s+a\s+different\s+style\s+or\s+color/i,
+    `'try a different style or color' must not appear for the kids-no-footwear case`);
+});
+
 await test("D10 — non-empty pool DOES emit a CTA (regression check)", async () => {
   // Sanity: the new gate must not break the normal happy path.
   const out = await runProductTurn({

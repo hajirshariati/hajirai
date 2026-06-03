@@ -32,7 +32,7 @@ const POLICY_INTENT_PATTERNS = {
   return_fee:    /\b(?:return\s+fee|restocking\s+fee|returns?\s+(?:charge|cost)|do\s+you\s+charge\s+(?:a\s+)?(?:fee|for\s+returns?)|free\s+returns?|return\s+shipping\s+cost)\b/i,
   shipping:      /\b(?:shipping(?:\s+(?:policy|cost|fee|time|takes?|options?|rate))?|how\s+(?:long|much)\s+(?:does\s+|is\s+)?(?:shipping|delivery)|delivery(?:\s+(?:time|cost|fee))?|how\s+long\s+(?:does\s+it\s+take|until\s+(?:i\s+get|it\s+arrives?))|free\s+shipping)\b/i,
   warranty:      /\b(?:warranty|guarantee(?:d)?\b|defects?|covered\s+for|how\s+long\s+(?:is|does)\s+(?:the\s+)?warranty)\b/i,
-  exchanges:     /\b(?:exchange|swap|trade(?:\s+in)?|wrong\s+size\s+(?:can\s+i|do\s+i)|different\s+size)\b/i,
+  exchanges:     /\b(?:exchange|swap|trade(?:\s+in)?|wrong\s+size|different\s+size|change\s+(?:the\s+|my\s+)?size|change\s+(?:the\s+|my\s+)?order|cancel\s+(?:and\s+reorder|my\s+order|the\s+order|this\s+order|my\s+(?:existing\s+)?order)|modify\s+(?:my\s+|the\s+)?order|refund\s+(?:will\s+|show\s+)|order\s+change|reorder)\b/i,
   tracking:      /\b(?:track(?:ing)?\s+(?:my\s+)?(?:order|package|shipment)|where(?:'s|\s+is)\s+my\s+order|order\s+(?:status|tracking)|tracking\s+(?:number|info))\b/i,
   // Discounts policy — limited to questions about discount/promo/coupon
   // MECHANISMS (codes, eligibility, terms). Product-browse questions
@@ -398,6 +398,7 @@ export const __internals = {
   POLICY_FILE_TYPES,
   HIGH_CONFIDENCE,
   LOW_CONFIDENCE,
+  detectPolicyIntent,
   selectRelevantChunks,
   composePolicyAnswer,
   intentMatchesTitle,
