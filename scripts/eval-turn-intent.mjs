@@ -298,6 +298,39 @@ await test("T18 — 'hiking shoes' after 'pink sandals' drops sandals+color (use
   assert.ok(intent.staleKeysToDrop.includes("color"));
 });
 
+// Live trace 2026-06-03 16:26:18 — prior turn established
+// gender=kid/category=orthotics/condition=flat_feet from a "kids
+// orthotics for flat feet" session. Customer pivots to "i'm going
+// to italy and i need a comfortable shoe for hiking" — engine MUST
+// drop orthotics + flat_feet (orthotics aren't shoes; hiking is a
+// shoe use-case). Without this drop, the engine returned a unisex
+// cleats orthotic instead of women's hiking sneakers.
+await test("T18b — 'hiking shoe' after carried orthotics drops orthotics+condition", () => {
+  const intent = resolveTurnIntent({
+    latestUserText: "i'm going to italy and i need a comfortable shoe for hiking",
+    previousScope: {
+      gender: "kid",
+      category: "orthotics",
+      condition: "flat_feet",
+    },
+  });
+  assert.equal(intent.label, L.PIVOT_FULL);
+  assert.equal(intent.reason, "usecase_category_conflict");
+  assert.ok(intent.staleKeysToDrop.includes("category"),
+    `expected category drop; got ${intent.staleKeysToDrop.join(",")}`);
+  assert.ok(intent.staleKeysToDrop.includes("condition"),
+    `expected condition drop; got ${intent.staleKeysToDrop.join(",")}`);
+});
+
+await test("T18c — 'dress shoes' after carried orthotics also pivots", () => {
+  const intent = resolveTurnIntent({
+    latestUserText: "I'm looking for dress shoes for a wedding",
+    previousScope: { gender: "women", category: "orthotics" },
+  });
+  assert.equal(intent.label, L.PIVOT_FULL);
+  assert.equal(intent.reason, "usecase_category_conflict");
+});
+
 // ---------------------------------------------------------------------------
 // Gender pivot (not gender-only continuation) drops subject-bound scope.
 // ---------------------------------------------------------------------------

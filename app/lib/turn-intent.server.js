@@ -153,10 +153,22 @@ const ATHLETIC_INCOMPATIBLE_CATEGORIES = [
   "sandals", "wedges-heels", "slippers", "mary-janes",
   "loafers", "oxfords", "clogs",
 ];
+// "orthotics" is an insole/insert category — it isn't a shoe. When
+// the customer's new use case implies buying a SHOE (hiking, dress,
+// walking-around-Italy), the carried `category=orthotics` is stale.
+// Live trace (2026-06-03 italy hiking): prev scope had
+// category=orthotics + condition=flat_feet from a prior kids turn;
+// "i'm going to italy and i need a comfortable shoe for hiking"
+// kept orthotics and returned 1 unisex cleats orthotic instead of
+// women's hiking sneakers. NOT applied to athletic/running — Aetrex
+// markets athletic-orthotic insoles, so those use-cases are
+// legitimately compatible with category=orthotics.
+const SHOE_CENTRIC_INCOMPATIBLE_WITH_ORTHOTICS = ["orthotics"];
 const USECASE_CATEGORY_CONFLICTS = {
-  hiking: new Set(ATHLETIC_INCOMPATIBLE_CATEGORIES),
+  hiking: new Set([...ATHLETIC_INCOMPATIBLE_CATEGORIES, ...SHOE_CENTRIC_INCOMPATIBLE_WITH_ORTHOTICS]),
   running: new Set(ATHLETIC_INCOMPATIBLE_CATEGORIES),
   athletic: new Set(ATHLETIC_INCOMPATIBLE_CATEGORIES),
+  walking: new Set(SHOE_CENTRIC_INCOMPATIBLE_WITH_ORTHOTICS),
   // "Dress shoes" after a casual/open-toe carry-over should pivot.
   // Sandals/slippers/clogs/slip-ons are open or casual silhouettes
   // — dress-occasion intent invalidates them as the carried scope.
@@ -164,7 +176,10 @@ const USECASE_CATEGORY_CONFLICTS = {
   // category=sandals because sandals wasn't in the dress conflict
   // set; the search ran "dress sandals bunions arch support" and
   // returned 2 results that weren't what the customer asked for.
-  dress: new Set(["sneakers", "sandals", "slippers", "clogs", "slip-ons"]),
+  dress: new Set([
+    "sneakers", "sandals", "slippers", "clogs", "slip-ons",
+    ...SHOE_CENTRIC_INCOMPATIBLE_WITH_ORTHOTICS,
+  ]),
 };
 
 // ---------------------------------------------------------------------------

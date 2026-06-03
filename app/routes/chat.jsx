@@ -383,30 +383,38 @@ async function runProductTurnDispatch({ ctx, controller, encoder, claimConfig })
     const query = queryParts.length > 0
       ? queryParts.join(" ").trim()
       : (scope.rawMessage || "").slice(0, 160);
-    const input = { query, filters, limit };
-    if (scope.onSale === true) input.onSale = true;
-    let result;
-    try {
-      result = await dispatchTool("search_products", input, ctx);
-    } catch (err) {
-      console.warn(`[product-turn-engine] searchFn failed: ${err?.message || err}`);
-      return [];
+    const baseInput = { query, filters, limit };
+    if (scope.onSale === true) baseInput.onSale = true;
+    const runSearch = async (input) => {
+      try {
+        const r = await dispatchTool("search_products", input, ctx);
+        if (!r || r.error || !Array.isArray(r.products)) return [];
+        return extractProductCards("search_products", r, ctx);
+      } catch (err) {
+        console.warn(`[product-turn-engine] searchFn failed: ${err?.message || err}`);
+        return [];
+      }
+    };
+    // extractProductCards is idempotent w.r.t. _claimFacts.
+    let cards = await runSearch(baseInput);
+    // Empty-pool retry. When the customer asked an availability
+    // question ("Do you have orthotics for kids?") and the dispatcher
+    // appended an auto-filled useCase (e.g. "comfort_walking_everyday")
+    // to the query, the synthetic tokens can starve the semantic
+    // search and return zero — even when the gender+category bucket
+    // has matching products in the catalog. Retry once with just the
+    // category as the query string, keeping the structured filters.
+    if (cards.length === 0 && scope.category) {
+      const retryQuery = scope.category;
+      if (retryQuery !== query) {
+        console.log(
+          `[product-turn-engine] searchFn retry: query="${query}" returned 0; ` +
+            `re-running with query="${retryQuery}" + same filters`,
+        );
+        cards = await runSearch({ ...baseInput, query: retryQuery });
+      }
     }
-    if (!result || result.error || !Array.isArray(result.products)) return [];
-    // Run the search result through extractProductCards so engine
-    // output cards inherit the SAME projection the existing path
-    // uses — price_formatted, compare_at_price (in cents), image,
-    // url, category/gender attrs, _claimFacts, etc. Without this
-    // the engine cards spread the raw search-result product object
-    // and the widget displays raw $1.40 instead of $140.00 because
-    // it expects the projected `price_formatted` field, not the
-    // unparsed `price` string.
-    //
-    // extractProductCards is idempotent w.r.t. _claimFacts — it
-    // builds fresh facts on every call. The engine's later
-    // attachClaimFactsToCard call notices _claimFacts is already
-    // present and skips re-attaching (see engine step 3).
-    return extractProductCards("search_products", result, ctx);
+    return cards;
   };
 
   // similarFn — Phase 2. REUSE the existing find_similar_products
