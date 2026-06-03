@@ -819,6 +819,13 @@ export function isUnanswerableSuggestion(question, { lastText = "", latestUserMe
     /\b(?:don't|do not|doesn't|does not|no)\s+(?:carry|sell|stock|offer|have)\b[^.!?]{0,80}\b(?:kids?'?s?|teen(?:age|ager)?s?'?s?|children'?s?|youth|boys?'?s?|girls?'?s?|child)\b/i.test(lastLower) ||
     /\bno\s+(?:kids?'?s?|teen(?:age|ager)?s?'?s?|children'?s?)\s+(?:footwear|shoes?|sizes?)\b/i.test(lastLower);
   if (repliedNoKidsCoverage) {
+    if (/\b(?:do\s+you\s+(?:carry|have|sell|offer)|what)\b/i.test(qLower) &&
+        /\b(?:kids?'?s?|children'?s?|child|youth)\b/i.test(qLower) &&
+        /\b(?:orthotics?|insoles?|inserts?)\b/i.test(qLower) &&
+        /\b(?:kids?'?s?|children'?s?|child|youth)\b[^.!?]{0,80}\b(?:orthotics?|insoles?|inserts?)\b|\b(?:orthotics?|insoles?|inserts?)\b[^.!?]{0,80}\b(?:kids?'?s?|children'?s?|child|youth)\b/i.test(lastLower) &&
+        /\b(?:do|does|carry|have|include|available|offer|yes)\b/i.test(lastLower)) {
+      return { unanswerable: true, reason: "duplicates answered kids orthotics availability" };
+    }
     if (/\b(?:kids?'?s?|teen(?:age|ager)?s?'?s?|children'?s?|youth|boys?'?s?|girls?'?s?|daughter|son|child|her|him)\b/i.test(qLower) &&
         /\b(?:fit|size|smaller|adult\s+women|adult\s+men|work\s+for|big\s+enough|small\s+enough|youth\s+size)\b/i.test(qLower)) {
       return { unanswerable: true, reason: "contradicts kids-coverage honesty note in main reply" };

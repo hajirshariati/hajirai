@@ -6,6 +6,7 @@ import { getCatalogCategories, getAllCatalogCategories, getCategoryGenderAvailab
 import { getActiveCampaigns, formatCampaignsForCS } from "../models/Campaign.server";
 import { buildSystemPrompt } from "../lib/chat-prompt.server";
 import { retrieveRelevantChunks } from "../lib/knowledge-chunks.server";
+import { buildKidsCoveragePrompt } from "../lib/kids-coverage.server";
 import { filterForbiddenCategoryChips, filterContradictingGenderChips, narrowChipAllowListForGroup } from "../lib/chip-filter.server";
 import { analyzeCategoryIntent, cardMatchesActiveGroup, textIntentDivergesFromGroup, matchingGroupsForText } from "../lib/category-intent.server";
 import { extractAnsweredChoices } from "../lib/conversation-memory.server";
@@ -3044,33 +3045,13 @@ export const action = async ({ request }) => {
       activeCampaigns,
       merchantGroups,
     });
-    // Kids-coverage honesty. When the customer is shopping for a child
-    // but the gender-scoped catalog carries NO kids' footwear (only
-    // accessories / orthotic insoles are tagged kid-eligible), the AI
-    // must say so plainly instead of steering them to kids accessories
-    // as if that were the ask. Production failure: the bot offered
-    // "kids accessories / orthotics" for a child with no kids' shoes in
-    // the catalog, which reads as a bait-and-switch. Data-driven —
-    // derived from the live gender-scoped category list, not a
-    // hardcoded merchant assumption — so it self-disables the moment a
-    // merchant adds kids' footwear.
-    if (["kid", "kids", "boy", "girl"].includes(String(sessionGender || ""))) {
-      const NON_FOOTWEAR = new Set([
-        "accessories", "accessory", "orthotics", "orthotic",
-        "insoles", "insole", "socks", "gift card", "gift cards",
-      ]);
-      const kidsFootwear = catalogProductTypes.filter(
-        (c) => !NON_FOOTWEAR.has(String(c || "").toLowerCase().trim()),
+    const kidsCoverage = buildKidsCoveragePrompt({ sessionGender, catalogProductTypes });
+    if (kidsCoverage.prompt) {
+      console.log(
+        `[chat] ${session.shop} kids-coverage: no kids footwear in catalog ` +
+        `(scoped=${catalogProductTypes.join("|") || "none"}; alternatives=${kidsCoverage.diagnostics.availableNonFootwear?.join("|") || "none"}); injecting honesty note`,
       );
-      if (kidsFootwear.length === 0) {
-        console.log(`[chat] ${session.shop} kids-coverage: no kids footwear in catalog (scoped=${catalogProductTypes.join("|") || "none"}); injecting honesty note`);
-        systemPrompt +=
-          "\n\n=== Kids coverage (turn-scoped) ===\n" +
-          "This store does NOT carry children's / kids' footwear (shoes). " +
-          "If the customer is shopping for a child, tell them plainly and up front that the store doesn't carry kids' shoes. " +
-          "Do NOT offer kids' shoes, and do NOT pivot to kids' accessories or orthotic insoles as if they were the request. " +
-          "Only mention that kids' accessories or orthotic insoles exist if the customer explicitly asks about them; otherwise suggest the adult lines or checking back later.\n";
-      }
+      systemPrompt += kidsCoverage.prompt;
     }
     if (isCompoundPolicyProductQuestion(body.message)) {
       systemPrompt +=

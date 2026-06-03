@@ -1103,6 +1103,18 @@ test("kids-coverage contradiction — unrelated follow-up survives when kids-hon
   assert.equal(v.unanswerable, false, `unrelated suggestion should survive; got ${JSON.stringify(v)}`);
 });
 
+test("kids-coverage contradiction — duplicate kids orthotics availability chip is dropped", () => {
+  const v = isUnanswerableSuggestion(
+    "Do you carry Orthotics for kids?",
+    {
+      lastText: "We don't carry kids' shoes, but we do carry kids orthotics and accessories. Which would you like to see?",
+      latestUserMessage: "Kids",
+    },
+  );
+  assert.equal(v.unanswerable, true);
+  assert.match(v.reason, /kids orthotics/i);
+});
+
 test("escalation-signal — Haiku searched-but-no-cards flags", () => {
   const s = haikuEscalationSignal({ isHaiku: true, productSearchAttempted: true, poolSize: 0, textLen: 40 });
   assert.equal(s.escalate, true);
