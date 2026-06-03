@@ -249,10 +249,11 @@ export function composePolicyAnswer({
 }) {
   // Contact-support CTA (rendered as a button by the widget).
   // ONLY when supportUrl is configured — we NEVER invent a URL.
-  // Live failure 2026-06-03: policy answers shipped with no CTA
-  // at all; customer had no obvious next action.
+  // Kind "external_link" tells the dispatcher to forward this
+  // {url,label} verbatim into the SSE link chunk (no URL building).
   const contactCta = supportUrl
     ? {
+        kind: "external_link",
         label: `Contact ${supportLabel || "customer support"}`,
         url: supportUrl,
         scopeSource: "policy_support_url",
@@ -260,11 +261,13 @@ export function composePolicyAnswer({
     : null;
 
   // No relevant chunks → honest "I don't have that specific
-  // detail" line + a pointer to support if a URL is configured.
-  // NEVER invent fees, windows, or covered defects.
+  // detail" line. Avoid putting the raw URL in the body when a CTA
+  // button is emitted — duplicate URLs look broken. When CTA
+  // exists, just refer to the button; otherwise fall back to a
+  // generic "contact support" line.
   if (!relevant || relevant.length === 0) {
-    const supportSuffix = supportUrl
-      ? ` For an authoritative answer, please reach out to ${supportLabel || "our support team"}: ${supportUrl}`
+    const supportSuffix = contactCta
+      ? ` For an authoritative answer, please use the contact button below.`
       : ` For an authoritative answer, please contact support directly.`;
     const topic = humanizeIntent(intent.primary);
     return {

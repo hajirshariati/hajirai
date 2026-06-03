@@ -118,16 +118,17 @@ export async function runProductTurn(ctx = {}, options = {}) {
   // 3. Attach facts. Cards without _claimFacts after this step are
   // a regression — log and drop.
   //
-  // attachClaimFactsToCard returns ONLY the projected fact fields
-  // (_conditionTags / _archSupport / _claimFacts / etc), not the
-  // original UI fields (title, handle, image, url, price). The
-  // engine output goes straight to the SSE emit and needs those
-  // fields to render product cards — spread the candidate first,
-  // then layer the fact fields on top.
+  // When the caller (chat.jsx dispatcher) already projected each
+  // candidate via extractProductCards, _claimFacts is present —
+  // skip the re-attach. Otherwise (test fixtures, future callers
+  // that pass raw shopify-shape products) spread the candidate
+  // first so UI fields survive and layer fact fields on top.
   const cardsWithFacts = [];
   const droppedNoFacts = [];
   for (const cand of rawCandidates) {
-    const card = { ...cand, ...attachClaimFactsToCard(cand, { shop: ctx.shop, claimConfig }) };
+    const card = cand?._claimFacts
+      ? cand
+      : { ...cand, ...attachClaimFactsToCard(cand, { shop: ctx.shop, claimConfig }) };
     if (!card._claimFacts) {
       droppedNoFacts.push(cand?.handle || cand?.title || "?");
       continue;
@@ -173,13 +174,28 @@ export async function runProductTurn(ctx = {}, options = {}) {
   // if the engine couldn't satisfy the claim exactly.
   const displayCards = familiesToCards([...selected, ...deferred]);
 
+  // CTA — anchored in the resolved scope (gender + category +
+  // optional color). Engine returns the scope only; the dispatcher
+  // composes the URL via buildStorefrontSearchCTA so we reuse the
+  // merchant's admin-configured storefrontSearchUrlPattern and
+  // ctaOverrides — no parallel URL builder, no Aetrex hardcoding.
+  const retrievalCta = scope.category
+    ? {
+        kind: "storefront_search",
+        gender: scope.gender || null,
+        category: scope.category,
+        color: scope.color || null,
+        scopeSource: "engine_scope",
+      }
+    : null;
+
   return {
     decline: false,
     scope,
     products: displayCards,
     facts: displayCards.map((c) => c._claimFacts),
     answerText: composed.text,
-    cta: composed.cta || null,
+    cta: retrievalCta,
     diagnostics,
   };
 }
@@ -534,7 +550,7 @@ function pickAttr(attrs, aliases) {
 function deriveAnchorCTA(cardsWithFacts) {
   const anchor = cardsWithFacts?.[0];
   if (!anchor) return null;
-  const attrs = anchor.attributes || {};
+  const attrs = anchor.attributes || anchor._attributes || {};
   const category = anchor?._claimFacts?.category?.value
     || pickAttr(attrs, ["category", "Category", "category_for_filter", "subcategory"])
     || (anchor.productType ? String(anchor.productType).toLowerCase().trim() : null);
@@ -548,11 +564,15 @@ function deriveAnchorCTA(cardsWithFacts) {
     else if (genderRaw === "unisex") gender = "unisex";
   }
   if (!category || !gender) return null;
+  // Dispatcher converts to a renderable {type:link,url,label} via
+  // buildStorefrontSearchCTA so we reuse the merchant's
+  // admin-configured pattern + overrides.
   return {
-    label: `View more ${genderPossessive(gender)} ${category}`,
+    kind: "storefront_search",
     scopeSource: "anchor_product",
     category,
     gender,
+    color: null,
   };
 }
 

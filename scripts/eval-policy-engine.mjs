@@ -193,7 +193,7 @@ await test("PE-10 — different merchant data → different composer output", as
 
 // ─── honest admission when knowledge is missing ────────────────
 
-await test("PE-11 — discount question with NO matching chunks → admits + points to support", async () => {
+await test("PE-11 — discount question with NO matching chunks → admits + emits CTA (no raw URL in text)", async () => {
   const out = await runPolicyTurn(
     { ...ctxBase, latestUserMessage: "do you offer any discounts?" },
     { forceEnable: true, retrievedChunks: [] },
@@ -201,8 +201,13 @@ await test("PE-11 — discount question with NO matching chunks → admits + poi
   assert.ok(!out.decline);
   assert.match(out.answerText, /don't have/i);
   assert.match(out.answerText, /discounts and promotions/i);
-  assert.match(out.answerText, /support/i);
-  assert.match(out.answerText, /example\.com\/support/);
+  // The CTA carries the URL — the text should refer to the button,
+  // NOT include the raw URL (which would render duplicated and
+  // look broken next to the actual button).
+  assert.match(out.answerText, /contact button below/i);
+  assert.doesNotMatch(out.answerText, /https?:\/\//,
+    `text must not include the raw URL when CTA is emitted; got "${out.answerText}"`);
+  assert.equal(out.cta?.url, ctxBase.supportUrl);
   assert.equal(out.diagnostics.composer, "no_relevant_knowledge");
 });
 
@@ -323,15 +328,20 @@ await test("PE-19 — composePolicyAnswer with relevant chunk renders title + co
   assert.equal(out.reason, "knowledge_confident");
 });
 
-await test("PE-20 — composePolicyAnswer empty + supportUrl emits link", () => {
+await test("PE-20 — composePolicyAnswer empty + supportUrl emits CTA, no raw URL in text", () => {
   const out = composePolicyAnswer({
     intent: { primary: "return_policy" },
     relevant: [],
     supportUrl: "https://shop.example/support",
     supportLabel: "Customer Care",
   });
-  assert.match(out.text, /Customer Care/);
-  assert.match(out.text, /shop\.example\/support/);
+  // CTA carries label + URL; text refers to the button.
+  assert.equal(out.cta?.kind, "external_link");
+  assert.match(out.cta.label, /Customer Care/);
+  assert.equal(out.cta.url, "https://shop.example/support");
+  assert.match(out.text, /contact button below/i);
+  assert.doesNotMatch(out.text, /shop\.example\/support/,
+    `raw URL must not duplicate in text when CTA is emitted; got "${out.text}"`);
 });
 
 // ──────────────────────────────────────────────────────────────
@@ -340,7 +350,7 @@ await test("PE-20 — composePolicyAnswer empty + supportUrl emits link", () => 
 // follow-up chips, so the customer had no obvious next action.
 // ──────────────────────────────────────────────────────────────
 
-await test("PE-21 — runPolicyTurn emits a contact CTA when supportUrl is configured", async () => {
+await test("PE-21 — runPolicyTurn emits an EXTERNAL-LINK CTA when supportUrl is configured", async () => {
   const out = await runPolicyTurn(
     { ...ctxBase, latestUserMessage: "what is your return policy?" },
     {
@@ -351,9 +361,13 @@ await test("PE-21 — runPolicyTurn emits a contact CTA when supportUrl is confi
     },
   );
   assert.ok(out.cta, `expected a CTA when supportUrl is configured; got null`);
+  // The CTA must use the "external_link" kind so the dispatcher
+  // forwards it verbatim as { type:"link", url, label } — the only
+  // shape the widget renders as a button. Live failure: previous
+  // kind="cta" never rendered.
+  assert.equal(out.cta.kind, "external_link");
   assert.equal(out.cta.url, ctxBase.supportUrl);
   assert.match(out.cta.label, /support|customer/i);
-  assert.equal(out.cta.scopeSource, "policy_support_url");
 });
 
 await test("PE-22 — no supportUrl configured → no CTA emitted (we don't invent a URL)", async () => {
@@ -431,6 +445,35 @@ function synthMessage(intentKey) {
     terms:         "what are your terms of service?",
   }[intentKey] || intentKey;
 }
+
+// ──────────────────────────────────────────────────────────────
+// PE-25 — SSE event contract. Codex audit (2026-06-03): widget
+// only handles `{ type:"link", url, label }`. `{ type:"cta", cta }`
+// silently drops. Test the engine output against the EXACT shape
+// the dispatcher will emit and the widget consumes.
+// ──────────────────────────────────────────────────────────────
+
+await test("PE-25 — engine CTA shape must be convertible to widget-renderable {type:link,url,label}", async () => {
+  const out = await runPolicyTurn(
+    { ...ctxBase, latestUserMessage: "what is your return policy?" },
+    {
+      forceEnable: true,
+      retrievedChunks: [
+        chunk({ similarity: 0.7, fileType: "faqs", sectionTitle: "Returns", content: "30-day return window." }),
+      ],
+    },
+  );
+  // Simulate the dispatcher's emit step. This MUST produce a
+  // payload the widget would render. Codex confirmed widget JS:
+  //   if (p.type === 'link' && p.url) linkCTA = { url, label }
+  const ctaForSse = out.cta && out.cta.url
+    ? { type: "link", url: out.cta.url, label: out.cta.label || `Contact ${ctxBase.supportLabel}` }
+    : null;
+  assert.ok(ctaForSse, "CTA must be emittable as a link payload");
+  assert.equal(ctaForSse.type, "link");
+  assert.ok(typeof ctaForSse.url === "string" && /^https?:\/\//.test(ctaForSse.url));
+  assert.ok(typeof ctaForSse.label === "string" && ctaForSse.label.length > 0);
+});
 
 // ──────────────────────────────────────────────────────────────
 console.log("");

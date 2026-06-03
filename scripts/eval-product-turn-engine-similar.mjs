@@ -518,6 +518,8 @@ await test("P2-20 — CTA is derived from the ANCHOR product, never from stale s
   assert.equal(out.cta.category, "sneakers",
     `CTA category must come from anchor (sneakers), not stale (footwear); got ${out.cta.category}`);
   assert.equal(out.cta.scopeSource, "anchor_product");
+  // The kind tells the dispatcher to convert via buildStorefrontSearchCTA.
+  assert.equal(out.cta.kind, "storefront_search");
 });
 
 // ──────────────────────────────────────────────────────────────

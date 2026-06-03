@@ -387,12 +387,20 @@ async function runProductTurnDispatch({ ctx, controller, encoder, claimConfig })
       return [];
     }
     if (!result || result.error || !Array.isArray(result.products)) return [];
-    // Engine consumes the canonical Shopify-shaped product objects
-    // (title, handle, productType, description, tags, attributes,
-    // price, compareAtPrice). search_products already returns this
-    // shape — pass through unmodified so attachClaimFactsToCard
-    // sees the same input it would in the existing path.
-    return result.products;
+    // Run the search result through extractProductCards so engine
+    // output cards inherit the SAME projection the existing path
+    // uses — price_formatted, compare_at_price (in cents), image,
+    // url, category/gender attrs, _claimFacts, etc. Without this
+    // the engine cards spread the raw search-result product object
+    // and the widget displays raw $1.40 instead of $140.00 because
+    // it expects the projected `price_formatted` field, not the
+    // unparsed `price` string.
+    //
+    // extractProductCards is idempotent w.r.t. _claimFacts — it
+    // builds fresh facts on every call. The engine's later
+    // attachClaimFactsToCard call notices _claimFacts is already
+    // present and skips re-attaching (see engine step 3).
+    return extractProductCards("search_products", result, ctx);
   };
 
   // similarFn — Phase 2. REUSE the existing find_similar_products
@@ -449,22 +457,62 @@ async function runProductTurnDispatch({ ctx, controller, encoder, claimConfig })
   if (!out) return null;
   if (out.decline) return { declined: true, diagnostics: out.diagnostics };
 
-  // Emit text → products → done. Engine output is true-by-
-  // construction — bypass postprocessors that could zero it out.
+  // Emit text → products → link? → done. Engine output is
+  // true-by-construction — bypass postprocessors that could zero
+  // it out.
+  //
+  // CTA conversion: engine returns scope only (gender + category +
+  // optional color). Dispatcher resolves to a renderable storefront
+  // URL via buildStorefrontSearchCTA — reuses the merchant's
+  // admin-configured storefrontSearchUrlPattern + ctaOverrides so
+  // we don't build a parallel URL system. Widget contract is
+  // `{ type:"link", url, label }` (verified against
+  // hajirai-chat-widget.js — only `type:"link"` renders as a CTA
+  // button).
   const text = String(out.answerText || "").trim();
   const products = Array.isArray(out.products) ? out.products : [];
   controller.enqueue(encoder.encode(sseChunk({ type: "text", text })));
   controller.enqueue(encoder.encode(sseChunk({ type: "products", products })));
-  if (out.cta) {
-    controller.enqueue(encoder.encode(sseChunk({ type: "cta", cta: out.cta })));
+  const linkPayload = await convertEngineCtaToLink(out.cta, ctx);
+  if (linkPayload) {
+    controller.enqueue(encoder.encode(sseChunk({
+      type: "link",
+      url: linkPayload.url,
+      label: linkPayload.label,
+    })));
   }
   controller.enqueue(encoder.encode(sseChunk({ type: "done" })));
   return {
     handled: true,
     answerText: text,
     products,
-    diagnostics: out.diagnostics,
+    diagnostics: { ...out.diagnostics, cta: linkPayload ? linkPayload.label : null },
   };
+}
+
+// Convert the engine's structured CTA object into a widget-
+// renderable {url, label} pair. Returns null when no CTA is
+// emittable. Reuses merchant-admin pattern + overrides via
+// buildStorefrontSearchCTA — no parallel URL builder.
+async function convertEngineCtaToLink(cta, ctx) {
+  if (!cta) return null;
+  if (cta.kind === "external_link" && cta.url) {
+    return { url: cta.url, label: cta.label || "Open" };
+  }
+  if (cta.kind === "storefront_search") {
+    const { buildStorefrontSearchCTA } = await import("../lib/storefront-search-cta.server");
+    const built = buildStorefrontSearchCTA({
+      pattern: ctx.storefrontSearchUrlPattern || "",
+      overrides: ctx.ctaOverrides || [],
+      gender: cta.gender || ctx.sessionGender || "",
+      category: cta.category || "",
+      color: cta.color || "",
+      latestUserMessage: ctx.latestUserMessage || "",
+    });
+    if (built && built.url) return { url: built.url, label: built.label || "View all" };
+    return null;
+  }
+  return null;
 }
 
 // Phase 3 — Policy / Knowledge dispatcher. Same flag, same
@@ -490,18 +538,26 @@ async function runPolicyTurnDispatch({ ctx, controller, encoder, retrievedChunks
   if (!out) return null;
   if (out.decline) return { declined: true, diagnostics: out.diagnostics };
 
-  // Emit text → products(empty) → cta? → suggestions? → done.
-  // products empty so any stale cards left over from a prior
-  // product turn clear. Policy answers never carry cards.
+  // Emit text → products(empty) → link? → suggestions? → done.
+  //
+  // Widget contract: CTA renders as `{ type:"link", url, label }`,
+  // NOT `{ type:"cta", cta: {...} }`. Verified against
+  // hajirai-chat-widget.js — only type:"link" triggers
+  // linkCTA={url,label} which the UI renders as a button. Live
+  // failure 2026-06-03: policy answers shipped with the wrong
+  // shape and the button never rendered.
   //
   // Follow-up suggestions (quick-reply chips) come from the
-  // policy engine's deterministic per-intent list — no LLM call
-  // for this path. Customer always has an obvious next step.
+  // policy engine's deterministic per-intent list — no LLM call.
   const text = String(out.answerText || "").trim();
   controller.enqueue(encoder.encode(sseChunk({ type: "text", text })));
   controller.enqueue(encoder.encode(sseChunk({ type: "products", products: [] })));
-  if (out.cta) {
-    controller.enqueue(encoder.encode(sseChunk({ type: "cta", cta: out.cta })));
+  if (out.cta && out.cta.url) {
+    controller.enqueue(encoder.encode(sseChunk({
+      type: "link",
+      url: out.cta.url,
+      label: out.cta.label || `Contact ${ctx.supportLabel || "support"}`,
+    })));
   }
   if (Array.isArray(out.followUps) && out.followUps.length > 0) {
     controller.enqueue(encoder.encode(sseChunk({
@@ -513,7 +569,7 @@ async function runPolicyTurnDispatch({ ctx, controller, encoder, retrievedChunks
   return {
     handled: true,
     answerText: text,
-    diagnostics: out.diagnostics,
+    diagnostics: { ...out.diagnostics, ctaUrl: out.cta?.url || null },
   };
 }
 
@@ -3367,11 +3423,17 @@ export const action = async ({ request }) => {
             ctx, controller, encoder, retrievedChunks,
           });
           if (policyResult && policyResult.handled) {
+            // final_path log overrides any earlier "final_path=llm"
+            // line — the router logs that before dispatcher runs.
+            // Surface the engine win prominently for log readers.
+            console.log(`[router] ${ctx.shop} final_path=policy_engine`);
             console.log(
               `[policy-engine] handled shop=${ctx.shop} ` +
                 `intent=${policyResult.diagnostics?.intent?.primary || "-"} ` +
                 `composer=${policyResult.diagnostics?.composer || "-"} ` +
                 `topSim=${policyResult.diagnostics?.topSimilarity?.toFixed?.(2) || "-"} ` +
+                `ctaUrl=${policyResult.diagnostics?.ctaUrl ? "yes" : "no"} ` +
+                `followUps=${policyResult.diagnostics?.followUps || 0} ` +
                 `textLen=${policyResult.answerText?.length || 0}`,
             );
             return; // policy emitted text/products(empty)/done; no agent loop.
@@ -3391,11 +3453,13 @@ export const action = async ({ request }) => {
             ctx, controller, encoder, claimConfig,
           });
           if (engineResult && engineResult.handled) {
+            console.log(`[router] ${ctx.shop} final_path=product_engine`);
             console.log(
               `[product-turn-engine] handled shop=${ctx.shop} ` +
                 `families=${engineResult.diagnostics?.rungs?.join("|") || "-"} ` +
                 `selection=${engineResult.diagnostics?.selectionReason || "-"} ` +
                 `composer=${engineResult.diagnostics?.composer || "-"} ` +
+                `cta=${engineResult.diagnostics?.cta || "-"} ` +
                 `textLen=${engineResult.answerText?.length || 0} ` +
                 `cards=${engineResult.products?.length || 0}`,
             );
