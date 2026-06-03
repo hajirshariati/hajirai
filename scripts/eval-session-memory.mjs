@@ -271,6 +271,21 @@ await test("S19 — empty memory yields empty prompt block", async () => {
   assert.equal(buildSessionMemoryPromptBlock(mem), "");
 });
 
+await test("S19b — merchandising intent carries through gender/all refinements", async () => {
+  const mem = buildSessionMemory({
+    messages: [
+      u("Show me what's new"),
+      a("Which styles would you like to browse? <<Men's>><<Women's>><<Kids>>"),
+      u("Women's"),
+      a("What type of shoes are you looking for?"),
+      u("all"),
+    ],
+  });
+  assert.equal(mem.explicit.modifier, "new", `new modifier should carry; got ${JSON.stringify(mem.explicit)}`);
+  assert.equal(mem.explicit.badge, "new", `new badge should carry; got ${JSON.stringify(mem.explicit)}`);
+  assert.equal(mem.explicit.gender, "women");
+});
+
 // ── Production-bug regressions (2026-05-19 logs) ───────────────
 
 await test("S20 — classifier useCase is DROPPED on non-orthotic turns (orthotic terminology can't leak)", async () => {

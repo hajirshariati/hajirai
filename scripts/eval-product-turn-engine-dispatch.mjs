@@ -231,6 +231,42 @@ await test("D4 — 'plantar fasciitis women's sandals' is handled with useful te
   assert.doesNotMatch(out.answerText, /^Here are the matching styles I found\.?$/i);
 });
 
+await test("D4b — 'show me what's new' is a badge-backed product turn, not scope-too-thin", async () => {
+  let seenScope = null;
+  const candidates = [
+    uiCandidate({
+      title: "New Arrival Sandal",
+      handle: "new-arrival-sandal",
+      productType: "Sandals",
+      attributes: { category: "Sandals", gender: "Women", badge: "New" },
+    }),
+    uiCandidate({
+      title: "New Arrival Sneaker",
+      handle: "new-arrival-sneaker",
+      productType: "Sneakers",
+      attributes: { category: "Sneakers", gender: "Women", badge: "New" },
+    }),
+  ];
+  const out = await runProductTurn({
+    ...ctxBase,
+    latestUserMessage: "Show me what's new",
+    sessionMemory: { explicit: {}, inferred: {} },
+  }, {
+    forceEnable: true,
+    searchFn: async (scope) => {
+      seenScope = scope;
+      return candidates;
+    },
+    claimConfig: FIXTURE_CLAIM_CONFIG,
+  });
+  assert.ok(out && !out.decline, `engine should handle new-arrival turns; got ${JSON.stringify(out?.diagnostics)}`);
+  assert.equal(seenScope?.modifier, "new");
+  assert.equal(seenScope?.badge, "new");
+  assert.equal(out.cta?.modifier, "new");
+  assert.match(out.answerText, /new/i);
+  assert.equal(out.products.length, 2);
+});
+
 // ─── Decline path: compare / named-product still fall back to old path
 
 await test("D5 — 'Which has the most cushioning like the Jillian?' DECLINES (old path takes it)", async () => {

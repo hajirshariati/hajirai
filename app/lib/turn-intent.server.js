@@ -308,7 +308,10 @@ export function resolveTurnIntent({
       (extracted.category && extracted.category !== normStr(prev.category)) ||
       (extracted.color && extracted.color !== normStr(prev.color)) ||
       (extracted.condition && extracted.condition !== normStr(prev.condition)) ||
-      (extracted.useCase && extracted.useCase !== normStr(prev.useCase));
+      (extracted.useCase && extracted.useCase !== normStr(prev.useCase)) ||
+      (extracted.modifier && extracted.modifier !== normStr(prev.modifier)) ||
+      (extracted.badge && extracted.badge !== normStr(prev.badge)) ||
+      (extracted.onSale === true && prev.onSale !== true);
     if (!namesNewSearchTerm) {
       return {
         label: LABEL.META,

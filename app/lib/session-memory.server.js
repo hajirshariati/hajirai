@@ -37,12 +37,13 @@
 import { extractUserConstraints } from "./catalog-resolver.server.js";
 import { detectRejectedCategories } from "./chat-postprocessing.js";
 import { extractChoiceEvents } from "./choice-events.server.js";
+import { detectStorefrontSearchModifier } from "./storefront-search-cta.server.js";
 import { resolveTurnIntent } from "./turn-intent.server.js";
 
 const SCALAR_KEYS = [
   "gender", "category", "color", "size", "width",
   "condition", "useCase", "arch", "overpronation",
-  "specificProduct",
+  "specificProduct", "modifier", "badge", "onSale",
 ];
 
 // Scope that is owned by a specific gender. Kept for recipient-
@@ -105,6 +106,16 @@ function detectSizeWidth(text) {
   // "size 9" / "size 9.5"
   m = text.match(/\bsize\s+(\d{1,2}(?:\.\d|½)?)\b/i);
   if (m) out.size = m[1];
+  return out;
+}
+
+function detectMerchandisingScope(text) {
+  const modifier = detectStorefrontSearchModifier(text);
+  if (!modifier) return {};
+  const out = { modifier };
+  if (modifier === "new") out.badge = "new";
+  else if (modifier === "bestseller") out.badge = "best";
+  else if (modifier === "sale") out.onSale = true;
   return out;
 }
 
@@ -244,7 +255,11 @@ export function buildSessionMemory({ messages, classifiedIntent, resolverState }
     if (!text) return;
 
     // 1. Per-turn scalar extraction (lex-matched).
-    const extracted = { ...extractUserConstraints(text), ...detectSizeWidth(text) };
+    const extracted = {
+      ...extractUserConstraints(text),
+      ...detectSizeWidth(text),
+      ...detectMerchandisingScope(text),
+    };
 
     // 2. Recipient → gender pivot. Recipient phrasing implies the
     //    shopping subject changed; override extracted gender.

@@ -39,8 +39,11 @@ const MODIFIER_PATTERNS = [
   { match: /\b(bestsell(ers?|ing)|most\s+popular|top\s+rated|trending)\b/i, token: "bestseller" },
 ];
 
-function detectModifier(text) {
+export function detectStorefrontSearchModifier(text) {
   if (!text || typeof text !== "string") return null;
+  // "New Footwear" is an internal disambiguation chip in this app,
+  // meaning "new shoes vs orthotic insoles", not "new arrivals".
+  if (/^\s*new\s+footwear\s*$/i.test(text)) return null;
   for (const { match, token } of MODIFIER_PATTERNS) {
     if (match.test(text)) return token;
   }
@@ -133,12 +136,13 @@ function matchOverride(overrides, resolved) {
 export function buildStorefrontSearchCTA(opts) {
   if (!opts || typeof opts !== "object") return null;
   const { pattern, gender, category, color, latestUserMessage, overrides } = opts;
-  if (!gender && !category) return null; // nothing to search
 
   const genderToken = normalizeGenderToken(gender);
   const cat = category ? String(category).toLowerCase().trim() : "";
   const col = color ? String(color).toLowerCase().trim() : "";
-  const modifier = detectModifier(latestUserMessage || "");
+  const explicitModifier = opts.modifier ? String(opts.modifier).toLowerCase().trim() : "";
+  const modifier = explicitModifier || detectStorefrontSearchModifier(latestUserMessage || "");
+  if (!genderToken && !cat && !col && !modifier) return null; // nothing to search
 
   // Build the human-friendly label. Modifiers like "sale" and
   // "bestseller" read awkwardly when placed before the gender
@@ -154,6 +158,7 @@ export function buildStorefrontSearchCTA(opts) {
   if (genderToken) labelParts.push(genderLabel(genderToken));
   if (cat) labelParts.push(titleCase(cat));
   let autoLabel = labelParts.join(" ").replace(/\s+/g, " ").trim();
+  if (modifier === "new" && !genderToken && !cat && !col) autoLabel = "Shop New Arrivals";
   if (modifier === "sale") autoLabel += " on Sale";
   else if (modifier === "bestseller") autoLabel += " — Bestsellers";
 

@@ -370,16 +370,20 @@ async function runProductTurnDispatch({ ctx, controller, encoder, claimConfig })
     if (scope.gender) filters.gender = scope.gender;
     if (scope.category) filters.category = scope.category;
     if (scope.color) filters.color = scope.color;
-    const queryParts = [
+    if (scope.badge) filters.badge = scope.badge;
+    const queryParts = Array.from(new Set([
+      scope.modifier,
+      scope.badge,
       scope.condition,
       scope.color,
       scope.category,
       scope.useCase,
-    ].filter(Boolean);
+    ].filter(Boolean)));
     const query = queryParts.length > 0
       ? queryParts.join(" ").trim()
       : (scope.rawMessage || "").slice(0, 160);
     const input = { query, filters, limit };
+    if (scope.onSale === true) input.onSale = true;
     let result;
     try {
       result = await dispatchTool("search_products", input, ctx);
@@ -523,6 +527,7 @@ async function convertEngineCtaToLink(cta, ctx) {
       gender: cta.gender || ctx.sessionGender || "",
       category: cta.category || "",
       color: cta.color || "",
+      modifier: cta.modifier || "",
       latestUserMessage: ctx.latestUserMessage || "",
     });
     if (built && built.url) return { url: built.url, label: built.label || "View all" };

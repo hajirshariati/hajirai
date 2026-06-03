@@ -38,6 +38,7 @@ import {
   resolveColorFamily,
   familiesContainingColor,
 } from "./merchant-claim-config.server.js";
+import { detectStorefrontSearchModifier } from "./storefront-search-cta.server.js";
 
 // Flag — feature gate for production wiring. Read at engine entry
 // so flipping it at runtime (env update) takes effect without a
@@ -164,7 +165,7 @@ export async function runProductTurn(ctx = {}, options = {}) {
   // dispatcher will emit a storefront-search button — keeps the
   // text accurate ("...then use the View All button" only when
   // a button will actually appear).
-  const willHaveCta = !!(scope.category || scope.gender || scope.color);
+  const willHaveCta = !!(scope.category || scope.gender || scope.color || scope.modifier);
   const composed = composeAnswer({
     scope,
     selected,
@@ -181,22 +182,23 @@ export async function runProductTurn(ctx = {}, options = {}) {
   const displayCards = familiesToCards([...selected, ...deferred]);
 
   // CTA — anchored in the resolved scope (gender + category +
-  // optional color). Engine returns the scope only; the dispatcher
-  // composes the URL via buildStorefrontSearchCTA so we reuse the
-  // merchant's admin-configured storefrontSearchUrlPattern and
-  // ctaOverrides — no parallel URL builder, no Aetrex hardcoding.
+  // optional color/modifier). Engine returns the scope only; the
+  // dispatcher composes the URL via buildStorefrontSearchCTA so we
+  // reuse the merchant's admin-configured storefrontSearchUrlPattern
+  // and ctaOverrides — no parallel URL builder, no Aetrex hardcoding.
   //
   // Phase 4: fire the CTA whenever ANY of gender/category/color is
-  // resolved. buildStorefrontSearchCTA still needs gender OR
-  // category internally; otherwise it returns null and the
-  // dispatcher emits no link chunk. The composer mentions "the
-  // View All button" only when this CTA will actually fire.
-  const retrievalCta = (scope.category || scope.gender || scope.color)
+  // resolved, or when a merchandising modifier like "new" is
+  // resolved. buildStorefrontSearchCTA still returns null when
+  // there is no meaningful scope. The composer mentions "the View
+  // All button" only when this CTA will actually fire.
+  const retrievalCta = (scope.category || scope.gender || scope.color || scope.modifier)
     ? {
         kind: "storefront_search",
         gender: scope.gender || null,
         category: scope.category || null,
         color: scope.color || null,
+        modifier: scope.modifier || null,
         scopeSource: "engine_scope",
       }
     : null;
@@ -232,9 +234,20 @@ export function resolveTurnScope({ latestUserMessage, sessionMemory, claimConfig
     useCase: explicit.useCase || null,
     width: explicit.width || null,
     size: explicit.size || null,
+    modifier: explicit.modifier || null,
+    badge: explicit.badge || null,
+    onSale: explicit.onSale === true,
     requestedClaim: null,
     namedProduct: explicit.specificProduct || null,
   };
+
+  const latestModifier = detectStorefrontSearchModifier(scope.rawMessage);
+  if (latestModifier) {
+    scope.modifier = latestModifier;
+    if (latestModifier === "new") scope.badge = "new";
+    else if (latestModifier === "bestseller") scope.badge = "best";
+    else if (latestModifier === "sale") scope.onSale = true;
+  }
 
   // Map condition / use-case mentions into a "requested claim" the
   // selector understands. Per spec: claim semantics come from
@@ -246,6 +259,10 @@ export function resolveTurnScope({ latestUserMessage, sessionMemory, claimConfig
     scope.requestedClaim = { kind: "archSupport" };
   } else if (/\bwater[\s-]?friendly\b/i.test(scope.rawMessage)) {
     scope.requestedClaim = { kind: "waterFriendly" };
+  } else if (scope.badge) {
+    scope.requestedClaim = { kind: "badge", substring: scope.badge };
+  } else if (scope.onSale) {
+    scope.requestedClaim = { kind: "onSale" };
   }
 
   // Color family resolution. "black or neutral" → color=black AND
@@ -282,7 +299,7 @@ function engineWantsThisTurn(scope) {
   // and turns missing a category — those still go through the LLM
   // agent so it can ask clarifying questions or run catalog-
   // resolver paths the engine doesn't own yet.
-  if (!scope.category) return false;
+  if (!scope.category && !scope.badge && !scope.onSale && !scope.modifier) return false;
   if (scope.namedProduct) return false;
   const raw = scope.rawMessage || "";
   if (NAMED_PRODUCT_ANCHOR_RE.test(raw)) return false;
@@ -379,6 +396,13 @@ function familySupportsClaim(family, claim, claimConfig) {
   }
   if (claim.kind === "waterFriendly") {
     return cards.some((c) => c?._waterFriendly === true);
+  }
+  if (claim.kind === "badge") {
+    const want = String(claim.substring || "").toLowerCase();
+    return cards.some((c) => String(c?._badge || "").toLowerCase().includes(want));
+  }
+  if (claim.kind === "onSale") {
+    return cards.some((c) => c?._onSale === true);
   }
   return false;
 }
@@ -478,6 +502,10 @@ function buildWhyClause({ scope, selected, deferred, selectionReason }) {
       clauses.push(`arch-support details vary — open a card to confirm`);
     } else if (scope.requestedClaim?.kind === "waterFriendly") {
       clauses.push(`water-friendly details vary — open a card to confirm`);
+    } else if (scope.requestedClaim?.kind === "badge") {
+      clauses.push(`not all are tagged ${scope.requestedClaim.substring} — check card details before deciding`);
+    } else if (scope.requestedClaim?.kind === "onSale") {
+      clauses.push(`sale details vary — open a card to confirm`);
     }
   } else if (selectionReason === "proven_preferred" || selectionReason === "all_proven") {
     if (scope.requestedClaim?.kind === "condition") {
@@ -486,12 +514,19 @@ function buildWhyClause({ scope, selected, deferred, selectionReason }) {
       clauses.push(`all with verified arch-support details`);
     } else if (scope.requestedClaim?.kind === "waterFriendly" && allWaterFriendly) {
       clauses.push(`all water-friendly`);
+    } else if (scope.requestedClaim?.kind === "badge" && scope.requestedClaim.substring === "new") {
+      clauses.push(`tagged as new arrivals`);
+    } else if (scope.requestedClaim?.kind === "badge") {
+      clauses.push(`tagged ${scope.requestedClaim.substring}`);
+    } else if (scope.requestedClaim?.kind === "onSale" && allOnSale) {
+      clauses.push(`all currently on sale`);
     }
   }
 
-  if (allOnSale && cards.length >= 2) {
+  const alreadyMentionedSale = clauses.some((c) => /\bsale\b/i.test(c));
+  if (allOnSale && cards.length >= 2 && !alreadyMentionedSale) {
     clauses.push(`all currently on sale`);
-  } else if (allOnSale && cards.length === 1) {
+  } else if (allOnSale && cards.length === 1 && !alreadyMentionedSale) {
     clauses.push(`currently on sale`);
   }
 
@@ -524,10 +559,14 @@ function humanizeCondition(tag) {
 
 function scopeLabel(scope, { fallback = "styles" } = {}) {
   const parts = [];
+  if (scope.modifier === "new") parts.push("new");
   if (scope.gender) parts.push(genderPossessive(scope.gender));
   if (scope.color) parts.push(scope.color);
   if (scope.category) parts.push(scope.category);
-  return parts.length ? parts.join(" ") : fallback;
+  let label = parts.length ? parts.join(" ") : fallback;
+  if (scope.modifier === "sale" || scope.onSale) label = `${label} on sale`;
+  if (scope.modifier === "bestseller") label = `${label} best sellers`;
+  return label;
 }
 
 function genderPossessive(g) {

@@ -2,7 +2,10 @@
 // no API key required. Run: node scripts/eval-storefront-search-cta.mjs
 
 import assert from "node:assert/strict";
-import { buildStorefrontSearchCTA } from "../app/lib/storefront-search-cta.server.js";
+import {
+  buildStorefrontSearchCTA,
+  detectStorefrontSearchModifier,
+} from "../app/lib/storefront-search-cta.server.js";
 
 let passed = 0;
 let failed = 0;
@@ -75,6 +78,30 @@ test("'show me new men's sneakers' → new+men+sneakers", () => {
   });
   assert.equal(r.url, "https://www.aetrex.com/collections/shop?q=new+men+sneakers&tab=products");
   assert.equal(r.label, "View All New Men's Sneakers");
+});
+
+test("explicit modifier survives follow-up messages that no longer say new", () => {
+  const r = buildStorefrontSearchCTA({
+    pattern: AETREX,
+    modifier: "new",
+    gender: "women",
+    latestUserMessage: "Women's",
+  });
+  assert.equal(r.url, "https://www.aetrex.com/collections/shop?q=new+women&tab=products");
+  assert.equal(r.label, "View All New Women's");
+});
+
+test("modifier-only new arrival CTA is allowed", () => {
+  const r = buildStorefrontSearchCTA({
+    pattern: AETREX,
+    modifier: "new",
+  });
+  assert.equal(r.url, "https://www.aetrex.com/collections/shop?q=new&tab=products");
+  assert.equal(r.label, "Shop New Arrivals");
+});
+
+test("internal 'New Footwear' chip is not treated as a new-arrivals modifier", () => {
+  assert.equal(detectStorefrontSearchModifier("New Footwear"), null);
 });
 
 test("sale modifier detected", () => {

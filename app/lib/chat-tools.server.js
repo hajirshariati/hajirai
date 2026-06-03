@@ -1281,6 +1281,14 @@ const isExcludedByRule = (p) => {
       const categoryWant = String(
         attrFilters.category || attrFilters.Category || ""
       ).toLowerCase().trim();
+      const protectedAttrKeys = Object.keys(attrFilters).filter((k) =>
+        ["badge"].includes(String(k).toLowerCase()),
+      );
+      if (protectedAttrKeys.length > 0) {
+        console.log(
+          `[search]   filter-wipeout: protected filter(s) ${protectedAttrKeys.join(",")} had zero matches — leaving empty`,
+        );
+      } else {
 
       let recovered = null;
       if (categoryWant) {
@@ -1321,6 +1329,7 @@ const isExcludedByRule = (p) => {
       // match these constraints") than to ship orthotics under a sneaker
       // request.
       if (recovered) filtered = recovered;
+      }
     }
   }
 
