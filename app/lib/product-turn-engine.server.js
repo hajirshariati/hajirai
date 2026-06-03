@@ -437,19 +437,37 @@ export function composeAnswer({ scope, selected, deferred, selectionReason, will
 
   // Sentence 1 — acknowledgment + WHY (combined).
   // Built from verified-only signals; never invented.
+  //
+  // Singular grammar: when n=1 we use "Here's a matching" / "Here's
+  // one matching" instead of "I found one women's yellow sandals"
+  // (the noun "sandals" is inherently plural so "one … sandals"
+  // reads broken). Verb agreement follows.
   const why = buildWhyClause({ scope, selected, deferred, selectionReason });
+  const isSingular = selectionReason === "proven_preferred"
+    || selectionReason === "all_proven"
+    ? selected.length === 1
+    : familyCount === 1;
+  const countWord = (n) => (n === 1 ? "one" : String(n));
   let sentence1;
   if (selectionReason === "closest_matches_no_proof") {
-    sentence1 = `These ${label} are the closest matches I have${why ? ` — ${why}` : ""}.`;
+    sentence1 = isSingular
+      ? `Here's the closest ${label} match I have${why ? ` — ${why}` : ""}.`
+      : `These ${label} are the closest matches I have${why ? ` — ${why}` : ""}.`;
   } else if (selectionReason === "proven_preferred") {
     const runnerUps = familyCount > selected.length
       ? ` plus ${familyCount - selected.length} close runner-up${familyCount - selected.length > 1 ? "s" : ""}`
       : "";
-    sentence1 = `I found ${selected.length === 1 ? "one" : selected.length} ${label} that match your request${runnerUps}${why ? `, ${why}` : ""}.`;
+    sentence1 = isSingular
+      ? `Here's a matching ${label} style${runnerUps}${why ? `, ${why}` : ""}.`
+      : `I found ${countWord(selected.length)} ${label} that match your request${runnerUps}${why ? `, ${why}` : ""}.`;
   } else if (selectionReason === "all_proven") {
-    sentence1 = `I found ${selected.length === 1 ? "one" : selected.length} ${label} that match your request${why ? `, ${why}` : ""}.`;
+    sentence1 = isSingular
+      ? `Here's a matching ${label} style${why ? `, ${why}` : ""}.`
+      : `I found ${countWord(selected.length)} ${label} that match your request${why ? `, ${why}` : ""}.`;
   } else {
-    sentence1 = `I found ${familyCount === 1 ? "one" : familyCount} ${label}${why ? ` — ${why}` : ""}.`;
+    sentence1 = isSingular
+      ? `Here's a ${label} style${why ? ` — ${why}` : ""}.`
+      : `I found ${countWord(familyCount)} ${label}${why ? ` — ${why}` : ""}.`;
   }
 
   // Sentence 2 — WHAT to do next. Mentions the View All button when
@@ -519,15 +537,29 @@ function buildWhyClause({ scope, selected, deferred, selectionReason }) {
     } else if (scope.requestedClaim?.kind === "badge") {
       clauses.push(`tagged ${scope.requestedClaim.substring}`);
     } else if (scope.requestedClaim?.kind === "onSale" && allOnSale) {
-      clauses.push(`all currently on sale`);
+      // Live 2026-06-04: composer said "I found one ... sandals on
+      // sale, all currently on sale" — "all" reads wrong for n=1
+      // AND scope label already says "on sale" so the why-clause
+      // repeats. Skip when label already announces; respect
+      // singular when label doesn't.
+      const scopeAlreadySaysSale = scope.modifier === "sale" || scope.onSale;
+      if (!scopeAlreadySaysSale) {
+        clauses.push(cards.length === 1 ? `currently on sale` : `all currently on sale`);
+      }
     }
   }
 
+  // Generic sale mention — fires when sale wasn't the explicit claim
+  // but every card in the pool happens to be on sale. Same anti-
+  // duplication guard: skip when the scope label already announces it.
+  const scopeAlreadySaysSale = scope.modifier === "sale" || scope.onSale;
   const alreadyMentionedSale = clauses.some((c) => /\bsale\b/i.test(c));
-  if (allOnSale && cards.length >= 2 && !alreadyMentionedSale) {
-    clauses.push(`all currently on sale`);
-  } else if (allOnSale && cards.length === 1 && !alreadyMentionedSale) {
-    clauses.push(`currently on sale`);
+  if (!scopeAlreadySaysSale && !alreadyMentionedSale) {
+    if (allOnSale && cards.length >= 2) {
+      clauses.push(`all currently on sale`);
+    } else if (allOnSale && cards.length === 1) {
+      clauses.push(`currently on sale`);
+    }
   }
 
   if (allAdjustable) {

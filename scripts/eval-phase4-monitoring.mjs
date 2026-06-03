@@ -483,6 +483,60 @@ await test("P4-11 — Phase 4 follow-ups never include unanswerable / contradict
   }
 });
 
+await test("P4-12a — single on-sale match: no broken 'one ... sandals' grammar, no double 'on sale'", async () => {
+  // Live 2026-06-04 screenshot: "I found one women's yellow sandals
+  // on sale that match your request, all currently on sale."
+  // Three bugs here:
+  //   (1) "one ... sandals" — number/noun disagreement (category
+  //       is inherently plural).
+  //   (2) "match" with subject "one" — verb disagreement.
+  //   (3) "all currently on sale" with 1 product.
+  //   (4) "on sale" duplicated (scope label + why-clause).
+  // Fix: singular acknowledgments use "Here's a matching ... style"
+  // and the why-clause skips sale phrasing when the scope label
+  // already announces it.
+  const oneSaleCard = sandalCard({
+    title: "Daisy Adjustable Slide - Sunflower",
+    handle: "daisy-sunflower",
+    price: "87.47",
+    compare_at_price: 8747,
+    _onSale: true,
+  });
+  const out = await runProductTurn(
+    {
+      ...ctxBase,
+      latestUserMessage: "how about yellow?",
+      sessionMemory: {
+        explicit: {
+          gender: "women",
+          category: "sandals",
+          color: "yellow",
+          modifier: "sale",
+          onSale: true,
+        },
+        inferred: {},
+      },
+    },
+    {
+      forceEnable: true,
+      searchFn: async () => [oneSaleCard],
+      claimConfig: CLAIM_CONFIG,
+    },
+  );
+  assert.ok(!out.decline);
+  // Grammar: no "one + plural noun" pattern.
+  assert.doesNotMatch(out.answerText, /\bone\s+women's\s+yellow\s+sandals\b/i,
+    `singular acknowledgment must not say "one ... sandals"; got "${out.answerText}"`);
+  // No "all currently on sale" with 1 product.
+  assert.doesNotMatch(out.answerText, /\ball\s+currently\s+on\s+sale\b/i,
+    `single-product turn must not say "all currently on sale"; got "${out.answerText}"`);
+  // No duplicate "on sale" in the sentence (scope label already
+  // has it, so the why-clause shouldn't repeat).
+  const saleCount = (out.answerText.match(/\bon\s+sale\b/gi) || []).length;
+  assert.ok(saleCount <= 1,
+    `"on sale" must appear at most once when modifier=sale; got ${saleCount} in "${out.answerText}"`);
+});
+
 await test("P4-12b — 'What's currently on sale?' routes to PRODUCT engine, NOT policy (admit)", async () => {
   // Live 2026-06-04 failure: bare "What's on sale?" was matching
   // the policy discounts intent via \bsales?\b and the customer

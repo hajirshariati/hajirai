@@ -530,7 +530,18 @@ async function convertEngineCtaToLink(cta, ctx) {
       modifier: cta.modifier || "",
       latestUserMessage: ctx.latestUserMessage || "",
     });
-    if (built && built.url) return { url: built.url, label: built.label || "View all" };
+    if (built && built.url) {
+      // Surface the actual emitted URL so a wrong-destination
+      // (e.g. modifier=sale but URL goes to bestseller) is
+      // diagnosable against the merchant's storefrontSearchUrlPattern
+      // + ctaOverrides without guessing.
+      console.log(
+        `[chat] ${ctx.shop} engine cta url=${built.url} label=${JSON.stringify(built.label || "View all")} ` +
+          `from scope={gender:${cta.gender || "-"},category:${cta.category || "-"},color:${cta.color || "-"},modifier:${cta.modifier || "-"}} ` +
+          `overrides=${(ctx.ctaOverrides || []).length}`,
+      );
+      return { url: built.url, label: built.label || "View all" };
+    }
     return null;
   }
   return null;
