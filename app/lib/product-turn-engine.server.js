@@ -187,12 +187,20 @@ export async function runProductTurn(ctx = {}, options = {}) {
   // reuse the merchant's admin-configured storefrontSearchUrlPattern
   // and ctaOverrides — no parallel URL builder, no Aetrex hardcoding.
   //
-  // Phase 4: fire the CTA whenever ANY of gender/category/color is
-  // resolved, or when a merchandising modifier like "new" is
-  // resolved. buildStorefrontSearchCTA still returns null when
-  // there is no meaningful scope. The composer mentions "the View
-  // All button" only when this CTA will actually fire.
-  const retrievalCta = (scope.category || scope.gender || scope.color || scope.modifier)
+  // Phase 4: fire the CTA whenever ANY of gender/category/color/
+  // modifier is resolved AND the engine actually produced cards.
+  // Live 2026-06-04 failure: customer clicked a "Carly Arch Support
+  // Sneaker in other colors?" chip while session memory carried
+  // gender=kids from a prior orthotic turn. Engine retrieved 0
+  // cards (catalog has no kids' sneakers) but still emitted a
+  // "View All Kids' Sneakers" CTA that pointed to an empty
+  // storefront page. Suppress the CTA when displayCards.length===0
+  // — without products, the link almost always points to a
+  // confidently-wrong destination.
+  const retrievalCta = (
+    (scope.category || scope.gender || scope.color || scope.modifier)
+    && displayCards.length > 0
+  )
     ? {
         kind: "storefront_search",
         gender: scope.gender || null,

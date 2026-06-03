@@ -339,6 +339,60 @@ await test("D8 — default (flag unset) returns null (production behavior is unc
   }
 });
 
+// ─── Live 2026-06-04: empty pool must NOT emit a CTA ───────────
+//
+// Customer clicked "Do you have the Carly Arch Support Sneaker in
+// other colors?" while session memory carried gender=kids from a
+// prior orthotic turn. Engine retrieved 0 cards (catalog has no
+// kids' sneakers) but still emitted "View All Kids' Sneakers" —
+// pointing to an empty storefront page. The composer correctly
+// said "I couldn't find …" but the misleading CTA right below
+// made the bot look broken.
+
+await test("D9 — empty pool does NOT emit a misleading View All CTA", async () => {
+  const out = await runProductTurn({
+    ...ctxBase,
+    latestUserMessage: "Do you have the Carly Arch Support Sneaker in other colors?",
+    sessionMemory: {
+      // Stale gender=kids carried from a prior orthotic turn.
+      explicit: { gender: "kids", category: "sneakers" },
+      inferred: {},
+    },
+  }, {
+    forceEnable: true,
+    // Simulate the catalog having no kids' sneakers — searchFn returns [].
+    searchFn: async () => [],
+    claimConfig: FIXTURE_CLAIM_CONFIG,
+  });
+  assert.ok(out && !out.decline, "engine should still handle the turn");
+  assert.equal(out.products.length, 0, "no products in empty pool");
+  // The honest "I couldn't find …" text is fine; the CTA must NOT fire.
+  assert.equal(out.cta, null,
+    `empty pool must not emit a CTA; got ${JSON.stringify(out.cta)}`);
+  // Follow-ups should also be empty (no products to refine).
+  assert.ok(!Array.isArray(out.followUps) || out.followUps.length === 0,
+    `empty pool should not emit follow-ups; got ${JSON.stringify(out.followUps)}`);
+  // Text is honest.
+  assert.match(out.answerText, /couldn't find/i);
+});
+
+await test("D10 — non-empty pool DOES emit a CTA (regression check)", async () => {
+  // Sanity: the new gate must not break the normal happy path.
+  const out = await runProductTurn({
+    ...ctxBase,
+    latestUserMessage: "show me women's sandals",
+    sessionMemory: { explicit: { gender: "women", category: "sandals" }, inferred: {} },
+  }, {
+    forceEnable: true,
+    searchFn: async () => [uiCandidate({ title: "Maui", handle: "maui" })],
+    claimConfig: FIXTURE_CLAIM_CONFIG,
+  });
+  assert.ok(!out.decline);
+  assert.ok(out.products.length >= 1);
+  assert.ok(out.cta, "non-empty pool must still emit a CTA");
+  assert.equal(out.cta.kind, "storefront_search");
+});
+
 // ──────────────────────────────────────────────────────────────
 console.log("");
 if (failed === 0) {
