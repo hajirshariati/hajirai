@@ -334,7 +334,48 @@ function engineWantsThisTurn(scope, resolverState = null) {
   const raw = scope.rawMessage || "";
   if (NAMED_PRODUCT_ANCHOR_RE.test(raw)) return false;
   if (COMPARE_SHAPE_RE.test(raw)) return false;
+  // Complex multi-criteria turn — let the LLM agent handle it.
+  // The engine is a category + claim filter; it can't synthesize
+  // "dressy AND walkable AND restaurant-appropriate". Live trace
+  // 2026-06-03 Italy turn: customer asked for ONE pair of shoes
+  // that works for sightseeing + dinner at nicer restaurants
+  // with flat feet support — the engine reduced it to
+  // category=sandals + condition=flat_feet and returned flip-flops
+  // because they happened to be tagged for flat feet. Declining
+  // lets the LLM read the whole nuanced ask and apply judgement.
+  if (isComplexMultiCriteriaTurn(raw)) return false;
   return true;
+}
+
+// Detect long, multi-criteria customer questions the engine
+// shouldn't try to answer as a category filter. Signals:
+//   - long message (compound, multi-sentence) AND
+//   - conflicting/competing use-case categories (a "dressy +
+//     walking 8 miles" ask requires synthesis, not retrieval)
+// Threshold tuned so short focused queries
+// ("women's sandals for plantar fasciitis") stay on the engine
+// path and only the genuinely nuanced ones fall through.
+const DRESSY_USE_RE =
+  /\b(?:dress(?:y|ier|ed)?|formal|elegant|sophisticated|fancy|upscale|business[\s-]casual|office|interview|wedding|cocktail|night[\s-]out|restaurant|dinner|date\s+night)\b/i;
+const ACTIVE_USE_RE =
+  /\b(?:walking|walk(?:ed)?|running|hiking|trail|gym|workout|training|miles?\s+(?:a\s+)?day|cobble(?:stone)?s?|sightsee|touring|tourist|cardio|athletic|sport|standing\s+\d+|on\s+(?:my|your)\s+feet)\b/i;
+const COMFORT_USE_RE =
+  /\b(?:comfort(?:able)?|all[\s-]day|long\s+(?:hours|shift|day)|stand(?:ing)?\s+(?:all|long|on))\b/i;
+
+function isComplexMultiCriteriaTurn(rawMessage) {
+  const msg = String(rawMessage || "");
+  if (msg.length < 200) return false;
+  const hasDressy = DRESSY_USE_RE.test(msg);
+  const hasActive = ACTIVE_USE_RE.test(msg);
+  const hasComfort = COMFORT_USE_RE.test(msg);
+  // "Dressy" plus an active/walking ask is the canonical conflict:
+  // the customer wants a single product that satisfies two
+  // ordinarily-opposing use cases. Engine can't reason about that.
+  if (hasDressy && hasActive) return true;
+  // "Dressy + long day on feet" is the same shape from the other
+  // side (the comfort signal is about endurance, not formality).
+  if (hasDressy && hasComfort) return true;
+  return false;
 }
 
 function resolverHasCandidateRecommendation(resolverState) {
@@ -367,13 +408,22 @@ export function groupVariantsByBaseStyle(cards = []) {
 }
 
 function familyKey(card) {
+  // Always prefix with gender so Maui Men's and Maui Women's never
+  // collapse into the same family. Live trace 2026-06-03 Italy
+  // query: a women's-scope search retrieved Maui Women's Flips
+  // (correct), but the family-grouping then expanded the "maui"
+  // family to include Maui Men's Flips as a "variant" — and the
+  // engine displayed every variant in the family. Result: a men's
+  // product surfaced in a women's-only carousel.
+  const gender = cardGender(card) || "any";
+
   // Prefer merchant productLine attribute (canonical, set during
   // catalog sync). Fallback: first meaningful title token before
   // any " - " color suffix.
   const productLine = card?._claimFacts?.productLine?.value
     || card?._productLine
     || null;
-  if (productLine) return `pl:${String(productLine).toLowerCase().trim()}`;
+  if (productLine) return `${gender}:pl:${String(productLine).toLowerCase().trim()}`;
 
   const title = String(card?.title || "");
   const beforeDash = title.split(/\s[-–—]\s/)[0];
@@ -383,9 +433,9 @@ function familyKey(card) {
     .split(/\s+/)
     .filter(Boolean);
   for (const t of tokens) {
-    if (t.length >= 4 && !FAMILY_STOPWORDS.has(t)) return `t:${t}`;
+    if (t.length >= 4 && !FAMILY_STOPWORDS.has(t)) return `${gender}:t:${t}`;
   }
-  return `h:${card?.handle || title}`;
+  return `${gender}:h:${card?.handle || title}`;
 }
 
 const FAMILY_STOPWORDS = new Set([

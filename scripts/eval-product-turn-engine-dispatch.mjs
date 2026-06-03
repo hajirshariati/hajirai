@@ -741,6 +741,110 @@ await test("D18 — width filter is a no-op when no narrow/wide-feet tag exists"
     `untagged products must pass through; got ${out.products.map((p) => p.handle).join(",")}`);
 });
 
+await test("D19 — complex 'dressy + walking' multi-criteria turn declines (let LLM handle)", async () => {
+  // Live trace 2026-06-03 Italy turn. Customer asked for ONE pair
+  // of shoes for sightseeing + nicer-restaurants dinner + flat
+  // feet support + 8-10 mile cobblestone walks. The engine reduced
+  // it to (gender=women, category=sandals, condition=flat_feet,
+  // useCase=walking) and returned 6 sandals including flip-flops
+  // — flip-flops being the antithesis of "dressy enough for a
+  // restaurant". The engine can't synthesize conflicting use
+  // cases; it MUST decline so the LLM agent reads the whole ask
+  // and applies judgement.
+  const italyMsg =
+    "I'm going on a 10-day trip to Italy in August where I'll be walking 8-10 miles a day on cobblestones, " +
+    "I need ONE pair of shoes that works for both daytime sightseeing and dinner at nicer restaurants, " +
+    "I have flat feet and tend to get arch pain after about 3 miles — what do you have that's both " +
+    "supportive and looks dressy enough for a restaurant?";
+  const out = await runProductTurn({
+    ...ctxBase,
+    latestUserMessage: italyMsg,
+    sessionMemory: {
+      explicit: { gender: "women", category: "sandals", useCase: "walking", condition: "flat_feet" },
+      inferred: {},
+    },
+  }, {
+    forceEnable: true,
+    searchFn: async () => [uiCandidate({ title: "Maui Flip", handle: "maui-w" })],
+    claimConfig: FIXTURE_CLAIM_CONFIG,
+  });
+  assert.ok(out.decline,
+    `engine must decline the multi-criteria dressy+walking ask; got handled with cards=${out.products?.length}`);
+  assert.ok(
+    Array.isArray(out.diagnostics?.rungs) && out.diagnostics.rungs.includes("declined:scope-too-thin"),
+    `expected scope-too-thin rung for complex turn; got rungs=${out.diagnostics?.rungs?.join("|")}`,
+  );
+});
+
+await test("D20 — short focused query (no dressy conflict) still takes the engine", async () => {
+  // Sanity: don't over-decline. Short queries with a single use
+  // case must stay on the engine path so the warm copy + claim
+  // verification still runs.
+  const out = await runProductTurn({
+    ...ctxBase,
+    latestUserMessage: "women's sandals for flat feet",
+    sessionMemory: {
+      explicit: { gender: "women", category: "sandals", condition: "flat_feet" },
+      inferred: {},
+    },
+  }, {
+    forceEnable: true,
+    searchFn: async () => [
+      uiCandidate({
+        title: "Whit Sport Sandal", handle: "whit",
+        attributes: { category: "Sandals", gender: "Women", helps_with: ["Flat Feet"] },
+        tags: ["flat feet"],
+      }),
+    ],
+    claimConfig: FIXTURE_CLAIM_CONFIG,
+  });
+  assert.ok(!out.decline, `simple women's-sandals-for-flat-feet must NOT decline; got rungs=${out.diagnostics?.rungs?.join("|")}`);
+  assert.ok(out.products.length >= 1);
+});
+
+await test("D21 — Maui men's and women's never collapse into the same family", async () => {
+  // Live trace 2026-06-03 Italy turn (screenshot): a women's-scope
+  // carousel surfaced "Maui Orthotic Men's Flips - Black" because
+  // familyKey returned `t:maui` for both, so the women's-only
+  // search candidate "expanded" to include the men's variant. Fix:
+  // familyKey now prefixes with `_gender`. This test locks it in.
+  const womensFlip = uiCandidate({
+    title: "Maui Orthotic Women's Flips - Black",
+    handle: "maui-w-black",
+    productType: "Sandals",
+    attributes: { category: "Sandals", gender: "Women", helps_with: ["Flat Feet"] },
+    tags: ["flat feet"],
+  });
+  const mensFlip = uiCandidate({
+    title: "Maui Orthotic Men's Flips - Black",
+    handle: "maui-m-black",
+    productType: "Sandals",
+    attributes: { category: "Sandals", gender: "Men", helps_with: ["Flat Feet"] },
+    tags: ["flat feet"],
+  });
+  const out = await runProductTurn({
+    ...ctxBase,
+    latestUserMessage: "women's flat-feet sandals",
+    sessionMemory: {
+      explicit: { gender: "women", category: "sandals", condition: "flat_feet" },
+      inferred: {},
+    },
+  }, {
+    forceEnable: true,
+    // searchFn supplies both — simulating the prior bug where the
+    // search leaked a men's product into a women's-scope retrieval.
+    searchFn: async () => [womensFlip, mensFlip],
+    claimConfig: FIXTURE_CLAIM_CONFIG,
+  });
+  assert.ok(!out.decline);
+  const handles = out.products.map((p) => p.handle);
+  // Even if both are in the retrieval pool, the women's preference
+  // (preferExactGenderOverUnisex on the proven set + gender-keyed
+  // families) must drop the men's product.
+  assert.ok(!handles.includes("maui-m-black"),
+    `Maui men's must NOT appear in a women's-scope carousel; got ${handles.join(",")}`);
+});
+
 await test("D10 — non-empty pool DOES emit a CTA (regression check)", async () => {
   // Sanity: the new gate must not break the normal happy path.
   const out = await runProductTurn({
