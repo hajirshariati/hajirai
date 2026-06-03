@@ -280,6 +280,14 @@ export function resolveTurnScope({ latestUserMessage, sessionMemory, resolverSta
     scope.requestedClaim = { kind: "archSupport" };
   } else if (/\bwater[\s-]?friendly\b/i.test(scope.rawMessage)) {
     scope.requestedClaim = { kind: "waterFriendly" };
+  } else if (scope.width === "wide" || scope.width === "narrow") {
+    // Width compatibility — exclude products the merchant has
+    // explicitly marketed for the OPPOSITE width via helps_with.
+    // Live trace 2026-06-03: customer asked "Do you have wide
+    // width?" and got Miles sneakers, which Aetrex itself tags
+    // as helps_with=Narrow Feet. The selector had no way to filter
+    // because scope.width was never converted to a requested claim.
+    scope.requestedClaim = { kind: "widthCompat", want: scope.width };
   } else if (scope.badge) {
     scope.requestedClaim = { kind: "badge", substring: scope.badge };
   } else if (scope.onSale) {
@@ -431,6 +439,13 @@ export function selectByProvenFacts({ families, scope, claimConfig }) {
     if (scope.requestedClaim?.kind === "condition") {
       return { selected: provenAfterGender, deferred: [], selectionReason: "all_proven" };
     }
+    // Width-compat is a HARD exclusion too — a sneaker tagged for
+    // narrow feet is the wrong recommendation for a wide-width
+    // shopper. Same logic as condition: drop deferred so the
+    // carousel doesn't include the obvious mismatch.
+    if (scope.requestedClaim?.kind === "widthCompat") {
+      return { selected: provenAfterGender, deferred: [], selectionReason: "all_proven" };
+    }
     return { selected: provenAfterGender, deferred: partial, selectionReason: "proven_preferred" };
   }
   // No proven candidates — engine surfaces all as "closest matches"
@@ -504,6 +519,18 @@ function familySupportsClaim(family, claim, claimConfig) {
   }
   if (claim.kind === "waterFriendly") {
     return cards.some((c) => c?._waterFriendly === true);
+  }
+  // Width compatibility is an EXCLUSION claim, not an inclusion one.
+  // A family "supports" wide width if no variant is explicitly marked
+  // for narrow feet (and vice versa). Products with no width signal
+  // at all are treated as compatible — we only filter out the ones
+  // the merchant has actively tagged for the OPPOSITE width.
+  if (claim.kind === "widthCompat") {
+    const opposite = claim.want === "wide" ? "narrow_feet" : "wide_feet";
+    return cards.every((c) => {
+      const tags = Array.isArray(c?._conditionTags) ? c._conditionTags : [];
+      return !tags.includes(opposite);
+    });
   }
   if (claim.kind === "badge") {
     const want = String(claim.substring || "").toLowerCase();
@@ -657,6 +684,12 @@ function buildWhyClause({ scope, selected, deferred, selectionReason }) {
       clauses.push(`all with verified arch-support details`);
     } else if (scope.requestedClaim?.kind === "waterFriendly" && allWaterFriendly) {
       clauses.push(`all water-friendly`);
+    } else if (scope.requestedClaim?.kind === "widthCompat") {
+      // Honest framing: we filtered out the obvious mismatches but
+      // we can't promise wide-width availability per variant from
+      // here. Tell the customer to check sizing on the card.
+      const want = scope.requestedClaim.want === "wide" ? "wide" : "narrow";
+      clauses.push(`open a card to confirm ${want}-width sizing — these aren't tagged for the opposite width`);
     } else if (scope.requestedClaim?.kind === "badge" && scope.requestedClaim.substring === "new") {
       clauses.push(`tagged as new arrivals`);
     } else if (scope.requestedClaim?.kind === "badge") {

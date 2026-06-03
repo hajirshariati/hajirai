@@ -652,6 +652,95 @@ await test("D16 — kids+footwear empty pool emits honest coverage message, not 
     `'try a different style or color' must not appear for the kids-no-footwear case`);
 });
 
+await test("D17 — 'wide width' excludes products tagged helps_with=Narrow Feet", async () => {
+  // Live trace 2026-06-03 19:51:34 — customer asked "Do you have
+  // wide width?" on men's sneakers. The carousel included Miles
+  // (tagged helps_with=['Arch Pain','Ball of Foot Pain','Flat Feet',
+  //  'Heel Pain','High Instep','Metatarsalgia','Narrow Feet']), even
+  // though "Narrow Feet" is exactly what disqualifies a sneaker for
+  // a wide-width shopper. Two compounding bugs:
+  //   1. MERCHANT_CONDITION_TAG_MAP didn't include "narrow feet" /
+  //      "wide feet" — those metafield values were dropped silently.
+  //   2. scope.width was never converted to a requestedClaim — so
+  //      the selector ran no_claim_requested and kept everything.
+  // Both fixed; this test locks in the behavior.
+  const dash = uiCandidate({
+    title: "Dash Arch Support Men's Sneaker - Grey",
+    handle: "dash-grey",
+    productType: "Sneakers",
+    attributes: { category: "Sneakers", gender: "Men", helps_with: ["Arch Pain", "Heel Pain"] },
+  });
+  const milesBlack = uiCandidate({
+    title: "Miles Arch Support Sneaker - Black",
+    handle: "miles-black",
+    productType: "Sneakers",
+    attributes: {
+      category: "Sneakers", gender: "Men",
+      helps_with: ["Arch Pain", "Ball of Foot Pain", "Flat Feet", "Heel Pain", "High Instep", "Metatarsalgia", "Narrow Feet"],
+    },
+  });
+  const milesTan = uiCandidate({
+    title: "Miles Arch Support Sneaker - Tan",
+    handle: "miles-tan",
+    productType: "Sneakers",
+    attributes: {
+      category: "Sneakers", gender: "Men",
+      helps_with: ["Arch Pain", "Flat Feet", "Heel Pain", "Narrow Feet"],
+    },
+  });
+  const out = await runProductTurn({
+    ...ctxBase,
+    latestUserMessage: "Do you have wide width?",
+    sessionMemory: {
+      explicit: { gender: "men", category: "sneakers", width: "wide" },
+      inferred: {},
+    },
+  }, {
+    forceEnable: true,
+    searchFn: async () => [dash, milesBlack, milesTan],
+    claimConfig: FIXTURE_CLAIM_CONFIG,
+  });
+  assert.ok(!out.decline,
+    `engine must handle the wide-width query; got decline rungs=${out.diagnostics?.rungs?.join("|")}`);
+  const handles = out.products.map((p) => p.handle);
+  assert.ok(!handles.some((h) => /miles/i.test(h)),
+    `Miles (tagged Narrow Feet) MUST be excluded for wide-width; got ${handles.join(",")}`);
+  assert.ok(handles.includes("dash-grey"),
+    `Dash (no narrow-feet tag) must remain; got ${handles.join(",")}`);
+});
+
+await test("D18 — width filter is a no-op when no narrow/wide-feet tag exists", async () => {
+  // Products with no width signal at all pass through — we only
+  // exclude the ones the merchant has actively tagged for the
+  // OPPOSITE width. Otherwise this would over-filter every catalog
+  // that doesn't use the foot-width helps_with vocabulary.
+  const a = uiCandidate({
+    title: "A", handle: "a",
+    productType: "Sneakers",
+    attributes: { category: "Sneakers", gender: "Men", helps_with: ["Arch Pain"] },
+  });
+  const b = uiCandidate({
+    title: "B", handle: "b",
+    productType: "Sneakers",
+    attributes: { category: "Sneakers", gender: "Men" }, // no helps_with at all
+  });
+  const out = await runProductTurn({
+    ...ctxBase,
+    latestUserMessage: "wide width sneakers",
+    sessionMemory: {
+      explicit: { gender: "men", category: "sneakers", width: "wide" },
+      inferred: {},
+    },
+  }, {
+    forceEnable: true,
+    searchFn: async () => [a, b],
+    claimConfig: FIXTURE_CLAIM_CONFIG,
+  });
+  assert.ok(!out.decline);
+  assert.equal(out.products.length, 2,
+    `untagged products must pass through; got ${out.products.map((p) => p.handle).join(",")}`);
+});
+
 await test("D10 — non-empty pool DOES emit a CTA (regression check)", async () => {
   // Sanity: the new gate must not break the normal happy path.
   const out = await runProductTurn({

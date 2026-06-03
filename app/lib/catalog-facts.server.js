@@ -177,6 +177,15 @@ const MERCHANT_CONDITION_TAG_MAP = {
   "arch pain": "arch_pain",
   "hammer toes": "hammer_toes",
   "high instep": "high_instep",
+  // Foot-width markers from the merchant's helps_with metafield.
+  // Previously dropped on the floor — the map didn't include them,
+  // so "Narrow Feet" / "Wide Feet" tags from details_icons never
+  // reached the verifier. Live trace 2026-06-03 19:51:34: the Miles
+  // sneaker is tagged "Narrow Feet" on Aetrex, yet appeared in a
+  // "Do you have wide width?" result because the engine had no
+  // signal that Miles is purpose-built for narrow feet.
+  "narrow feet": "narrow_feet",
+  "wide feet": "wide_feet",
 };
 
 // Read structured per-product condition signals from BOTH the

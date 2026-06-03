@@ -352,6 +352,31 @@ await test("Merchant tags — 'Ball of Foot Pain' canonicalizes to metatarsalgia
   assert.ok(conds.includes("metatarsalgia"));
 });
 
+// Live trace 2026-06-03 19:51:34. Aetrex's helps_with metafield
+// labels foot-width with "Narrow Feet" / "Wide Feet" — the merchant
+// has actively curated those signals. Map them through so the
+// engine can use them to filter wide-width and narrow-width queries.
+await test("helps_with — 'Narrow Feet' canonicalizes to narrow_feet (was previously dropped)", () => {
+  const conds = extractMerchantConditionTags({
+    tags: [],
+    attributesJson: {
+      helps_with: ["Arch Pain", "Ball of Foot Pain", "Flat Feet", "Heel Pain", "High Instep", "Metatarsalgia", "Narrow Feet"],
+    },
+  });
+  assert.ok(conds.includes("narrow_feet"),
+    `expected narrow_feet in tags; got ${conds.join(",")}`);
+});
+
+await test("helps_with — 'Wide Feet' canonicalizes to wide_feet", () => {
+  const conds = extractMerchantConditionTags({
+    tags: [],
+    attributesJson: { helps_with: ["Wide Feet", "Bunions"] },
+  });
+  assert.ok(conds.includes("wide_feet"),
+    `expected wide_feet in tags; got ${conds.join(",")}`);
+  assert.ok(conds.includes("bunions"));
+});
+
 await test("Merchant tags — products without condition tags return empty list (corpus fallback kicks in upstream)", () => {
   const conds = extractMerchantConditionTags({
     tags: ["YGroup_SILICONE_HEEL"],
