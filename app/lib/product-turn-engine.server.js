@@ -887,45 +887,49 @@ export function composeSimilarAnswer({
 
 // Phase 4 follow-up chips for product retrieval turns.
 //
+// Each chip must read as a question a CUSTOMER would actually type
+// — never a UI instruction ("Filter by color" is wrong: a customer
+// would say "What other colors are available?"). Live 2026-06-04
+// audit: "Filter by color" / "Filter by size" / "Show on-sale
+// styles only" are widget directives, not customer language;
+// rewritten to natural questions.
+//
 // Deterministic, merchant-data-aware. We only emit chips the bot
 // can ACTUALLY answer:
 //   - Color refinement is safe (chat path supports it).
-//   - "Compare top 2" hits the existing compare-shape detector.
+//   - "Compare the top two" hits the existing compare-shape detector.
 //   - Width/size questions hit the existing facet handlers.
-//   - "On sale only" hits the search filter.
-//   - "Other similar styles" is safe when the engine can re-enter.
+//   - "Anything on sale?" hits the search onSale filter.
 //
 // NEVER suggest a question that would contradict established
-// scope (e.g. don't suggest a different gender, that would push
-// against the customer's locked subject). NEVER reference a
-// claim the bot hasn't verified.
+// scope (e.g. don't push gender). NEVER reference a claim the bot
+// hasn't verified.
 export function buildProductTurnFollowUps({ scope, families, selectionReason } = {}) {
   if (!Array.isArray(families) || families.length === 0) return [];
   const out = [];
 
   // Compare lives at every multi-style turn — the compare path is
-  // already an established engine intent shape.
+  // already an established engine intent shape. Phrased the way a
+  // customer would say it.
   if (families.length >= 2) {
     out.push(`Compare the top two`);
   }
 
-  // Color refinement. If color is set, offer to widen; if unset,
-  // offer to narrow.
+  // Color refinement. Phrased as the actual question a customer
+  // would type, not a widget instruction.
   if (scope.color) {
-    out.push(`Show other colors`);
+    out.push(`What other colors are available?`);
   } else {
-    out.push(`Filter by color`);
+    out.push(`What colors are available?`);
   }
 
-  // Width is a universal sizing dimension. Customers ask about it
-  // constantly; the existing chat path supports the question.
+  // Width is a universal sizing question. Direct yes/no shape.
   out.push(`Do you have wide width?`);
 
-  // Sale filter — generic, applies to any retail catalog.
-  out.push(`Show on-sale styles only`);
+  // Sale filter — customer-natural phrasing.
+  out.push(`Anything on sale?`);
 
-  // Similar / drill-down to a specific named style. Encourage the
-  // customer to click into one if they're indecisive.
+  // Drill into the most popular when the catalog is broad.
   if (families.length >= 3) {
     out.push(`What's the most popular?`);
   }
@@ -936,16 +940,17 @@ export function buildProductTurnFollowUps({ scope, families, selectionReason } =
 
 // Phase 4 follow-up chips for similar-product turns. Anchored on
 // the named-product intent so the customer can drill into the
-// anchor or pivot to color/size.
+// anchor or pivot to color/size — phrased as customer questions.
 export function buildSimilarTurnFollowUps({ anchorTitle, families } = {}) {
   const out = [];
   if (Array.isArray(families) && families.length >= 2) {
     out.push(`Compare the top two`);
   }
   if (anchorTitle) {
-    out.push(`Show ${truncateAnchorLabel(anchorTitle)} colors`);
+    const anchor = truncateAnchorLabel(anchorTitle);
+    out.push(`What colors does the ${anchor} come in?`);
   }
-  out.push(`Filter by size`);
+  out.push(`What sizes are available?`);
   out.push(`Do you have wide width?`);
   return out.slice(0, 3);
 }

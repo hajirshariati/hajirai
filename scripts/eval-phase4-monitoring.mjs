@@ -201,8 +201,12 @@ await test("P4-1 — pink sandals + arch support + bunions: text, products, CTA,
   assert.ok(Array.isArray(out.followUps) && out.followUps.length >= 2);
   // Compare must be one of the chips.
   assert.ok(out.followUps.some((q) => /compare/i.test(q)));
-  // Color is set so "Show other colors" should appear.
-  assert.ok(out.followUps.some((q) => /other colors|filter by color/i.test(q)));
+  // Color is set so "What other colors are available?" should appear.
+  assert.ok(out.followUps.some((q) => /other colors/i.test(q)));
+  // Chips must be PHRASED AS CUSTOMER QUESTIONS, not UI directives.
+  for (const chip of out.followUps) {
+    assert.doesNotMatch(chip, /^Filter by\b/i, `chip "${chip}" reads as a widget directive, not a question`);
+  }
   // Run the full audit. Zero warnings.
   assert.deepEqual(auditProductEngineOut(out), []);
 });
@@ -381,6 +385,75 @@ await test("P4-10 — composer NEVER emits the bland 'Here are the matching styl
     `composer must produce richer copy; got "${out.answerText}"`);
   // The View All hint must appear (scope is gender+category → CTA fires).
   assert.match(out.answerText, /view all button/i);
+});
+
+await test("P4-10b — every follow-up chip is a customer-shaped QUESTION, not a widget directive", async () => {
+  // Live 2026-06-04 audit: "Filter by color" / "Filter by size" /
+  // "Show on-sale styles only" are UI instructions, not language a
+  // customer would type. Chip text must end with a question mark
+  // OR be a one-word/phrase intent the customer would naturally
+  // say ("Compare the top two").
+  const cards = [
+    sandalCard({ title: "A", handle: "a" }),
+    sandalCard({ title: "B", handle: "b" }),
+    sandalCard({ title: "C", handle: "c" }),
+  ];
+  const scopes = [
+    { scope: { gender: "women", category: "sandals", color: "pink" } },
+    { scope: { gender: "women", category: "sandals" } }, // no color
+  ];
+  for (const s of scopes) {
+    const out = await runProductTurn(
+      { ...ctxBase, latestUserMessage: "show me sandals", sessionMemory: { explicit: s.scope, inferred: {} } },
+      { forceEnable: true, searchFn: async () => cards, claimConfig: CLAIM_CONFIG },
+    );
+    for (const chip of out.followUps || []) {
+      // Either ends with "?" (a question) or matches the
+      // imperative-action allowlist (compare/what's the most popular).
+      const isQuestion = /\?$/.test(chip);
+      const isAllowedImperative = /^Compare the top/i.test(chip);
+      assert.ok(isQuestion || isAllowedImperative,
+        `chip "${chip}" must be a customer question (ends with ?) or an allowed imperative; got "${chip}"`);
+      // Block widget-directive phrasings explicitly.
+      assert.doesNotMatch(chip, /^(?:Filter|Show)\s+(?:by|me)\b/i,
+        `chip "${chip}" reads as a widget directive`);
+    }
+  }
+});
+
+await test("P4-10c — similar-product follow-ups are also customer questions", async () => {
+  const danikaSimilar = {
+    reference: { handle: "danika-white", title: "Danika Sneaker - White" },
+    products: [
+      sandalCard({ title: "Chase Sneaker", handle: "chase", attributes: { category: "Sneakers", gender: "Women", footbed: "ap" }, productType: "Sneakers" }),
+      sandalCard({ title: "Molly Sneaker", handle: "molly", attributes: { category: "Sneakers", gender: "Women", footbed: "ap" }, productType: "Sneakers" }),
+    ],
+  };
+  const out = await runProductTurn(
+    {
+      ...ctxBase,
+      similarMatchAttributes: ["footbed"],
+      latestUserMessage: "what other shoes have same support as Danika",
+      sessionMemory: { explicit: {}, inferred: {} },
+    },
+    {
+      forceEnable: true,
+      searchFn: async () => [],
+      similarFn: async () => danikaSimilar,
+      resolveNamedProductFn: async () => "danika-white",
+      claimConfig: CLAIM_CONFIG,
+    },
+  );
+  // Must include an anchor-colors question with the named anchor.
+  assert.ok(out.followUps.some((q) => /What colors does the Danika come in\?/i.test(q)),
+    `expected "What colors does the Danika come in?"; got ${JSON.stringify(out.followUps)}`);
+  // None of the chips may be "Filter by size" or similar.
+  for (const chip of out.followUps) {
+    assert.doesNotMatch(chip, /^(?:Filter|Show)\s+by\b/i,
+      `chip "${chip}" must not be a widget directive`);
+    assert.ok(/\?$/.test(chip) || /^Compare the top/i.test(chip),
+      `chip "${chip}" must be a customer question or allowed imperative`);
+  }
 });
 
 await test("P4-11 — Phase 4 follow-ups never include unanswerable / contradicting / off-group chips", async () => {
