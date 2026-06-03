@@ -108,8 +108,36 @@ await test("PE-7 — non-policy turns are NOT detected", () => {
     "i want pink sandals with arch support",
     "which has the most cushioning like the Jillian?",
     "what other shoes have same support as Danika",
+    // Live 2026-06-04 failure: product-browse sale queries used to
+    // match the discounts regex via bare \bsales?\b and got an "I
+    // don't have discount details" admit. They must now fall through
+    // so the product engine can show actual on-sale cards.
+    "what's currently on sale?",
+    "what's on sale?",
+    "show me sale shoes",
+    "anything on sale",
+    "show me clearance items",
+    "any on-sale wedges?",
   ]) {
     assert.equal(detectPolicyIntent(q), null, `false positive for "${q}"`);
+  }
+});
+
+await test("PE-7b — policy-shape DISCOUNT questions still detect discounts", () => {
+  // Real discount-mechanism questions stay routed to policy so the
+  // engine can quote the merchant's promo/coupon terms (if any) or
+  // admit gracefully.
+  for (const q of [
+    "Do you offer any discount?",
+    "do you have a coupon code?",
+    "Do you offer a first-time customer discount?",
+    "What's your discount policy?",
+    "How do I apply a coupon code?",
+    "How do I use a promo code?",
+    "first-order off?",
+  ]) {
+    const i = detectPolicyIntent(q);
+    assert.equal(i?.primary, "discounts", `failed for "${q}"; got ${i?.primary}`);
   }
 });
 

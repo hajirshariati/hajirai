@@ -410,6 +410,57 @@ await test("P4-11 — Phase 4 follow-ups never include unanswerable / contradict
   }
 });
 
+await test("P4-12b — 'What's currently on sale?' routes to PRODUCT engine, NOT policy (admit)", async () => {
+  // Live 2026-06-04 failure: bare "What's on sale?" was matching
+  // the policy discounts intent via \bsales?\b and the customer
+  // got "I don't have discount details" + Contact button. The
+  // catalog HAS on-sale products (compareAtPrice > price); the
+  // engine should retrieve those and show cards.
+  //
+  // Two assertions:
+  //   (a) Policy engine cleanly DECLINES this turn.
+  //   (b) Product engine ACCEPTS it (engineWantsThisTurn=true via
+  //       scope.modifier or scope.onSale).
+  const { detectPolicyIntent } = await import("../app/lib/policy-engine.server.js");
+  assert.equal(detectPolicyIntent("what's currently on sale?"), null,
+    "policy engine must decline sale-browse turns");
+
+  const onSaleCards = [
+    sandalCard({
+      title: "Maui Sandal - White",
+      handle: "maui-white",
+      price: "99.00",
+      compare_at_price: 13995,
+    }),
+    sandalCard({
+      title: "Whit Sport Sandal",
+      handle: "whit",
+      price: "89.00",
+      compare_at_price: 12995,
+    }),
+  ].map((c) => ({ ...c, _onSale: true }));
+
+  const out = await runProductTurn(
+    {
+      ...ctxBase,
+      latestUserMessage: "What's currently on sale?",
+      sessionMemory: { explicit: {}, inferred: {} },
+    },
+    {
+      forceEnable: true,
+      searchFn: async () => onSaleCards,
+      claimConfig: CLAIM_CONFIG,
+    },
+  );
+  assert.ok(!out.decline, `product engine must accept sale-browse; got rungs=${JSON.stringify(out.diagnostics?.rungs)}`);
+  assert.ok(out.products.length >= 1, "must return at least one on-sale product");
+  // CTA fires (storefront search with modifier=sale).
+  assert.ok(out.cta && out.cta.kind === "storefront_search");
+  // No price-audit warnings — these are real prices.
+  const warnings = auditProductEngineOut(out);
+  assert.equal(warnings.filter((w) => w.code === "C:low_price").length, 0);
+});
+
 await test("P4-12 — every Phase 4 product CTA payload is convertible to {type:link,url,label}", async () => {
   const out = await runProductTurn(
     {

@@ -34,7 +34,26 @@ const POLICY_INTENT_PATTERNS = {
   warranty:      /\b(?:warranty|guarantee(?:d)?\b|defects?|covered\s+for|how\s+long\s+(?:is|does)\s+(?:the\s+)?warranty)\b/i,
   exchanges:     /\b(?:exchange|swap|trade(?:\s+in)?|wrong\s+size\s+(?:can\s+i|do\s+i)|different\s+size)\b/i,
   tracking:      /\b(?:track(?:ing)?\s+(?:my\s+)?(?:order|package|shipment)|where(?:'s|\s+is)\s+my\s+order|order\s+(?:status|tracking)|tracking\s+(?:number|info))\b/i,
-  discounts:     /\b(?:discounts?\b|promo(?:tion)?s?\s+code|coupons?|sales?\b|markdowns?|first[\s-]?(?:time\s+)?(?:order|customer)\s+(?:discount|off)|do\s+you\s+offer\s+(?:any\s+)?(?:discount|promo|coupon))\b/i,
+  // Discounts policy — limited to questions about discount/promo/coupon
+  // MECHANISMS (codes, eligibility, terms). Product-browse questions
+  // like "what's on sale" / "show me sale shoes" must NOT match: those
+  // are product retrieval turns the engine answers with actual cards
+  // filtered by _onSale=true. Live failure 2026-06-04: "What's
+  // currently on sale?" was matching this regex via bare \bsales?\b
+  // and getting a "I don't have discount policy details" admit
+  // instead of a list of on-sale products.
+  //
+  // Keeps in scope:
+  //   "promo code" / "coupon" / "coupons"
+  //   "first-time customer discount"
+  //   "discount policy" / "discount code"
+  //   "do you offer/have any discount/promo/coupon"
+  //   "how do I apply / use / enter a discount"
+  //   "what's your discount" (asking about policy)
+  // Lets fall through to product engine:
+  //   "what's on sale?"  "show me sale items"  "anything on sale"
+  //   "sale shoes"  "on-sale wedges"  "clearance shoes"
+  discounts:     /\b(?:promo(?:tion)?s?\s+code|coupons?\b|first[\s-]?(?:time\s+)?(?:order|customer)\s+(?:discount|off)|discount\s+(?:policy|code|details|window)|do\s+you\s+(?:offer|have)\s+(?:any\s+)?(?:discounts?|promos?|coupons?)|how\s+(?:do\s+i|can\s+i|to)\s+(?:get|use|apply|enter)\s+(?:a\s+|the\s+)?(?:discount|coupon|promo)|what(?:'s|\s+is)\s+your\s+discount)\b/i,
   services:      /\b(?:do\s+you\s+(?:offer|have)\s+(?:fitting|measurement|consultation|service|in[\s-]store)|services?\b|fittings?|consultation|in[\s-]store\s+(?:experience|visit|pickup))\b/i,
   terms:         /\b(?:terms\s+(?:of\s+(?:service|use)|and\s+conditions)|privacy\s+policy|cookie\s+policy|legal)\b/i,
 };
