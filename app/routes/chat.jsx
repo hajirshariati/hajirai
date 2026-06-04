@@ -2458,14 +2458,6 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
             `but pool families [${m.poolFamilies.join(",")}] don't overlap — wiping ${filteredPool.length} card(s)`,
         );
         filteredPool = [];
-        // Also wipe the upstream `pool` so the display-boundary
-        // fallback below doesn't re-emit the same cards we just
-        // rejected. Live trace 2026-06-04: the mismatch guard
-        // correctly wiped 4 cards on a "what is bio rocker?" turn,
-        // then `display-boundary: scorer produced zero cards;
-        // emitting 4 scoped fallback card(s)` re-attached them
-        // because the fallback reads from `pool`, not `filteredPool`.
-        pool = [];
       }
     }
 
@@ -2530,20 +2522,12 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
                 `— wiping pool (text-only answer)`,
             );
             filteredPool = [];
-            // Wipe upstream `pool` so the display-boundary fallback
-            // can't resurrect these cards. Same reasoning as the
-            // named-product mismatch guard above.
-            pool = [];
           } else if (matching.length < filteredPool.length) {
             console.log(
               `[chat] ${ctx.shop} definition-question guard: keeping ${matching.length}/${filteredPool.length} card(s) ` +
                 `that mention "${topic}"`,
             );
             filteredPool = matching;
-            // Narrow `pool` to the same matching set so the
-            // display-boundary fallback can only fall back to the
-            // topic-matching cards we've explicitly approved.
-            pool = matching;
           }
         }
       }
@@ -2765,38 +2749,18 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
           );
         }
       }
-    } else if (
-      (!effectiveSaysNoMatch || isCompoundPolicyProductQuestion(ctx.latestUserMessage)) &&
-      pool.length > 0 &&
-      shouldAttachProductCardsForTurn({ text: fullResponseText, ctx, recommenderAskedForMoreInfo })
-    ) {
-      // Last display-boundary invariant: a scoped product pool plus
-      // product-presenting text must never degrade to a text-only turn
-      // because a late scorer/narrower found no confident subset. At
-      // this point the pool has already passed the response contract's
-      // scope filter, so showing the top scoped cards is safer than
-      // leaving the customer with "Here are..." and no cards.
-      const fallbackCards = pool.slice(0, cardCap);
-      const { products: deduped, categoryCounts, genderCounts } = prepareProductCardsForTurn(fallbackCards);
-      if (deduped.length > 0) {
-        console.log(`[chat] display-boundary: scorer produced zero cards; emitting ${deduped.length} scoped fallback card(s)`);
-        finalProductCards = deduped;
-        controller.enqueue(encoder.encode(sseChunk({
-          type: "products",
-          products: deduped,
-        })));
-
-        const productLink = resolveProductTurnLink({ categoryCounts, genderCounts, ctx });
-        if (productLink.link) {
-          outboundLinks.push(productLink.link);
-          controller.enqueue(encoder.encode(sseChunk({
-            type: "link",
-            url: productLink.link.url,
-            label: productLink.link.label,
-          })));
-        }
-      }
     }
+    // Display-boundary fallback removed. It existed because the
+    // scorer used to ignore user-question-vs-card-title and would
+    // drop cards to zero whenever the LLM wrote vague text ("Here
+    // are some options:") without naming products. The fallback
+    // then resurrected them by reading `pool` directly — which
+    // bypassed every upstream guard. Fixed at the source: scorer
+    // now also matches user words against card titles, so a card
+    // that legitimately matches the customer's ask survives even
+    // when the LLM didn't name it. If the scorer drops all cards
+    // now, that's because none of them actually match — the right
+    // answer is text-only, not "show whatever we had."
   }
 
   const turnResult = createTurnResult({

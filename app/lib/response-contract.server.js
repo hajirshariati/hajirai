@@ -64,8 +64,32 @@ export function scoreCardAgainstText(card, textLower, userTextLower) {
   const raw = card.title.toLowerCase().replace(/[^a-z0-9\s]/g, " ").split(/\s+/).filter((w) => w.length > 1);
   const generic = new Set(["the", "a", "an", "for", "and", "or", "in", "on", "with", "men", "mens", "women", "womens", "black", "white", "tan", "brown", "red", "blue", "grey", "gray", "pink", "dark", "light"]);
   const nameWords = raw.filter((w) => !generic.has(w));
+  // 1. Title vs response text — "did the AI name this product?"
   const titleScore = nameWords.length === 0 ? 0 : nameWords.filter((w) => textLower.includes(w)).length / nameWords.length;
 
+  // 2. User question vs card title — "does this product match what the
+  // customer asked about?" Missing this signal was the original sin
+  // behind the display-boundary fallback: when the LLM wrote vague
+  // text ("Here are some options:") with no specific product names,
+  // titleScore went to 0 for every card and the scorer dropped them
+  // all — even when the cards clearly matched the customer's intent
+  // ("show me sandals" → every sandal card has "sandal" in the title).
+  // Display-boundary was bolted on to compensate. This signal is the
+  // upstream fix.
+  let userTitleScore = 0;
+  if (userTextLower && nameWords.length > 0) {
+    const userWords = userTextLower
+      .replace(/[^a-z0-9\s]/g, " ")
+      .split(/\s+/)
+      .filter((w) => w.length >= 3 && !generic.has(w) && !["what", "does", "mean", "tell", "about", "show", "find", "have", "you", "your", "the"].includes(w));
+    if (userWords.length > 0) {
+      userTitleScore = nameWords.filter((w) => userWords.some((uw) => w.includes(uw) || uw.includes(w))).length / nameWords.length;
+    }
+  }
+
+  // 3. User question vs description snippet — "does this product's
+  // description discuss what the customer asked about?" Captures
+  // technology/feature queries when the term is in the description.
   let queryScore = 0;
   const snippet = (card._descriptionSnippet || "").toLowerCase();
   const searchQ = (card._searchQuery || "").toLowerCase().trim();
@@ -83,7 +107,7 @@ export function scoreCardAgainstText(card, textLower, userTextLower) {
     queryScore = Math.max(queryScore, 1);
   }
 
-  return Math.max(titleScore, queryScore);
+  return Math.max(titleScore, userTitleScore, queryScore);
 }
 
 export const SKU_PATTERN = /\b[A-Z]{1,2}\d{3,5}[A-Z]?\b/g;
