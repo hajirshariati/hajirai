@@ -700,7 +700,7 @@ export function composeAnswer({ scope, selected, deferred, selectionReason, will
   const leadFamily = selected[0] || deferred[0] || allFamilies[0];
   const leadCard = leadFamily?.primary || leadFamily?.variants?.[0] || allCards[0];
   const leadTitle = String(leadCard?.title || label).trim();
-  const catalogRequirement = customerFacingCatalogRequirement(scope);
+  const catalogRequirement = customerFacingCatalogRequirement(scope, allCards);
   const catalogDefinition = catalogRequirement
     ? findCatalogDefinition(allCards, scope?.requiredCatalogTerms?.[0])
     : "";
@@ -783,9 +783,37 @@ function isCatalogDefinitionQuestion(message) {
     .test(String(message || ""));
 }
 
-function customerFacingCatalogRequirement(scope = {}) {
+function findCatalogDisplayTerm(cards = [], requirement = "") {
+  const tokens = normalizeCatalogText(requirement).split(" ").filter(Boolean);
+  if (tokens.length === 0) return "";
+  const pattern = new RegExp(
+    `(${tokens.map(escapeRegex).join("[^A-Za-z0-9]*")})[™®©℠]?`,
+    "i",
+  );
+  for (const card of cards || []) {
+    for (const source of [
+      card?.title,
+      card?._description,
+      card?.description,
+      card?._descriptionSnippet,
+      card?.descriptionSnippet,
+    ]) {
+      const match = pattern.exec(String(source || ""));
+      if (match?.[1]) return match[1].trim();
+    }
+  }
+  return "";
+}
+
+function customerFacingCatalogRequirement(scope = {}, cards = []) {
   const requirement = String(scope?.requiredCatalogTerms?.[0] || "").trim();
   if (!requirement) return "";
+
+  // Prefer the merchant's own product-data casing for branded concepts.
+  // A shopper may type "bio rocker", but our descriptions establish the
+  // customer-facing name as "BioRocker".
+  const catalogDisplay = findCatalogDisplayTerm(cards, requirement);
+  if (catalogDisplay) return catalogDisplay;
 
   // Preserve the customer's own casing when the latest message names the
   // concept directly ("BioRocker" instead of the normalized "bio rocker").

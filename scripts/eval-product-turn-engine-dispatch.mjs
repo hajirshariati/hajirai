@@ -391,6 +391,28 @@ await test("D7b — category-less technology definition is owned by the engine a
   );
 });
 
+await test("D7bb — merchant product data restores branded concept casing from a lowercase question", async () => {
+  const out = await runProductTurn({
+    ...ctxBase,
+    latestUserMessage: "what is bio rocker?",
+    messages: [{ role: "user", content: "what is bio rocker?" }],
+    sessionMemory: { explicit: {}, inferred: {} },
+  }, {
+    forceEnable: true,
+    searchFn: async () => [
+        uiCandidate({
+          title: "Savannah Sandal",
+          handle: "savannah",
+          description: "Designed with BioRocker™ Technology for a natural stride.",
+        }),
+    ],
+    claimConfig: FIXTURE_CLAIM_CONFIG,
+  });
+  assert.ok(out && !out.decline);
+  assert.match(out.answerText, /^BioRocker is our /);
+  assert.doesNotMatch(out.answerText, /^bio rocker /);
+});
+
 await test("D7c — immediate technology continuation stays in the engine without a category", async () => {
   const message = "Which other shoe styles feature this technology?";
   const out = await runProductTurn({
@@ -426,7 +448,7 @@ await test("D7c — immediate technology continuation stays in the engine withou
   assert.ok(out.answerText.length > 0, "engine must not emit confident empty text");
   assert.match(
     out.answerText,
-    /For styles with bio rocker, I'd start with Savannah Sandal because it includes the feature you asked about/i,
+    /For styles with BioRocker, I'd start with Savannah Sandal because it includes the feature you asked about/i,
   );
   assert.doesNotMatch(out.answerText, /product description|catalog evidence|explicitly mentions/i);
 });
