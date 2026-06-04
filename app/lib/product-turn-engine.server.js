@@ -847,7 +847,7 @@ const TOPIC_STOP_WORDS = new Set([
   "the", "a", "an", "this", "these", "those", "all", "any",
   "for", "with", "and", "or", "but", "your", "my", "me",
 ]);
-function extractTopicTerm(message) {
+export function extractTopicTerm(message) {
   const msg = String(message || "");
   if (!msg) return null;
   // Trademark-marked term wins over plain CamelCase ("BioRocker™"

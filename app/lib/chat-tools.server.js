@@ -31,6 +31,7 @@ import {
   productMatchesVariantScope,
   variantScopedPriceValues,
 } from "./chat-tool-variant-helpers.server.js";
+import { extractTopicTerm } from "./product-turn-engine.server.js";
 
 // Re-export tool schemas so existing imports
 //   import { TOOLS } from "../lib/chat-tools.server"
@@ -1209,6 +1210,50 @@ const isExcludedByRule = (p) => {
   }
 
   let filtered = tieredScored.map((x) => x.product);
+
+  // Topic-term hard filter at the search source. When the customer's
+  // message names a brand / technology / product code (CamelCase like
+  // "BioRocker", trademark-marked like "UltraSky™", or short codes
+  // like "P3"), every result MUST literally reference that term in
+  // its title or description. Semantic similarity is helpful when the
+  // customer described an attribute ("comfortable", "wide"), but for
+  // a NAMED entity it produces false friends — embedding lookup for
+  // "BioRocker" surfaces other sneakers because the term reads
+  // sneaker-shaped, even when those products have nothing to do with
+  // the actual technology. Filtering at the source removes the need
+  // for downstream named-product mismatch guards / definition-question
+  // guards / display-boundary fallbacks to clean it up later.
+  // Source precedence: customer's literal current message first, then
+  // the raw AI query (preserves CamelCase when the AI echoes the
+  // brand), then the broader user/conversation history. The history
+  // fallback catches the case where the customer clicked a follow-up
+  // chip whose text doesn't repeat the brand name ("any other styles
+  // besides sneakers that use this technology?") but a prior turn
+  // established the topic ("BioRocker").
+  const topicTerm =
+    extractTopicTerm(latestUserMessage) ||
+    extractTopicTerm(q) ||
+    extractTopicTerm(userText) ||
+    extractTopicTerm(conversationText);
+  if (topicTerm) {
+    const topicKey = String(topicTerm).toLowerCase().replace(/[^a-z0-9]/g, "");
+    if (topicKey.length >= 3) {
+      const beforeTopic = filtered.length;
+      filtered = filtered.filter((p) => {
+        const haystack = [p?.title, p?.handle, p?.description]
+          .filter(Boolean)
+          .join(" ")
+          .toLowerCase()
+          .replace(/[^a-z0-9]/g, "");
+        return haystack.includes(topicKey);
+      });
+      if (filtered.length !== beforeTopic) {
+        console.log(
+          `[search]   topic filter: term="${topicTerm}" kept=${filtered.length}/${beforeTopic} (literal title/description match required)`,
+        );
+      }
+    }
+  }
 
   if (attrKeys.length > 0) {
     const beforeAttrFilter = filtered;

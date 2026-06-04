@@ -38,6 +38,7 @@ import {
   colorExistsInCatalogScope,
   computeCatalogConstraintDomains,
 } from "./catalog-matcher.server.js";
+import { detectRejectedCategories } from "./chat-postprocessing.js";
 
 // ─── helpers ───────────────────────────────────────────────────
 
@@ -537,6 +538,29 @@ function matchLex(text, lex) {
   return null;
 }
 
+// Stem-aware membership test against the rejected-category set
+// produced by detectRejectedCategories. The detector's output uses
+// the customer's own surface form (e.g. "sneakers"), the canonical
+// values use the resolver's normalized form (e.g. "sneakers" — or
+// "wedges-heels" for heels). Compare on a normalized singular stem
+// so "sneaker" vs "sneakers" and hyphenated canonicals both match.
+function categoryIsRejected(canonical, rejectedSet) {
+  if (!rejectedSet || rejectedSet.size === 0 || !canonical) return false;
+  const stems = new Set();
+  for (const part of String(canonical).split("-")) {
+    const norm = part.trim().toLowerCase();
+    if (!norm) continue;
+    stems.add(norm);
+    stems.add(norm.endsWith("s") ? norm.slice(0, -1) : `${norm}s`);
+  }
+  for (const term of rejectedSet) {
+    const t = String(term).toLowerCase().trim();
+    const tStem = t.endsWith("s") ? t.slice(0, -1) : t;
+    if (stems.has(t) || stems.has(tStem)) return true;
+  }
+  return false;
+}
+
 // Garment words the customer might wear (and color-describe) WITHOUT
 // asking for footwear in that color. Production trace: "do you have any
 // wedge that goes well with my blue dress?" — the lex extractor grabbed
@@ -613,8 +637,19 @@ export function extractUserConstraints(message) {
   const out = {};
   const gender = matchLex(message, RESOLVER_GENDER_LEX);
   if (gender) out.gender = gender;
+  // Negation-aware category extraction. When the customer says
+  // "besides sneakers" / "other than boots" / "no heels", the lex
+  // matcher would still grab the rejected term as a positive
+  // category constraint — then the rest of the pipeline searches
+  // for the very thing the customer just ruled out. Pre-compute
+  // the rejection set with the shared detector and skip any
+  // category whose canonical form (or its singular/plural stem)
+  // appears in that set.
+  const rejected = detectRejectedCategories(message);
   const category = matchLex(message, RESOLVER_CATEGORY_LEX);
-  if (category) out.category = category;
+  if (category && !categoryIsRejected(category, rejected)) {
+    out.category = category;
+  }
   const color = pickCustomerColor(message);
   if (color) out.color = color;
   for (const [tag, re] of Object.entries(RESOLVER_CONDITION_RE)) {
