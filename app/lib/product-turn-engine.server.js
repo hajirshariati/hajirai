@@ -115,8 +115,33 @@ export async function runProductTurn(ctx = {}, options = {}) {
   }
 
   // 2. Retrieve
-  const rawCandidates = await options.searchFn(scope);
+  let rawCandidates = await options.searchFn(scope);
   diagnostics.rungs.push(`retrieved:${rawCandidates.length}`);
+
+  // 2b. Topic-term post-filter.
+  //
+  // When the customer asks about a specific brand/technology
+  // ("Which sandals have BioRocker?", "Do you have UltraSky shoes?"),
+  // the structured search returns category matches but doesn't know
+  // about brand vocabulary. Honor the customer's intent by keeping
+  // only the products whose title/handle/description literally
+  // mentions the topic term. Cards with no match disappear; an empty
+  // result is honest ("I couldn't find sandals with BioRocker"
+  // composer takes over). Normalization strips non-alphanumerics so
+  // "biorocker" matches "Bio Rocker", "BioRocker™", and "BioRocker".
+  if (scope.topicTerm) {
+    const topicKey = String(scope.topicTerm).toLowerCase().replace(/[^a-z0-9]/g, "");
+    if (topicKey.length >= 3) {
+      const matches = rawCandidates.filter((c) => {
+        const haystack = [
+          c?.title, c?.handle, c?._descriptionSnippet, c?.description,
+        ].filter(Boolean).join(" ").toLowerCase().replace(/[^a-z0-9]/g, "");
+        return haystack.includes(topicKey);
+      });
+      diagnostics.rungs.push(`topic_filter:${scope.topicTerm}=${matches.length}/${rawCandidates.length}`);
+      rawCandidates = matches;
+    }
+  }
 
   // 3. Attach facts. Cards without _claimFacts after this step are
   // a regression — log and drop.
@@ -253,6 +278,19 @@ export function resolveTurnScope({ latestUserMessage, sessionMemory, resolverSta
     onSale: explicit.onSale === true || matched.onSale === true || inferredValue("onSale") === true,
     requestedClaim: null,
     namedProduct: explicit.specificProduct || matched.specificProduct || inferredValue("specificProduct"),
+    // Topic term: capitalized brand/technology name in the question
+    // ("BioRocker", "UltraSky", "Lynco", "P3"). Not in the structured
+    // schema, but customers ask "which X have Y?" all the time, and
+    // the engine has to scan descriptions for Y to answer honestly.
+    // Live trace 2026-06-04: customer clicked "Which sandals have
+    // BioRocker™ Technology?" — engine extracted category=sandals,
+    // built search query="sandals", returned 10 generic sandals.
+    // None of them had BioRocker. The token was dropped because the
+    // engine's queryParts builder only knows about the structured
+    // scope keys. Capturing it here lets the search query include
+    // it AND lets the engine post-filter results to products whose
+    // description literally contains the term.
+    topicTerm: extractTopicTerm(latestUserMessage),
   };
 
   const latestModifier = detectStorefrontSearchModifier(scope.rawMessage);
@@ -795,6 +833,38 @@ function humanizeCondition(tag) {
     heel_pain: "heel pain",
   };
   return map[tag] || String(tag || "").replace(/_/g, " ");
+}
+
+// Extract a brand/technology name from the customer's question.
+// Looks for CamelCase compound words ("BioRocker", "UltraSky"),
+// trademark-marked terms ("BioRocker™", "UltraSky®"), and short
+// all-caps product codes ("P3", "L1320"). Returns the bare term
+// (no trademark glyph) or null when nothing technology-shaped is
+// present. Stop-word safe: common capitalized words at sentence
+// start (What, Which, Show, Tell, Do, Is, How) don't qualify.
+const TOPIC_STOP_WORDS = new Set([
+  "what", "which", "show", "tell", "do", "is", "are", "how",
+  "the", "a", "an", "this", "these", "those", "all", "any",
+  "for", "with", "and", "or", "but", "your", "my", "me",
+]);
+function extractTopicTerm(message) {
+  const msg = String(message || "");
+  if (!msg) return null;
+  // Trademark-marked term wins over plain CamelCase ("BioRocker™"
+  // is clearly a brand, "BioRocker" alone is also a brand but the
+  // mark is a strong tell).
+  const tmMatch = msg.match(/\b([A-Za-z][\w'-]{2,30})\s*(?:™|®|℠)/);
+  if (tmMatch) return tmMatch[1];
+  // CamelCase compound: "BioRocker", "UltraSky", "EngineeredComfort".
+  // At least one internal lowercase→uppercase transition.
+  const camelMatch = msg.match(/\b([A-Z][a-z]+(?:[A-Z][a-z]+)+)\b/);
+  if (camelMatch && !TOPIC_STOP_WORDS.has(camelMatch[1].toLowerCase())) {
+    return camelMatch[1];
+  }
+  // Product code: "P3", "L1320", "EW8600" — uppercase + digits.
+  const codeMatch = msg.match(/\b([A-Z]{1,3}\d{1,4}[A-Z]?)\b/);
+  if (codeMatch) return codeMatch[1];
+  return null;
 }
 
 function scopeLabel(scope, { fallback = "styles" } = {}) {

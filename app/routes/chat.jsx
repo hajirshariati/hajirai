@@ -400,6 +400,11 @@ async function runProductTurnDispatch({ ctx, controller, encoder, claimConfig })
       scope.color,
       scope.category,
       scope.useCase,
+      // Topic term (brand / technology name) goes into the semantic
+      // query so search ranks products whose descriptions mention it
+      // higher. The engine also post-filters by literal description
+      // match — semantic is the rank hint, post-filter is the truth.
+      scope.topicTerm,
     ].filter(Boolean)));
     const query = queryParts.length > 0
       ? queryParts.join(" ").trim()
