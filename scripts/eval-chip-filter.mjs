@@ -14,6 +14,7 @@
 
 import assert from "node:assert/strict";
 import {
+  filterCatalogScopedNavigationChips,
   filterForbiddenCategoryChips,
   narrowChipAllowListForGroup,
   looksLikeShoeTypeQuestion,
@@ -195,6 +196,73 @@ await test("C10 — different merchant: jewelry shop with custom 'Rings' group s
   // current behavior: callers extend the detector if they want
   // other groups to be narrowable.
   assert.equal(narrowed, allow);
+});
+
+await test("C11 — product-navigation chips survive only when the current catalog intersection proves them", () => {
+  const facetIndex = {
+    categoryByGender: {
+      sneakers: ["men", "women"],
+      sandals: ["women"],
+      orthotics: ["kids"],
+      accessories: ["men"],
+    },
+    colorByGenderCategory: {
+      "men:sneakers": ["black"],
+      "women:sneakers": ["pink"],
+      "women:sandals": ["pink"],
+      "kids:orthotics": ["pink"],
+      "men:accessories": ["pink"],
+    },
+  };
+  const out = filterCatalogScopedNavigationChips(
+    "Which styles would you like to browse? <<Men's>><<Women's>><<Kids>>",
+    {
+      constraints: { color: "pink" },
+      facetIndex,
+      allowedCategories: ["Sneakers", "Sandals"],
+      catalogCategories: ["Sneakers", "Sandals", "Orthotics", "Accessories"],
+    },
+  );
+  assert.deepEqual(out.stripped.sort(), ["Kids", "Men's"].sort());
+  assert.doesNotMatch(out.text, /<<Men's>>|<<Kids>>/);
+  assert.match(out.text, /<<Women's>>/);
+});
+
+await test("C12 — custom merchant categories are grounded without a code-list change", () => {
+  const facetIndex = {
+    categoryByGender: { tunics: ["women"], scarves: ["women"] },
+    colorByGenderCategory: {
+      "women:tunics": ["pink"],
+      "women:scarves": ["blue"],
+    },
+  };
+  const out = filterCatalogScopedNavigationChips(
+    "Choose one: <<Tunics>><<Scarves>>",
+    {
+      constraints: { color: "pink", gender: "women" },
+      facetIndex,
+      catalogCategories: ["Tunics", "Scarves"],
+    },
+  );
+  assert.match(out.text, /<<Tunics>>/);
+  assert.doesNotMatch(out.text, /<<Scarves>>/);
+  assert.deepEqual(out.stripped, ["Scarves"]);
+});
+
+await test("C13 — catalog grounding leaves clinical orthotic choices untouched", () => {
+  const facetIndex = {
+    categoryByGender: { orthotics: ["men", "women", "kids"] },
+    colorByGenderCategory: {},
+  };
+  const text = "What's your arch type? <<Flat / Low>><<Medium>><<High>><<I don't know>>";
+  const out = filterCatalogScopedNavigationChips(text, {
+    constraints: { gender: "women", category: "orthotics" },
+    facetIndex,
+    allowedCategories: ["Orthotics"],
+    catalogCategories: ["Orthotics"],
+  });
+  assert.equal(out.text, text);
+  assert.deepEqual(out.stripped, []);
 });
 
 // ──────────────────────────────────────────────────────────────

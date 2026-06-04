@@ -215,7 +215,7 @@ await test("P2-8 — 'most cushioning' admits the limit when cushioning isn't in
   });
   assert.ok(!out.decline);
   // Honesty: admit the ranking limit.
-  assert.match(out.answerText, /don't have catalog data to rank.*cushioning/i,
+  assert.match(out.answerText, /can't rank these by cushioning specifically/i,
     `composer must admit ranking limit when cushioning isn't configured; got "${out.answerText}"`);
   // And it should name what IS configured so the customer can recalibrate.
   assert.match(out.answerText, /footbed/i,
@@ -238,7 +238,7 @@ await test("P2-9 — 'most footbed' does NOT trigger the caveat (footbed IS conf
     claimConfig: FIXTURE_CLAIM_CONFIG,
   });
   assert.ok(!out.decline);
-  assert.doesNotMatch(out.answerText, /don't have catalog data to rank/i,
+  assert.doesNotMatch(out.answerText, /can't rank these by/i,
     `composer should NOT add the ranking caveat when criterion is configured; got "${out.answerText}"`);
 });
 
@@ -425,7 +425,7 @@ await test("P2-18 — live failure end-to-end: Jillian turn now HANDLES via perm
     `expected a Jillian handle forwarded to similarFn; got "${similar.calls[0][0].handle}"`);
   // The composer's caveat must still fire — cushioning isn't a
   // configured attribute even with the resolver working.
-  assert.match(out.answerText, /don't have catalog data to rank.*cushioning/i,
+  assert.match(out.answerText, /can't rank these by cushioning specifically/i,
     `expected ranking caveat; got "${out.answerText}"`);
 });
 

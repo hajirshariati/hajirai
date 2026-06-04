@@ -1,3 +1,9 @@
+import { normalizeCategory, normalizeColor } from "./catalog-facts.server.js";
+import {
+  canonicalizeCatalogConstraints,
+  catalogScopeHasMatches,
+} from "./catalog-matcher.server.js";
+
 function normalize(s) {
   return String(s || "").trim().toLowerCase().replace(/s$/, "");
 }
@@ -167,12 +173,14 @@ export function filterForbiddenCategoryChips(
 const GENDER_CHIP_TOKENS = {
   men: ["men", "mens", "men's", "male", "boy", "boys", "boy's", "guys"],
   women: ["women", "womens", "women's", "female", "girl", "girls", "girl's", "ladies"],
+  kids: ["kid", "kids", "kid's", "child", "children", "youth"],
 };
 
 function chipGender(inner) {
   const norm = String(inner || "").toLowerCase().replace(/[^a-z\s]/g, " ").split(/\s+/).filter(Boolean);
   if (norm.some((t) => GENDER_CHIP_TOKENS.men.includes(t))) return "men";
   if (norm.some((t) => GENDER_CHIP_TOKENS.women.includes(t))) return "women";
+  if (norm.some((t) => GENDER_CHIP_TOKENS.kids.includes(t))) return "kids";
   return null;
 }
 
@@ -231,6 +239,73 @@ export function filterContradictingGenderChips(text, conversationText, categoryG
     const g = chipGender(inner);
     if (!g) return match; // not a gender chip
     if (supportedGenders.has(g)) return match;
+    stripped.push(inner.trim());
+    return "";
+  });
+
+  return {
+    text: out.replace(/[ \t]{2,}/g, " ").replace(/\n{3,}/g, "\n\n").trim(),
+    stripped,
+  };
+}
+
+function categoryFromChip(inner, catalogCategories) {
+  const text = String(inner || "").toLowerCase().replace(/[_-]+/g, " ");
+  const direct = normalizeCategory(inner);
+  if (direct) return direct;
+
+  const escapeRe = (value) => String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  for (const raw of catalogCategories || []) {
+    const display = String(raw || "").trim();
+    if (!display) continue;
+    const phrase = display.toLowerCase().replace(/[_-]+/g, " ");
+    const re = new RegExp(`\\b${escapeRe(phrase)}\\b`, "i");
+    if (!re.test(text)) continue;
+    return canonicalizeCatalogConstraints({ category: display }).category;
+  }
+  return null;
+}
+
+function navigationConstraintsFromChip(inner, catalogCategories) {
+  const out = {};
+  const gender = chipGender(inner);
+  const category = categoryFromChip(inner, catalogCategories);
+  const color = normalizeColor(inner);
+  if (gender) out.gender = gender;
+  if (category) out.category = category;
+  if (color) out.color = color;
+  return out;
+}
+
+// Final catalog-grounding boundary for product-navigation chips.
+// It recognizes only product facets the shared CatalogFacetIndex can prove
+// (gender/category/color); clinical orthotic choices and ordinary prose chips
+// pass through untouched. A recognized chip survives only when at least one
+// live catalog tuple satisfies the current scope plus that choice.
+export function filterCatalogScopedNavigationChips(
+  text,
+  {
+    constraints = {},
+    facetIndex = null,
+    allowedCategories = [],
+    catalogCategories = [],
+  } = {},
+) {
+  if (!text || typeof text !== "string" || !facetIndex) {
+    return { text: text || "", stripped: [] };
+  }
+
+  const base = canonicalizeCatalogConstraints(constraints || {});
+  const stripped = [];
+  const out = text.replace(/<<([^<>|]+)>>/g, (match, inner) => {
+    const choice = navigationConstraintsFromChip(inner, catalogCategories);
+    if (Object.keys(choice).length === 0) return match;
+    const possible = catalogScopeHasMatches(
+      facetIndex,
+      { ...base, ...choice },
+      { allowedCategories },
+    );
+    if (possible !== false) return match;
     stripped.push(inner.trim());
     return "";
   });

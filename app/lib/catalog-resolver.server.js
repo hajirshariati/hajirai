@@ -34,6 +34,7 @@
 import prisma from "../db.server.js";
 import { getCatalogFacetIndex } from "./catalog-facts.server.js";
 import {
+  catalogFieldOptions,
   canonicalizeCatalogConstraints,
   colorExistsInCatalogScope,
   computeCatalogConstraintDomains,
@@ -147,6 +148,8 @@ export async function resolveCatalogTurn({
   shop,
   userConstraints = {},
   sessionMemory = {},
+  facetIndex: providedFacetIndex,
+  allowedCategories = [],
   // Test-only injection points. Production code never passes these.
   _testFacetIndex,
   _testFetchCandidates,
@@ -155,7 +158,7 @@ export async function resolveCatalogTurn({
   // Skip early if we have no scope to work with.
   const facetIndex = _testFacetIndex !== undefined
     ? _testFacetIndex
-    : await getCatalogFacetIndex(shop);
+    : providedFacetIndex || await getCatalogFacetIndex(shop);
   if (!facetIndex) {
     return {
       type: "skip",
@@ -212,7 +215,13 @@ export async function resolveCatalogTurn({
   if (merged.color) {
     const scopeGender = matched_constraints.gender;
     const scopeCategory = matched_constraints.category;
-    const exists = colorExistsInCatalogScope(merged.color, scopeGender, scopeCategory, facetIndex);
+    const exists = colorExistsInCatalogScope(
+      merged.color,
+      scopeGender,
+      scopeCategory,
+      facetIndex,
+      { allowedCategories: scopeCategory ? [] : allowedCategories },
+    );
     if (exists) {
       matched_constraints.color = merged.color;
     } else if (exists === false) {
@@ -252,7 +261,7 @@ export async function resolveCatalogTurn({
     if (matched_constraints.gender) known.gender = matched_constraints.gender;
     if (matched_constraints.category) known.category = matched_constraints.category;
     if (matched_constraints.color) known.color = matched_constraints.color;
-    const domains = computeCatalogConstraintDomains(known, facetIndex);
+    const domains = computeCatalogConstraintDomains(known, facetIndex, { allowedCategories });
     for (const [field, info] of Object.entries(domains)) {
       if (info.inferred == null) continue;
       const reason = buildInferenceReason(field, info.inferred, known);
@@ -308,7 +317,7 @@ export async function resolveCatalogTurn({
 
   // If we have gender + category resolved, recommend.
   const effectiveGender = matched_constraints.gender || inferred_constraints.gender?.value;
-  const effectiveCategory = matched_constraints.category;
+  const effectiveCategory = matched_constraints.category || inferred_constraints.category?.value;
 
   if (effectiveGender && effectiveCategory) {
     const candidates = await (_testFetchCandidates || fetchCandidates)({
@@ -389,26 +398,28 @@ export async function resolveCatalogTurn({
   const askField = remaining_disambiguators[0]; // gender first, then category
   let chipOptions = [];
   if (askField === "gender") {
-    // Restrict chip options to genders actually present in scope.
-    if (effectiveCategory && categoryByGender[effectiveCategory]) {
-      chipOptions = categoryByGender[effectiveCategory].filter((g) => g !== "unisex");
-    } else {
-      // All genders observed in shop:
-      const all = new Set();
-      for (const genders of Object.values(categoryByGender)) {
-        for (const g of genders) if (g !== "unisex") all.add(g);
-      }
-      chipOptions = Array.from(all).sort();
-    }
+    // Project from the exact live tuple intersection. This prevents a
+    // broad "pink shoes" request from offering Men's/Kids merely because
+    // those genders exist elsewhere in the shop.
+    chipOptions = catalogFieldOptions(
+      facetIndex,
+      {
+        category: effectiveCategory,
+        color: matched_constraints.color,
+      },
+      "gender",
+      { allowedCategories },
+    );
   } else if (askField === "category") {
-    if (effectiveGender) {
-      chipOptions = Object.entries(categoryByGender)
-        .filter(([, genders]) => genders.includes(effectiveGender) || genders.includes("unisex"))
-        .map(([cat]) => cat)
-        .sort();
-    } else {
-      chipOptions = Object.keys(categoryByGender).sort();
-    }
+    chipOptions = catalogFieldOptions(
+      facetIndex,
+      {
+        gender: effectiveGender,
+        color: matched_constraints.color,
+      },
+      "category",
+      { allowedCategories },
+    );
   }
 
   return {

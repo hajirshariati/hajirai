@@ -58,16 +58,37 @@ export function buildCatalogTupleSpace(facetIndex) {
   return tuples;
 }
 
+function normalizeAllowedCategory(raw) {
+  return normalizeCategory(raw) || String(raw || "").toLowerCase().trim().replace(/[_\s]+/g, "-");
+}
+
+function restrictCatalogTuples(tuples, allowedCategories = []) {
+  const allowed = new Set(
+    (Array.isArray(allowedCategories) ? allowedCategories : [])
+      .map(normalizeAllowedCategory)
+      .filter(Boolean),
+  );
+  if (allowed.size === 0) return tuples || [];
+  return (tuples || []).filter((tuple) => allowed.has(normalizeAllowedCategory(tuple?.category)));
+}
+
 export function catalogTupleMatches(tuple, constraints = {}) {
   const canonical = canonicalizeCatalogConstraints(constraints);
-  if (canonical.gender && tuple.gender && tuple.gender !== "unisex" && tuple.gender !== canonical.gender) {
-    return false;
+  if (canonical.gender && tuple.gender) {
+    // Adult unisex products can satisfy men's/women's browsing, but
+    // "unisex" alone is not proof that a product is made for kids.
+    // Kids must be explicit in the synced catalog facts.
+    if (tuple.gender === "unisex" && canonical.gender === "kids") return false;
+    if (tuple.gender !== "unisex" && tuple.gender !== canonical.gender) return false;
   }
   if (canonical.category && tuple.category && tuple.category !== canonical.category) {
     return false;
   }
-  if (canonical.color != null && tuple.color != null && tuple.color !== canonical.color) {
-    return false;
+  if (canonical.color != null) {
+    // A missing color fact is not proof that a requested color exists.
+    // This matters for navigation choices: a category/gender bucket with
+    // no color data must never make "pink" look available.
+    if (tuple.color == null || tuple.color !== canonical.color) return false;
   }
   return true;
 }
@@ -84,8 +105,8 @@ export function projectCatalogField(tuples, constraints, field) {
   return Array.from(out);
 }
 
-export function computeCatalogConstraintDomains(known, facetIndex) {
-  const tuples = buildCatalogTupleSpace(facetIndex);
+export function computeCatalogConstraintDomains(known, facetIndex, { allowedCategories = [] } = {}) {
+  const tuples = restrictCatalogTuples(buildCatalogTupleSpace(facetIndex), allowedCategories);
   const fields = ["gender", "category", "color"];
   const out = {};
   for (const field of fields) {
@@ -97,10 +118,22 @@ export function computeCatalogConstraintDomains(known, facetIndex) {
   return out;
 }
 
-export function colorExistsInCatalogScope(color, gender, category, facetIndex) {
+export function catalogScopeHasMatches(facetIndex, constraints = {}, { allowedCategories = [] } = {}) {
+  if (!facetIndex) return null;
+  const tuples = restrictCatalogTuples(buildCatalogTupleSpace(facetIndex), allowedCategories);
+  return tuples.some((tuple) => catalogTupleMatches(tuple, constraints));
+}
+
+export function catalogFieldOptions(facetIndex, constraints, field, { allowedCategories = [] } = {}) {
+  if (!facetIndex) return [];
+  const tuples = restrictCatalogTuples(buildCatalogTupleSpace(facetIndex), allowedCategories);
+  return projectCatalogField(tuples, constraints || {}, field).sort();
+}
+
+export function colorExistsInCatalogScope(color, gender, category, facetIndex, { allowedCategories = [] } = {}) {
   const canonical = canonicalizeCatalogConstraints({ color, gender, category });
   if (!canonical.color || !facetIndex) return null;
-  const tuples = buildCatalogTupleSpace(facetIndex);
+  const tuples = restrictCatalogTuples(buildCatalogTupleSpace(facetIndex), allowedCategories);
   const constraints = { color: canonical.color };
   if (canonical.gender) constraints.gender = canonical.gender;
   if (canonical.category) constraints.category = canonical.category;

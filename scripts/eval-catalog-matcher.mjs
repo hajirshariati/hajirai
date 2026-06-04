@@ -1,5 +1,7 @@
 import assert from "node:assert/strict";
 import {
+  catalogFieldOptions,
+  catalogScopeHasMatches,
   canonicalizeCatalogConstraints,
   colorExistsInCatalogScope,
   computeCatalogConstraintDomains,
@@ -122,6 +124,75 @@ test("M7 — category constraint can recover from missing category attrs via tit
       productType: "Footwear",
       attributes: {},
     }, "sandals"),
+    true,
+  );
+});
+
+test("M8 — missing color data is not proof of a requested color", () => {
+  const unknownColorFacetIndex = {
+    categoryByGender: { sneakers: ["men", "women"] },
+    colorByGenderCategory: { "women:sneakers": ["pink"] },
+  };
+  assert.equal(
+    catalogScopeHasMatches(unknownColorFacetIndex, { gender: "men", color: "pink" }),
+    false,
+  );
+  assert.equal(
+    catalogScopeHasMatches(unknownColorFacetIndex, { gender: "women", color: "pink" }),
+    true,
+  );
+});
+
+test("M9 — scoped field options project only catalog-proven choices", () => {
+  const scopedFacetIndex = {
+    categoryByGender: {
+      sneakers: ["men", "women"],
+      sandals: ["women"],
+      orthotics: ["kids"],
+      accessories: ["men"],
+    },
+    colorByGenderCategory: {
+      "men:sneakers": ["black"],
+      "women:sneakers": ["pink"],
+      "women:sandals": ["pink"],
+      "kids:orthotics": ["pink"],
+      "men:accessories": ["pink"],
+    },
+  };
+  const allowedCategories = ["Sneakers", "Sandals"];
+  assert.deepEqual(
+    catalogFieldOptions(scopedFacetIndex, { color: "pink" }, "gender", { allowedCategories }),
+    ["women"],
+  );
+  assert.equal(
+    catalogScopeHasMatches(
+      scopedFacetIndex,
+      { gender: "kids", color: "pink" },
+      { allowedCategories },
+    ),
+    false,
+  );
+});
+
+test("M10 — adult unisex is not proof of kids availability", () => {
+  const unisexFacetIndex = {
+    categoryByGender: { sneakers: ["unisex"], orthotics: ["kids", "unisex"] },
+    colorByGenderCategory: {
+      "unisex:sneakers": ["pink"],
+      "kids:orthotics": ["pink"],
+      "unisex:orthotics": ["pink"],
+    },
+  };
+  assert.equal(
+    catalogScopeHasMatches(unisexFacetIndex, { gender: "kids", category: "sneakers", color: "pink" }),
+    false,
+  );
+  assert.equal(
+    catalogScopeHasMatches(unisexFacetIndex, { gender: "women", category: "sneakers", color: "pink" }),
+    true,
+  );
+  assert.equal(
+    catalogScopeHasMatches(unisexFacetIndex, { gender: "kids", category: "orthotics", color: "pink" }),
     true,
   );
 });

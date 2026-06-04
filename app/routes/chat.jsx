@@ -7,7 +7,12 @@ import { getActiveCampaigns, formatCampaignsForCS } from "../models/Campaign.ser
 import { buildSystemPrompt } from "../lib/chat-prompt.server";
 import { retrieveRelevantChunks } from "../lib/knowledge-chunks.server";
 import { buildKidsCoveragePrompt } from "../lib/kids-coverage.server";
-import { filterForbiddenCategoryChips, filterContradictingGenderChips, narrowChipAllowListForGroup } from "../lib/chip-filter.server";
+import {
+  filterCatalogScopedNavigationChips,
+  filterForbiddenCategoryChips,
+  filterContradictingGenderChips,
+  narrowChipAllowListForGroup,
+} from "../lib/chip-filter.server";
 import { analyzeCategoryIntent, cardMatchesActiveGroup, textIntentDivergesFromGroup, matchingGroupsForText } from "../lib/category-intent.server";
 import { extractAnsweredChoices } from "../lib/conversation-memory.server";
 import {
@@ -43,6 +48,8 @@ import { buildRecommenderTools } from "../lib/recommender-tools.server";
 import { maybeRunOrthoticFlow } from "../lib/orthotic-flow-gate.server";
 import { classifyOrthoticTurn } from "../lib/orthotic-classifier.server";
 import { resolveCatalogTurn, buildResolverStatePromptBlock, extractUserConstraints, detectSpecificProduct } from "../lib/catalog-resolver.server";
+import { getCatalogFacetIndex } from "../lib/catalog-facts.server";
+import { canonicalizeCatalogConstraints, catalogScopeHasMatches } from "../lib/catalog-matcher.server";
 import { buildSessionMemory, detectClarifyingQuestionType, memorySummary, buildSessionMemoryPromptBlock } from "../lib/session-memory.server";
 import {
   SKU_PATTERN,
@@ -376,6 +383,72 @@ async function dispatchTool(name, input, ctx) {
   return await executeTool(rewritten.name, rewritten.input, ctx);
 }
 
+function allowedCatalogCategoriesFromContext(ctx = {}) {
+  return Array.isArray(ctx.catalogScopeCategories) ? ctx.catalogScopeCategories : [];
+}
+
+function categoryConstraintFromText(text, catalogCategories = []) {
+  const normalizedText = String(text || "").toLowerCase().replace(/[_-]+/g, " ");
+  const matches = [];
+  for (const raw of catalogCategories || []) {
+    const display = String(raw || "").trim();
+    if (!display) continue;
+    const phrase = display.toLowerCase().replace(/[_-]+/g, " ");
+    const escaped = phrase.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    if (new RegExp(`\\b${escaped}(?:s|es)?\\b`, "i").test(normalizedText)) {
+      matches.push(canonicalizeCatalogConstraints({ category: display }).category);
+    }
+  }
+  return matches.length === 1 ? matches[0] : null;
+}
+
+function productFacetConstraintsFromText(text, ctx = {}) {
+  const extracted = extractUserConstraints(String(text || ""));
+  const category = categoryConstraintFromText(
+    text,
+    ctx.fullCatalogCategories || ctx.catalogCategories || [],
+  );
+  if (category) extracted.category = category;
+  return canonicalizeCatalogConstraints(extracted);
+}
+
+function catalogGroundedSuggestionIsPossible(question, ctx = {}) {
+  if (!ctx.catalogFacetIndex) return true;
+  const choice = productFacetConstraintsFromText(question, ctx);
+  const facetChoice = {};
+  for (const field of ["gender", "category", "color"]) {
+    if (choice[field]) facetChoice[field] = choice[field];
+  }
+  if (Object.keys(facetChoice).length === 0) return true;
+
+  const current = {
+    ...currentCatalogScopeFromContext(ctx),
+    ...productFacetConstraintsFromText(ctx.latestUserMessage, ctx),
+  };
+  return catalogScopeHasMatches(
+    ctx.catalogFacetIndex,
+    { ...current, ...facetChoice },
+    { allowedCategories: allowedCatalogCategoriesFromContext(ctx) },
+  ) !== false;
+}
+
+function filterCatalogGroundedSuggestions(questions, ctx = {}) {
+  const input = Array.isArray(questions) ? questions : [];
+  const kept = [];
+  const dropped = [];
+  for (const question of input) {
+    if (catalogGroundedSuggestionIsPossible(question, ctx)) kept.push(question);
+    else dropped.push(question);
+  }
+  if (dropped.length > 0) {
+    console.log(
+      `[chat] ${ctx.shop} catalog-grounding dropped ${dropped.length}/${input.length} suggestion(s): ` +
+        dropped.map((q) => JSON.stringify(String(q).slice(0, 70))).join(", "),
+    );
+  }
+  return kept;
+}
+
 // Phase 1 dispatcher for the Product Turn Engine. Returns:
 //   { handled: true, ... }   — engine emitted text/products/done; caller returns.
 //   { declined: true, ... }  — engine declined (named-product, compare, no
@@ -561,10 +634,11 @@ async function runProductTurnDispatch({ ctx, controller, encoder, claimConfig })
       label: linkPayload.label,
     })));
   }
-  if (Array.isArray(out.followUps) && out.followUps.length > 0) {
+  const groundedFollowUps = filterCatalogGroundedSuggestions(out.followUps, ctx);
+  if (groundedFollowUps.length > 0) {
     controller.enqueue(encoder.encode(sseChunk({
       type: "suggestions",
-      questions: out.followUps,
+      questions: groundedFollowUps,
     })));
   }
   controller.enqueue(encoder.encode(sseChunk({ type: "done" })));
@@ -575,7 +649,7 @@ async function runProductTurnDispatch({ ctx, controller, encoder, claimConfig })
     diagnostics: {
       ...out.diagnostics,
       cta: linkPayload ? linkPayload.label : null,
-      followUps: Array.isArray(out.followUps) ? out.followUps.length : 0,
+      followUps: groundedFollowUps.length,
     },
   };
 }
@@ -1754,7 +1828,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       console.log(`[chat] false-denial guard: AI claimed the store doesn't carry "${deniedCat}" — stripping (catalog actually contains it)`);
       qualitySignals.falseDenial = true;
       fullResponseText = pool.length > 0
-        ? `Take a look — here are some ${deniedCat.toLowerCase()} from the catalog.`
+        ? `Take a look — here are some ${deniedCat.toLowerCase()} we carry.`
         : `We do carry ${deniedCat.toLowerCase()} — could you share a bit more (gender, style, occasion)? I can pull up a few for you.`;
     }
   }
@@ -1947,6 +2021,29 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
         console.log(`[chat] ${ctx.shop} stripped contradicting-gender chips:`, genderFiltered.stripped);
       }
       fullResponseText = genderFiltered.text;
+    }
+
+    // Final product-navigation grounding boundary. Broad gender/category
+    // availability is not enough: every recognized gender/category/color
+    // chip must have at least one live catalog tuple under the customer's
+    // current conjunction and merchant-configured active group.
+    if (ctx.catalogFacetIndex) {
+      const scoped = filterCatalogScopedNavigationChips(fullResponseText, {
+        constraints: {
+          ...currentCatalogScopeFromContext(ctx),
+          ...productFacetConstraintsFromText(ctx.latestUserMessage, ctx),
+        },
+        facetIndex: ctx.catalogFacetIndex,
+        allowedCategories: allowedCatalogCategoriesFromContext(ctx),
+        catalogCategories: ctx.fullCatalogCategories || ctx.catalogCategories || [],
+      });
+      if (scoped.stripped.length > 0) {
+        console.log(
+          `[chat] ${ctx.shop} stripped catalog-impossible navigation chips: ` +
+            scoped.stripped.map((label) => JSON.stringify(label)).join(", "),
+        );
+      }
+      fullResponseText = scoped.text;
     }
   }
 
@@ -2998,7 +3095,7 @@ export const action = async ({ request }) => {
       }
     }
 
-    let [knowledge, attrMappings, catalogProductTypes, allCatalogCategories, categoryGenderMap, categoryAttributeCoverage, activeCampaigns, claimConfig] = await Promise.all([
+    let [knowledge, attrMappings, catalogProductTypes, allCatalogCategories, categoryGenderMap, categoryAttributeCoverage, activeCampaigns, claimConfig, catalogFacetIndex] = await Promise.all([
       getKnowledgeFilesWithContent(session.shop),
       getAttributeMappings(session.shop),
       getCatalogCategories(session.shop, { gender: sessionGender }),
@@ -3020,6 +3117,10 @@ export const action = async ({ request }) => {
           console.warn(`[chat] claim-config load failed for ${session.shop}: ${err?.message || err}`);
           return null;
         }),
+      getCatalogFacetIndex(session.shop).catch((err) => {
+        console.warn(`[chat] catalog-facet-index load failed for ${session.shop}: ${err?.message || err}`);
+        return null;
+      }),
     ]);
 
     // Aetrex-specific suppressed categories. These exist in the live
@@ -3074,6 +3175,10 @@ export const action = async ({ request }) => {
 
     let groupFilterApplied = "";
     const categoryIntent = analyzeCategoryIntent(messages, merchantGroups);
+    const catalogScopeCategories =
+      categoryIntent.activeGroup && !categoryIntent.ambiguous && Array.isArray(categoryIntent.activeGroup.categories)
+        ? categoryIntent.activeGroup.categories
+        : [];
 
     // Active-group narrowing is used to prefer chips and bias
     // search filters, NOT to shrink the prompt's ALLOW-LIST. When
@@ -3325,6 +3430,8 @@ export const action = async ({ request }) => {
       shopConfig: config,
       fullCatalogCategories: allCatalogCategories,
       categoryGenderMap,
+      catalogFacetIndex,
+      catalogScopeCategories,
       // Merchant-data-driven claim rules / category groups / color
       // families. Parked on ctx so extractProductCards, the Product
       // Turn Engine, and the composer all see the same merchant
@@ -3517,6 +3624,8 @@ export const action = async ({ request }) => {
                 userConstraints,
                 sessionMemory,
                 messages,
+                facetIndex: catalogFacetIndex,
+                allowedCategories: catalogScopeCategories,
               });
               ctx.sessionMemory = buildSessionMemory({
                 messages,
@@ -3873,6 +3982,10 @@ export const action = async ({ request }) => {
                   });
                   if (verdict.unanswerable) {
                     dropped.push({ q, reason: verdict.reason });
+                    continue;
+                  }
+                  if (!catalogGroundedSuggestionIsPossible(q, ctx)) {
+                    dropped.push({ q, reason: "catalog intersection has no matching products" });
                     continue;
                   }
                   filtered.push(q);

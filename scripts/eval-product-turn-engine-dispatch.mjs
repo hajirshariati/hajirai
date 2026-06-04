@@ -382,10 +382,13 @@ await test("D7b — category-less technology definition is owned by the engine a
   assert.deepEqual(out.products.map((product) => product.handle), ["savannah"]);
   assert.match(
     out.answerText,
-    /^BioRocker is described in the catalog as technology for a natural stride/i,
+    /^BioRocker is our technology for a natural stride/i,
   );
-  assert.match(out.answerText, /verified example/i);
-  assert.doesNotMatch(out.answerText, /product description|catalog evidence|explicitly mentions/i);
+  assert.match(out.answerText, /I'd start with Savannah Sandal as one style that uses it/i);
+  assert.doesNotMatch(
+    out.answerText,
+    /product description|catalog evidence|explicitly mentions|verified|configured|merchant/i,
+  );
 });
 
 await test("D7c — immediate technology continuation stays in the engine without a category", async () => {

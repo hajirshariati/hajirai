@@ -672,13 +672,13 @@ export function composeAnswer({ scope, selected, deferred, selectionReason, will
     if (scope?.requiredCatalogTerms?.length > 0) {
       const requirement = scope.requiredCatalogTerms.join(" and ");
       return {
-        text: `I couldn't find ${scopeLabel(scope, { fallback: "products" })} that explicitly mention ${requirement} in the current catalog. I can help you look at the closest alternatives instead.`,
+        text: `I couldn't find ${scopeLabel(scope, { fallback: "products" })} that list ${requirement} as a feature. I can help you look at the closest alternatives instead.`,
         reason: "empty_pool_catalog_requirement",
         cta: null,
       };
     }
     return {
-      text: `I couldn't find ${scopeLabel(scope, { fallback: "matching styles" })} in our current catalog. Try a different style or color?`,
+      text: `I couldn't find ${scopeLabel(scope, { fallback: "matching styles" })} in what we currently carry. Try a different style or color?`,
       reason: "empty_pool",
       cta: null,
     };
@@ -712,11 +712,11 @@ export function composeAnswer({ scope, selected, deferred, selectionReason, will
 
   let sentence1;
   if (selectionReason === "closest_matches_no_proof") {
-    sentence1 = `These are the closest ${label} matches, but I can't verify every requested detail from the catalog.`;
+    sentence1 = `These are the closest ${label} matches, but I can't confirm every detail you asked for.`;
   } else if (catalogRequirement && isCatalogDefinitionQuestion(scope?.rawMessage)) {
     sentence1 = catalogDefinition
-      ? `${catalogRequirement} is described in the catalog as ${catalogDefinition}. ${leadTitle} is a verified example to start with.`
-      : `${catalogRequirement} is used in selected styles, and ${leadTitle} is a verified example to start with.`;
+      ? `${catalogRequirement} is our ${catalogDefinition}. I'd start with ${leadTitle} as one style that uses it.`
+      : `${catalogRequirement} is one of the features we use in selected styles. I'd start with ${leadTitle} as one example.`;
   } else if (catalogRequirement) {
     const requirementLabel = scope?.category
       ? `${catalogRequirement} ${scope.category}`
@@ -761,10 +761,10 @@ function buildLeadRecommendationReason({ scope, leadCard, selectionReason }) {
     return `it is specifically tagged for ${humanizeCondition(claim.tag)}`;
   }
   if (claim?.kind === "archSupport" && leadCard?._archSupport === true) {
-    return "its catalog facts verify arch support";
+    return "it has the arch support you asked for";
   }
   if (claim?.kind === "waterFriendly" && leadCard?._waterFriendly === true) {
-    return "it is verified as water-friendly";
+    return "it has the water-friendly design you asked for";
   }
   if (claim?.kind === "badge") {
     return `it is tagged ${claim.substring}`;
@@ -775,7 +775,7 @@ function buildLeadRecommendationReason({ scope, leadCard, selectionReason }) {
   if (claim?.kind === "widthCompat") {
     return "it is not tagged for the opposite width";
   }
-  return "it is the strongest catalog match for what you asked";
+  return "it is the closest match for what you asked";
 }
 
 function isCatalogDefinitionQuestion(message) {
@@ -1195,7 +1195,7 @@ export function composeSimilarAnswer({
 }) {
   if (families.length === 0) {
     return {
-      text: `I couldn't find other styles that match ${anchorTitle} on the configured similarity criteria. Try widening the search?`,
+      text: `I couldn't find another style close enough to ${anchorTitle}. Want to widen the search?`,
       reason: "similar_empty",
       cta: null,
     };
@@ -1212,8 +1212,8 @@ export function composeSimilarAnswer({
     const isConfigured = configuredAttrs.some((a) => a.includes(c) || c.includes(a));
     if (!isConfigured) {
       rankingCaveat =
-        ` I don't have catalog data to rank these by ${c} specifically — they share ${anchorTitle}'s configured similarity attributes` +
-        (configuredAttrs.length > 0 ? ` (${configuredAttrs.join(", ")})` : "") +
+        ` I can't rank these by ${c} specifically, but they share ${anchorTitle}'s` +
+        (configuredAttrs.length > 0 ? ` ${configuredAttrs.join(", ")}` : " key features") +
         ` plus category and gender.`;
     }
   }
@@ -1223,8 +1223,8 @@ export function composeSimilarAnswer({
     : `I found ${n} styles similar to ${anchorTitle}.`;
 
   const why = configuredAttrs.length > 0 && !rankingCaveat
-    ? ` They share the configured similarity attributes (${configuredAttrs.join(", ")}) plus category and gender, and exclude the ${anchorTitle} family.`
-    : (rankingCaveat ? "" : ` They share the merchant's configured similarity attributes plus category and gender.`);
+    ? ` They share the same ${configuredAttrs.join(", ")} plus category and gender, and I left out other colors of the ${anchorTitle} family.`
+    : (rankingCaveat ? "" : ` They share the same category and gender as ${anchorTitle}.`);
 
   // "Tap a card" boilerplate removed (customer feedback 2026-06-03):
   // the cards are visible, telling them what to do with them just

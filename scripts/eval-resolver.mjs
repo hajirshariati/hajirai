@@ -560,6 +560,39 @@ await test("R20 — classifier-style capitalized constraints are canonicalized b
   assert.equal(out.candidate_products.length, 2);
 });
 
+await test("R21 — pink footwear scope infers women and never offers men or kids", async () => {
+  const facetIndex = {
+    categoryByGender: {
+      sneakers: ["men", "women"],
+      sandals: ["women"],
+      orthotics: ["kids"],
+      accessories: ["men"],
+    },
+    colorByGenderCategory: {
+      "men:sneakers": ["black"],
+      "women:sneakers": ["pink"],
+      "women:sandals": ["pink"],
+      "kids:orthotics": ["pink"],
+      "men:accessories": ["pink"],
+    },
+    conditionByCategory: {},
+    sizeByGenderCategory: {},
+  };
+  const out = await resolveCatalogTurn({
+    shop: SHOP,
+    query: "i need pink shoes",
+    userConstraints: { color: "pink" },
+    allowedCategories: ["Sneakers", "Sandals"],
+    _testFacetIndex: facetIndex,
+    _testFetchCandidates: makeFetcher([]),
+  });
+  assert.equal(out.inferred_constraints.gender?.value, "women");
+  assert.ok(out.do_not_ask.includes("gender"));
+  assert.equal(out.recommended_next_action.type, "ask");
+  assert.equal(out.recommended_next_action.field, "category");
+  assert.deepEqual(out.recommended_next_action.chip_options.sort(), ["sandals", "sneakers"]);
+});
+
 await test("buildResolverStatePromptBlock — produces non-empty block for resolver_state output", async () => {
   const facetIndex = {
     categoryByGender: { sandals: ["women"] },
