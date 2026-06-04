@@ -19,6 +19,7 @@ import {
   narrowChipAllowListForGroup,
   looksLikeShoeTypeQuestion,
 } from "../app/lib/chip-filter.server.js";
+import { catalogScopedNavigationQuestionVerdict } from "../app/lib/catalog-matcher.server.js";
 
 let passed = 0;
 let failed = 0;
@@ -263,6 +264,61 @@ await test("C13 — catalog grounding leaves clinical orthotic choices untouched
   });
   assert.equal(out.text, text);
   assert.deepEqual(out.stripped, []);
+});
+
+await test("C14 — exact no-match quick replies require a real catalog intersection", () => {
+  const facetIndex = {
+    categoryByGender: {
+      sneakers: ["men", "women"],
+      sandals: ["men", "women"],
+    },
+    colorByGenderCategory: {
+      "men:sneakers": ["black", "navy"],
+      "men:sandals": ["brown"],
+      "women:sneakers": ["pink"],
+      "women:sandals": ["pink"],
+    },
+  };
+  const common = {
+    constraints: { gender: "men", color: "pink" },
+    facetIndex,
+    allowedCategories: ["Sneakers", "Sandals"],
+    requireProof: true,
+  };
+
+  const impossible = catalogScopedNavigationQuestionVerdict({
+    ...common,
+    question: "Can you show me pink sneakers instead?",
+    choice: { category: "sneakers", color: "pink" },
+  });
+  const valid = catalogScopedNavigationQuestionVerdict({
+    ...common,
+    question: "Can you show me black sneakers instead?",
+    choice: { category: "sneakers", color: "black" },
+  });
+
+  assert.equal(impossible.possible, false);
+  assert.equal(impossible.reason, "catalog_intersection_empty");
+  assert.deepEqual(impossible.effectiveConstraints, {
+    gender: "men",
+    color: "pink",
+    category: "sneakers",
+  });
+  assert.equal(valid.possible, true);
+  assert.equal(valid.reason, "catalog_match");
+});
+
+await test("C15 — exact no-match product navigation fails closed without catalog proof", () => {
+  const out = catalogScopedNavigationQuestionVerdict({
+    question: "Can you show me pink sneakers instead?",
+    choice: { category: "sneakers", color: "pink" },
+    constraints: { gender: "men", color: "pink" },
+    facetIndex: null,
+    allowedCategories: ["Sneakers", "Sandals"],
+    requireProof: true,
+  });
+  assert.equal(out.possible, false);
+  assert.equal(out.reason, "catalog_proof_required");
 });
 
 // ──────────────────────────────────────────────────────────────

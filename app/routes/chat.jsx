@@ -49,7 +49,7 @@ import { maybeRunOrthoticFlow } from "../lib/orthotic-flow-gate.server";
 import { classifyOrthoticTurn } from "../lib/orthotic-classifier.server";
 import { resolveCatalogTurn, buildResolverStatePromptBlock, extractUserConstraints, detectSpecificProduct } from "../lib/catalog-resolver.server";
 import { getCatalogFacetIndex } from "../lib/catalog-facts.server";
-import { canonicalizeCatalogConstraints, catalogScopeHasMatches } from "../lib/catalog-matcher.server";
+import { canonicalizeCatalogConstraints, catalogScopedNavigationQuestionVerdict } from "../lib/catalog-matcher.server";
 import { buildSessionMemory, detectClarifyingQuestionType, memorySummary, buildSessionMemoryPromptBlock } from "../lib/session-memory.server";
 import {
   SKU_PATTERN,
@@ -59,6 +59,7 @@ import {
   dropSiblingCards,
   buildCodeOwnedProductListingText,
   buildCodeOwnedComparisonText,
+  buildCodeOwnedExactNoMatchText,
   buildSoftBrowseFallbackText,
   ensureProductTurnCards,
   extractCollectionCTA,
@@ -412,24 +413,28 @@ function productFacetConstraintsFromText(text, ctx = {}) {
   return canonicalizeCatalogConstraints(extracted);
 }
 
-function catalogGroundedSuggestionIsPossible(question, ctx = {}) {
-  if (!ctx.catalogFacetIndex) return true;
-  const choice = productFacetConstraintsFromText(question, ctx);
-  const facetChoice = {};
-  for (const field of ["gender", "category", "color"]) {
-    if (choice[field]) facetChoice[field] = choice[field];
-  }
-  if (Object.keys(facetChoice).length === 0) return true;
+function resolverRequiresCatalogProof(ctx = {}) {
+  return (
+    ctx.resolverState?.recommended_next_action?.type === "no_match" ||
+    (Array.isArray(ctx.resolverState?.impossible_constraints) &&
+      ctx.resolverState.impossible_constraints.length > 0)
+  );
+}
 
+function catalogGroundedSuggestionVerdict(question, ctx = {}) {
+  const choice = productFacetConstraintsFromText(question, ctx);
   const current = {
     ...currentCatalogScopeFromContext(ctx),
     ...productFacetConstraintsFromText(ctx.latestUserMessage, ctx),
   };
-  return catalogScopeHasMatches(
-    ctx.catalogFacetIndex,
-    { ...current, ...facetChoice },
-    { allowedCategories: allowedCatalogCategoriesFromContext(ctx) },
-  ) !== false;
+  return catalogScopedNavigationQuestionVerdict({
+    question,
+    choice,
+    constraints: current,
+    facetIndex: ctx.catalogFacetIndex,
+    allowedCategories: allowedCatalogCategoriesFromContext(ctx),
+    requireProof: resolverRequiresCatalogProof(ctx),
+  });
 }
 
 function filterCatalogGroundedSuggestions(questions, ctx = {}) {
@@ -437,13 +442,19 @@ function filterCatalogGroundedSuggestions(questions, ctx = {}) {
   const kept = [];
   const dropped = [];
   for (const question of input) {
-    if (catalogGroundedSuggestionIsPossible(question, ctx)) kept.push(question);
-    else dropped.push(question);
+    const verdict = catalogGroundedSuggestionVerdict(question, ctx);
+    if (verdict.possible) kept.push(question);
+    else dropped.push(verdict);
   }
   if (dropped.length > 0) {
     console.log(
       `[chat] ${ctx.shop} catalog-grounding dropped ${dropped.length}/${input.length} suggestion(s): ` +
-        dropped.map((q) => JSON.stringify(String(q).slice(0, 70))).join(", "),
+        dropped
+          .map((verdict) =>
+            `${JSON.stringify(String(verdict.question).slice(0, 70))} ` +
+            `(${verdict.reason}; scope=${JSON.stringify(verdict.effectiveConstraints)})`,
+          )
+          .join(", "),
     );
   }
   return kept;
@@ -1676,6 +1687,17 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   });
   if (ensuredCards.searchAttempted) productSearchAttempted = true;
   let pool = ensuredCards.products;
+  if (ensuredCards.diagnostics?.exactNoMatch && pool.length === 0) {
+    const exactNoMatch = buildCodeOwnedExactNoMatchText({ ctx });
+    if (exactNoMatch.text) {
+      const before = fullResponseText;
+      fullResponseText = exactNoMatch.text;
+      console.log(
+        `[chat] response-contract: code-owned exact no-match ` +
+          `(${String(before || "").length}→${fullResponseText.length} chars, reason=${exactNoMatch.reason})`,
+      );
+    }
+  }
   // wrong-topic guard: for a general footwear/gift request, drop
   // shoe-care/accessories/socks/gift-cards that semantic search may
   // have surfaced above real shoes. No-op when the customer asked for
@@ -3984,8 +4006,14 @@ export const action = async ({ request }) => {
                     dropped.push({ q, reason: verdict.reason });
                     continue;
                   }
-                  if (!catalogGroundedSuggestionIsPossible(q, ctx)) {
-                    dropped.push({ q, reason: "catalog intersection has no matching products" });
+                  const catalogVerdict = catalogGroundedSuggestionVerdict(q, ctx);
+                  if (!catalogVerdict.possible) {
+                    dropped.push({
+                      q,
+                      reason:
+                        `${catalogVerdict.reason}; ` +
+                        `scope=${JSON.stringify(catalogVerdict.effectiveConstraints)}`,
+                    });
                     continue;
                   }
                   filtered.push(q);

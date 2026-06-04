@@ -103,10 +103,25 @@ function buildInferenceReason(field, value, known) {
 // Look up candidate products from CatalogFact for the resolved
 // scope. Filters OOS unless includeOos=true (used by the controlled-
 // OOS path when a specific variant was requested).
-async function fetchCandidates({ shop, gender, category, color, condition, includeOos = false, limit = 6 }) {
+async function fetchCandidates({
+  shop,
+  gender,
+  category,
+  color,
+  condition,
+  allowedCategories = [],
+  includeOos = false,
+  limit = 6,
+}) {
   const where = { shop };
   if (!includeOos) where.available = true;
   if (category) where.category = category;
+  else if (Array.isArray(allowedCategories) && allowedCategories.length > 0) {
+    const normalizedAllowed = allowedCategories
+      .map((value) => canonicalizeCatalogConstraints({ category: value }).category)
+      .filter(Boolean);
+    if (normalizedAllowed.length > 0) where.category = { in: normalizedAllowed };
+  }
   if (gender) where.gender = { has: gender };
   if (color) where.colors = { has: color };
   if (condition) where.conditionTags = { has: condition };
@@ -292,12 +307,23 @@ export async function resolveCatalogTurn({
 
   // If any constraint is impossible, surface that first.
   if (impossible_constraints.length > 0) {
-    const candidates = await (_testFetchCandidates || fetchCandidates)({
-      shop,
-      // Drop the impossible constraint when fetching alternatives:
-      gender: matched_constraints.gender,
-      category: matched_constraints.category,
-    });
+    // Alternatives must remain inside the customer's active product
+    // group. A broad no-match such as "pink men's shoes" must never
+    // suggest men's orthotics merely because both share the gender.
+    // When there is no category or active-group scope, do not invent
+    // broad alternatives; the assistant can ask for a valid pivot.
+    const canGroundAlternatives =
+      Boolean(matched_constraints.category) ||
+      (Array.isArray(allowedCategories) && allowedCategories.length > 0);
+    const candidates = canGroundAlternatives
+      ? await (_testFetchCandidates || fetchCandidates)({
+          shop,
+          // Drop only the impossible constraint when fetching alternatives.
+          gender: matched_constraints.gender,
+          category: matched_constraints.category,
+          allowedCategories: matched_constraints.category ? [] : allowedCategories,
+        })
+      : [];
     return {
       type: "resolver_state",
       matched_constraints,

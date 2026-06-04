@@ -4,6 +4,7 @@ import {
   ensureCompleteCustomerText,
   productPoolSatisfiesCatalogScope,
   buildCodeOwnedProductListingText,
+  buildCodeOwnedExactNoMatchText,
   buildCodeOwnedComparisonText,
   buildSoftBrowseFallbackText,
   ensureProductTurnCards,
@@ -12,6 +13,7 @@ import {
   stripMissingSkus,
   createTurnResult,
   extractGenericCTA,
+  resolveProductTurnLink,
   verifyClaimsAgainstCards,
   detectNamedProductMismatch,
 } from "../app/lib/response-contract.server.js";
@@ -1713,6 +1715,105 @@ await testAsync("R85 — resolver candidates attach before broad scoped search",
   assert.equal(out.searchAttempted, false);
   assert.deepEqual(calls.map((c) => c.name), ["get_product_details", "get_product_details", "get_product_details"]);
   assert.deepEqual(out.products.map((p) => p.handle), ["l1700y-m", "l1720y-m", "l1750y-m"]);
+});
+
+await testAsync("R86 — exact no-match never relaxes constraints or attaches unrelated resolver alternatives", async () => {
+  const calls = [];
+  const allProductPool = new Map([
+    ["mens-work-orthotic", {
+      handle: "mens-work-orthotic",
+      title: "Men's Work Orthotics",
+      _gender: "men",
+      _category: "orthotics",
+      _attributes: { Color: "Pink", Gender: "Men", Category: "Orthotics" },
+    }],
+  ]);
+  const out = await ensureProductTurnCards({
+    ctx: {
+      latestUserMessage: "i need pink shoes",
+      sessionGender: "men",
+      catalogScopeCategories: ["Sneakers", "Sandals", "Boots", "Loafers"],
+      sessionMemory: { explicit: { gender: "men", color: "pink" } },
+      resolverState: {
+        type: "resolver_state",
+        matched_constraints: { gender: "men" },
+        inferred_constraints: {},
+        impossible_constraints: [{ field: "color", value: "pink" }],
+        candidate_products: [{ handle: "mens-work-orthotic", title: "Men's Work Orthotics" }],
+        recommended_next_action: { type: "no_match", reason: "no pink products in men" },
+      },
+    },
+    allProductPool,
+    shouldAttach: true,
+    searchInput: {
+      scope: { gender: "men", color: "pink" },
+      input: { query: "pink", filters: { gender: "men", color: "pink" } },
+    },
+    dispatchTool: async (name, input) => {
+      calls.push({ name, input });
+      if (name === "get_product_details") throw new Error("must not load resolver alternatives on exact no-match");
+      return { products: [] };
+    },
+    extractProductCards: () => [],
+  });
+
+  assert.equal(out.diagnostics.rung, "exact-no-match");
+  assert.equal(out.products.length, 0);
+  assert.deepEqual(calls.map((call) => call.name), ["search_products"]);
+  assert.equal(calls[0].input.filters.color, "pink", "exact color must never be removed");
+});
+
+test("R87 — product CTA is suppressed when its catalog tuple is impossible", () => {
+  const out = resolveProductTurnLink({
+    categoryCounts: new Map([["orthotics", 4]]),
+    genderCounts: new Map([["men", 4]]),
+    ctx: {
+      latestUserMessage: "i need pink shoes",
+      storefrontSearchUrlPattern: "https://example.com/search?q={query}",
+      ctaOverrides: [],
+      catalogFacetIndex: {
+        categoryByGender: { footwear: ["men", "women"], orthotics: ["men", "women"] },
+        colorByGenderCategory: {
+          "men:footwear": ["black", "navy"],
+          "men:orthotics": ["brown"],
+          "women:footwear": ["pink"],
+        },
+      },
+      _merchantColors: ["pink", "black", "navy", "brown"],
+    },
+  });
+
+  assert.equal(out.kind, "catalog-no-match");
+  assert.equal(out.link, null);
+  assert.deepEqual(out.diagnostics, {
+    gender: "men",
+    category: "footwear",
+    color: "pink",
+    patternSet: true,
+    overrideCount: 0,
+  });
+});
+
+test("R88 — exact no-match text cannot inherit an unrelated LLM product group", () => {
+  const out = buildCodeOwnedExactNoMatchText({
+    ctx: {
+      latestUserMessage: "i need pink shoes",
+      activeCategoryGroup: { name: "Footwear", categories: ["Sneakers", "Sandals"] },
+      sessionMemory: { explicit: { gender: "men", color: "pink" } },
+      resolverState: {
+        type: "resolver_state",
+        matched_constraints: { gender: "men" },
+        inferred_constraints: {},
+        impossible_constraints: [{ field: "color", value: "pink", reason: "no pink products in men" }],
+        recommended_next_action: { type: "no_match", reason: "no pink products in men" },
+      },
+    },
+  });
+
+  assert.equal(out.reason, "exact_catalog_no_match");
+  assert.match(out.text, /pink men's footwear/i);
+  assert.match(out.text, /current catalog/i);
+  assert.doesNotMatch(out.text, /orthotic/i);
 });
 
 if (failed > 0) {

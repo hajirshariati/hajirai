@@ -106,6 +106,13 @@ await test("R0e — rejected categories never become the positive category", () 
   assert.equal(out.category, "boots");
 });
 
+await test("R0f — product-navigation quick reply extracts both requested color and category", () => {
+  assert.deepEqual(
+    extractUserConstraints("Can you show me pink sneakers instead?"),
+    { category: "sneakers", color: "pink" },
+  );
+});
+
 await test("R1 — navy color infers men's, gender goes in do_not_ask", async () => {
   const facetIndex = {
     categoryByGender: { sneakers: ["men", "women"], sandals: ["women"] },
@@ -591,6 +598,41 @@ await test("R21 — pink footwear scope infers women and never offers men or kid
   assert.equal(out.recommended_next_action.type, "ask");
   assert.equal(out.recommended_next_action.field, "category");
   assert.deepEqual(out.recommended_next_action.chip_options.sort(), ["sandals", "sneakers"]);
+});
+
+await test("R22 — broad no-match alternatives stay inside the active product group", async () => {
+  const seen = [];
+  const facetIndex = {
+    categoryByGender: {
+      sneakers: ["men", "women"],
+      sandals: ["men", "women"],
+      orthotics: ["men", "women"],
+    },
+    colorByGenderCategory: {
+      "men:sneakers": ["black"],
+      "men:sandals": ["brown"],
+      "men:orthotics": ["brown"],
+      "women:sneakers": ["pink"],
+    },
+    conditionByCategory: {},
+    sizeByGenderCategory: {},
+  };
+  const out = await resolveCatalogTurn({
+    shop: SHOP,
+    query: "i need pink shoes",
+    userConstraints: { gender: "men", color: "pink" },
+    allowedCategories: ["Sneakers", "Sandals"],
+    _testFacetIndex: facetIndex,
+    _testFetchCandidates: async (input) => {
+      seen.push(input);
+      return [{ handle: "chase-black", title: "Chase Sneaker - Black" }];
+    },
+  });
+
+  assert.equal(out.recommended_next_action.type, "no_match");
+  assert.deepEqual(seen[0].allowedCategories, ["Sneakers", "Sandals"]);
+  assert.deepEqual(out.candidate_products.map((p) => p.handle), ["chase-black"]);
+  assert.equal(out.candidate_products.some((p) => /orthotic/i.test(p.title)), false);
 });
 
 await test("buildResolverStatePromptBlock — produces non-empty block for resolver_state output", async () => {

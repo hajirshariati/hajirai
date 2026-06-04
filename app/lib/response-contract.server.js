@@ -1,4 +1,5 @@
 import {
+  catalogScopeHasMatches,
   canonicalizeCatalogConstraints,
   deriveCatalogMatchContract,
   readAttributeCI,
@@ -503,7 +504,7 @@ export function productPoolSatisfiesCatalogScope(pool, scope = {}) {
   });
 }
 
-function cardMatchesCatalogScope(card, scope = {}, { enforceColor = true } = {}) {
+function cardMatchesCatalogScope(card, scope = {}, { enforceColor = true, requireKnown = false } = {}) {
   const canonical = canonicalizeCatalogConstraints(scope);
   const gender = normalizeGender(canonical.gender);
   const category = normalizeCategory(canonical.category);
@@ -517,6 +518,8 @@ function cardMatchesCatalogScope(card, scope = {}, { enforceColor = true } = {})
     normalizeCategory(card?.productType) ||
     normalizeCategory(cardAttr(card, ["category", "category_for_filter", "subcategory", "product_type"]));
 
+  if (gender && requireKnown && !cardGender) return false;
+  if (category && requireKnown && !cardCategory) return false;
   if (gender && cardGender && cardGender !== gender && cardGender !== "unisex") return false;
   if (category && cardCategory && cardCategory !== category) return false;
   if (color && enforceColor && !cardMatchesColor(card, color)) return false;
@@ -556,25 +559,42 @@ function cardVerifiedVariantScope(card, scope = {}) {
   return sizeOk && widthOk;
 }
 
-export function filterProductCardsToCatalogScope(pool = [], ctx = {}) {
-  const products = Array.isArray(pool) ? pool.filter(Boolean) : [];
+export function filterProductCardsToCatalogScope(pool = [], ctx = {}, { strict = false } = {}) {
+  let products = Array.isArray(pool) ? pool.filter(Boolean) : [];
   if (products.length === 0) {
     return { products: [], dropped: 0, scope: currentCatalogScopeFromContext(ctx), enforcedColor: false };
   }
+  const originalProductCount = products.length;
 
   const scope = currentCatalogScopeFromContext(ctx);
   const canonical = canonicalizeCatalogConstraints(scope);
+  if (strict && Array.isArray(ctx.catalogScopeCategories) && ctx.catalogScopeCategories.length > 0) {
+    const allowed = new Set(
+      ctx.catalogScopeCategories
+        .map((category) => normalizeCategory(category))
+        .filter(Boolean),
+    );
+    if (allowed.size > 0) {
+      products = products.filter((card) => {
+        const category =
+          normalizeCategory(card?._category) ||
+          normalizeCategory(card?.productType) ||
+          normalizeCategory(cardAttr(card, ["category", "category_for_filter", "subcategory", "product_type"]));
+        return Boolean(category) && allowed.has(category);
+      });
+    }
+  }
   const hasStructuralScope = Boolean(canonical.gender || canonical.category);
   if (!hasStructuralScope && !canonical.color) {
-    return { products, dropped: 0, scope, enforcedColor: false };
+    return { products, dropped: originalProductCount - products.length, scope, enforcedColor: false };
   }
 
   const structuralMatches = products.filter((card) =>
-    cardMatchesCatalogScope(card, canonical, { enforceColor: false }),
+    cardMatchesCatalogScope(card, canonical, { enforceColor: false, requireKnown: strict }),
   );
   const base = hasStructuralScope ? structuralMatches : products;
   if (base.length === 0) {
-    return { products: [], dropped: products.length, scope, enforcedColor: false };
+    return { products: [], dropped: originalProductCount, scope, enforcedColor: false };
   }
 
   // Color is a hard display constraint only when we have ENOUGH literal
@@ -590,25 +610,32 @@ export function filterProductCardsToCatalogScope(pool = [], ctx = {}) {
   let enforcedColor = false;
   let filtered = base;
   if (canonical.color) {
-    const literalColor = base.filter((card) => cardMatchesLiteralColor(card, canonical.color));
-    const semanticColor = base.filter((card) =>
-      cardMatchesCatalogScope(card, canonical, { enforceColor: true }),
-    );
-    if (literalColor.length >= 2) {
-      filtered = literalColor;
+    if (strict) {
+      filtered = base.filter((card) =>
+        cardMatchesCatalogScope(card, canonical, { enforceColor: true, requireKnown: true }),
+      );
       enforcedColor = true;
-    } else if (literalColor.length === 1 && base.length < 3) {
-      // Tiny pool — the single literal match is what we have.
-      filtered = literalColor;
-      enforcedColor = true;
-    } else if (literalColor.length >= 1 && base.length >= 3) {
-      // Mixed pool — show literal + closest semantic siblings; the
-      // listing text will frame as "pink and similar".
-      filtered = base;
-      enforcedColor = false;
-    } else if (semanticColor.length > 0) {
-      filtered = semanticColor;
-      enforcedColor = true;
+    } else {
+      const literalColor = base.filter((card) => cardMatchesLiteralColor(card, canonical.color));
+      const semanticColor = base.filter((card) =>
+        cardMatchesCatalogScope(card, canonical, { enforceColor: true }),
+      );
+      if (literalColor.length >= 2) {
+        filtered = literalColor;
+        enforcedColor = true;
+      } else if (literalColor.length === 1 && base.length < 3) {
+        // Tiny pool — the single literal match is what we have.
+        filtered = literalColor;
+        enforcedColor = true;
+      } else if (literalColor.length >= 1 && base.length >= 3) {
+        // Mixed pool — show literal + closest semantic siblings; the
+        // listing text will frame as "pink and similar".
+        filtered = base;
+        enforcedColor = false;
+      } else if (semanticColor.length > 0) {
+        filtered = semanticColor;
+        enforcedColor = true;
+      }
     }
   }
 
@@ -619,7 +646,7 @@ export function filterProductCardsToCatalogScope(pool = [], ctx = {}) {
 
   return {
     products: filtered,
-    dropped: products.length - filtered.length,
+    dropped: originalProductCount - filtered.length,
     scope,
     enforcedColor,
   };
@@ -659,6 +686,14 @@ async function attachResolverCandidateCards({ ctx, allProductPool, dispatchTool,
   return attached;
 }
 
+function resolverRequiresExactNoMatch(resolverState) {
+  if (!resolverState || resolverState.type !== "resolver_state") return false;
+  return (
+    resolverState.recommended_next_action?.type === "no_match" ||
+    (Array.isArray(resolverState.impossible_constraints) && resolverState.impossible_constraints.length > 0)
+  );
+}
+
 export async function ensureProductTurnCards({
   ctx = {},
   allProductPool,
@@ -673,12 +708,14 @@ export async function ensureProductTurnCards({
   }
 
   const diagnostics = { rung: "existing", scope: currentCatalogScopeFromContext(ctx), reason };
+  const exactNoMatch = resolverRequiresExactNoMatch(ctx.resolverState);
+  diagnostics.exactNoMatch = exactNoMatch;
   let searchAttempted = false;
   let attached = 0;
 
   const scopedProducts = () => {
     const products = Array.from(allProductPool.values());
-    const scoped = filterProductCardsToCatalogScope(products, ctx);
+    const scoped = filterProductCardsToCatalogScope(products, ctx, { strict: exactNoMatch });
     if (scoped.dropped > 0) {
       console.log(
         `[chat] response-contract: dropped ${scoped.dropped} off-scope card(s) ` +
@@ -701,7 +738,7 @@ export async function ensureProductTurnCards({
     return { products, attached, searchAttempted, diagnostics };
   }
 
-  if (resolverPromisedRecommendation(ctx.resolverState) && dispatchTool && extractProductCards) {
+  if (!exactNoMatch && resolverPromisedRecommendation(ctx.resolverState) && dispatchTool && extractProductCards) {
     attached += await attachResolverCandidateCards({
       ctx,
       allProductPool,
@@ -736,7 +773,7 @@ export async function ensureProductTurnCards({
     }
   }
 
-  if (attached === 0 && input?.filters?.color && (input.filters.category || input.filters.gender) && dispatchTool && extractProductCards) {
+  if (!exactNoMatch && attached === 0 && input?.filters?.color && (input.filters.category || input.filters.gender) && dispatchTool && extractProductCards) {
     const relaxedFilters = { ...input.filters };
     delete relaxedFilters.color;
     const relaxedQuery = [scope.condition, scope.category]
@@ -762,7 +799,7 @@ export async function ensureProductTurnCards({
     }
   }
 
-  if (attached === 0) {
+  if (!exactNoMatch && attached === 0) {
     attached += await attachResolverCandidateCards({
       ctx,
       allProductPool,
@@ -774,6 +811,7 @@ export async function ensureProductTurnCards({
   }
 
   products = scopedProducts();
+  if (exactNoMatch && products.length === 0) diagnostics.rung = "exact-no-match";
   console.log(`[chat] product-turn cards: attached ${attached} card(s); final=${products.length}; rung=${diagnostics.rung}`);
   return { products, attached, searchAttempted, diagnostics };
 }
@@ -1687,6 +1725,49 @@ function scopedLabel(scope = {}, fallback = "styles") {
   return parts.length > 0 ? parts.join(" ") : fallback;
 }
 
+export function buildCodeOwnedExactNoMatchText({ ctx = {} } = {}) {
+  const resolver = ctx?.resolverState;
+  const impossible = Array.isArray(resolver?.impossible_constraints)
+    ? resolver.impossible_constraints
+    : [];
+  const isExactNoMatch =
+    resolver?.recommended_next_action?.type === "no_match" ||
+    impossible.length > 0;
+  if (!isExactNoMatch) {
+    return { text: "", reason: "not_exact_no_match" };
+  }
+
+  const scope = currentCatalogScopeFromContext(ctx);
+  const primary = impossible[0] || {};
+  const groupCategory = scope.category || ctx?.activeCategoryGroup?.name || "";
+  let requested;
+  if (primary.field === "color") {
+    requested = [
+      String(primary.value || scope.color || "").toLowerCase(),
+      displayGender(scope.gender),
+      displayCategory(groupCategory),
+    ].filter(Boolean).join(" ");
+  } else if (primary.field === "gender") {
+    requested = [
+      displayGender(primary.value || scope.gender),
+      displayCategory(scope.category || groupCategory),
+    ].filter(Boolean).join(" ");
+  } else if (primary.field === "category") {
+    requested = [
+      displayGender(scope.gender),
+      displayCategory(primary.value || scope.category),
+    ].filter(Boolean).join(" ");
+  } else {
+    requested = scopedLabel(scope, "that exact combination");
+  }
+
+  const label = requested || "that exact combination";
+  return {
+    text: `I couldn't find ${label} in our current catalog. Try a different color or style?`,
+    reason: "exact_catalog_no_match",
+  };
+}
+
 function dominantCardValue(cards = [], getter) {
   const counts = new Map();
   for (const card of Array.isArray(cards) ? cards : []) {
@@ -2297,6 +2378,25 @@ export function resolveProductTurnLink({ categoryCounts, genderCounts, ctx = {} 
     const mixedStyles = categoryCounts.size >= 3 || topShare < 0.6;
     const ctaCategory = (isGenericAsk || mixedStyles) ? "footwear" : dominantCat;
     const dominantColor = dominantRequestedColor(ctx);
+    const ctaScope = {
+      ...(dominantGender ? { gender: dominantGender } : {}),
+      ...(ctaCategory ? { category: ctaCategory } : {}),
+      ...(dominantColor ? { color: dominantColor } : {}),
+    };
+    const ctaScopePossible = catalogScopeHasMatches(ctx.catalogFacetIndex, ctaScope);
+    if (ctaScopePossible === false) {
+      return {
+        link: null,
+        kind: "catalog-no-match",
+        diagnostics: {
+          gender: dominantGender || "",
+          category: ctaCategory || "",
+          color: dominantColor || "",
+          patternSet: !!ctx.storefrontSearchUrlPattern,
+          overrideCount: (ctx.ctaOverrides || []).length,
+        },
+      };
+    }
 
     const auto = buildStorefrontSearchCTA({
       pattern: ctx.storefrontSearchUrlPattern,

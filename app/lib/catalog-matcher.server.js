@@ -124,6 +124,66 @@ export function catalogScopeHasMatches(facetIndex, constraints = {}, { allowedCa
   return tuples.some((tuple) => catalogTupleMatches(tuple, constraints));
 }
 
+// Shared final boundary for quick-reply questions that navigate product
+// facets. After an exact no-match, missing catalog proof must fail closed.
+export function catalogScopedNavigationQuestionVerdict({
+  question = "",
+  choice = {},
+  constraints = {},
+  facetIndex = null,
+  allowedCategories = [],
+  requireProof = false,
+} = {}) {
+  const parsed = canonicalizeCatalogConstraints(choice || {});
+  const facetChoice = {};
+  for (const field of ["gender", "category", "color"]) {
+    if (parsed[field]) facetChoice[field] = parsed[field];
+  }
+
+  const base = canonicalizeCatalogConstraints(constraints || {});
+  const effectiveConstraints = canonicalizeCatalogConstraints({ ...base, ...facetChoice });
+  if (Object.keys(facetChoice).length === 0) {
+    return {
+      possible: true,
+      reason: "not_product_navigation",
+      question,
+      choice: facetChoice,
+      effectiveConstraints,
+    };
+  }
+
+  const match = catalogScopeHasMatches(
+    facetIndex,
+    effectiveConstraints,
+    { allowedCategories },
+  );
+  if (match === true) {
+    return {
+      possible: true,
+      reason: "catalog_match",
+      question,
+      choice: facetChoice,
+      effectiveConstraints,
+    };
+  }
+  if (match === false) {
+    return {
+      possible: false,
+      reason: "catalog_intersection_empty",
+      question,
+      choice: facetChoice,
+      effectiveConstraints,
+    };
+  }
+  return {
+    possible: !requireProof,
+    reason: requireProof ? "catalog_proof_required" : "catalog_proof_unavailable",
+    question,
+    choice: facetChoice,
+    effectiveConstraints,
+  };
+}
+
 export function catalogFieldOptions(facetIndex, constraints, field, { allowedCategories = [] } = {}) {
   if (!facetIndex) return [];
   const tuples = restrictCatalogTuples(buildCatalogTupleSpace(facetIndex), allowedCategories);
