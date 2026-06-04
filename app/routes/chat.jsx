@@ -2456,6 +2456,78 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       }
     }
 
+    // Definition / technology-name guard.
+    //
+    // Live 2026-06-04: customer asked "what is bio rocker?". RAG
+    // returned 0 chunks (knowledge file has no bio-rocker entry).
+    // The LLM explained the technology in prose without bolding the
+    // name, then called search_products("bio rocker") which returned
+    // 4 unrelated products (Savannah Quarter Strap Sandal, Darcy
+    // Slip-On Sneaker, Jenny Slide Sandal, Donna Thong). The earlier
+    // named-product guard only fires on **bolded** mentions, so it
+    // missed this — the customer saw an explanation of bio rocker
+    // accompanied by random sandals that don't actually use it.
+    //
+    // For definition questions ("what is X?", "tell me about X",
+    // "explain X", "how does X work"), require that EVERY remaining
+    // card visibly references the topic in its title or handle.
+    // If none do, wipe the pool — text-only explanation is correct.
+    // Compare turn for UltraSky which DID bold the name: the prior
+    // guard fired and wiped 6 cards. This guard generalizes that
+    // behavior to the bolded-or-not case.
+    if (filteredPool.length > 0 && ctx.latestUserMessage) {
+      const msg = String(ctx.latestUserMessage).trim();
+      // Match common definition / technology-question shapes and
+      // capture the topic. Greedy capture, then strip filler suffixes
+      // ("work", "mean", "technology", "shoes", etc.) so the topic
+      // is the bare term.
+      const defPatterns = [
+        /^\s*(?:what(?:'s|\s+is|\s+are|\s+does)|tell\s+me\s+about|explain|describe|define|what\s+do(?:es)?\s+(?:the\s+)?)\s+(.+?)\s*\??\s*$/i,
+        /^\s*(?:how\s+(?:does|do)\s+(?:the\s+)?)(.+?)\s+(?:work|operate|function)s?\s*\??\s*$/i,
+      ];
+      let topicRaw = null;
+      for (const re of defPatterns) {
+        const m = msg.match(re);
+        if (m) { topicRaw = m[1]; break; }
+      }
+      if (topicRaw) {
+        const topic = String(topicRaw)
+          .toLowerCase()
+          .replace(/^\s*(?:the|a|an)\s+/i, "")
+          .replace(/\s+(?:work|mean|stand\s+for|do)$/i, "")
+          .replace(/\s+(?:technology|tech|material|foam|shoes?|sole|outsole|footbed|insole|cushion(?:ing)?|feature|line|collection)$/i, "")
+          .trim();
+        // Match if topic literally appears in title, handle, or
+        // description snippet. Strip punctuation/space so "biorocker"
+        // matches "bio rocker", "ultrasky" matches "UltraSKY", etc.
+        const normalize = (s) => String(s || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+        const topicKey = normalize(topic);
+        if (topicKey.length >= 3) {
+          const matchesTopic = (card) => {
+            const haystack = normalize(
+              [card?.title, card?.handle, card?._descriptionSnippet, card?.description].filter(Boolean).join(" "),
+            );
+            return haystack.includes(topicKey);
+          };
+          const matching = filteredPool.filter(matchesTopic);
+          if (matching.length === 0) {
+            console.log(
+              `[chat] ${ctx.shop} definition-question guard: customer asked "what is ${topic}?" ` +
+                `but 0 of ${filteredPool.length} card(s) mention "${topic}" in title/handle/description ` +
+                `— wiping pool (text-only answer)`,
+            );
+            filteredPool = [];
+          } else if (matching.length < filteredPool.length) {
+            console.log(
+              `[chat] ${ctx.shop} definition-question guard: keeping ${matching.length}/${filteredPool.length} card(s) ` +
+                `that mention "${topic}"`,
+            );
+            filteredPool = matching;
+          }
+        }
+      }
+    }
+
     const userTextLower = (ctx.userText || "").toLowerCase();
     const scored = filteredPool.map((card) => ({
       card,
