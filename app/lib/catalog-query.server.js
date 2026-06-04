@@ -150,9 +150,22 @@ export function matchCatalogRequirement(product, requirement) {
   if (tokens.length === 0) return { matched: false, source: null, tokens };
 
   const document = buildCatalogSearchDocument(product);
-  const exactSource = Object.entries(document.sources).find(([, text]) =>
-    textHasTokens(text, tokens),
-  );
+  // Prefer descriptive proof over a title match. A title may use a
+  // material word as a colorway name ("- Cork"), while the description
+  // or merchant attributes can prove the product is actually built with it.
+  const sourcePriority = [
+    "description",
+    "attributes",
+    "variants",
+    "tags",
+    "enrichment",
+    "title",
+    "classification",
+  ];
+  const exactSource = sourcePriority
+    .filter((source) => document.sources[source])
+    .map((source) => [source, document.sources[source]])
+    .find(([, text]) => textHasTokens(text, tokens));
   if (!exactSource) {
     return { matched: false, source: null, tokens };
   }

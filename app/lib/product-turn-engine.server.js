@@ -706,7 +706,7 @@ export function composeAnswer({ scope, selected, deferred, selectionReason, will
   if (familyCount > 1) {
     sentence2 = selectionReason === "closest_matches_no_proof" || deferred.length > 0
       ? "Compare the other options too, but check each card's details before choosing."
-      : `The other ${label} matches are good alternatives if you prefer their style, color, or fit.`;
+      : "The other options are good alternatives if you prefer their style, color, or fit.";
   } else if (willHaveCta) {
     sentence2 = "Open the card for the full details, or use View All to keep browsing.";
   }

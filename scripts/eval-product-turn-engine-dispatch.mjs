@@ -185,7 +185,7 @@ await test("D3 — 'pink sandals + arch support + bunions' is handled (text + ca
   assert.ok(out.answerText.length > 30, `useful text required; got "${out.answerText}"`);
   assert.equal(out.products.length, 2);
   assert.match(out.answerText, /bunions/i);
-  assert.match(out.answerText, /sandals/i);
+  assert.match(out.answerText, /sandal/i);
 });
 
 await test("D4 — 'plantar fasciitis women's sandals' is handled with useful text", async () => {

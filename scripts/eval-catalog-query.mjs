@@ -123,11 +123,18 @@ await test("CQ5 — canonical document includes description, tags, product and v
 
 await test("CQ6 — evidence matcher identifies the source that proves a requirement", () => {
   const fromDescription = matchCatalogRequirement(
-    { description: "Built with BioRocker technology." },
+    {
+      title: "BioRocker Sandal",
+      description: "Built with BioRocker technology.",
+    },
     "BioRocker",
   );
   assert.equal(fromDescription.matched, true);
-  assert.equal(fromDescription.source, "description");
+  assert.equal(
+    fromDescription.source,
+    "description",
+    "descriptive proof should outrank a title-only mention",
+  );
 
   const fromAttribute = matchCatalogRequirement(
     { attributes: { footbed: "Memory Foam" } },
