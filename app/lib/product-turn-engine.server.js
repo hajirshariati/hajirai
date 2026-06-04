@@ -729,14 +729,14 @@ function buildLeadRecommendationReason({ scope, leadCard, selectionReason }) {
   if (requirement) {
     const match = matchCatalogRequirement(leadCard, requirement);
     const source = {
-      title: "its name",
-      description: "its product details",
-      tags: "its merchant tags",
-      attributes: "its product attributes",
-      variants: "its variant details",
-      enrichment: "its merchant enrichment data",
-      classification: "its catalog classification",
-    }[match.source] || "its catalog evidence";
+      title: "the product name",
+      description: "the product description",
+      tags: "a merchant tag",
+      attributes: "a product attribute",
+      variants: "a variant detail",
+      enrichment: "the merchant enrichment record",
+      classification: "the catalog classification",
+    }[match.source] || "the catalog evidence";
     return `${source} explicitly mentions ${requirement}`;
   }
 
