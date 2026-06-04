@@ -380,7 +380,10 @@ await test("D7b — category-less technology definition is owned by the engine a
     `concrete catalog definition must be engine-owned; got ${JSON.stringify(out?.diagnostics)}`);
   assert.deepEqual(out.scope.requiredCatalogTerms, ["bio rocker"]);
   assert.deepEqual(out.products.map((product) => product.handle), ["savannah"]);
-  assert.match(out.answerText, /^BioRocker is used in selected styles/i);
+  assert.match(
+    out.answerText,
+    /^BioRocker is described in the catalog as technology for a natural stride/i,
+  );
   assert.match(out.answerText, /verified example/i);
   assert.doesNotMatch(out.answerText, /product description|catalog evidence|explicitly mentions/i);
 });

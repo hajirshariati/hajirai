@@ -701,6 +701,9 @@ export function composeAnswer({ scope, selected, deferred, selectionReason, will
   const leadCard = leadFamily?.primary || leadFamily?.variants?.[0] || allCards[0];
   const leadTitle = String(leadCard?.title || label).trim();
   const catalogRequirement = customerFacingCatalogRequirement(scope);
+  const catalogDefinition = catalogRequirement
+    ? findCatalogDefinition(allCards, scope?.requiredCatalogTerms?.[0])
+    : "";
   const leadReason = buildLeadRecommendationReason({
     scope,
     leadCard,
@@ -711,7 +714,9 @@ export function composeAnswer({ scope, selected, deferred, selectionReason, will
   if (selectionReason === "closest_matches_no_proof") {
     sentence1 = `These are the closest ${label} matches, but I can't verify every requested detail from the catalog.`;
   } else if (catalogRequirement && isCatalogDefinitionQuestion(scope?.rawMessage)) {
-    sentence1 = `${catalogRequirement} is used in selected styles, and ${leadTitle} is a verified example to start with.`;
+    sentence1 = catalogDefinition
+      ? `${catalogRequirement} is described in the catalog as ${catalogDefinition}. ${leadTitle} is a verified example to start with.`
+      : `${catalogRequirement} is used in selected styles, and ${leadTitle} is a verified example to start with.`;
   } else if (catalogRequirement) {
     const requirementLabel = scope?.category
       ? `${catalogRequirement} ${scope.category}`
@@ -796,6 +801,56 @@ function customerFacingCatalogRequirement(scope = {}) {
     }
   }
   return requirement;
+}
+
+function findCatalogDefinition(cards = [], requirement = "") {
+  const tokens = normalizeCatalogText(requirement).split(" ").filter(Boolean);
+  if (tokens.length === 0) return "";
+  const termPattern = new RegExp(
+    tokens.map(escapeRegex).join("[^A-Za-z0-9]*"),
+    "i",
+  );
+  const candidates = [];
+
+  for (const card of cards || []) {
+    const description = cleanCatalogDescription(
+      card?._description || card?.description || card?._descriptionSnippet || card?.descriptionSnippet,
+    );
+    for (const sentence of description.split(/(?<=[.!?])\s+|\n+/).filter(Boolean)) {
+      const match = sentence.match(termPattern);
+      if (!match || match.index == null) continue;
+      const after = sentence
+        .slice(match.index + match[0].length)
+        .replace(/^[™®©℠\s:;,()\-–—]+/, "")
+        .replace(/\s+/g, " ")
+        .trim();
+      const words = after.split(/\s+/).filter(Boolean);
+      if (words.length < 3 || words.length > 24) continue;
+
+      let score = 0;
+      if (/^technology\b/i.test(after)) score += 4;
+      if (/\b(?:for|helps?|designed|provides?|delivers?|supports?|allows?|creates?|promotes?|improves?|reduces?)\b/i.test(after)) {
+        score += 8;
+      }
+      if (/\b(?:details|machine washable|upper material|heel height)\b/i.test(after)) score -= 10;
+      candidates.push({ text: after.replace(/[.!?]+$/, ""), score });
+    }
+  }
+
+  candidates.sort((a, b) => b.score - a.score || a.text.length - b.text.length);
+  const best = candidates[0]?.score > 0 ? candidates[0].text : "";
+  return /^[A-Z][a-z]/.test(best) ? `${best[0].toLowerCase()}${best.slice(1)}` : best;
+}
+
+function cleanCatalogDescription(value) {
+  return String(value || "")
+    .replace(/<[^>]*>/g, " ")
+    .replace(/&amp;/gi, "&")
+    .replace(/&quot;/gi, "\"")
+    .replace(/&#(?:39|x27);/gi, "'")
+    .replace(/&nbsp;/gi, " ")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 function humanizeCondition(tag) {
