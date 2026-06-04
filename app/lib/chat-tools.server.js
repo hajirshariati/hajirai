@@ -679,8 +679,13 @@ const searchQuery = detected.gender ? detected.query : q;
   const keywords = rawKeywords.filter(
     (kw) => !["men", "women", "boy", "girl", "kid", "children"].includes(kw)
   );
+  const wantedCatalogTerms = Array.from(new Set(
+    (Array.isArray(requiredTerms) ? requiredTerms : [])
+      .map((term) => normalizeCatalogText(term))
+      .filter(Boolean),
+  ));
 
-  if (keywords.length === 0 && !effectiveGender) {
+  if (keywords.length === 0 && !effectiveGender && wantedCatalogTerms.length === 0) {
     return { products: [] };
   }
 
@@ -876,7 +881,16 @@ const searchQuery = detected.gender ? detected.query : q;
     console.log(`[search]   oos filter: ${products.length}/${beforeOOS} (dropped ${beforeOOS - products.length} fully-OOS products)`);
   }
 
-  if (activeCategoryGroup) {
+  if (activeCategoryGroup && wantedCatalogTerms.length > 0 && !effectiveCategory) {
+    // A concrete catalog concept without a category is a fresh cross-catalog
+    // request ("What is BioRocker?", "Which other styles use this
+    // technology?"). Do not let a category-group lock inherited from an
+    // earlier turn hide products that explicitly prove the requested concept.
+    console.log(
+      `[search]   active-group skip: concrete catalog requirement="${wantedCatalogTerms.join(" | ")}" ` +
+        `has no category — searching across groups`,
+    );
+  } else if (activeCategoryGroup) {
     // Explicit-filter divergence — the AI passed a category filter
     // (`attrFilters.category=X`) where X belongs to a DIFFERENT
     // merchant group than the active lock. The lock is stale; the
@@ -943,17 +957,34 @@ const searchQuery = detected.gender ? detected.query : q;
     }
   }
 
+  // Concrete requirements are proof constraints, not ranking hints. Apply
+  // them to the full eligible catalog before keyword/semantic ranking so the
+  // ranker can order proven matches but can never discard them first.
+  let catalogRequirementMatches = new Map();
+  if (wantedCatalogTerms.length > 0) {
+    const beforeRequirements = products.length;
+    const requirementResult = filterByCatalogRequirements(products, wantedCatalogTerms);
+    products = requirementResult.products;
+    catalogRequirementMatches = requirementResult.matches;
+    console.log(
+      `[search]   catalog requirements source filter: terms="${wantedCatalogTerms.join(" | ")}" ` +
+        `kept=${products.length}/${beforeRequirements}`,
+    );
+  }
+
   const expandKeywordTerms = (kw) => {
     const out = new Set();
 
     for (const v of inflectVariants(kw)) {
-      out.add(v.toLowerCase());
+      const normalized = normalizeCatalogText(v);
+      if (normalized) out.add(normalized);
     }
 
     for (const v of inflectVariants(kw)) {
       for (const s of synonymMap[v.toLowerCase()] || []) {
         for (const sv of inflectVariants(s)) {
-          out.add(String(sv).toLowerCase());
+          const normalized = normalizeCatalogText(sv);
+          if (normalized) out.add(normalized);
         }
       }
     }
@@ -1082,25 +1113,25 @@ const isExcludedByRule = (p) => {
     const categoryAttrs = [attrs.category, attrs.category_for_filter, attrs.subcategory]
       .flatMap((v) => (Array.isArray(v) ? v : [v]))
       .filter(Boolean)
-      .map((v) => String(v).toLowerCase())
+      .map((v) => normalizeCatalogText(v))
       .join(" ");
     const otherAttrValues = Object.entries(attrs)
       .filter(([k]) => k !== "category" && k !== "category_for_filter" && k !== "subcategory")
       .flatMap(([, v]) => (Array.isArray(v) ? v : [v]))
       .filter((v) => v !== null && v !== undefined && v !== "")
-      .map((v) => String(v).toLowerCase())
+      .map((v) => normalizeCatalogText(v))
       .join(" ");
     const variantAttrs = (p.variants || [])
       .map((v) => flattenValues(v.attributesJson))
       .join(" ");
     return {
-      title: (p.title || "").toLowerCase(),
-      productType: (p.productType || "").toLowerCase(),
+      title: normalizeCatalogText(p.title),
+      productType: normalizeCatalogText(p.productType),
       categoryAttrs,
-      tags: Array.isArray(p.tags) ? p.tags.join(" ").toLowerCase() : "",
-      otherAttrs: `${otherAttrValues} ${variantAttrs}`.trim(),
-      vendor: (p.vendor || "").toLowerCase(),
-      description: (p.description || "").toLowerCase(),
+      tags: normalizeCatalogText(Array.isArray(p.tags) ? p.tags.join(" ") : ""),
+      otherAttrs: normalizeCatalogText(`${otherAttrValues} ${variantAttrs}`),
+      vendor: normalizeCatalogText(p.vendor),
+      description: normalizeCatalogText(p.description),
     };
   };
 
@@ -1176,6 +1207,7 @@ const isExcludedByRule = (p) => {
     })
     .filter(({ product, score }) => {
       if (isExcludedByRule(product)) return false;
+      if (wantedCatalogTerms.length > 0) return true;
       if (keywordGroups.length === 0) return true;
       return score > 0;
     })
@@ -1211,28 +1243,6 @@ const isExcludedByRule = (p) => {
   }
 
   let filtered = tieredScored.map((x) => x.product);
-  let catalogRequirementMatches = new Map();
-
-  // Concrete catalog requirements are verified against one canonical
-  // evidence document: title, description, tags, product attributes,
-  // variant attributes, and classification. This replaces the old
-  // CamelCase-only topic filter and never scans the whole conversation
-  // for stale terms.
-  const wantedCatalogTerms = Array.from(new Set(
-    (Array.isArray(requiredTerms) ? requiredTerms : [])
-      .map((term) => String(term || "").trim())
-      .filter(Boolean),
-  ));
-  if (wantedCatalogTerms.length > 0) {
-    const beforeRequirements = filtered.length;
-    const requirementResult = filterByCatalogRequirements(filtered, wantedCatalogTerms);
-    filtered = requirementResult.products;
-    catalogRequirementMatches = requirementResult.matches;
-    console.log(
-      `[search]   catalog requirements: terms="${wantedCatalogTerms.join(" | ")}" ` +
-        `kept=${filtered.length}/${beforeRequirements}`,
-    );
-  }
 
   if (attrKeys.length > 0) {
     const beforeAttrFilter = filtered;

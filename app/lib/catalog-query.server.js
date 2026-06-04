@@ -78,6 +78,11 @@ function valuesFrom(value, out = [], depth = 0) {
 
 export function normalizeCatalogText(value) {
   return String(value || "")
+    // Remove presentation marks before Unicode normalization. NFKD expands
+    // the trademark symbol into the literal letters "TM"; without this,
+    // "BioRocker™" becomes "bio rockertm" and no longer matches the
+    // customer's "BioRocker" requirement.
+    .replace(/[\u00a9\u00ae\u2120\u2122]/g, " ")
     .replace(/([a-z0-9])([A-Z])/g, "$1 $2")
     .normalize("NFKD")
     .replace(/[\u0300-\u036f]/g, "")

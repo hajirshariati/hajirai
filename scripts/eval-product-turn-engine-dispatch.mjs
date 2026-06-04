@@ -354,6 +354,70 @@ await test("D7 — bare 'show me shoes' (no category resolved yet) DECLINES so t
   assert.ok(out.decline);
 });
 
+await test("D7b — category-less technology definition is owned by the engine and keeps only proven cards", async () => {
+  const out = await runProductTurn({
+    ...ctxBase,
+    latestUserMessage: "what is BioRocker?",
+    messages: [{ role: "user", content: "what is BioRocker?" }],
+    sessionMemory: { explicit: {}, inferred: {} },
+  }, {
+    forceEnable: true,
+    searchFn: async () => [
+      uiCandidate({
+        title: "Savannah Sandal",
+        handle: "savannah",
+        description: "Designed with BioRocker Technology for a natural stride.",
+      }),
+      uiCandidate({
+        title: "Plain Sandal",
+        handle: "plain-sandal",
+        description: "An everyday sandal.",
+      }),
+    ],
+    claimConfig: FIXTURE_CLAIM_CONFIG,
+  });
+  assert.ok(out && !out.decline,
+    `concrete catalog definition must be engine-owned; got ${JSON.stringify(out?.diagnostics)}`);
+  assert.deepEqual(out.scope.requiredCatalogTerms, ["bio rocker"]);
+  assert.deepEqual(out.products.map((product) => product.handle), ["savannah"]);
+  assert.match(out.answerText, /BioRocker|bio rocker/i);
+});
+
+await test("D7c — immediate technology continuation stays in the engine without a category", async () => {
+  const message = "Which other shoe styles feature this technology?";
+  const out = await runProductTurn({
+    ...ctxBase,
+    latestUserMessage: message,
+    messages: [
+      { role: "user", content: "what is BioRocker?" },
+      { role: "assistant", content: "BioRocker is used in selected products." },
+      { role: "user", content: message },
+    ],
+    sessionMemory: { explicit: {}, inferred: {} },
+  }, {
+    forceEnable: true,
+    searchFn: async () => [
+      uiCandidate({
+        title: "Savannah Sandal",
+        handle: "savannah",
+        description: "Designed with BioRocker Technology for a natural stride.",
+      }),
+      uiCandidate({
+        title: "Plain Sandal",
+        handle: "plain-sandal",
+        description: "An everyday sandal.",
+      }),
+    ],
+    claimConfig: FIXTURE_CLAIM_CONFIG,
+  });
+  assert.ok(out && !out.decline,
+    `immediate concrete-topic continuation must be engine-owned; got ${JSON.stringify(out?.diagnostics)}`);
+  assert.equal(out.scope.catalogQueryContinuedFromPrior, true);
+  assert.deepEqual(out.scope.requiredCatalogTerms, ["bio rocker"]);
+  assert.deepEqual(out.products.map((product) => product.handle), ["savannah"]);
+  assert.ok(out.answerText.length > 0, "engine must not emit confident empty text");
+});
+
 // ─── Flag default: when PRODUCT_TURN_ENGINE_ENABLED is unset, the
 //     engine returns null so the agent path proceeds untouched.
 

@@ -360,13 +360,23 @@ const COMPARE_SHAPE_RE =
 
 function engineWantsThisTurn(scope, resolverState = null) {
   const hasResolverCandidates = resolverHasCandidateRecommendation(resolverState);
+  const hasCatalogRequirement = scope.requiredCatalogTerms?.length > 0;
   // V1 gate: handle clear claim-carrying retrieval shapes only.
   // Decline named-product lookups (compare/similar/specific-product)
-  // and turns missing a category — those still go through the LLM
-  // agent so it can ask clarifying questions or run catalog-
-  // resolver paths the engine doesn't own yet.
-  if (!scope.category && !scope.badge && !scope.onSale && !scope.modifier && !hasResolverCandidates) return false;
-  if (scope.namedProduct && !hasResolverCandidates) return false;
+  // and turns missing both a category and a concrete catalog concept.
+  // A verified product concept ("BioRocker", "cork", "memory foam")
+  // is sufficient retrieval scope even without a category; keeping those
+  // in the engine prevents the fallback agent from confidently describing
+  // products after an unverified/empty search.
+  if (
+    !scope.category
+    && !scope.badge
+    && !scope.onSale
+    && !scope.modifier
+    && !hasResolverCandidates
+    && !hasCatalogRequirement
+  ) return false;
+  if (scope.namedProduct && !hasResolverCandidates && !hasCatalogRequirement) return false;
   const raw = scope.rawMessage || "";
   if (NAMED_PRODUCT_ANCHOR_RE.test(raw)) return false;
   if (COMPARE_SHAPE_RE.test(raw)) return false;

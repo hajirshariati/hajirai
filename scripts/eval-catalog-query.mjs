@@ -11,6 +11,7 @@ import {
   deriveCatalogRequirements,
   filterByCatalogRequirements,
   matchCatalogRequirement,
+  normalizeCatalogText,
 } from "../app/lib/catalog-query.server.js";
 import { runProductTurn } from "../app/lib/product-turn-engine.server.js";
 
@@ -48,6 +49,7 @@ await test("CQ1 — arbitrary material before category becomes a concrete requir
 });
 
 await test("CQ2 — named technology works without CamelCase dependence", () => {
+  assert.equal(normalizeCatalogText("BioRocker™ Technology"), "bio rocker technology");
   assert.deepEqual(
     requirements("Which sandals have BioRocker technology?").requiredTerms,
     ["bio rocker"],
