@@ -380,7 +380,9 @@ await test("D7b — category-less technology definition is owned by the engine a
     `concrete catalog definition must be engine-owned; got ${JSON.stringify(out?.diagnostics)}`);
   assert.deepEqual(out.scope.requiredCatalogTerms, ["bio rocker"]);
   assert.deepEqual(out.products.map((product) => product.handle), ["savannah"]);
-  assert.match(out.answerText, /BioRocker|bio rocker/i);
+  assert.match(out.answerText, /^BioRocker is used in selected styles/i);
+  assert.match(out.answerText, /verified example/i);
+  assert.doesNotMatch(out.answerText, /product description|catalog evidence|explicitly mentions/i);
 });
 
 await test("D7c — immediate technology continuation stays in the engine without a category", async () => {
@@ -416,6 +418,11 @@ await test("D7c — immediate technology continuation stays in the engine withou
   assert.deepEqual(out.scope.requiredCatalogTerms, ["bio rocker"]);
   assert.deepEqual(out.products.map((product) => product.handle), ["savannah"]);
   assert.ok(out.answerText.length > 0, "engine must not emit confident empty text");
+  assert.match(
+    out.answerText,
+    /For styles with bio rocker, I'd start with Savannah Sandal because it includes the feature you asked about/i,
+  );
+  assert.doesNotMatch(out.answerText, /product description|catalog evidence|explicitly mentions/i);
 });
 
 // ─── Flag default: when PRODUCT_TURN_ENGINE_ENABLED is unset, the

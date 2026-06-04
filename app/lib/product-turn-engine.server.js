@@ -43,6 +43,7 @@ import {
   deriveCatalogRequirements,
   filterByCatalogRequirements,
   matchCatalogRequirement,
+  normalizeCatalogText,
 } from "./catalog-query.server.js";
 
 // Flag — feature gate for production wiring. Read at engine entry
@@ -699,6 +700,7 @@ export function composeAnswer({ scope, selected, deferred, selectionReason, will
   const leadFamily = selected[0] || deferred[0] || allFamilies[0];
   const leadCard = leadFamily?.primary || leadFamily?.variants?.[0] || allCards[0];
   const leadTitle = String(leadCard?.title || label).trim();
+  const catalogRequirement = customerFacingCatalogRequirement(scope);
   const leadReason = buildLeadRecommendationReason({
     scope,
     leadCard,
@@ -708,13 +710,22 @@ export function composeAnswer({ scope, selected, deferred, selectionReason, will
   let sentence1;
   if (selectionReason === "closest_matches_no_proof") {
     sentence1 = `These are the closest ${label} matches, but I can't verify every requested detail from the catalog.`;
+  } else if (catalogRequirement && isCatalogDefinitionQuestion(scope?.rawMessage)) {
+    sentence1 = `${catalogRequirement} is used in selected styles, and ${leadTitle} is a verified example to start with.`;
+  } else if (catalogRequirement) {
+    const requirementLabel = scope?.category
+      ? `${catalogRequirement} ${scope.category}`
+      : `styles with ${catalogRequirement}`;
+    sentence1 = `For ${requirementLabel}, I'd start with ${leadTitle}${leadReason ? ` because ${leadReason}` : ""}.`;
   } else {
     sentence1 = `I'd start with ${leadTitle}${leadReason ? ` because ${leadReason}` : ""}.`;
   }
 
   let sentence2 = "";
   if (familyCount > 1) {
-    sentence2 = selectionReason === "closest_matches_no_proof" || deferred.length > 0
+    sentence2 = catalogRequirement && selectionReason !== "closest_matches_no_proof" && deferred.length === 0
+      ? "The other cards match that feature too, so compare the styles and choose the one that best fits how you'll wear it."
+      : selectionReason === "closest_matches_no_proof" || deferred.length > 0
       ? "Compare the other options too, but check each card's details before choosing."
       : "The other options are good alternatives if you prefer their style, color, or fit.";
   } else if (willHaveCta) {
@@ -737,17 +748,7 @@ function buildLeadRecommendationReason({ scope, leadCard, selectionReason }) {
     matchCatalogRequirement(leadCard, term).matched,
   );
   if (requirement) {
-    const match = matchCatalogRequirement(leadCard, requirement);
-    const source = {
-      title: "the product name",
-      description: "the product description",
-      tags: "a merchant tag",
-      attributes: "a product attribute",
-      variants: "a variant detail",
-      enrichment: "the merchant enrichment record",
-      classification: "the catalog classification",
-    }[match.source] || "the catalog evidence";
-    return `${source} explicitly mentions ${requirement}`;
+    return "it includes the feature you asked about";
   }
 
   const claim = scope?.requestedClaim;
@@ -770,6 +771,31 @@ function buildLeadRecommendationReason({ scope, leadCard, selectionReason }) {
     return "it is not tagged for the opposite width";
   }
   return "it is the strongest catalog match for what you asked";
+}
+
+function isCatalogDefinitionQuestion(message) {
+  return /^\s*(?:what|which)\s+(?:is|are)\b|^\s*(?:tell\s+me\s+about|explain)\b/i
+    .test(String(message || ""));
+}
+
+function customerFacingCatalogRequirement(scope = {}) {
+  const requirement = String(scope?.requiredCatalogTerms?.[0] || "").trim();
+  if (!requirement) return "";
+
+  // Preserve the customer's own casing when the latest message names the
+  // concept directly ("BioRocker" instead of the normalized "bio rocker").
+  // This is vocabulary-agnostic and falls back to the canonical term for an
+  // anaphoric continuation such as "Which other styles use this technology?"
+  const rawWords = String(scope?.rawMessage || "").match(/[A-Za-z0-9][A-Za-z0-9'’™®©℠-]*/g) || [];
+  for (let size = Math.min(rawWords.length, 6); size >= 1; size -= 1) {
+    for (let start = 0; start + size <= rawWords.length; start += 1) {
+      const phrase = rawWords.slice(start, start + size).join(" ");
+      if (normalizeCatalogText(phrase) === normalizeCatalogText(requirement)) {
+        return phrase.replace(/[™®©℠]/g, "").trim();
+      }
+    }
+  }
+  return requirement;
 }
 
 function humanizeCondition(tag) {

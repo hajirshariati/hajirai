@@ -229,7 +229,11 @@ await test("CQ10 — engine filters injected candidates and recommends a verifie
   assert.ok(out && !out.decline, "engine should handle the product turn");
   assert.deepEqual(out.products.map((product) => product.handle), ["cork-trail"]);
   assert.match(out.answerText, /I'd start with Cork Trail Sandal/i);
-  assert.match(out.answerText, /explicitly mentions cork/i);
+  assert.match(
+    out.answerText,
+    /For cork sandals, I'd start with Cork Trail Sandal because it includes the feature you asked about/i,
+  );
+  assert.doesNotMatch(out.answerText, /product description|catalog evidence|explicitly mentions/i);
   assert.doesNotMatch(out.answerText, /\bI found \d+/i);
 });
 
