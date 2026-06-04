@@ -2453,6 +2453,14 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
             `but pool families [${m.poolFamilies.join(",")}] don't overlap — wiping ${filteredPool.length} card(s)`,
         );
         filteredPool = [];
+        // Also wipe the upstream `pool` so the display-boundary
+        // fallback below doesn't re-emit the same cards we just
+        // rejected. Live trace 2026-06-04: the mismatch guard
+        // correctly wiped 4 cards on a "what is bio rocker?" turn,
+        // then `display-boundary: scorer produced zero cards;
+        // emitting 4 scoped fallback card(s)` re-attached them
+        // because the fallback reads from `pool`, not `filteredPool`.
+        pool = [];
       }
     }
 
@@ -2517,12 +2525,20 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
                 `— wiping pool (text-only answer)`,
             );
             filteredPool = [];
+            // Wipe upstream `pool` so the display-boundary fallback
+            // can't resurrect these cards. Same reasoning as the
+            // named-product mismatch guard above.
+            pool = [];
           } else if (matching.length < filteredPool.length) {
             console.log(
               `[chat] ${ctx.shop} definition-question guard: keeping ${matching.length}/${filteredPool.length} card(s) ` +
                 `that mention "${topic}"`,
             );
             filteredPool = matching;
+            // Narrow `pool` to the same matching set so the
+            // display-boundary fallback can only fall back to the
+            // topic-matching cards we've explicitly approved.
+            pool = matching;
           }
         }
       }
