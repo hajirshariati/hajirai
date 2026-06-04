@@ -31,6 +31,10 @@ import {
 } from "../lib/chat-helpers.server";
 import { TOOLS, executeTool, extractProductCards, CUSTOMER_ORDERS_TOOL, FIT_PREDICTOR_TOOL, detectLatestGender } from "../lib/chat-tools.server";
 import { rewriteToolCall } from "../lib/chat-tool-rewrite.server";
+import {
+  deriveCatalogRequirements,
+  matchCatalogRequirement,
+} from "../lib/catalog-query.server.js";
 import { withAnthropicRetry, classifyAnthropicError, customerFacingFailureMessage } from "../lib/anthropic-resilience.server";
 import { fetchCustomerContext } from "../lib/customer-context.server";
 import { fetchKlaviyoEnrichment } from "../lib/klaviyo-enrichment.server";
@@ -338,7 +342,37 @@ async function loadMerchantColors(ctx) {
 // rewrite-pipeline coverage automatically.
 // ============================================================
 async function dispatchTool(name, input, ctx) {
-  const rewritten = rewriteToolCall({ name, input }, ctx);
+  let rewritten = rewriteToolCall({ name, input }, ctx);
+  if (
+    rewritten.name === "search_products"
+    && !Array.isArray(rewritten.input?.requiredTerms)
+  ) {
+    const catalogScope = {
+      ...(ctx?.sessionMemory?.explicit || {}),
+      ...(ctx?.classifiedIntent?.attributes || {}),
+      ...(ctx?.resolverState?.matched_constraints || {}),
+    };
+    const requirements = deriveCatalogRequirements({
+      latestUserMessage: ctx?.latestUserMessage || "",
+      messages: ctx?.messages || [],
+      scope: catalogScope,
+      claimConfig: ctx?.claimConfig || null,
+      knownCategories: ctx?.fullCatalogCategories || ctx?.catalogCategories || [],
+    });
+    if (requirements.requiredTerms.length > 0) {
+      rewritten = {
+        ...rewritten,
+        input: {
+          ...(rewritten.input || {}),
+          requiredTerms: requirements.requiredTerms,
+        },
+      };
+      console.log(
+        `[chat] catalog requirements: terms="${requirements.requiredTerms.join(" | ")}"` +
+          `${requirements.continuedFromPrior ? " source=immediate-prior-turn" : " source=latest-message"}`,
+      );
+    }
+  }
   return await executeTool(rewritten.name, rewritten.input, ctx);
 }
 
@@ -394,22 +428,23 @@ async function runProductTurnDispatch({ ctx, controller, encoder, claimConfig })
     if (scope.color) filters.color = scope.color;
     if (scope.badge) filters.badge = scope.badge;
     const queryParts = Array.from(new Set([
+      scope.catalogQuery,
       scope.modifier,
       scope.badge,
       scope.condition,
       scope.color,
       scope.category,
       scope.useCase,
-      // Topic term (brand / technology name) goes into the semantic
-      // query so search ranks products whose descriptions mention it
-      // higher. The engine also post-filters by literal description
-      // match — semantic is the rank hint, post-filter is the truth.
-      scope.topicTerm,
     ].filter(Boolean)));
     const query = queryParts.length > 0
       ? queryParts.join(" ").trim()
       : (scope.rawMessage || "").slice(0, 160);
-    const baseInput = { query, filters, limit };
+    const baseInput = {
+      query,
+      filters,
+      limit,
+      requiredTerms: scope.requiredCatalogTerms || [],
+    };
     if (scope.onSale === true) baseInput.onSale = true;
     const runSearch = async (input) => {
       try {
@@ -2475,7 +2510,9 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     //
     // For definition questions ("what is X?", "tell me about X",
     // "explain X", "how does X work"), require that EVERY remaining
-    // card visibly references the topic in its title or handle.
+    // card has canonical catalog evidence for the topic. Valid proof
+    // may live in description, tags, product/variant attributes, or
+    // enrichment — not only the visible title.
     // If none do, wipe the pool — text-only explanation is correct.
     // Compare turn for UltraSky which DID bold the name: the prior
     // guard fired and wiped 6 cards. This guard generalizes that
@@ -2502,23 +2539,14 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
           .replace(/\s+(?:work|mean|stand\s+for|do)$/i, "")
           .replace(/\s+(?:technology|tech|material|foam|shoes?|sole|outsole|footbed|insole|cushion(?:ing)?|feature|line|collection)$/i, "")
           .trim();
-        // Match if topic literally appears in title, handle, or
-        // description snippet. Strip punctuation/space so "biorocker"
-        // matches "bio rocker", "ultrasky" matches "UltraSKY", etc.
-        const normalize = (s) => String(s || "").toLowerCase().replace(/[^a-z0-9]/g, "");
-        const topicKey = normalize(topic);
-        if (topicKey.length >= 3) {
-          const matchesTopic = (card) => {
-            const haystack = normalize(
-              [card?.title, card?.handle, card?._descriptionSnippet, card?.description].filter(Boolean).join(" "),
-            );
-            return haystack.includes(topicKey);
-          };
-          const matching = filteredPool.filter(matchesTopic);
+        if (topic.length >= 3) {
+          const matching = filteredPool.filter((card) =>
+            matchCatalogRequirement(card, topic).matched,
+          );
           if (matching.length === 0) {
             console.log(
               `[chat] ${ctx.shop} definition-question guard: customer asked "what is ${topic}?" ` +
-                `but 0 of ${filteredPool.length} card(s) mention "${topic}" in title/handle/description ` +
+                `but 0 of ${filteredPool.length} card(s) have catalog evidence for "${topic}" ` +
                 `— wiping pool (text-only answer)`,
             );
             filteredPool = [];

@@ -183,6 +183,7 @@ export function validateFollowUpSuggestion(suggestion, replyText) {
 //     as much as possible and lands on the latest category in the
 //     window — producing the wrong pairing.
 const REJECT_RE = /\b(?:no|don'?t[\s-]?(?:like|want|need|care\s+for|carry|have|do)|do\s+not\s+(?:like|want|need|care\s+for|carry|have|do)|doesn'?t[\s-]?(?:like|want|need|care\s+for|carry|have|do)|does\s+not\s+(?:like|want|need|care\s+for|carry|have|do)|didn'?t[\s-]?(?:like|want|need|care\s+for)|did\s+not\s+(?:like|want|need|care\s+for)|hate|hates|dislike|dislikes|avoid|avoids|avoiding|without|besides|other[\s-]?than|except[\s-]?for|except|instead[\s-]?of|rather[\s-]?than|not[\s-]?into|not[\s-]?a[\s-]?fan|not[\s-]?interested[\s-]?in)\b[^.!?,\n]{0,50}?\b((?:shoes?|footwear|orthotics?|insoles?|footbeds?|sandals?|sneakers?|boots?|clogs?|loafers?|slippers?|oxfords?|wedges?|heels?|flats|mules?|mary[\s-]?janes?|slip[\s-]?ons?))\b/gi;
+const FOLLOWING_REJECTED_CATEGORY_RE = /^\s*(?:,\s*|\b(?:and|or|nor)\b\s+)\b((?:shoes?|footwear|orthotics?|insoles?|footbeds?|sandals?|sneakers?|boots?|clogs?|loafers?|slippers?|oxfords?|wedges?|heels?|flats|mules?|mary[\s-]?janes?|slip[\s-]?ons?))\b/i;
 
 // Permissive context — when the captured category is preceded by
 // "any/all/some/every type/kind/sort of", the clause is INCLUDING
@@ -205,6 +206,14 @@ const FOOTWEAR_UMBRELLA_MEMBERS = [
 export function detectRejectedCategories(text) {
   const out = new Set();
   if (typeof text !== "string" || !text) return out;
+  const addRejected = (raw) => {
+    const term = String(raw || "").toLowerCase().replace(/\s+/g, " ").trim();
+    if (!term) return;
+    out.add(term);
+    if (term === "shoes" || term === "shoe" || term === "footwear") {
+      FOOTWEAR_UMBRELLA_MEMBERS.forEach((c) => out.add(c));
+    }
+  };
   REJECT_RE.lastIndex = 0;
   let m;
   while ((m = REJECT_RE.exec(text)) !== null) {
@@ -216,9 +225,18 @@ export function detectRejectedCategories(text) {
     const termStart = matchEnd - m[1].length;
     const before = text.substring(m.index, termStart);
     if (INCLUSIVE_CONTEXT_BEFORE_CATEGORY_RE.test(before)) continue;
-    out.add(term);
-    if (term === "shoes" || term === "shoe" || term === "footwear") {
-      FOOTWEAR_UMBRELLA_MEMBERS.forEach((c) => out.add(c));
+    addRejected(term);
+
+    // A single rejection clause can name several categories:
+    // "besides sneakers and sandals". The primary regex intentionally
+    // captures the first category; continue through conjunctions in the
+    // same clause so later categories cannot become positive constraints.
+    let cursor = m.index + m[0].length;
+    while (cursor < text.length) {
+      const next = text.slice(cursor).match(FOLLOWING_REJECTED_CATEGORY_RE);
+      if (!next) break;
+      addRejected(next[1]);
+      cursor += next[0].length;
     }
   }
   return out;

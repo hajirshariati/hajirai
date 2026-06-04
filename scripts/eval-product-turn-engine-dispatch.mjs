@@ -314,6 +314,7 @@ await test("D6b — 'which one had the removable insole' is NOT a compare-shape 
       title: "Carly Arch Support Sneaker - White Sparkle",
       handle: "carly-white-sparkle",
       productType: "Sneakers",
+      description: "A white sneaker with a removable insole.",
       attributes: { category: "Sneakers", gender: "Women", color: "White Sparkle" },
       price: "139.95",
     }),
@@ -331,7 +332,11 @@ await test("D6b — 'which one had the removable insole' is NOT a compare-shape 
     claimConfig: FIXTURE_CLAIM_CONFIG,
   });
   assert.ok(out && !out.decline, `ordinary product-finding 'which one had' must not decline as compare; got ${JSON.stringify(out?.diagnostics)}`);
-  assert.equal(out.products.length, 2);
+  assert.deepEqual(
+    out.products.map((product) => product.handle),
+    ["carly-white-sparkle"],
+    "only the product with catalog evidence for a removable insole should survive",
+  );
 });
 
 // ─── Decline path: turn missing a category still falls back ─────

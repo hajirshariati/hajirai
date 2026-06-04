@@ -39,6 +39,11 @@ import {
   familiesContainingColor,
 } from "./merchant-claim-config.server.js";
 import { detectStorefrontSearchModifier } from "./storefront-search-cta.server.js";
+import {
+  deriveCatalogRequirements,
+  filterByCatalogRequirements,
+  matchCatalogRequirement,
+} from "./catalog-query.server.js";
 
 // Flag — feature gate for production wiring. Read at engine entry
 // so flipping it at runtime (env update) takes effect without a
@@ -86,6 +91,7 @@ export async function runProductTurn(ctx = {}, options = {}) {
   // 1. Scope
   const scope = resolveTurnScope({
     latestUserMessage: ctx.latestUserMessage || "",
+    messages: ctx.messages || [],
     sessionMemory: ctx.sessionMemory || null,
     resolverState: ctx.resolverState || null,
     classifiedIntent: ctx.classifiedIntent || null,
@@ -118,29 +124,21 @@ export async function runProductTurn(ctx = {}, options = {}) {
   let rawCandidates = await options.searchFn(scope);
   diagnostics.rungs.push(`retrieved:${rawCandidates.length}`);
 
-  // 2b. Topic-term post-filter.
-  //
-  // When the customer asks about a specific brand/technology
-  // ("Which sandals have BioRocker?", "Do you have UltraSky shoes?"),
-  // the structured search returns category matches but doesn't know
-  // about brand vocabulary. Honor the customer's intent by keeping
-  // only the products whose title/handle/description literally
-  // mentions the topic term. Cards with no match disappear; an empty
-  // result is honest ("I couldn't find sandals with BioRocker"
-  // composer takes over). Normalization strips non-alphanumerics so
-  // "biorocker" matches "Bio Rocker", "BioRocker™", and "BioRocker".
-  if (scope.topicTerm) {
-    const topicKey = String(scope.topicTerm).toLowerCase().replace(/[^a-z0-9]/g, "");
-    if (topicKey.length >= 3) {
-      const matches = rawCandidates.filter((c) => {
-        const haystack = [
-          c?.title, c?.handle, c?._descriptionSnippet, c?.description,
-        ].filter(Boolean).join(" ").toLowerCase().replace(/[^a-z0-9]/g, "");
-        return haystack.includes(topicKey);
-      });
-      diagnostics.rungs.push(`topic_filter:${scope.topicTerm}=${matches.length}/${rawCandidates.length}`);
-      rawCandidates = matches;
-    }
+  // 2b. Verify concrete catalog requirements against canonical product
+  // evidence. This is vocabulary-agnostic: cork, memory foam, BioRocker,
+  // or a merchant-defined attribute all use the same evidence contract.
+  // SearchFn performs the same filter at source in production; keeping it
+  // here makes resolver candidates and injected test candidates obey it too.
+  if (scope.requiredCatalogTerms?.length > 0) {
+    const before = rawCandidates.length;
+    const requirementResult = filterByCatalogRequirements(
+      rawCandidates,
+      scope.requiredCatalogTerms,
+    );
+    rawCandidates = requirementResult.products;
+    diagnostics.rungs.push(
+      `catalog_requirements:${scope.requiredCatalogTerms.join("+")}=${rawCandidates.length}/${before}`,
+    );
   }
 
   // 3. Attach facts. Cards without _claimFacts after this step are
@@ -257,7 +255,7 @@ export async function runProductTurn(ctx = {}, options = {}) {
 // pivot/stale logic. The engine's job is to read the cleaned
 // memory and surface the scope it'll use for retrieval/selection,
 // not to redo that logic.
-export function resolveTurnScope({ latestUserMessage, sessionMemory, resolverState, classifiedIntent, claimConfig }) {
+export function resolveTurnScope({ latestUserMessage, messages = [], sessionMemory, resolverState, classifiedIntent, claimConfig }) {
   const explicit = sessionMemory?.explicit || {};
   const classified = classifiedIntent?.attributes || {};
   const matched = resolverState?.matched_constraints || {};
@@ -278,19 +276,9 @@ export function resolveTurnScope({ latestUserMessage, sessionMemory, resolverSta
     onSale: explicit.onSale === true || matched.onSale === true || inferredValue("onSale") === true,
     requestedClaim: null,
     namedProduct: explicit.specificProduct || matched.specificProduct || inferredValue("specificProduct"),
-    // Topic term: capitalized brand/technology name in the question
-    // ("BioRocker", "UltraSky", "Lynco", "P3"). Not in the structured
-    // schema, but customers ask "which X have Y?" all the time, and
-    // the engine has to scan descriptions for Y to answer honestly.
-    // Live trace 2026-06-04: customer clicked "Which sandals have
-    // BioRocker™ Technology?" — engine extracted category=sandals,
-    // built search query="sandals", returned 10 generic sandals.
-    // None of them had BioRocker. The token was dropped because the
-    // engine's queryParts builder only knows about the structured
-    // scope keys. Capturing it here lets the search query include
-    // it AND lets the engine post-filter results to products whose
-    // description literally contains the term.
-    topicTerm: extractTopicTerm(latestUserMessage),
+    requiredCatalogTerms: [],
+    catalogQuery: "",
+    catalogQueryContinuedFromPrior: false,
   };
 
   const latestModifier = detectStorefrontSearchModifier(scope.rawMessage);
@@ -344,6 +332,16 @@ export function resolveTurnScope({ latestUserMessage, sessionMemory, resolverSta
       }
     }
   }
+
+  const catalogRequirements = deriveCatalogRequirements({
+    latestUserMessage: scope.rawMessage,
+    messages,
+    scope,
+    claimConfig,
+  });
+  scope.requiredCatalogTerms = catalogRequirements.requiredTerms;
+  scope.catalogQuery = catalogRequirements.catalogQuery;
+  scope.catalogQueryContinuedFromPrior = catalogRequirements.continuedFromPrior;
 
   return scope;
 }
@@ -660,6 +658,14 @@ export function composeAnswer({ scope, selected, deferred, selectionReason, will
         cta: null,
       };
     }
+    if (scope?.requiredCatalogTerms?.length > 0) {
+      const requirement = scope.requiredCatalogTerms.join(" and ");
+      return {
+        text: `I couldn't find ${scopeLabel(scope, { fallback: "products" })} that explicitly mention ${requirement} in the current catalog. I can help you look at the closest alternatives instead.`,
+        reason: "empty_pool_catalog_requirement",
+        cta: null,
+      };
+    }
     return {
       text: `I couldn't find ${scopeLabel(scope, { fallback: "matching styles" })} in our current catalog. Try a different style or color?`,
       reason: "empty_pool",
@@ -680,48 +686,32 @@ export function composeAnswer({ scope, selected, deferred, selectionReason, will
     computeEffectiveLabelScope(scope, allCards),
     { fallback: "styles" },
   );
+  const leadFamily = selected[0] || deferred[0] || allFamilies[0];
+  const leadCard = leadFamily?.primary || leadFamily?.variants?.[0] || allCards[0];
+  const leadTitle = String(leadCard?.title || label).trim();
+  const leadReason = buildLeadRecommendationReason({
+    scope,
+    leadCard,
+    selectionReason,
+  });
 
-  // Sentence 1 — acknowledgment + WHY (combined).
-  // Built from verified-only signals; never invented.
-  //
-  // Singular grammar: when n=1 we use "Here's a matching" / "Here's
-  // one matching" instead of "I found one women's yellow sandals"
-  // (the noun "sandals" is inherently plural so "one … sandals"
-  // reads broken). Verb agreement follows.
-  const why = buildWhyClause({ scope, selected, deferred, selectionReason });
-  const isSingular = selectionReason === "proven_preferred"
-    || selectionReason === "all_proven"
-    ? selected.length === 1
-    : familyCount === 1;
-  const countWord = (n) => (n === 1 ? "one" : String(n));
   let sentence1;
   if (selectionReason === "closest_matches_no_proof") {
-    sentence1 = isSingular
-      ? `Here's the closest ${label} match I have${why ? ` — ${why}` : ""}.`
-      : `These ${label} are the closest matches I have${why ? ` — ${why}` : ""}.`;
-  } else if (selectionReason === "proven_preferred") {
-    const runnerUps = familyCount > selected.length
-      ? ` plus ${familyCount - selected.length} close runner-up${familyCount - selected.length > 1 ? "s" : ""}`
-      : "";
-    sentence1 = isSingular
-      ? `Here's a matching ${label} style${runnerUps}${why ? `, ${why}` : ""}.`
-      : `I found ${countWord(selected.length)} ${label} that match your request${runnerUps}${why ? `, ${why}` : ""}.`;
-  } else if (selectionReason === "all_proven") {
-    sentence1 = isSingular
-      ? `Here's a matching ${label} style${why ? `, ${why}` : ""}.`
-      : `I found ${countWord(selected.length)} ${label} that match your request${why ? `, ${why}` : ""}.`;
+    sentence1 = `These are the closest ${label} matches, but I can't verify every requested detail from the catalog.`;
   } else {
-    sentence1 = isSingular
-      ? `Here's a ${label} style${why ? ` — ${why}` : ""}.`
-      : `I found ${countWord(familyCount)} ${label}${why ? ` — ${why}` : ""}.`;
+    sentence1 = `I'd start with ${leadTitle}${leadReason ? ` because ${leadReason}` : ""}.`;
   }
 
-  // Sentence 2 was a "Tap a card / use the View All button" hint
-  // that read as boilerplate over every product turn. Customer
-  // feedback 2026-06-03: the cards and the View All button are
-  // already visible — narrating them just adds length without
-  // adding information. Keep the warm sentence 1 only.
-  const text = `${sentence1}`.replace(/\s{2,}/g, " ").trim();
+  let sentence2 = "";
+  if (familyCount > 1) {
+    sentence2 = selectionReason === "closest_matches_no_proof" || deferred.length > 0
+      ? "Compare the other options too, but check each card's details before choosing."
+      : `The other ${label} matches are good alternatives if you prefer their style, color, or fit.`;
+  } else if (willHaveCta) {
+    sentence2 = "Open the card for the full details, or use View All to keep browsing.";
+  }
+
+  const text = `${sentence1} ${sentence2}`.replace(/\s{2,}/g, " ").trim();
 
   return {
     text,
@@ -730,93 +720,46 @@ export function composeAnswer({ scope, selected, deferred, selectionReason, will
   };
 }
 
-// Build a short "why" clause used as a subordinate inside the
-// acknowledgment sentence. Returns "" when no honest claim can be
-// made. NEVER invents medical/comfort claims; uses only verified
-// per-card signals (claim coverage, sale, adjustable).
-function buildWhyClause({ scope, selected, deferred, selectionReason }) {
-  const all = [...selected, ...deferred];
-  const cards = familiesToCards(all);
-  if (cards.length === 0) return "";
+function buildLeadRecommendationReason({ scope, leadCard, selectionReason }) {
+  if (!leadCard || selectionReason === "closest_matches_no_proof") return "";
 
-  // Verified-only signals.
-  const allOnSale = cards.every((c) => c?._onSale === true);
-  const allArchSupport = cards.every((c) => c?._archSupport === true);
-  const allWaterFriendly = cards.every((c) => c?._waterFriendly === true);
-  const adjustableInTitle = cards.filter((c) => /\badjust/i.test(c?.title || "")).length;
-  const allAdjustable = adjustableInTitle === cards.length && cards.length >= 2;
-  const someAdjustable = adjustableInTitle > 0 && adjustableInTitle < cards.length;
-
-  // Build a SHORT clause (no leading capital, no trailing period)
-  // that can be embedded inside the acknowledgment sentence.
-  // Returns "" when no honest clause is available.
-  const clauses = [];
-
-  if (selectionReason === "closest_matches_no_proof") {
-    // Be honest. The requested claim isn't proven on any card.
-    if (scope.requestedClaim?.kind === "condition") {
-      clauses.push(`none are specifically tagged for ${humanizeCondition(scope.requestedClaim.tag)} — check card details before deciding`);
-    } else if (scope.requestedClaim?.kind === "archSupport") {
-      clauses.push(`arch-support details vary — open a card to confirm`);
-    } else if (scope.requestedClaim?.kind === "waterFriendly") {
-      clauses.push(`water-friendly details vary — open a card to confirm`);
-    } else if (scope.requestedClaim?.kind === "badge") {
-      clauses.push(`not all are tagged ${scope.requestedClaim.substring} — check card details before deciding`);
-    } else if (scope.requestedClaim?.kind === "onSale") {
-      clauses.push(`sale details vary — open a card to confirm`);
-    }
-  } else if (selectionReason === "proven_preferred" || selectionReason === "all_proven") {
-    if (scope.requestedClaim?.kind === "condition") {
-      clauses.push(`with verified ${humanizeCondition(scope.requestedClaim.tag)} support`);
-    } else if (scope.requestedClaim?.kind === "archSupport" && allArchSupport) {
-      clauses.push(`all with verified arch-support details`);
-    } else if (scope.requestedClaim?.kind === "waterFriendly" && allWaterFriendly) {
-      clauses.push(`all water-friendly`);
-    } else if (scope.requestedClaim?.kind === "widthCompat") {
-      // Honest framing: we filtered out the obvious mismatches but
-      // we can't promise wide-width availability per variant from
-      // here. Tell the customer to check sizing on the card.
-      const want = scope.requestedClaim.want === "wide" ? "wide" : "narrow";
-      clauses.push(`open a card to confirm ${want}-width sizing — these aren't tagged for the opposite width`);
-    } else if (scope.requestedClaim?.kind === "badge" && scope.requestedClaim.substring === "new") {
-      clauses.push(`tagged as new arrivals`);
-    } else if (scope.requestedClaim?.kind === "badge") {
-      clauses.push(`tagged ${scope.requestedClaim.substring}`);
-    } else if (scope.requestedClaim?.kind === "onSale" && allOnSale) {
-      // Live 2026-06-04: composer said "I found one ... sandals on
-      // sale, all currently on sale" — "all" reads wrong for n=1
-      // AND scope label already says "on sale" so the why-clause
-      // repeats. Skip when label already announces; respect
-      // singular when label doesn't.
-      const scopeAlreadySaysSale = scope.modifier === "sale" || scope.onSale;
-      if (!scopeAlreadySaysSale) {
-        clauses.push(cards.length === 1 ? `currently on sale` : `all currently on sale`);
-      }
-    }
+  const requirement = scope?.requiredCatalogTerms?.find((term) =>
+    matchCatalogRequirement(leadCard, term).matched,
+  );
+  if (requirement) {
+    const match = matchCatalogRequirement(leadCard, requirement);
+    const source = {
+      title: "its name",
+      description: "its product details",
+      tags: "its merchant tags",
+      attributes: "its product attributes",
+      variants: "its variant details",
+      enrichment: "its merchant enrichment data",
+      classification: "its catalog classification",
+    }[match.source] || "its catalog evidence";
+    return `${source} explicitly mentions ${requirement}`;
   }
 
-  // Generic sale mention — fires when sale wasn't the explicit claim
-  // but every card in the pool happens to be on sale. Same anti-
-  // duplication guard: skip when the scope label already announces it.
-  const scopeAlreadySaysSale = scope.modifier === "sale" || scope.onSale;
-  const alreadyMentionedSale = clauses.some((c) => /\bsale\b/i.test(c));
-  if (!scopeAlreadySaysSale && !alreadyMentionedSale) {
-    if (allOnSale && cards.length >= 2) {
-      clauses.push(`all currently on sale`);
-    } else if (allOnSale && cards.length === 1) {
-      clauses.push(`currently on sale`);
-    }
+  const claim = scope?.requestedClaim;
+  if (claim?.kind === "condition") {
+    return `it is specifically tagged for ${humanizeCondition(claim.tag)}`;
   }
-
-  if (allAdjustable) {
-    clauses.push(`with adjustable straps for easier fit control`);
-  } else if (someAdjustable && selectionReason !== "closest_matches_no_proof") {
-    clauses.push(`with adjustable options if you want easier fit control`);
+  if (claim?.kind === "archSupport" && leadCard?._archSupport === true) {
+    return "its catalog facts verify arch support";
   }
-
-  // Pick the strongest 1-2 clauses for the warm sentence; longer
-  // strings become unreadable.
-  return clauses.slice(0, 2).join(" and ");
+  if (claim?.kind === "waterFriendly" && leadCard?._waterFriendly === true) {
+    return "it is verified as water-friendly";
+  }
+  if (claim?.kind === "badge") {
+    return `it is tagged ${claim.substring}`;
+  }
+  if (claim?.kind === "onSale" && leadCard?._onSale === true) {
+    return "it is currently on sale";
+  }
+  if (claim?.kind === "widthCompat") {
+    return "it is not tagged for the opposite width";
+  }
+  return "it is the strongest catalog match for what you asked";
 }
 
 function humanizeCondition(tag) {
@@ -833,38 +776,6 @@ function humanizeCondition(tag) {
     heel_pain: "heel pain",
   };
   return map[tag] || String(tag || "").replace(/_/g, " ");
-}
-
-// Extract a brand/technology name from the customer's question.
-// Looks for CamelCase compound words ("BioRocker", "UltraSky"),
-// trademark-marked terms ("BioRocker™", "UltraSky®"), and short
-// all-caps product codes ("P3", "L1320"). Returns the bare term
-// (no trademark glyph) or null when nothing technology-shaped is
-// present. Stop-word safe: common capitalized words at sentence
-// start (What, Which, Show, Tell, Do, Is, How) don't qualify.
-const TOPIC_STOP_WORDS = new Set([
-  "what", "which", "show", "tell", "do", "is", "are", "how",
-  "the", "a", "an", "this", "these", "those", "all", "any",
-  "for", "with", "and", "or", "but", "your", "my", "me",
-]);
-export function extractTopicTerm(message) {
-  const msg = String(message || "");
-  if (!msg) return null;
-  // Trademark-marked term wins over plain CamelCase ("BioRocker™"
-  // is clearly a brand, "BioRocker" alone is also a brand but the
-  // mark is a strong tell).
-  const tmMatch = msg.match(/\b([A-Za-z][\w'-]{2,30})\s*(?:™|®|℠)/);
-  if (tmMatch) return tmMatch[1];
-  // CamelCase compound: "BioRocker", "UltraSky", "EngineeredComfort".
-  // At least one internal lowercase→uppercase transition.
-  const camelMatch = msg.match(/\b([A-Z][a-z]+(?:[A-Z][a-z]+)+)\b/);
-  if (camelMatch && !TOPIC_STOP_WORDS.has(camelMatch[1].toLowerCase())) {
-    return camelMatch[1];
-  }
-  // Product code: "P3", "L1320", "EW8600" — uppercase + digits.
-  const codeMatch = msg.match(/\b([A-Z]{1,3}\d{1,4}[A-Z]?)\b/);
-  if (codeMatch) return codeMatch[1];
-  return null;
 }
 
 function scopeLabel(scope, { fallback = "styles" } = {}) {

@@ -538,6 +538,16 @@ function matchLex(text, lex) {
   return null;
 }
 
+function matchLexWhere(text, lex, predicate) {
+  if (!text) return null;
+  const lc = String(text).toLowerCase();
+  for (const [key, canonical] of Object.entries(lex)) {
+    const re = new RegExp(`(?:^|[^a-z])${key.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?:[^a-z]|$)`, "i");
+    if (re.test(lc) && predicate(canonical, key)) return canonical;
+  }
+  return null;
+}
+
 // Stem-aware membership test against the rejected-category set
 // produced by detectRejectedCategories. The detector's output uses
 // the customer's own surface form (e.g. "sneakers"), the canonical
@@ -646,8 +656,12 @@ export function extractUserConstraints(message) {
   // category whose canonical form (or its singular/plural stem)
   // appears in that set.
   const rejected = detectRejectedCategories(message);
-  const category = matchLex(message, RESOLVER_CATEGORY_LEX);
-  if (category && !categoryIsRejected(category, rejected)) {
+  const category = matchLexWhere(
+    message,
+    RESOLVER_CATEGORY_LEX,
+    (canonical) => !categoryIsRejected(canonical, rejected),
+  );
+  if (category) {
     out.category = category;
   }
   const color = pickCustomerColor(message);

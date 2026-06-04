@@ -31,7 +31,10 @@ import {
   productMatchesVariantScope,
   variantScopedPriceValues,
 } from "./chat-tool-variant-helpers.server.js";
-import { extractTopicTerm } from "./product-turn-engine.server.js";
+import {
+  filterByCatalogRequirements,
+  normalizeCatalogText,
+} from "./catalog-query.server.js";
 
 // Re-export tool schemas so existing imports
 //   import { TOOLS } from "../lib/chat-tools.server"
@@ -317,9 +320,7 @@ const GENDERED_SEARCH = {
 };
 
 function extractKeywords(q) {
-  return q
-    .toLowerCase()
-    .replace(/['']/g, "")
+  return normalizeCatalogText(q)
     .split(/\s+/)
     .filter((w) => w.length > 1 && !STOP_WORDS.has(w))
     .map((w) => POSSESSIVE_STRIP[w] || w);
@@ -620,7 +621,7 @@ function genderFilterClause(gender) {
 }
 
 async function searchProducts(
-  { query, limit, filters, priceMax, priceMin, onSale },
+  { query, limit, filters, priceMax, priceMin, onSale, requiredTerms },
   { shop, deduplicateColors, sessionGender, categoryExclusions, querySynonyms, conversationText, userText, latestUserMessage, shopConfig, activeCategoryGroup, merchantGroups, categoryGenderMap }
 ) {
   const q = String(query || "").trim();
@@ -1210,49 +1211,27 @@ const isExcludedByRule = (p) => {
   }
 
   let filtered = tieredScored.map((x) => x.product);
+  let catalogRequirementMatches = new Map();
 
-  // Topic-term hard filter at the search source. When the customer's
-  // message names a brand / technology / product code (CamelCase like
-  // "BioRocker", trademark-marked like "UltraSky™", or short codes
-  // like "P3"), every result MUST literally reference that term in
-  // its title or description. Semantic similarity is helpful when the
-  // customer described an attribute ("comfortable", "wide"), but for
-  // a NAMED entity it produces false friends — embedding lookup for
-  // "BioRocker" surfaces other sneakers because the term reads
-  // sneaker-shaped, even when those products have nothing to do with
-  // the actual technology. Filtering at the source removes the need
-  // for downstream named-product mismatch guards / definition-question
-  // guards / display-boundary fallbacks to clean it up later.
-  // Source precedence: customer's literal current message first, then
-  // the raw AI query (preserves CamelCase when the AI echoes the
-  // brand), then the broader user/conversation history. The history
-  // fallback catches the case where the customer clicked a follow-up
-  // chip whose text doesn't repeat the brand name ("any other styles
-  // besides sneakers that use this technology?") but a prior turn
-  // established the topic ("BioRocker").
-  const topicTerm =
-    extractTopicTerm(latestUserMessage) ||
-    extractTopicTerm(q) ||
-    extractTopicTerm(userText) ||
-    extractTopicTerm(conversationText);
-  if (topicTerm) {
-    const topicKey = String(topicTerm).toLowerCase().replace(/[^a-z0-9]/g, "");
-    if (topicKey.length >= 3) {
-      const beforeTopic = filtered.length;
-      filtered = filtered.filter((p) => {
-        const haystack = [p?.title, p?.handle, p?.description]
-          .filter(Boolean)
-          .join(" ")
-          .toLowerCase()
-          .replace(/[^a-z0-9]/g, "");
-        return haystack.includes(topicKey);
-      });
-      if (filtered.length !== beforeTopic) {
-        console.log(
-          `[search]   topic filter: term="${topicTerm}" kept=${filtered.length}/${beforeTopic} (literal title/description match required)`,
-        );
-      }
-    }
+  // Concrete catalog requirements are verified against one canonical
+  // evidence document: title, description, tags, product attributes,
+  // variant attributes, and classification. This replaces the old
+  // CamelCase-only topic filter and never scans the whole conversation
+  // for stale terms.
+  const wantedCatalogTerms = Array.from(new Set(
+    (Array.isArray(requiredTerms) ? requiredTerms : [])
+      .map((term) => String(term || "").trim())
+      .filter(Boolean),
+  ));
+  if (wantedCatalogTerms.length > 0) {
+    const beforeRequirements = filtered.length;
+    const requirementResult = filterByCatalogRequirements(filtered, wantedCatalogTerms);
+    filtered = requirementResult.products;
+    catalogRequirementMatches = requirementResult.matches;
+    console.log(
+      `[search]   catalog requirements: terms="${wantedCatalogTerms.join(" | ")}" ` +
+        `kept=${filtered.length}/${beforeRequirements}`,
+    );
   }
 
   if (attrKeys.length > 0) {
@@ -1504,7 +1483,10 @@ const isExcludedByRule = (p) => {
       productType: p.productType || undefined,
       tags: p.tags?.length ? p.tags : undefined,
       attributes: p.attributesJson || undefined,
+      description: p.description || undefined,
       descriptionSnippet: descriptionSnippet(p.description, q, 280),
+      catalogRequirementEvidence: catalogRequirementMatches.get(p.handle) || undefined,
+      requiredCatalogTerms: wantedCatalogTerms.length ? wantedCatalogTerms : undefined,
       priceRange: priceRange(availableVariantsForScope(p, variantScope)),
       variantCount: (p.variants || []).length,
       variantFacts: productVariantFacts(p, styleColorFacts),
@@ -2524,7 +2506,13 @@ export function extractProductCards(name, result, ctx = null) {
       image: p.image || "",
       price_formatted: p.priceRange || (p.price ? `$${parseFloat(p.price).toFixed(2)}` : ""),
       compare_at_price: p.compareAtPrice ? Math.round(parseFloat(p.compareAtPrice) * 100) : undefined,
+      _description: p.description || "",
       _descriptionSnippet: p.descriptionSnippet || "",
+      _tags: p.tags || [],
+      _vendor: p.vendor || "",
+      _productType: p.productType || "",
+      _catalogRequirementEvidence: p.catalogRequirementEvidence || [],
+      _requiredCatalogTerms: p.requiredCatalogTerms || [],
       _searchQuery: query,
       _category: categoryFromAttrs(p),
       _gender: genderFromAttrs(p),
@@ -2544,7 +2532,11 @@ export function extractProductCards(name, result, ctx = null) {
       image: p.image || "",
       price_formatted: p.priceRange || (p.price ? `$${parseFloat(p.price).toFixed(2)}` : ""),
       compare_at_price: p.compareAtPrice ? Math.round(parseFloat(p.compareAtPrice) * 100) : undefined,
-      _descriptionSnippet: "",
+      _description: p.description || "",
+      _descriptionSnippet: p.descriptionSnippet || "",
+      _tags: p.tags || [],
+      _vendor: p.vendor || "",
+      _productType: p.productType || "",
       _searchQuery: refTitle,
       _category: categoryFromAttrs(p),
       _gender: genderFromAttrs(p),
@@ -2561,6 +2553,11 @@ export function extractProductCards(name, result, ctx = null) {
       image: result.image || "",
       price_formatted: result.priceRange || (result.price ? `$${parseFloat(result.price).toFixed(2)}` : ""),
       compare_at_price: result.compareAtPrice ? Math.round(parseFloat(result.compareAtPrice) * 100) : undefined,
+      _description: result.description || "",
+      _descriptionSnippet: result.descriptionSnippet || "",
+      _tags: result.tags || [],
+      _vendor: result.vendor || "",
+      _productType: result.productType || "",
       _category: categoryFromAttrs(result),
       _gender: genderFromAttrs(result),
       _attributes: result.attributes || {},
@@ -2584,6 +2581,10 @@ export function extractProductCards(name, result, ctx = null) {
           image: f.image || "",
           price_formatted: f.price ? `$${parseFloat(f.price).toFixed(2)}` : "",
           compare_at_price: f.compareAtPrice ? Math.round(parseFloat(f.compareAtPrice) * 100) : undefined,
+          _description: f.productDescription || "",
+          _tags: f.productTags || [],
+          _vendor: f.vendor || "",
+          _productType: f.productType || "",
           _category: categoryFromAttrs({ attributes: f.productAttributes, productType: f.productType }),
           _gender: genderFromAttrs({ attributes: f.productAttributes }),
           _attributes: f.productAttributes || {},
@@ -2608,6 +2609,11 @@ export function extractProductCards(name, result, ctx = null) {
       image: p.image || "",
       price_formatted: p.price ? `$${parseFloat(p.price).toFixed(2)}` : "",
       compare_at_price: p.compareAtPrice ? Math.round(parseFloat(p.compareAtPrice) * 100) : undefined,
+      _description: p.description || "",
+      _descriptionSnippet: p.descriptionSnippet || "",
+      _tags: p.tags || [],
+      _vendor: p.vendor || "",
+      _productType: p.productType || "",
       _category: categoryFromAttrs(p),
       _gender: genderFromAttrs(p),
       _attributes: p.attributes || {},

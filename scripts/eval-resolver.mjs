@@ -101,6 +101,11 @@ await test("R0d — 'pink dress shoes' keeps the color because 'dress' is the oc
   assert.equal(extractUserConstraints("pink dress shoes").color, "pink");
 });
 
+await test("R0e — rejected categories never become the positive category", () => {
+  const out = extractUserConstraints("anything besides sneakers and sandals — show me boots");
+  assert.equal(out.category, "boots");
+});
+
 await test("R1 — navy color infers men's, gender goes in do_not_ask", async () => {
   const facetIndex = {
     categoryByGender: { sneakers: ["men", "women"], sandals: ["women"] },

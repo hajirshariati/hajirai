@@ -320,6 +320,14 @@ test("'something other than sneakers' → {sneakers}", () => {
   assert(r.has("sneakers"));
 });
 
+test("'anything besides sneakers and sandals' → rejects both categories", () => {
+  const r = detectRejectedCategories("anything besides sneakers and sandals");
+  assert(
+    r.has("sneakers") && r.has("sandals"),
+    `expected sneakers and sandals, got ${[...r].join(",")}`,
+  );
+});
+
 test("'is not good for flat feet' → empty (evaluation phrase, NOT rejection)", () => {
   // Production false-positive: "but L2305 is not good for flat feet"
   // was adding "flat" and "orthotic" to rejectedCategories. Tighten
