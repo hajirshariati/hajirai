@@ -130,6 +130,7 @@ export function catalogScopedNavigationQuestionVerdict({
   question = "",
   choice = {},
   constraints = {},
+  impossibleConstraints = [],
   facetIndex = null,
   allowedCategories = [],
   requireProof = false,
@@ -149,6 +150,27 @@ export function catalogScopedNavigationQuestionVerdict({
       question,
       choice: facetChoice,
       effectiveConstraints,
+    };
+  }
+
+  const repeatedImpossible = (Array.isArray(impossibleConstraints) ? impossibleConstraints : [])
+    .map((constraint) => {
+      const field = String(constraint?.field || "");
+      if (!["gender", "category", "color"].includes(field)) return null;
+      const canonical = canonicalizeCatalogConstraints({ [field]: constraint?.value });
+      return canonical[field] && effectiveConstraints[field] === canonical[field]
+        ? { field, value: canonical[field] }
+        : null;
+    })
+    .find(Boolean);
+  if (repeatedImpossible) {
+    return {
+      possible: false,
+      reason: "repeats_resolver_impossible_constraint",
+      question,
+      choice: facetChoice,
+      effectiveConstraints,
+      impossibleConstraint: repeatedImpossible,
     };
   }
 

@@ -431,6 +431,7 @@ function catalogGroundedSuggestionVerdict(question, ctx = {}) {
     question,
     choice,
     constraints: current,
+    impossibleConstraints: ctx.resolverState?.impossible_constraints || [],
     facetIndex: ctx.catalogFacetIndex,
     allowedCategories: allowedCatalogCategoriesFromContext(ctx),
     requireProof: resolverRequiresCatalogProof(ctx),

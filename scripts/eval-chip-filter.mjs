@@ -321,6 +321,50 @@ await test("C15 — exact no-match product navigation fails closed without catal
   assert.equal(out.reason, "catalog_proof_required");
 });
 
+await test("C16 — suggestions cannot resurrect a resolver-proven impossible constraint", () => {
+  const common = {
+    constraints: { gender: "men", color: "pink" },
+    impossibleConstraints: [{ field: "color", value: "pink" }],
+    // Deliberately contradictory/stale proof: resolver verdict must still win.
+    facetIndex: {
+      categoryByGender: { sneakers: ["men"] },
+      colorByGenderCategory: { "men:sneakers": ["pink", "black"] },
+    },
+    requireProof: true,
+  };
+
+  const repeated = catalogScopedNavigationQuestionVerdict({
+    ...common,
+    question: "Do you have pink sneakers?",
+    choice: { category: "sneakers", color: "pink" },
+  });
+  const changed = catalogScopedNavigationQuestionVerdict({
+    ...common,
+    question: "Do you have black sneakers?",
+    choice: { category: "sneakers", color: "black" },
+  });
+
+  assert.equal(repeated.possible, false);
+  assert.equal(repeated.reason, "repeats_resolver_impossible_constraint");
+  assert.deepEqual(repeated.impossibleConstraint, { field: "color", value: "pink" });
+  assert.equal(changed.possible, true);
+  assert.equal(changed.reason, "catalog_match");
+});
+
+await test("C17 — resolver impossibility does not suppress unrelated follow-up questions", () => {
+  const out = catalogScopedNavigationQuestionVerdict({
+    question: "Would you like help choosing a size?",
+    choice: {},
+    constraints: { gender: "men", color: "pink" },
+    impossibleConstraints: [{ field: "color", value: "pink" }],
+    facetIndex: null,
+    requireProof: true,
+  });
+
+  assert.equal(out.possible, true);
+  assert.equal(out.reason, "not_product_navigation");
+});
+
 // ──────────────────────────────────────────────────────────────
 console.log("");
 if (failed === 0) {
