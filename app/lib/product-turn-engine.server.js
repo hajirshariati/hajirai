@@ -371,6 +371,8 @@ function engineWantsThisTurn(scope, resolverState = null) {
   // products after an unverified/empty search.
   if (
     !scope.category
+    && !scope.color
+    && !scope.colorFamily
     && !scope.badge
     && !scope.onSale
     && !scope.modifier

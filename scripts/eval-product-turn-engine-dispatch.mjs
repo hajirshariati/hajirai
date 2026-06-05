@@ -354,6 +354,36 @@ await test("D7 — bare 'show me shoes' (no category resolved yet) DECLINES so t
   assert.ok(out.decline);
 });
 
+await test("D7a — color-only shopping scope is engine-owned, not legacy-agent owned", async () => {
+  let receivedScope = null;
+  const out = await runProductTurn({
+    ...ctxBase,
+    latestUserMessage: "i need pink shoes",
+    sessionMemory: { explicit: { gender: "women", color: "pink" }, inferred: {} },
+  }, {
+    forceEnable: true,
+    searchFn: async (scope) => {
+      receivedScope = scope;
+      return [
+        uiCandidate({
+          title: "Emily Lace-Up Sneaker - Peach",
+          handle: "emily-peach",
+          productType: "Sneakers",
+          attributes: { category: "Sneakers", gender: "Women", color_family: "pink" },
+        }),
+      ];
+    },
+    claimConfig: FIXTURE_CLAIM_CONFIG,
+  });
+  assert.ok(out && !out.decline,
+    `color-only product request must be handled by engine; got ${JSON.stringify(out?.diagnostics)}`);
+  assert.equal(receivedScope?.color, "pink");
+  assert.equal(receivedScope?.category || "", "");
+  assert.deepEqual(out.products.map((product) => product.handle), ["emily-peach"]);
+  assert.equal(out.cta?.color, "pink");
+  assert.equal(out.cta?.gender, "women");
+});
+
 await test("D7b — category-less technology definition is owned by the engine and keeps only proven cards", async () => {
   const out = await runProductTurn({
     ...ctxBase,
