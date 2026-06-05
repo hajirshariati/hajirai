@@ -402,6 +402,25 @@ await test("D7aa — broad shoe request with no gender asks only catalog-backed 
   assert.ok(!out.choices.includes("Kids"), "must not offer Kids unless kids footwear exists in the catalog");
 });
 
+await test("D7aaa — 'I need new shoes' clarifies broad footwear, not new-arrivals or orthotics", async () => {
+  const out = await runProductTurn({
+    ...BROWSE_CTX,
+    latestUserMessage: "i need new shoes",
+    sessionMemory: { explicit: {}, inferred: {} },
+  }, {
+    forceEnable: true,
+    searchFn: async () => {
+      throw new Error("clarifier should not search before gender/category is known");
+    },
+    claimConfig: FIXTURE_CLAIM_CONFIG,
+  });
+  assert.ok(out && !out.decline, `engine should own vague first-turn footwear requests; got ${JSON.stringify(out?.diagnostics)}`);
+  assert.equal(out.products.length, 0);
+  assert.deepEqual(out.choices, ["Men's", "Women's"]);
+  assert.ok(!out.choices.includes("Kids"), "must not offer kids shoes unless kids footwear exists");
+  assert.ok(!out.answerText.toLowerCase().includes("orthotic"), "vague shoes request must not pivot to orthotics");
+});
+
 await test("D7ab — generic product browse can ask top-level merchant groups from catalog evidence", async () => {
   const out = await runProductTurn({
     ...BROWSE_CTX,

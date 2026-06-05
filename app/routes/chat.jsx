@@ -74,6 +74,7 @@ import {
   scoreCardAgainstText,
   skusFromCardText,
   stripMissingSkus,
+  isDirectProductFactQuestion,
   titleStyleFamily,
   detectNamedProductMismatch,
   validateTurnResult,
@@ -211,6 +212,7 @@ function compactHistoryProducts(products) {
       _category: p._category || p.category || p.productType || "",
       gender: p.gender || p._gender || "",
       _gender: p._gender || p.gender || "",
+      _variantFacts: p._variantFacts || p.variantFacts || {},
     }))
     .filter((p) => p.handle || p.title);
 }
@@ -676,6 +678,96 @@ async function runProductTurnDispatch({ ctx, controller, encoder, claimConfig })
   };
 }
 
+function isColorFactFollowUp(text = "") {
+  return /\b(?:other|more|different|available|come(?:s)?\s+in|colors?|colou?rs?|colorways?)\b/i.test(String(text || ""));
+}
+
+function variantColorsFromCards(cards = []) {
+  const seen = new Set();
+  const out = [];
+  const add = (value) => {
+    const display = String(value || "").trim();
+    if (!display) return;
+    const key = display.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+    if (!key || seen.has(key)) return;
+    seen.add(key);
+    out.push(display);
+  };
+  for (const card of Array.isArray(cards) ? cards : []) {
+    const facts = card?._variantFacts || card?.variantFacts || {};
+    for (const color of facts.availableColors || []) add(color);
+    for (const color of facts.styleAvailableColors || []) add(color);
+    const attrColor = card?._attributes?.Color || card?._attributes?.color || card?.color;
+    if (attrColor) add(attrColor);
+  }
+  return out;
+}
+
+function displayList(values = [], max = 6) {
+  const list = values.filter(Boolean).slice(0, max);
+  if (list.length === 0) return "";
+  if (list.length === 1) return list[0];
+  if (list.length === 2) return `${list[0]} and ${list[1]}`;
+  return `${list.slice(0, -1).join(", ")}, and ${list[list.length - 1]}`;
+}
+
+async function runVariantFactDispatch({ ctx, controller, encoder }) {
+  const enabled = String(process.env.PRODUCT_TURN_ENGINE_ENABLED || "").toLowerCase() === "true";
+  if (!enabled) return null;
+  const latest = String(ctx?.latestUserMessage || "");
+  if (!isDirectProductFactQuestion(latest) || !isColorFactFollowUp(latest)) return null;
+
+  let cards = Array.isArray(ctx?.priorProductCards) ? ctx.priorProductCards : [];
+  let usedSearch = false;
+  if (variantColorsFromCards(cards).length === 0) {
+    const scoped = scopedProductSearchInput(ctx);
+    const hasScope = Boolean(scoped.scope.gender || scoped.scope.category || scoped.scope.color);
+    if (!hasScope) return null;
+    const searchInput = {
+      ...scoped.input,
+      limit: Math.max(ctx?.productCardCap || 6, 6),
+    };
+    try {
+      const result = await dispatchTool("search_products", searchInput, ctx);
+      cards = extractProductCards("search_products", result, ctx);
+      usedSearch = true;
+    } catch (err) {
+      console.warn(`[variant-facts] search failed: ${err?.message || err}`);
+      return null;
+    }
+  }
+
+  const colors = variantColorsFromCards(cards);
+  if (colors.length === 0) return null;
+
+  const currentColor = String(currentCatalogScopeFromContext(ctx).color || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+  const otherColors = currentColor
+    ? colors.filter((c) => c.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim() !== currentColor)
+    : colors;
+  const scope = currentCatalogScopeFromContext(ctx);
+  const base = [
+    scope.gender === "men" ? "men's" : scope.gender === "women" ? "women's" : scope.gender === "kids" ? "kids'" : "",
+    scope.category ? String(scope.category).replace(/-/g, " ") : "styles",
+  ].filter(Boolean).join(" ");
+  const shown = displayList(otherColors.length > 0 ? otherColors : colors);
+  const text = otherColors.length > 0
+    ? `Yes — the ${base || "styles"} I found also come in ${shown}. Open a card to choose the exact style and color.`
+    : `I'm only seeing ${shown} in the current ${base || "style"} results. Open a card to confirm live size and color availability.`;
+
+  controller.enqueue(encoder.encode(sseChunk({ type: "text", text })));
+  controller.enqueue(encoder.encode(sseChunk({ type: "products", products: cards.slice(0, ctx?.productCardCap || 6) })));
+  controller.enqueue(encoder.encode(sseChunk({ type: "done" })));
+  return {
+    handled: true,
+    answerText: text,
+    products: cards,
+    diagnostics: { usedSearch, colors: colors.length, otherColors: otherColors.length },
+  };
+}
+
 // Convert the engine's structured CTA object into a widget-
 // renderable {url, label} pair. Returns null when no CTA is
 // emittable. Reuses merchant-admin pattern + overrides via
@@ -1028,8 +1120,21 @@ function lastAssistantContent(history) {
 
 function shouldSoftBrowseRefine(latestMessage, history) {
   const latest = String(latestMessage || "");
-  if (!/\b(?:cheap|cheaper|under|below|less\s+than|sale|deals?|discount)\b/i.test(latest)) return false;
   const previous = lastAssistantContent(history);
+  const previousAskedBroadClarifier =
+    /\bwhich styles would you like to browse\b/i.test(previous) ||
+    /\bare you shopping for men's or women's\b/i.test(previous) ||
+    /\bwhat type of\b/i.test(previous) ||
+    /\bwhat kind of\b/i.test(previous);
+
+  if (
+    previousAskedBroadClarifier &&
+    /\b(?:not\s+sure|don'?t\s+know|do\s+not\s+know|no\s+idea|anything|any\s+style|whatever|surprise\s+me|you\s+choose|browse|options?|gift|wedding|occasion|event|work|office|walking|travel|trip)\b/i.test(latest)
+  ) {
+    return true;
+  }
+
+  if (!/\b(?:cheap|cheaper|under|below|less\s+than|sale|deals?|discount)\b/i.test(latest)) return false;
   return /\bnarrow by men's, women's, style, color, or price\b/i.test(previous) ||
     /\bhere are (?:a few|popular|sale|comfort-focused|styles under \$\d+)/i.test(previous);
 }
@@ -3852,9 +3957,29 @@ export const action = async ({ request }) => {
           // retrievedChunks for this request). Engine declines
           // and falls through if no policy intent is detected.
           // ──────────────────────────────────────────────────────────
-          const policyResult = await runPolicyTurnDispatch({
-            ctx, controller, encoder, retrievedChunks, anthropic,
+          const variantFactResult = await runVariantFactDispatch({
+            ctx, controller, encoder,
           });
+          if (variantFactResult && variantFactResult.handled) {
+            console.log(`[router] ${ctx.shop} final_path=variant_fact_engine`);
+            console.log(
+              `[variant-facts] handled shop=${ctx.shop} ` +
+                `usedSearch=${variantFactResult.diagnostics?.usedSearch ? "yes" : "no"} ` +
+                `colors=${variantFactResult.diagnostics?.colors || 0} ` +
+                `otherColors=${variantFactResult.diagnostics?.otherColors || 0} ` +
+                `textLen=${variantFactResult.answerText?.length || 0}`,
+            );
+            return;
+          }
+
+          const compoundPolicyProduct = isCompoundPolicyProductQuestion(body.message);
+          const directProductFact = isDirectProductFactQuestion(body.message);
+
+          const policyResult = compoundPolicyProduct
+            ? null
+            : await runPolicyTurnDispatch({
+                ctx, controller, encoder, retrievedChunks, anthropic,
+              });
           if (policyResult && policyResult.handled) {
             // final_path log overrides any earlier "final_path=llm"
             // line — the router logs that before dispatcher runs.
@@ -3898,9 +4023,11 @@ export const action = async ({ request }) => {
             return; // exact catalog no-match emitted text/products(empty)/done.
           }
 
-          const engineResult = await runProductTurnDispatch({
-            ctx, controller, encoder, claimConfig,
-          });
+          const engineResult = (compoundPolicyProduct || directProductFact)
+            ? { declined: true, diagnostics: { rungs: [compoundPolicyProduct ? "declined:compound_policy_product" : "declined:direct_product_fact"] } }
+            : await runProductTurnDispatch({
+                ctx, controller, encoder, claimConfig,
+              });
           if (engineResult && engineResult.handled) {
             console.log(`[router] ${ctx.shop} final_path=product_engine`);
             console.log(

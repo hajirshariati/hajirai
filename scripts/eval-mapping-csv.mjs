@@ -42,7 +42,7 @@ test("empty array → header-only CSV", () => {
 
 test("single row serializes correctly", () => {
   const csv = serializeMasterIndexToCsv([
-    { masterSku: "L100M", title: "Mens Dress", gender: "Men", useCase: "dress",
+    { masterSku: "L100M", title: "Mens Dress", gender: "Men", useCase: "dress_no_removable",
       arch: "Medium / High Arch", posted: false, metSupport: false },
   ]);
   const lines = csv.trim().split("\n");
@@ -50,12 +50,12 @@ test("single row serializes correctly", () => {
   // "Medium / High Arch" has slashes but no comma/quote/newline, so it
   // doesn't need RFC-4180 quoting. Excel and Sheets both parse it
   // correctly unquoted.
-  assert.equal(lines[1], `L100M,Mens Dress,Men,dress,Medium / High Arch,FALSE,FALSE`);
+  assert.equal(lines[1], `L100M,Mens Dress,Men,dress_no_removable,Medium / High Arch,FALSE,FALSE`);
 });
 
 test("title with comma is quoted", () => {
   const csv = serializeMasterIndexToCsv([
-    { masterSku: "X", title: "A, B", gender: "Men", useCase: "casual",
+    { masterSku: "X", title: "A, B", gender: "Men", useCase: "comfort_walking_everyday",
       arch: "", posted: false, metSupport: false },
   ]);
   assert(csv.includes(`"A, B"`));
@@ -63,7 +63,7 @@ test("title with comma is quoted", () => {
 
 test("title with quote escapes correctly", () => {
   const csv = serializeMasterIndexToCsv([
-    { masterSku: "X", title: 'He said "hi"', gender: "Men", useCase: "casual",
+    { masterSku: "X", title: 'He said "hi"', gender: "Men", useCase: "comfort_walking_everyday",
       arch: "", posted: false, metSupport: false },
   ]);
   assert(csv.includes(`"He said ""hi"""`));
@@ -71,7 +71,7 @@ test("title with quote escapes correctly", () => {
 
 test("posted=true → 'TRUE'", () => {
   const csv = serializeMasterIndexToCsv([
-    { masterSku: "X", title: "T", gender: "Men", useCase: "casual",
+    { masterSku: "X", title: "T", gender: "Men", useCase: "comfort_walking_everyday",
       arch: "Flat / Low Arch", posted: true, metSupport: false },
   ]);
   assert(csv.includes(",TRUE,"));
@@ -83,11 +83,11 @@ section("parseCsvToMasterIndex — happy path");
 
 test("round-trip: serialize → parse → identical", () => {
   const original = [
-    { masterSku: "L100M", title: "Mens Dress", gender: "Men", useCase: "dress",
+    { masterSku: "L100M", title: "Mens Dress", gender: "Men", useCase: "dress_no_removable",
       arch: "Medium / High Arch", posted: false, metSupport: false },
-    { masterSku: "L600W", title: "Womens Casual W/ Met", gender: "Women", useCase: "casual",
+    { masterSku: "L600W", title: "Womens Casual W/ Met", gender: "Women", useCase: "comfort_walking_everyday",
       arch: "Flat / Low Arch", posted: true, metSupport: true },
-    { masterSku: "A100M", title: "Aetrex Mens InStyle", gender: "Men", useCase: "dress",
+    { masterSku: "A100M", title: "Aetrex Mens InStyle", gender: "Men", useCase: "dress_no_removable",
       arch: "", posted: false, metSupport: false },
   ];
   const csv = serializeMasterIndexToCsv(original);
@@ -99,7 +99,7 @@ test("round-trip: serialize → parse → identical", () => {
 test("CRLF line endings parse correctly", () => {
   const csv =
     "masterSku,title,gender,useCase,arch,posted,metSupport\r\n" +
-    "X,Test,Men,casual,,FALSE,FALSE\r\n";
+    "X,Test,Men,comfort_walking_everyday,,FALSE,FALSE\r\n";
   const r = parseCsvToMasterIndex(csv);
   assert(r.ok);
   assert.equal(r.masterIndex.length, 1);
@@ -108,7 +108,7 @@ test("CRLF line endings parse correctly", () => {
 test("trailing blank lines are ignored", () => {
   const csv =
     "masterSku,title,gender,useCase,arch,posted,metSupport\n" +
-    "X,T,Men,casual,,FALSE,FALSE\n" +
+    "X,T,Men,comfort_walking_everyday,,FALSE,FALSE\n" +
     "\n\n\n";
   const r = parseCsvToMasterIndex(csv);
   assert(r.ok);
@@ -118,9 +118,9 @@ test("trailing blank lines are ignored", () => {
 test("yes/no/1/0 boolean variants accepted", () => {
   const csv =
     "masterSku,title,gender,useCase,arch,posted,metSupport\n" +
-    "A,A,Men,casual,,yes,no\n" +
-    "B,B,Men,casual,,1,0\n" +
-    "C,C,Men,casual,,Y,N\n";
+    "A,A,Men,comfort_walking_everyday,,yes,no\n" +
+    "B,B,Men,comfort_walking_everyday,,1,0\n" +
+    "C,C,Men,comfort_walking_everyday,,Y,N\n";
   const r = parseCsvToMasterIndex(csv);
   assert(r.ok, (r.errors || []).join("; "));
   assert.equal(r.masterIndex[0].posted, true);
@@ -140,14 +140,14 @@ test("empty CSV → error", () => {
 });
 
 test("missing column header → error", () => {
-  const csv = "masterSku,title,gender,useCase,arch,posted\nX,T,Men,casual,,FALSE\n";
+  const csv = "masterSku,title,gender,useCase,arch,posted\nX,T,Men,comfort_walking_everyday,,FALSE\n";
   const r = parseCsvToMasterIndex(csv);
   assert(!r.ok);
   assert(r.errors.some((e) => e.includes("metSupport")));
 });
 
 test("invalid gender → row error", () => {
-  const csv = "masterSku,title,gender,useCase,arch,posted,metSupport\nX,T,Mans,casual,,FALSE,FALSE\n";
+  const csv = "masterSku,title,gender,useCase,arch,posted,metSupport\nX,T,Mans,comfort_walking_everyday,,FALSE,FALSE\n";
   const r = parseCsvToMasterIndex(csv);
   assert(!r.ok);
   assert(r.errors.some((e) => e.includes("gender") && e.includes("Mans")));
@@ -161,14 +161,14 @@ test("invalid useCase → row error", () => {
 });
 
 test("invalid arch → row error", () => {
-  const csv = "masterSku,title,gender,useCase,arch,posted,metSupport\nX,T,Men,casual,Tall,FALSE,FALSE\n";
+  const csv = "masterSku,title,gender,useCase,arch,posted,metSupport\nX,T,Men,comfort_walking_everyday,Tall,FALSE,FALSE\n";
   const r = parseCsvToMasterIndex(csv);
   assert(!r.ok);
   assert(r.errors.some((e) => e.includes("arch")));
 });
 
 test("blank arch is allowed (cross-arch SKU like A100M)", () => {
-  const csv = "masterSku,title,gender,useCase,arch,posted,metSupport\nX,T,Men,casual,,FALSE,FALSE\n";
+  const csv = "masterSku,title,gender,useCase,arch,posted,metSupport\nX,T,Men,comfort_walking_everyday,,FALSE,FALSE\n";
   const r = parseCsvToMasterIndex(csv);
   assert(r.ok);
 });
@@ -176,22 +176,22 @@ test("blank arch is allowed (cross-arch SKU like A100M)", () => {
 test("duplicate masterSku → error", () => {
   const csv =
     "masterSku,title,gender,useCase,arch,posted,metSupport\n" +
-    "X,T1,Men,casual,,FALSE,FALSE\n" +
-    "X,T2,Men,dress,,FALSE,FALSE\n";
+    "X,T1,Men,comfort_walking_everyday,,FALSE,FALSE\n" +
+    "X,T2,Men,dress_no_removable,,FALSE,FALSE\n";
   const r = parseCsvToMasterIndex(csv);
   assert(!r.ok);
   assert(r.errors.some((e) => e.includes("duplicate")));
 });
 
 test("empty masterSku → error", () => {
-  const csv = "masterSku,title,gender,useCase,arch,posted,metSupport\n,Mystery,Men,casual,,FALSE,FALSE\n";
+  const csv = "masterSku,title,gender,useCase,arch,posted,metSupport\n,Mystery,Men,comfort_walking_everyday,,FALSE,FALSE\n";
   const r = parseCsvToMasterIndex(csv);
   assert(!r.ok);
   assert(r.errors.some((e) => e.includes("masterSku")));
 });
 
 test("invalid posted boolean → error", () => {
-  const csv = "masterSku,title,gender,useCase,arch,posted,metSupport\nX,T,Men,casual,,maybe,FALSE\n";
+  const csv = "masterSku,title,gender,useCase,arch,posted,metSupport\nX,T,Men,comfort_walking_everyday,,maybe,FALSE\n";
   const r = parseCsvToMasterIndex(csv);
   assert(!r.ok);
   assert(r.errors.some((e) => e.includes("posted")));
@@ -202,8 +202,8 @@ section("diffMasterIndex");
 // =====================================================================
 
 test("identical → all empty", () => {
-  const a = [{ masterSku: "X", title: "T", gender: "Men", useCase: "casual", arch: "", posted: false, metSupport: false }];
-  const b = [{ masterSku: "X", title: "T", gender: "Men", useCase: "casual", arch: "", posted: false, metSupport: false }];
+  const a = [{ masterSku: "X", title: "T", gender: "Men", useCase: "comfort_walking_everyday", arch: "", posted: false, metSupport: false }];
+  const b = [{ masterSku: "X", title: "T", gender: "Men", useCase: "comfort_walking_everyday", arch: "", posted: false, metSupport: false }];
   const d = diffMasterIndex(a, b);
   assert.equal(d.added.length, 0);
   assert.equal(d.removed.length, 0);
@@ -211,10 +211,10 @@ test("identical → all empty", () => {
 });
 
 test("added row detected", () => {
-  const a = [{ masterSku: "A", title: "A", gender: "Men", useCase: "casual", arch: "", posted: false, metSupport: false }];
+  const a = [{ masterSku: "A", title: "A", gender: "Men", useCase: "comfort_walking_everyday", arch: "", posted: false, metSupport: false }];
   const b = [
-    { masterSku: "A", title: "A", gender: "Men", useCase: "casual", arch: "", posted: false, metSupport: false },
-    { masterSku: "B", title: "B", gender: "Women", useCase: "dress", arch: "", posted: false, metSupport: false },
+    { masterSku: "A", title: "A", gender: "Men", useCase: "comfort_walking_everyday", arch: "", posted: false, metSupport: false },
+    { masterSku: "B", title: "B", gender: "Women", useCase: "dress_no_removable", arch: "", posted: false, metSupport: false },
   ];
   const d = diffMasterIndex(a, b);
   assert.equal(d.added.length, 1);
@@ -223,18 +223,18 @@ test("added row detected", () => {
 
 test("removed row detected", () => {
   const a = [
-    { masterSku: "A", title: "A", gender: "Men", useCase: "casual", arch: "", posted: false, metSupport: false },
-    { masterSku: "B", title: "B", gender: "Women", useCase: "dress", arch: "", posted: false, metSupport: false },
+    { masterSku: "A", title: "A", gender: "Men", useCase: "comfort_walking_everyday", arch: "", posted: false, metSupport: false },
+    { masterSku: "B", title: "B", gender: "Women", useCase: "dress_no_removable", arch: "", posted: false, metSupport: false },
   ];
-  const b = [{ masterSku: "A", title: "A", gender: "Men", useCase: "casual", arch: "", posted: false, metSupport: false }];
+  const b = [{ masterSku: "A", title: "A", gender: "Men", useCase: "comfort_walking_everyday", arch: "", posted: false, metSupport: false }];
   const d = diffMasterIndex(a, b);
   assert.equal(d.removed.length, 1);
   assert.equal(d.removed[0].masterSku, "B");
 });
 
 test("modified row detected with field-level changes", () => {
-  const a = [{ masterSku: "X", title: "Old", gender: "Men", useCase: "casual", arch: "", posted: false, metSupport: false }];
-  const b = [{ masterSku: "X", title: "New", gender: "Men", useCase: "casual", arch: "", posted: true, metSupport: false }];
+  const a = [{ masterSku: "X", title: "Old", gender: "Men", useCase: "comfort_walking_everyday", arch: "", posted: false, metSupport: false }];
+  const b = [{ masterSku: "X", title: "New", gender: "Men", useCase: "comfort_walking_everyday", arch: "", posted: true, metSupport: false }];
   const d = diffMasterIndex(a, b);
   assert.equal(d.modified.length, 1);
   assert.deepEqual(d.modified[0].changes.title, { from: "Old", to: "New" });

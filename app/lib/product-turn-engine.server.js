@@ -514,8 +514,20 @@ function buildBrowseClarification({ ctx = {}, scope = {} } = {}) {
 function isBroadBrowseClarificationCandidate(scope = {}) {
   const raw = String(scope.rawMessage || "").trim();
   if (!raw || !BROAD_BROWSE_RE.test(raw)) return false;
-  if (scope.color || scope.colorFamily || scope.badge || scope.onSale || scope.modifier) return false;
-  if (scope.namedProduct || scope.requestedClaim || scope.requiredCatalogTerms?.length > 0) return false;
+  const vagueNeedNewFootwear =
+    /\b(?:need|want|looking\s+for|look\s+for)\b[^.?!]{0,40}\bnew\b[^.?!]{0,40}\b(?:shoes?|footwear)\b/i.test(raw) &&
+    !/\b(?:show|browse|shop|what'?s\s+new|new\s+arrivals?|latest)\b/i.test(raw);
+  if (
+    scope.color ||
+    scope.colorFamily ||
+    scope.onSale ||
+    ((scope.badge || scope.modifier) && !vagueNeedNewFootwear)
+  ) return false;
+  const ignorableNewBadgeClaim =
+    vagueNeedNewFootwear &&
+    scope.requestedClaim?.kind === "badge" &&
+    String(scope.requestedClaim?.substring || "").toLowerCase() === "new";
+  if (scope.namedProduct || (scope.requestedClaim && !ignorableNewBadgeClaim) || scope.requiredCatalogTerms?.length > 0) return false;
   if (isComplexMultiCriteriaTurn(raw)) return false;
   return true;
 }
