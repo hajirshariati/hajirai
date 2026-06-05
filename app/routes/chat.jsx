@@ -256,6 +256,10 @@ function isLowRiskShoppingTurn(message) {
   return LOW_RISK_SHOPPING_RE.test(value) && PRODUCT_LISTING_TERM_RE.test(value);
 }
 
+function productAuthorityModeEnabled() {
+  return String(process.env.PRODUCT_TURN_ENGINE_ENABLED || "").toLowerCase() === "true";
+}
+
 const detectGenderFromHistory = _detectGenderFromHistory;
 
 function chooseModel(config, message, history) {
@@ -1555,6 +1559,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     return /\?\s*$/.test(lastChunk.trim());
   })();
   if (
+    !productAuthorityModeEnabled() &&
     !productSearchAttempted &&
     looksLikeProductPitch(fullResponseText) &&
     allProductPool.size === 0 &&
@@ -1598,6 +1603,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     (Array.isArray(ctx.resolverState?.impossible_constraints) &&
       ctx.resolverState.impossible_constraints.length > 0);
   if (
+    !productAuthorityModeEnabled() &&
     !productSearchAttempted &&
     fullResponseText &&
     containsAvailabilityDenial(fullResponseText) &&
@@ -1632,7 +1638,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     }
   }
 
-  if (productSearchAttempted && allProductPool.size > 0 && allProductPool.size <= 2) {
+  if (!productAuthorityModeEnabled() && productSearchAttempted && allProductPool.size > 0 && allProductPool.size <= 2) {
     const userT = String(ctx.userText || "").toLowerCase();
     const namesCategory = Array.isArray(ctx.catalogCategories) && ctx.catalogCategories.some((c) => {
       const norm = String(c || "").trim().toLowerCase().replace(/s$/, "");
