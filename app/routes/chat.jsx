@@ -703,6 +703,39 @@ async function convertEngineCtaToLink(cta, ctx) {
   return null;
 }
 
+function resolverHasExactNoMatch(resolverState) {
+  if (!resolverState || resolverState.type !== "resolver_state") return false;
+  return (
+    resolverState.recommended_next_action?.type === "no_match" ||
+    (Array.isArray(resolverState.impossible_constraints) && resolverState.impossible_constraints.length > 0)
+  );
+}
+
+// Catalog truth boundary. When the resolver has already proved the
+// requested scope is impossible, do not let the product engine or
+// legacy LLM/tool fallback "helpfully" broaden it into false cards.
+// This owns cases like "pink men's footwear": answer honestly, clear
+// products, and stop.
+async function runResolverNoMatchDispatch({ ctx, controller, encoder }) {
+  if (!resolverHasExactNoMatch(ctx?.resolverState)) return null;
+  const exactNoMatch = buildCodeOwnedExactNoMatchText({ ctx });
+  const text = String(exactNoMatch?.text || "").trim();
+  if (!text) return null;
+
+  controller.enqueue(encoder.encode(sseChunk({ type: "text", text })));
+  controller.enqueue(encoder.encode(sseChunk({ type: "products", products: [] })));
+  controller.enqueue(encoder.encode(sseChunk({ type: "done" })));
+
+  return {
+    handled: true,
+    answerText: text,
+    diagnostics: {
+      reason: exactNoMatch.reason || "exact_catalog_no_match",
+      impossible: ctx.resolverState?.impossible_constraints || [],
+    },
+  };
+}
+
 // Phase 3 — Policy / Knowledge dispatcher. Same flag, same
 // short-circuit semantics as the product engine. Always emits
 // products=[] so the widget clears any stale product cards from a
@@ -3835,6 +3868,22 @@ export const action = async ({ request }) => {
                 `intent=${policyResult.diagnostics.intent.primary} ` +
                 `— falling through to agent path`,
             );
+          }
+
+          const resolverNoMatchResult = await runResolverNoMatchDispatch({
+            ctx, controller, encoder,
+          });
+          if (resolverNoMatchResult && resolverNoMatchResult.handled) {
+            console.log(`[router] ${ctx.shop} final_path=resolver_no_match`);
+            console.log(
+              `[resolver-no-match] handled shop=${ctx.shop} ` +
+                `reason=${resolverNoMatchResult.diagnostics?.reason || "-"} ` +
+                `impossible=${(resolverNoMatchResult.diagnostics?.impossible || [])
+                  .map((item) => `${item?.field || "?"}:${item?.value || "?"}`)
+                  .join("|") || "-"} ` +
+                `textLen=${resolverNoMatchResult.answerText?.length || 0}`,
+            );
+            return; // exact catalog no-match emitted text/products(empty)/done.
           }
 
           const engineResult = await runProductTurnDispatch({
