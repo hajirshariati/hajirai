@@ -701,6 +701,7 @@ export async function ensureProductTurnCards({
   extractProductCards,
   searchInput,
   shouldAttach = false,
+  allowRelaxedNoMatch = false,
   reason = "product turn",
 } = {}) {
   if (!(allProductPool instanceof Map)) {
@@ -708,7 +709,7 @@ export async function ensureProductTurnCards({
   }
 
   const diagnostics = { rung: "existing", scope: currentCatalogScopeFromContext(ctx), reason };
-  const exactNoMatch = resolverRequiresExactNoMatch(ctx.resolverState);
+  const exactNoMatch = resolverRequiresExactNoMatch(ctx.resolverState) && !allowRelaxedNoMatch;
   diagnostics.exactNoMatch = exactNoMatch;
   let searchAttempted = false;
   let attached = 0;

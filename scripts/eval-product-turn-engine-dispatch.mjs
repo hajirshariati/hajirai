@@ -402,10 +402,10 @@ await test("D7aa — broad shoe request with no gender asks only catalog-backed 
   assert.ok(!out.choices.includes("Kids"), "must not offer Kids unless kids footwear exists in the catalog");
 });
 
-await test("D7aaa — 'I need new shoes' clarifies broad footwear, not new-arrivals or orthotics", async () => {
+await test("D7aaa — 'hi I need new shoes' clarifies broad footwear, not new-arrivals or orthotics", async () => {
   const out = await runProductTurn({
     ...BROWSE_CTX,
-    latestUserMessage: "i need new shoes",
+    latestUserMessage: "hi i need new shoes",
     sessionMemory: { explicit: {}, inferred: {} },
   }, {
     forceEnable: true,

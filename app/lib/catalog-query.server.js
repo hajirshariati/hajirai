@@ -8,7 +8,7 @@
 const REQUEST_WORDS = new Set([
   "a", "an", "and", "any", "anything", "are", "best", "besides", "but", "can", "carry",
   "could", "do", "does", "find", "for", "from", "give", "has", "have",
-  "i", "in", "is", "it", "like", "looking", "made", "me", "my", "need",
+  "hello", "hey", "hi", "i", "in", "is", "it", "like", "looking", "made", "me", "my", "need",
   "of", "on", "or", "other", "please", "recommend", "show", "some",
   "something", "that", "the", "these", "this", "those", "to", "use",
   "uses", "using", "try", "want", "what", "which", "with", "you", "your",

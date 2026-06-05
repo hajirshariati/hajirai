@@ -679,7 +679,13 @@ async function runProductTurnDispatch({ ctx, controller, encoder, claimConfig })
 }
 
 function isColorFactFollowUp(text = "") {
-  return /\b(?:other|more|different|available|come(?:s)?\s+in|colors?|colou?rs?|colorways?)\b/i.test(String(text || ""));
+  const value = String(text || "");
+  if (/\b(?:size|sizes|width|wide|narrow|stock|in\s+stock|available\s+in\s+size)\b/i.test(value)) return false;
+  return (
+    /\b(?:colors?|colou?rs?|colorways?)\b/i.test(value) ||
+    /\b(?:other|more|different|available)\s+(?:colors?|colou?rs?|colorways?)\b/i.test(value) ||
+    /\bcome(?:s)?\s+in\s+(?:other|more|different)?\s*(?:colors?|colou?rs?|colorways?)\b/i.test(value)
+  );
 }
 
 function variantColorsFromCards(cards = []) {
@@ -687,7 +693,7 @@ function variantColorsFromCards(cards = []) {
   const out = [];
   const add = (value) => {
     const display = String(value || "").trim();
-    if (!display) return;
+    if (!display || /^miscellaneous$/i.test(display)) return;
     const key = display.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
     if (!key || seen.has(key)) return;
     seen.add(key);
@@ -703,7 +709,7 @@ function variantColorsFromCards(cards = []) {
   return out;
 }
 
-function displayList(values = [], max = 6) {
+function displayList(values = [], max = 8) {
   const list = values.filter(Boolean).slice(0, max);
   if (list.length === 0) return "";
   if (list.length === 1) return list[0];
@@ -1137,6 +1143,14 @@ function shouldSoftBrowseRefine(latestMessage, history) {
   if (!/\b(?:cheap|cheaper|under|below|less\s+than|sale|deals?|discount)\b/i.test(latest)) return false;
   return /\bnarrow by men's, women's, style, color, or price\b/i.test(previous) ||
     /\bhere are (?:a few|popular|sale|comfort-focused|styles under \$\d+)/i.test(previous);
+}
+
+function isOrthoticRecommendationIntent(text = "") {
+  const value = String(text || "");
+  const namesOrthotic = /\b(?:orthotics?|orhtotics?|orthtoics?|insoles?|inserts?|footbeds?)\b/i.test(value);
+  const namesClinicalNeed = /\b(?:overpronation|flat\s+feet|fallen\s+arches|plantar\s+fasciitis|heel\s+pain|arch\s+pain|metatarsalgia|ball[-\s]?of[-\s]?foot|morton's|neuropathy|diabetic|high\s+arch|low\s+arch)\b/i.test(value);
+  const asksRecommendation = /\b(?:need|recommend|best|which|what\s+should|help|for)\b/i.test(value);
+  return namesOrthotic && (namesClinicalNeed || asksRecommendation);
 }
 
 // How many prior assistant turns were soft-browse starter responses.
@@ -1834,6 +1848,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     extractProductCards: (n, r) => extractProductCards(n, r, ctx),
     searchInput: scopedProductSearchInput(ctx),
     shouldAttach: productTurnWantsCards,
+    allowRelaxedNoMatch: isCompoundPolicyProductQuestion(ctx.latestUserMessage),
     reason: "pre-display",
   });
   if (ensuredCards.searchAttempted) productSearchAttempted = true;
@@ -3844,6 +3859,16 @@ export const action = async ({ request }) => {
             routerLog.resolver = `error ${resolverErr?.message || "unknown"}`;
           }
 
+          if (shouldSoftBrowseRefine(body.message, history)) {
+            routerLog.finalPath = "soft_browse_refine";
+            console.log(`[router] ${ctx.shop} ${routerLog.classifier}`);
+            console.log(`[router] ${ctx.shop} ${routerLog.resolver || "resolver=skip"}`);
+            console.log(`[router] ${ctx.shop} ${routerLog.orthoticGate || "handled=false case=pre-gate-soft-browse"}`);
+            console.log(`[router] ${ctx.shop} final_path=${routerLog.finalPath}`);
+            await emitSoftGenderGateBrowse({ ctx, controller, encoder });
+            return;
+          }
+
           // STAGE 3: orthotic gate decision (now receives resolverState)
           let gateHandled = false;
           if (orthoticTree) {
@@ -3886,16 +3911,6 @@ export const action = async ({ request }) => {
             }
           }
           if (!routerLog.orthoticGate) routerLog.orthoticGate = "handled=false case=none";
-
-          if (shouldSoftBrowseRefine(body.message, history)) {
-            routerLog.finalPath = "soft_browse_refine";
-            console.log(`[router] ${ctx.shop} ${routerLog.classifier}`);
-            console.log(`[router] ${ctx.shop} ${routerLog.resolver || "resolver=skip"}`);
-            console.log(`[router] ${ctx.shop} ${routerLog.orthoticGate}`);
-            console.log(`[router] ${ctx.shop} final_path=${routerLog.finalPath}`);
-            await emitSoftGenderGateBrowse({ ctx, controller, encoder });
-            return;
-          }
 
           const resolverAction = ctx.resolverState?.recommended_next_action?.type;
           routerLog.finalPath =
@@ -3974,6 +3989,7 @@ export const action = async ({ request }) => {
 
           const compoundPolicyProduct = isCompoundPolicyProductQuestion(body.message);
           const directProductFact = isDirectProductFactQuestion(body.message);
+          const orthoticRecommendationIntent = isOrthoticRecommendationIntent(body.message);
 
           const policyResult = compoundPolicyProduct
             ? null
@@ -4023,8 +4039,12 @@ export const action = async ({ request }) => {
             return; // exact catalog no-match emitted text/products(empty)/done.
           }
 
-          const engineResult = (compoundPolicyProduct || directProductFact)
-            ? { declined: true, diagnostics: { rungs: [compoundPolicyProduct ? "declined:compound_policy_product" : "declined:direct_product_fact"] } }
+          const engineResult = (compoundPolicyProduct || directProductFact || orthoticRecommendationIntent)
+            ? { declined: true, diagnostics: { rungs: [
+                compoundPolicyProduct ? "declined:compound_policy_product" : null,
+                directProductFact ? "declined:direct_product_fact" : null,
+                orthoticRecommendationIntent ? "declined:orthotic_recommendation_intent" : null,
+              ].filter(Boolean) } }
             : await runProductTurnDispatch({
                 ctx, controller, encoder, claimConfig,
               });
