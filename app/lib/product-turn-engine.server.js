@@ -1038,6 +1038,12 @@ function buildLeadRecommendationReason({ scope, leadCard, selectionReason }) {
   if (claim?.kind === "widthCompat") {
     return "it is not tagged for the opposite width";
   }
+  if (scope?.color) {
+    return `it matches the ${scope.color} color range you asked for`;
+  }
+  if (scope?.colorFamily) {
+    return `it matches the ${scope.colorFamily} color family you asked for`;
+  }
   return "it is the closest match for what you asked";
 }
 

@@ -463,6 +463,7 @@ await test("D7a — color-only shopping scope is engine-owned, not legacy-agent 
   assert.equal(receivedScope?.color, "pink");
   assert.equal(receivedScope?.category || "", "");
   assert.deepEqual(out.products.map((product) => product.handle), ["emily-peach"]);
+  assert.match(out.answerText, /\bpink\b/i);
   assert.equal(out.cta?.color, "pink");
   assert.equal(out.cta?.gender, "women");
 });
