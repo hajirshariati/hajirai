@@ -34,6 +34,7 @@ const POLICY_INTENT_PATTERNS = {
   warranty:      /\b(?:warranty|guarantee(?:d)?\b|defects?|covered\s+for|how\s+long\s+(?:is|does)\s+(?:the\s+)?warranty)\b/i,
   exchanges:     /\b(?:exchange|swap|trade(?:\s+in)?|wrong\s+size|different\s+size|change\s+(?:the\s+|my\s+)?size|change\s+(?:the\s+|my\s+)?order|cancel\s+(?:and\s+reorder|my\s+order|the\s+order|this\s+order|my\s+(?:existing\s+)?order)|modify\s+(?:my\s+|the\s+)?order|refund\s+(?:will\s+|show\s+)|order\s+change|reorder)\b/i,
   tracking:      /\b(?:track(?:ing)?\s+(?:my\s+)?(?:order|package|shipment)|where(?:'s|\s+is)\s+my\s+order|order\s+(?:status|tracking)|tracking\s+(?:number|info))\b/i,
+  support_contact: /\b(?:(?:contact|reach|get\s+in\s+touch\s+with|talk\s+to|speak\s+to|message|email|call)\s+(?:customer\s+)?(?:support|service|care|team|someone|a\s+person|a\s+human|you|your\s+team|customer\s+service)|customer\s+(?:support|service|care)\b|support\s+(?:team|agent|person|human|about\s+(?:my\s+)?order))\b/i,
   // Discounts policy — limited to questions about discount/promo/coupon
   // MECHANISMS (codes, eligibility, terms). Product-browse questions
   // like "what's on sale" / "show me sale shoes" must NOT match: those
@@ -85,7 +86,7 @@ export function detectPolicyIntent(message) {
   // Most specific first when multiple match (e.g. "return fee"
   // also matches return_policy). Order via the keys array so the
   // more-specific intents win.
-  const priority = ["return_fee", "return_policy", "exchanges", "tracking", "discounts", "shipping", "warranty", "services", "terms"];
+  const priority = ["return_fee", "return_policy", "exchanges", "tracking", "support_contact", "discounts", "shipping", "warranty", "services", "terms"];
   const primary = priority.find((k) => matches.includes(k)) || matches[0];
   return { primary, matches };
 }
@@ -203,6 +204,11 @@ const POLICY_FOLLOW_UPS = {
     "Can I change my delivery address?",
     "What if my package is lost?",
   ],
+  support_contact: [
+    "Can I track my order?",
+    "What's your return policy?",
+    "Can I exchange my order?",
+  ],
   discounts: [
     "Do you have a first-time customer discount?",
     "Is there a sale or clearance section?",
@@ -259,6 +265,7 @@ function intentMatchesTitle(intentKey, lowerTitle) {
     warranty:      /warranty|guarantee/,
     exchanges:     /exchange/,
     tracking:      /track|order\s+status/,
+    support_contact: /support|customer\s+service|contact/,
     discounts:     /discount|promo|coupon|sale/,
     services:      /service|fitting|in[\s-]?store/,
     terms:         /terms|privacy|legal/,
@@ -308,6 +315,16 @@ export async function composePolicyAnswer({
         url: trackingUrl,
         scopeSource: "policy_tracking_page_url",
       },
+    };
+  }
+
+  if (intent?.primary === "support_contact") {
+    return {
+      text: supportUrl
+        ? `You can reach our customer support team using the button below. For help with an order, include your order number or the email used at checkout.`
+        : `You can reach our customer support team directly. For help with an order, include your order number or the email used at checkout.`,
+      reason: supportUrl ? "support_contact_url" : "support_contact_no_url",
+      cta: contactCta,
     };
   }
 
@@ -433,6 +450,7 @@ function humanizeIntent(intentKey) {
     warranty:      "warranty",
     exchanges:     "exchanges",
     tracking:      "order tracking",
+    support_contact: "customer support",
     discounts:     "discounts and promotions",
     services:      "our services",
     terms:         "terms of service",

@@ -102,6 +102,18 @@ await test("PE-6 — 'do you have returns?' (yes/no shape) still detects return_
   assert.equal(i?.primary, "return_policy");
 });
 
+await test("PE-6b — customer-support contact shapes detect support_contact", () => {
+  for (const q of [
+    "How do I contact customer support about my order?",
+    "I need to talk to a person",
+    "Can I reach your customer service team?",
+    "How do I email support?",
+  ]) {
+    const i = detectPolicyIntent(q);
+    assert.equal(i?.primary, "support_contact", `failed for "${q}"`);
+  }
+});
+
 await test("PE-7 — non-policy turns are NOT detected", () => {
   for (const q of [
     "show me sandals for plantar fasciitis",
@@ -121,6 +133,18 @@ await test("PE-7 — non-policy turns are NOT detected", () => {
   ]) {
     assert.equal(detectPolicyIntent(q), null, `false positive for "${q}"`);
   }
+});
+
+await test("PE-7c — support_contact emits support CTA without product cards", async () => {
+  const out = await runPolicyTurn(
+    { ...ctxBase, latestUserMessage: "How do I contact customer support about my order?" },
+    { forceEnable: true, retrievedChunks: [] },
+  );
+  assert.ok(!out.decline);
+  assert.equal(out.products.length, 0);
+  assert.match(out.answerText, /support team/i);
+  assert.equal(out.cta?.url, ctxBase.supportUrl);
+  assert.match(out.cta?.label, /contact our support team/i);
 });
 
 await test("PE-7b — policy-shape DISCOUNT questions still detect discounts", () => {

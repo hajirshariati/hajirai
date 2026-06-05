@@ -110,6 +110,7 @@ import {
 import prisma from "../db.server";
 import { recordChatUsage, getTodayMessageCount } from "../models/ChatUsage.server";
 import { canSendMessage } from "../lib/billing.server";
+import { normalizeVariantSize, normalizeVariantWidth } from "../lib/variant-matcher.server";
 
 // Model IDs are env-driven so you can update them in Railway without a code
 // deploy. When Anthropic ships a new model:
@@ -688,6 +689,27 @@ function isColorFactFollowUp(text = "") {
   );
 }
 
+function requestedSizeWidthScope(text = "") {
+  const value = String(text || "");
+  const out = { size: null, width: null };
+  const sizeMatch =
+    value.match(/\bsize\s+(\d{1,2}(?:\.\d|½| 1\/2)?)\b/i) ||
+    value.match(/\b(\d{1,2}(?:\.\d|½| 1\/2)?)\s*(?:wide|narrow|medium|regular|standard|w\b|n\b|m\b)/i);
+  if (sizeMatch) out.size = normalizeVariantSize(sizeMatch[1]);
+  const widthMatch = value.match(/\b(extra[-\s]?wide|xw|wide|narrow|slim|medium|regular|standard|[wnm])\b/i);
+  if (widthMatch) out.width = normalizeVariantWidth(widthMatch[1]);
+  return out;
+}
+
+function isSizeWidthFactFollowUp(text = "") {
+  const value = String(text || "");
+  if (!/\b(?:size|sizes|width|widths|wide|narrow|medium|regular|standard|in\s+stock|available)\b/i.test(value)) {
+    return false;
+  }
+  const scope = requestedSizeWidthScope(value);
+  return Boolean(scope.size || scope.width);
+}
+
 function variantColorsFromCards(cards = []) {
   const seen = new Set();
   const out = [];
@@ -717,14 +739,106 @@ function displayList(values = [], max = 8) {
   return `${list.slice(0, -1).join(", ")}, and ${list[list.length - 1]}`;
 }
 
+function variantFactsFromCard(card) {
+  return card?._variantFacts || card?.variantFacts || {};
+}
+
+function normalizedFactValues(values = [], normalizer) {
+  const raw = Array.isArray(values) ? values : [values];
+  const out = [];
+  const seen = new Set();
+  for (const value of raw.flat(Infinity)) {
+    const normalized = normalizer(value);
+    if (!normalized || seen.has(normalized)) continue;
+    seen.add(normalized);
+    out.push(normalized);
+  }
+  return out;
+}
+
+function cardVariantSizeWidthSummary(card) {
+  const facts = variantFactsFromCard(card);
+  return {
+    sizes: normalizedFactValues([facts.availableSizes, facts.sizes], normalizeVariantSize),
+    widths: normalizedFactValues([facts.availableWidths, facts.widths], normalizeVariantWidth),
+  };
+}
+
+function buildSizeWidthFactAnswer({ cards, scope }) {
+  const size = normalizeVariantSize(scope?.size);
+  const width = normalizeVariantWidth(scope?.width);
+  if (!size && !width) return null;
+
+  const compactCards = (Array.isArray(cards) ? cards : []).filter(Boolean).slice(0, 6);
+  if (compactCards.length === 0) return null;
+
+  if (size && width) {
+    return {
+      text:
+        `I can't confirm the exact size ${size} ${width} combination from these cards without checking a specific style. ` +
+        `Open the card you like to confirm live size and width availability, or tell me which style you want me to check.`,
+      products: compactCards,
+      reason: "size_width_combo_not_stamped",
+    };
+  }
+
+  const matches = compactCards.filter((card) => {
+    const summary = cardVariantSizeWidthSummary(card);
+    if (size) return summary.sizes.includes(size);
+    if (width) return summary.widths.includes(width);
+    return false;
+  });
+
+  const label = size ? `size ${size}` : `${width} width`;
+  if (matches.length > 0) {
+    const names = displayList(matches.map((card) => card.title).filter(Boolean), 3);
+    return {
+      text:
+        `From the current cards, ${names || "some styles"} list ${label}. ` +
+        `Open a card to confirm live inventory before choosing.`,
+      products: compactCards,
+      reason: "variant_fact_listed",
+    };
+  }
+
+  return {
+    text:
+      `I don't see ${label} listed in the current cards' variant facts. ` +
+      `Try another size or width, or open a style to confirm live availability.`,
+    products: compactCards,
+    reason: "variant_fact_not_listed",
+  };
+}
+
 async function runVariantFactDispatch({ ctx, controller, encoder }) {
   const enabled = String(process.env.PRODUCT_TURN_ENGINE_ENABLED || "").toLowerCase() === "true";
   if (!enabled) return null;
   const latest = String(ctx?.latestUserMessage || "");
-  if (!isDirectProductFactQuestion(latest) || !isColorFactFollowUp(latest)) return null;
+  const isColorFact = isDirectProductFactQuestion(latest) && isColorFactFollowUp(latest);
+  const sizeWidthScope = requestedSizeWidthScope(latest);
+  const isSizeWidthFact = isDirectProductFactQuestion(latest) && isSizeWidthFactFollowUp(latest);
+  if (!isColorFact && !isSizeWidthFact) return null;
 
   let cards = Array.isArray(ctx?.priorProductCards) ? ctx.priorProductCards : [];
   let usedSearch = false;
+  if (isSizeWidthFact) {
+    const answer = buildSizeWidthFactAnswer({ cards, scope: sizeWidthScope });
+    if (!answer) return null;
+    controller.enqueue(encoder.encode(sseChunk({ type: "text", text: answer.text })));
+    controller.enqueue(encoder.encode(sseChunk({ type: "products", products: answer.products.slice(0, ctx?.productCardCap || 6) })));
+    controller.enqueue(encoder.encode(sseChunk({ type: "done" })));
+    return {
+      handled: true,
+      answerText: answer.text,
+      products: answer.products,
+      diagnostics: {
+        usedSearch: false,
+        variantFactKind: "size_width",
+        reason: answer.reason,
+      },
+    };
+  }
+
   if (variantColorsFromCards(cards).length === 0) {
     const scoped = scopedProductSearchInput(ctx);
     const hasScope = Boolean(scoped.scope.gender || scoped.scope.category || scoped.scope.color);
