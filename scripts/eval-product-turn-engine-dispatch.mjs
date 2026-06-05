@@ -71,6 +71,28 @@ const FIXTURE_CLAIM_CONFIG = {
 };
 
 const ctxBase = { shop: "fixture.myshopify.com" };
+const BROWSE_CTX = {
+  ...ctxBase,
+  merchantGroups: [
+    {
+      name: "Footwear",
+      categories: ["Sneakers", "Sandals", "Clogs", "Boots"],
+      triggers: ["shoe", "shoes", "footwear"],
+    },
+    { name: "Accessories", categories: ["Accessories"], triggers: ["accessory", "accessories"] },
+    { name: "Orthotics", categories: ["Orthotics"], triggers: ["orthotic", "orthotics"] },
+  ],
+  catalogCategories: ["Sneakers", "Sandals", "Clogs", "Boots", "Accessories", "Orthotics"],
+  fullCatalogCategories: ["Sneakers", "Sandals", "Clogs", "Boots", "Accessories", "Orthotics"],
+  categoryGenderMap: {
+    sneakers: { display: "Sneakers", genders: ["men", "women"] },
+    sandals: { display: "Sandals", genders: ["men", "women"] },
+    clogs: { display: "Clogs", genders: ["men"] },
+    boots: { display: "Boots", genders: ["women"] },
+    accessories: { display: "Accessories", genders: ["women", "unisex"] },
+    orthotics: { display: "Orthotics", genders: ["men", "women", "kids", "unisex"] },
+  },
+};
 
 // A search_products-shaped candidate. The engine MUST preserve
 // these UI fields end-to-end so the widget renders cards.
@@ -339,19 +361,61 @@ await test("D6b — 'which one had the removable insole' is NOT a compare-shape 
   );
 });
 
-// ─── Decline path: turn missing a category still falls back ─────
+// ─── Grounded browse clarifier path ──────────────────────────────
 
-await test("D7 — bare 'show me shoes' (no category resolved yet) DECLINES so the agent can clarify", async () => {
+await test("D7 — broad 'show me shoes' asks grounded category choices, not legacy-agent chips", async () => {
+  let searchCalled = false;
   const out = await runProductTurn({
-    ...ctxBase,
+    ...BROWSE_CTX,
     latestUserMessage: "show me shoes",
     sessionMemory: { explicit: { gender: "women" }, inferred: {} },
   }, {
     forceEnable: true,
-    searchFn: async () => [],
+    searchFn: async () => {
+      searchCalled = true;
+      return [];
+    },
     claimConfig: FIXTURE_CLAIM_CONFIG,
   });
-  assert.ok(out.decline);
+  assert.ok(out && !out.decline, `engine should clarify broad browse turns; got ${JSON.stringify(out?.diagnostics)}`);
+  assert.equal(searchCalled, false, "clarifier should not search before the customer chooses a grounded category");
+  assert.equal(out.products.length, 0);
+  assert.deepEqual(out.choices, ["Sneakers", "Sandals", "Boots"]);
+  assert.ok(!out.choices.includes("Accessories"), "shoe-style clarifier must not offer Accessories");
+  assert.ok(!out.choices.includes("Orthotics"), "shoe-style clarifier must not offer Orthotics");
+});
+
+await test("D7aa — broad shoe request with no gender asks only catalog-backed genders", async () => {
+  const out = await runProductTurn({
+    ...BROWSE_CTX,
+    latestUserMessage: "show me shoes",
+    sessionMemory: { explicit: {}, inferred: {} },
+  }, {
+    forceEnable: true,
+    searchFn: async () => {
+      throw new Error("clarifier should not search");
+    },
+    claimConfig: FIXTURE_CLAIM_CONFIG,
+  });
+  assert.ok(out && !out.decline, `engine should own broad browse; got ${JSON.stringify(out?.diagnostics)}`);
+  assert.deepEqual(out.choices, ["Men's", "Women's"]);
+  assert.ok(!out.choices.includes("Kids"), "must not offer Kids unless kids footwear exists in the catalog");
+});
+
+await test("D7ab — generic product browse can ask top-level merchant groups from catalog evidence", async () => {
+  const out = await runProductTurn({
+    ...BROWSE_CTX,
+    latestUserMessage: "show me products",
+    sessionMemory: { explicit: {}, inferred: {} },
+  }, {
+    forceEnable: true,
+    searchFn: async () => {
+      throw new Error("clarifier should not search");
+    },
+    claimConfig: FIXTURE_CLAIM_CONFIG,
+  });
+  assert.ok(out && !out.decline);
+  assert.deepEqual(out.choices, ["Footwear", "Accessories", "Orthotics"]);
 });
 
 await test("D7a — color-only shopping scope is engine-owned, not legacy-agent owned", async () => {

@@ -45,6 +45,10 @@ import {
   matchCatalogRequirement,
   normalizeCatalogText,
 } from "./catalog-query.server.js";
+import {
+  compactGroup,
+  matchingGroupsForText,
+} from "./category-intent.server.js";
 
 // Flag — feature gate for production wiring. Read at engine entry
 // so flipping it at runtime (env update) takes effect without a
@@ -114,6 +118,23 @@ export async function runProductTurn(ctx = {}, options = {}) {
       similarFn: options.similarFn,
       resolveNamedProductFn: options.resolveNamedProductFn,
     });
+  }
+
+  const browseClarification = buildBrowseClarification({ ctx, scope });
+  if (browseClarification) {
+    diagnostics.rungs.push(`clarifier:${browseClarification.reason}`);
+    diagnostics.composer = "browse_clarifier";
+    return {
+      decline: false,
+      scope,
+      products: [],
+      facts: [],
+      answerText: browseClarification.text,
+      cta: null,
+      followUps: [],
+      choices: browseClarification.choices,
+      diagnostics,
+    };
   }
 
   if (!engineWantsThisTurn(scope, ctx.resolverState)) {
@@ -431,6 +452,234 @@ function resolverHasCandidateRecommendation(resolverState) {
   if (!resolverState || resolverState.type !== "resolver_state") return false;
   if (resolverState.recommended_next_action?.type !== "recommend") return false;
   return Array.isArray(resolverState.candidate_products) && resolverState.candidate_products.length > 0;
+}
+
+// ─── 3b. Catalog-grounded browse clarification ───────────────────
+//
+// Broad browse turns ("show me shoes", "I need footwear") need a
+// follow-up question, but that question must be grounded in merchant
+// configuration and catalog coverage. This keeps the old agent from
+// inventing unsupported chips like Kids' shoes or Accessories under a
+// shoe-style question.
+const BROAD_BROWSE_RE =
+  /\b(?:show|find|search|shop|browse|need|want|looking\s+for|recommend|suggest|carry|have)\b/i;
+
+function buildBrowseClarification({ ctx = {}, scope = {} } = {}) {
+  if (!isBroadBrowseClarificationCandidate(scope)) return null;
+
+  const groups = merchantBrowseGroups(ctx);
+  if (groups.length === 0) return null;
+
+  const group = resolveBrowseClarifierGroup(ctx, scope, groups);
+  if (!group) {
+    const choices = catalogBackedGroupChoices(ctx, groups);
+    if (choices.length < 2) return null;
+    return {
+      reason: "ask_group",
+      text: "Which styles would you like to browse?",
+      choices,
+    };
+  }
+
+  const categoryIsConcrete = scope.category && !categoryNamesGroup(scope.category, group);
+  if (categoryIsConcrete) return null;
+
+  const gender = normalizeGender(scope.gender);
+  if (!gender) {
+    const genderChoices = catalogBackedGenderChoicesForGroup(ctx, group);
+    if (genderChoices.length >= 2) {
+      return {
+        reason: "ask_gender",
+        text: "Which styles would you like to browse?",
+        choices: genderChoices,
+      };
+    }
+  }
+
+  const categoryChoices = catalogBackedCategoryChoicesForGroup(ctx, group, gender);
+  if (categoryChoices.length >= 2) {
+    const groupLabel = humanGroupLabel(group);
+    return {
+      reason: "ask_category",
+      text: gender
+        ? `What type of ${genderPossessive(gender)} ${groupLabel} are you looking for?`
+        : `What type of ${groupLabel} are you looking for?`,
+      choices: categoryChoices,
+    };
+  }
+
+  return null;
+}
+
+function isBroadBrowseClarificationCandidate(scope = {}) {
+  const raw = String(scope.rawMessage || "").trim();
+  if (!raw || !BROAD_BROWSE_RE.test(raw)) return false;
+  if (scope.color || scope.colorFamily || scope.badge || scope.onSale || scope.modifier) return false;
+  if (scope.namedProduct || scope.requestedClaim || scope.requiredCatalogTerms?.length > 0) return false;
+  if (isComplexMultiCriteriaTurn(raw)) return false;
+  return true;
+}
+
+function merchantBrowseGroups(ctx = {}) {
+  const groups = Array.isArray(ctx.merchantGroups) ? ctx.merchantGroups : [];
+  return groups
+    .map((g) => compactGroup(g))
+    .filter((g) => g?.name && Array.isArray(g.categories) && g.categories.length > 0);
+}
+
+function resolveBrowseClarifierGroup(ctx = {}, scope = {}, groups = []) {
+  const raw = stripClarifierNoise(scope.rawMessage || "");
+  const latestMatches = matchingGroupsForText(raw, groups, { includeTriggers: true });
+  if (latestMatches.length === 1) return latestMatches[0];
+  if (latestMatches.length > 1) return null;
+
+  if (scope.category) {
+    const categoryKey = normalizeCategoryKey(scope.category);
+    const byName = groups.find((g) => categoryNamesGroup(categoryKey, g));
+    if (byName) return byName;
+  }
+
+  const active = compactGroup(ctx.activeCategoryGroup || ctx.contextCategoryGroup);
+  if (active?.name) {
+    const match = groups.find((g) => normalizeCategoryKey(g.name) === normalizeCategoryKey(active.name));
+    if (match) return match;
+  }
+
+  return null;
+}
+
+function stripClarifierNoise(text) {
+  return String(text || "")
+    .replace(/\b(?:men'?s|mens|women'?s|womens|kids?|children'?s|childrens)\b/gi, " ")
+    .trim();
+}
+
+function categoryNamesGroup(value, group) {
+  const key = normalizeCategoryKey(value);
+  if (!key || !group) return false;
+  if (normalizeCategoryKey(group.name) === key) return true;
+  if ((group.triggers || []).some((t) => normalizeCategoryKey(t) === key)) return true;
+  return false;
+}
+
+function catalogBackedGroupChoices(ctx = {}, groups = []) {
+  const out = [];
+  for (const group of groups) {
+    if (catalogBackedCategoryChoicesForGroup(ctx, group, "").length > 0) {
+      out.push(humanGroupLabel(group, { title: true }));
+    }
+  }
+  return uniqueLabels(out);
+}
+
+function catalogBackedGenderChoicesForGroup(ctx = {}, group) {
+  const order = ["men", "women", "kids"];
+  const found = new Set();
+  for (const category of group?.categories || []) {
+    const availability = lookupCategoryAvailability(ctx, category);
+    for (const gender of availability?.genders || []) {
+      const normalized = normalizeGender(gender);
+      if (normalized && normalized !== "unisex") found.add(normalized);
+    }
+  }
+  return order.filter((g) => found.has(g)).map(genderChoiceLabel);
+}
+
+function catalogBackedCategoryChoicesForGroup(ctx = {}, group, gender = "") {
+  const out = [];
+  for (const category of group?.categories || []) {
+    if (!categoryHasCatalogEvidence(ctx, category, gender)) continue;
+    out.push(displayCategoryLabel(ctx, category));
+  }
+  return uniqueLabels(out);
+}
+
+function categoryHasCatalogEvidence(ctx = {}, category, gender = "") {
+  const key = normalizeCategoryKey(category);
+  if (!key) return false;
+  const availability = lookupCategoryAvailability(ctx, category);
+  const normalizedGender = normalizeGender(gender);
+  if (normalizedGender && availability) {
+    const genders = new Set((availability.genders || []).map((g) => normalizeGender(g)).filter(Boolean));
+    return genders.has(normalizedGender) || genders.has("unisex");
+  }
+  if (!normalizedGender && availability) return true;
+
+  const scopedCategories = categorySet(ctx.catalogCategories || []);
+  if (scopedCategories.size > 0 && scopedCategories.has(key)) return true;
+  const fullCategories = categorySet(ctx.fullCatalogCategories || []);
+  return fullCategories.has(key);
+}
+
+function lookupCategoryAvailability(ctx = {}, category) {
+  const key = normalizeCategoryKey(category);
+  const map = ctx.categoryGenderMap || {};
+  for (const [rawKey, rawValue] of Object.entries(map)) {
+    if (normalizeCategoryKey(rawKey) !== key) continue;
+    const value = rawValue || {};
+    return {
+      display: value.display || value.label || category,
+      genders: Array.isArray(value.genders) ? value.genders : [],
+    };
+  }
+  return null;
+}
+
+function categorySet(values = []) {
+  return new Set(
+    (Array.isArray(values) ? values : [])
+      .map((v) => normalizeCategoryKey(v))
+      .filter(Boolean),
+  );
+}
+
+function displayCategoryLabel(ctx = {}, category) {
+  const availability = lookupCategoryAvailability(ctx, category);
+  return titleCaseLabel(availability?.display || category);
+}
+
+function humanGroupLabel(group, { title = false } = {}) {
+  const label = titleCaseLabel(group?.name || "styles");
+  return title ? label : label.toLowerCase();
+}
+
+function titleCaseLabel(value) {
+  return String(value || "")
+    .replace(/[-_]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/\b\w/g, (m) => m.toUpperCase());
+}
+
+function uniqueLabels(labels = []) {
+  const seen = new Set();
+  const out = [];
+  for (const label of labels) {
+    const clean = String(label || "").trim();
+    const key = clean.toLowerCase();
+    if (!clean || seen.has(key)) continue;
+    seen.add(key);
+    out.push(clean);
+  }
+  return out;
+}
+
+function genderChoiceLabel(gender) {
+  const normalized = normalizeGender(gender);
+  if (normalized === "men") return "Men's";
+  if (normalized === "women") return "Women's";
+  if (normalized === "kids") return "Kids";
+  return titleCaseLabel(normalized);
+}
+
+function normalizeCategoryKey(raw) {
+  return String(raw || "")
+    .toLowerCase()
+    .trim()
+    .replace(/&/g, "and")
+    .replace(/['’]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
 }
 
 // ─── 4. Variant family grouping ─────────────────────────────────

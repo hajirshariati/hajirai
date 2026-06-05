@@ -642,6 +642,12 @@ async function runProductTurnDispatch({ ctx, controller, encoder, claimConfig })
   const products = Array.isArray(out.products) ? out.products : [];
   controller.enqueue(encoder.encode(sseChunk({ type: "text", text })));
   controller.enqueue(encoder.encode(sseChunk({ type: "products", products })));
+  if (Array.isArray(out.choices) && out.choices.length > 0) {
+    controller.enqueue(encoder.encode(sseChunk({
+      type: "choices",
+      options: out.choices,
+    })));
+  }
   const linkPayload = await convertEngineCtaToLink(out.cta, ctx);
   if (linkPayload) {
     controller.enqueue(encoder.encode(sseChunk({
