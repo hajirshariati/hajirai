@@ -826,6 +826,7 @@ function resolverHasExactNoMatch(resolverState) {
 // products, and stop.
 async function runResolverNoMatchDispatch({ ctx, controller, encoder }) {
   if (!resolverHasExactNoMatch(ctx?.resolverState)) return null;
+  if (isCompoundPolicyProductQuestion(ctx?.latestUserMessage)) return null;
   const exactNoMatch = buildCodeOwnedExactNoMatchText({ ctx });
   const text = String(exactNoMatch?.text || "").trim();
   if (!text) return null;
