@@ -365,7 +365,48 @@ export function resolveTurnScope({ latestUserMessage, messages = [], sessionMemo
   scope.catalogQuery = catalogRequirements.catalogQuery;
   scope.catalogQueryContinuedFromPrior = catalogRequirements.continuedFromPrior;
 
+  // Stale-named-product cleanup. When the customer's latest message
+  // is a clear broad-catalog query ("what do you have?", "what shoes
+  // aetrex have?", "show me shoes"), any namedProduct in session
+  // memory is stale and must not hijack the turn. This can happen
+  // when an earlier message contained a token that resolved to a
+  // single product (e.g. the merchant brand "aetrex" appears as the
+  // first title token of one accessory product — detectSpecificProduct
+  // then writes that handle into explicit.specificProduct, which the
+  // engine would otherwise treat as a focused product reference and
+  // decline the browse clarifier for.
+  //
+  // Owning this inside the engine — instead of adding a downstream
+  // guard — keeps the rule "one engine produces the final turn":
+  // engine sees broad browse → engine clears stale anchor → engine
+  // emits clarifier with catalog-backed category chips.
+  if (scope.namedProduct && looksLikeBroadCatalogQuery(scope.rawMessage)) {
+    scope.namedProduct = null;
+  }
+
   return scope;
+}
+
+// Heuristic: did the customer just ask a broad "what's in your
+// catalog?" question? Used by resolveTurnScope to drop a stale
+// session-memory product anchor so the browse clarifier can fire.
+//
+// Two shapes:
+//   1. Has a generic catalog noun (shoes / footwear / styles / types /
+//      products) plus a query verb (what / show / find / have / carry /
+//      need / want / looking ...).
+//   2. Bare "what do you have/carry/sell/offer/recommend" with no
+//      noun — still a broad catalog probe.
+const BROAD_BROWSE_NOUN_RE =
+  /\b(?:shoes?|footwear|styles?|types?|products?|stuff|things)\b/i;
+const BROAD_BROWSE_BARE_PROBE_RE =
+  /^\s*(?:what|which)\s+do\s+you\s+(?:have|carry|sell|offer|got|recommend|suggest)\b/i;
+function looksLikeBroadCatalogQuery(message) {
+  const text = String(message || "").trim();
+  if (!text) return false;
+  if (text.length > 140) return false;
+  if (BROAD_BROWSE_BARE_PROBE_RE.test(text)) return true;
+  return BROAD_BROWSE_RE.test(text) && BROAD_BROWSE_NOUN_RE.test(text);
 }
 
 // Compare / similar-to / named-anchor phrasing. When the customer
