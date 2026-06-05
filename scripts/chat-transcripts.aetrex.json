@@ -1,5 +1,43 @@
 [
   {
+    "name": "pink shoes first turn is catalog-grounded",
+    "turns": [
+      {
+        "user": "i need pink shoes",
+        "expect": {
+          "text": {
+            "mustIncludeAny": [
+              "pink",
+              "rose",
+              "blush",
+              "coral"
+            ],
+            "mustNotInclude": [
+              "pink men's",
+              "pink kids",
+              "men's orthotics",
+              "orthotics in other colors"
+            ]
+          },
+          "products": {
+            "min": 1,
+            "allTitleOrHandleMustNotMatch": "\\bmen(?:'s|s)?\\b|\\borthotics\\b|\\binsole\\b|\\binsert\\b"
+          },
+          "chips": {
+            "mustNotInclude": [
+              "Men's",
+              "Kids",
+              "Orthotics"
+            ]
+          },
+          "links": {
+            "labelMustInclude": "Pink"
+          }
+        }
+      }
+    ]
+  },
+  {
     "name": "shopping gender continuation keeps category and color",
     "turns": [
       {
