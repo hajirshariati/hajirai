@@ -1179,6 +1179,49 @@ function compoundPolicyFallbackText(latestMessage = "") {
   return "For the service question, the support page has the current Aetrex details.";
 }
 
+function compoundPolicyClausePresent(text = "", latestMessage = "") {
+  const visible = String(text || "");
+  const latest = String(latestMessage || "");
+  if (!visible.trim()) return false;
+
+  if (/\b(discount|coupon|promo(?:tion)?\s*code|promo(?:tion)?|coupon\s*code|bundle)\b/i.test(latest)) {
+    return /\b(discount|coupon|promo|code|checkout|offer)\b/i.test(visible);
+  }
+  if (/\b(rewards?|loyalty|points?|vip|referral)\b/i.test(latest)) {
+    return /\b(rewards?|loyalty|points?|vip|referral|account)\b/i.test(visible);
+  }
+  if (/\b(return|returns|refund|exchange|exchanges)\b/i.test(latest)) {
+    return /\b(return|returns|refund|exchange|30\s+days?|unworn|packaging)\b/i.test(visible);
+  }
+  if (/\b(ship|shipping|delivery)\b/i.test(latest)) {
+    return /\b(ship|shipping|delivery|checkout|support|tracking)\b/i.test(visible);
+  }
+  if (/\b(warranty|guarantee)\b/i.test(latest)) {
+    return /\b(warranty|guarantee|coverage|support)\b/i.test(visible);
+  }
+  if (/\b(track|tracking|order\s+(?:status|number|history)|where\s+is\s+my\s+order)\b/i.test(latest)) {
+    return /\b(track|tracking|order|email|support)\b/i.test(visible);
+  }
+  if (/\b(?:customer\s+(?:service|support)|support\s+team|contact\s+(?:you|your|support|us|customer)|account|log\s*in|sign\s*in|help\s+desk|reach\s+(?:out|customer))\b/i.test(latest)) {
+    return /\b(support|customer service|contact|account)\b/i.test(visible);
+  }
+  return /\b(support|service|policy|details)\b/i.test(visible);
+}
+
+function ensureCompoundPolicyClause(text = "", ctx = {}) {
+  const latest = ctx?.latestUserMessage || "";
+  if (!isCompoundPolicyProductQuestion(latest)) return { text, changed: false };
+  const fallback = compoundPolicyFallbackText(latest);
+  if (!fallback || compoundPolicyClausePresent(text, latest)) {
+    return { text, changed: false };
+  }
+  const trimmed = String(text || "").trim();
+  return {
+    text: trimmed ? `${fallback} ${trimmed}` : fallback,
+    changed: true,
+  };
+}
+
 function policyOnlyFallbackText(latestMessage = "") {
   const latest = String(latestMessage || "");
   if (/\b(discount|coupon|promo(?:tion)?|code|deal|sale|clearance|markdown|bundle)\b/i.test(latest)) {
@@ -2178,7 +2221,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   if (isCompoundPolicyProductQuestion(ctx.latestUserMessage) && fullResponseText) {
     const additions = [];
     const policyFallback = compoundPolicyFallbackText(ctx.latestUserMessage);
-    if (policyFallback && !/\b(return|returns|refund|exchange|30\s+days?|unworn|shipping|delivery|warranty|guarantee|discount|coupon|promo|code|sale|rewards?|loyalty|points?|vip|support|customer service|order|tracking)\b/i.test(fullResponseText)) {
+    if (policyFallback && !compoundPolicyClausePresent(fullResponseText, ctx.latestUserMessage)) {
       additions.push(policyFallback);
     }
     if (
@@ -2639,6 +2682,14 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       `[chat] empty-text final guard recovered after response-contract pool=${pool.length} ` +
         `len=${fullResponseText.length} reason=${listing.reason || "static_fallback"}`,
     );
+  }
+
+  {
+    const compound = ensureCompoundPolicyClause(fullResponseText, ctx);
+    if (compound.changed) {
+      fullResponseText = compound.text;
+      console.log("[chat] compound-contract: final guard restored missing policy clause");
+    }
   }
 
   console.log(`[chat] emit textLen=${fullResponseText.length} poolSize=${pool.length} searchAttempted=${productSearchAttempted}`);
