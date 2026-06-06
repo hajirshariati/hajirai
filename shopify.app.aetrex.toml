@@ -1,0 +1,54 @@
+client_id = "0448b3c2fd7ca4393b467d01ced74cd4"
+name = "Aetrex Fit Concierge"
+application_url = "https://seos-production.up.railway.app"
+embedded = true
+
+[build]
+automatically_update_urls_on_dev = true
+
+[webhooks]
+api_version = "2026-04"
+
+  [[webhooks.subscriptions]]
+  topics = [ "app/uninstalled" ]
+  uri = "/webhooks/app/uninstalled"
+
+  [[webhooks.subscriptions]]
+  topics = [ "app/scopes_update" ]
+  uri = "/webhooks/app/scopes_update"
+
+  [[webhooks.subscriptions]]
+  topics = [ "products/create" ]
+  uri = "/webhooks/products/create"
+
+  [[webhooks.subscriptions]]
+  topics = [ "products/update" ]
+  uri = "/webhooks/products/update"
+
+  [[webhooks.subscriptions]]
+  topics = [ "products/delete" ]
+  uri = "/webhooks/products/delete"
+
+  [[webhooks.subscriptions]]
+  topics = [ "orders/create" ]
+  uri = "/webhooks/orders/create"
+
+  [webhooks.privacy_compliance]
+  customer_deletion_url = "/webhooks/customers/redact"
+  customer_data_request_url = "/webhooks/customers/data_request"
+  shop_deletion_url = "/webhooks/shop/redact"
+
+[access_scopes]
+scopes = "read_products,read_customers,read_orders,write_orders,read_metaobjects"
+
+[auth]
+redirect_urls = [
+  "https://seos-production.up.railway.app/auth/callback",
+  "https://seos-production.up.railway.app/auth/shopify/callback",
+  "https://seos-production.up.railway.app/api/auth/callback"
+]
+
+[app_proxy]
+url = "https://seos-production.up.railway.app"
+subpath = "hajirai"
+prefix = "apps"
