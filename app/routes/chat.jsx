@@ -483,7 +483,7 @@ function filterCatalogGroundedSuggestions(questions, ctx = {}) {
 // the family color list into the existing filters.color shape that
 // search_products already supports (single canonical color), and
 // the engine's selection layer then prefers exact-color matches.
-async function runProductTurnDispatch({ ctx, controller, encoder, claimConfig }) {
+async function runProductTurnDispatch({ ctx, controller, encoder, claimConfig, anthropic }) {
   const enabled = String(process.env.PRODUCT_TURN_ENGINE_ENABLED || "").toLowerCase() === "true";
   if (!enabled) return null;
 
@@ -614,6 +614,63 @@ async function runProductTurnDispatch({ ctx, controller, encoder, claimConfig })
     }
   };
 
+  // Voice synthesizer. Engine still owns selection, lead pick, CTA,
+  // chips — this only rewrites the deterministic template into
+  // warmer prose using ONLY the facts the engine grounded. Strict
+  // rules in the prompt forbid inventing details and forbid
+  // describing UI. Falls back silently if Haiku errors / empties.
+  const synthesizeFn = anthropic
+    ? async ({ latestUserMessage, scope, leadCard, deterministicText, selectionReason, familyCount, deferredCount, willHaveCta }) => {
+        const leadTitle = String(leadCard?.title || "").trim();
+        if (!leadTitle) return null;
+        const facts = {
+          customer_asked: String(latestUserMessage || "").slice(0, 240),
+          recommended_product: leadTitle,
+          recommended_color: leadCard?._color || leadCard?.color || "",
+          recommended_price: leadCard?.price_formatted || leadCard?.priceRange || "",
+          scope_gender: scope?.gender || "",
+          scope_category: scope?.category || "",
+          scope_color: scope?.color || "",
+          scope_modifier: scope?.modifier || "",
+          requested_claim: scope?.requestedClaim?.kind || "",
+          requested_condition: scope?.requestedClaim?.tag || "",
+          required_feature: (scope?.requiredCatalogTerms || [])[0] || "",
+          other_options_count: Math.max(0, (familyCount || 0) - 1),
+          deferred_count: deferredCount || 0,
+          selection_reason: selectionReason || "",
+          has_view_all_button: !!willHaveCta,
+          template_for_reference: deterministicText,
+        };
+        const prompt =
+          `You are a warm, professional sales associate writing the assistant's reply for a footwear store chat.\n\n` +
+          `FACTS YOU MAY USE (do NOT invent anything outside this list):\n${JSON.stringify(facts, null, 2)}\n\n` +
+          `Write 1-2 short sentences that:\n` +
+          `- Sound like a real associate — friendly, natural, not robotic.\n` +
+          `- Lead with the recommended_product by name.\n` +
+          `- Briefly say why it's a good fit using only the listed facts (selection_reason, requested_claim, requested_condition, required_feature, or the scope fields).\n` +
+          `- If other_options_count > 0, mention the alternatives in passing (without listing them).\n` +
+          `- If has_view_all_button is true AND other_options_count === 0, you may invite them to open the card; otherwise don't.\n\n` +
+          `STRICT RULES:\n` +
+          `- Never invent product names, colors, prices, materials, technologies, sizes, or claims not in the facts.\n` +
+          `- Never describe UI elements ("click", "tap", "button below") beyond the one exception above.\n` +
+          `- Vary phrasing across turns — do NOT reuse the template_for_reference verbatim.\n` +
+          `- No greetings ("Hi!", "Sure!"), no sign-offs, no emojis.\n` +
+          `- Plain prose, no bullets, no markdown.\n\n` +
+          `Customer-facing reply (1-2 sentences):`;
+        try {
+          const r = await anthropic.messages.create({
+            model: HAIKU_MODEL,
+            max_tokens: 160,
+            messages: [{ role: "user", content: prompt }],
+          });
+          return r?.content?.[0]?.text?.trim() || "";
+        } catch (err) {
+          console.warn(`[product-turn-engine] voice synth haiku failed: ${err?.message || err}`);
+          return null;
+        }
+      }
+    : null;
+
   let out;
   try {
     out = await runProductTurn(ctx, {
@@ -621,6 +678,7 @@ async function runProductTurnDispatch({ ctx, controller, encoder, claimConfig })
       similarFn,
       resolveNamedProductFn,
       claimConfig,
+      synthesizeFn,
     });
   } catch (err) {
     console.error(`[product-turn-engine] runProductTurn threw: ${err?.stack || err?.message || err}`);
@@ -4239,7 +4297,7 @@ export const action = async ({ request }) => {
                 orthoticRecommendationIntent ? "declined:orthotic_recommendation_intent" : null,
               ].filter(Boolean) } }
             : await runProductTurnDispatch({
-                ctx, controller, encoder, claimConfig,
+                ctx, controller, encoder, claimConfig, anthropic,
               });
           if (engineResult && engineResult.handled) {
             console.log(`[router] ${ctx.shop} final_path=product_engine`);

@@ -223,6 +223,44 @@ export async function runProductTurn(ctx = {}, options = {}) {
   });
   diagnostics.composer = composed.reason;
 
+  // LLM voice on engine facts. Engine has already SELECTED the
+  // products and picked the lead — that's the safety guarantee
+  // ("engine owns the turn"). Composer wrote a deterministic
+  // sentence as the fallback. If the caller passed a synthesizeFn,
+  // we hand it the same grounded facts (lead product, scope,
+  // runner-up count, selection reason) and let it write warmer,
+  // less robotic prose. Anything the LLM produces replaces the
+  // deterministic text; if it fails / times out / returns empty,
+  // the deterministic copy stays. The LLM never decides what to
+  // show — only how to say it.
+  if (typeof options.synthesizeFn === "function" && composed?.text) {
+    const allFamilies = [...selected, ...deferred];
+    const allCards = familiesToCards(allFamilies);
+    const leadFamily = selected[0] || deferred[0] || allFamilies[0];
+    const leadCard = leadFamily?.primary || leadFamily?.variants?.[0] || allCards[0];
+    try {
+      const synthText = await options.synthesizeFn({
+        latestUserMessage: ctx.latestUserMessage || "",
+        scope,
+        leadCard,
+        deterministicText: composed.text,
+        selectionReason,
+        familyCount: allFamilies.length,
+        cardCount: allCards.length,
+        deferredCount: deferred.length,
+        willHaveCta,
+      });
+      const text = String(synthText || "").trim();
+      if (text) {
+        composed.text = text;
+        composed.reason = `${composed.reason}/synth`;
+        diagnostics.composer = composed.reason;
+      }
+    } catch (err) {
+      console.warn(`[product-turn-engine] synth failed (using deterministic): ${err?.message || err}`);
+    }
+  }
+
   // Flatten back to displayable cards (every variant of selected
   // families, in family-order). Deferred cards trail after selected
   // if the engine couldn't satisfy the claim exactly.
