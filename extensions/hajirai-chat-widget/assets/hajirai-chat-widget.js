@@ -900,14 +900,14 @@ showHighTraffic();
 function handleSSE(response){
 var reader=response.body.getReader();
 var decoder=new TextDecoder();
-var buf='',full='',prods=[],msgDiv=null,buffSugg=[],linkCTA=null,fitReport=null;
+var buf='',full='',prods=[],msgDiv=null,buffSugg=[],buffChoices=[],linkCTA=null,fitReport=null;
 function proc(chunk){
 buf+=chunk;var lines=buf.split('\n');buf=lines.pop()||'';
 for(var i=0;i<lines.length;i++){
 var line=lines[i].trim();
 if(!line.startsWith('data: '))continue;
 var data=line.slice(6);
-if(data==='[DONE]'){finish(full,prods,msgDiv,buffSugg,linkCTA,fitReport);return true}
+if(data==='[DONE]'){finish(full,prods,msgDiv,buffSugg,linkCTA,fitReport,buffChoices);return true}
 try{
 var p=JSON.parse(data);
 if(p.type==='text'||p.type==='content_block_delta'){
@@ -921,11 +921,7 @@ if(p.type==='link'&&p.url){
   linkCTA={url:p.url,label:p.label||'Visit Support Hub'};
 }
 if(p.type==='choices'&&p.options&&p.options.length){
-  typingEl.classList.remove('visible');
-  if(!msgDiv)msgDiv=appendMsg('assistant',full||'');
-  var b=$('.ai-chat-msg-bubble',msgDiv);
-  if(b){b.insertAdjacentHTML('beforeend',choiceButtonsHtml(p.options));var lc=b.querySelector('.ai-chat-choices:last-of-type');if(lc)initChoicesScroll(lc)}
-  scrollBottom();
+  buffChoices=p.options;
 }
 if(p.type==='suggestions'&&p.questions&&p.questions.length){
   buffSugg=p.questions;
@@ -951,14 +947,14 @@ if(p.type==='action'&&p.action==='show_dead_end'){
   setTimeout(function(){showKlaviyoForm('Stay Connected')},500);
   scrollBottom();
 }
-if(p.type==='done'){finish(full,prods,msgDiv,buffSugg,linkCTA,fitReport);return true}
+if(p.type==='done'){finish(full,prods,msgDiv,buffSugg,linkCTA,fitReport,buffChoices);return true}
 if(p.type==='error'){
   showStreamError(p.message||'I\'m sorry, I\'m having trouble right now. Please try again in a moment.');
   return true;
 }
 }catch(e){}
 }return false}
-function read(){reader.read().then(function(r){if(r.done){if(full)finish(full,prods,msgDiv,buffSugg,linkCTA,fitReport);else showStreamError('I\'m having trouble right now. Please try again.');return}var done=proc(decoder.decode(r.value,{stream:true}));if(!done)read()}).catch(function(e){if(e.name!=='AbortError'){if(full)finish(full,prods,msgDiv,buffSugg,linkCTA,fitReport);else showStreamError('Connection lost. Please try again.')}})}
+function read(){reader.read().then(function(r){if(r.done){if(full)finish(full,prods,msgDiv,buffSugg,linkCTA,fitReport,buffChoices);else showStreamError('I\'m having trouble right now. Please try again.');return}var done=proc(decoder.decode(r.value,{stream:true}));if(!done)read()}).catch(function(e){if(e.name!=='AbortError'){if(full)finish(full,prods,msgDiv,buffSugg,linkCTA,fitReport,buffChoices);else showStreamError('Connection lost. Please try again.')}})}
 read();
 }
 
@@ -1011,7 +1007,7 @@ return '<div class="ai-chat-fit-card" role="region" aria-label="Size recommendat
 '</div>';
 }
 
-function finish(text,prods,md2,sugg,linkCTA,fitReport){
+function finish(text,prods,md2,sugg,linkCTA,fitReport,sseChoices){
 clearWatchdog();
 typingEl.classList.remove('visible');isStreaming=false;sendBtn.disabled=false;
 errorRetryCount=0;
@@ -1021,6 +1017,15 @@ var cleanText=text||'';
 var choiceRe=/<<([^<>]+)>>/g;
 var cm;while((cm=choiceRe.exec(cleanText))!==null){choices.push(cm[1])}
 if(choices.length>0)cleanText=cleanText.replace(/\s*<<[^<>]+>>/g,'').trim();
+// SSE-delivered choices (engine browse-clarifier) merge into the
+// same chip set as in-text <<...>> markers. finish() owns the
+// bubble's final HTML — no other code path inserts chips.
+if(Array.isArray(sseChoices)&&sseChoices.length){
+  for(var sc=0;sc<sseChoices.length;sc++){
+    var c=String(sseChoices[sc]||'').trim();
+    if(c&&choices.indexOf(c)===-1)choices.push(c);
+  }
+}
 if(cleanText){
   if(!mDiv)mDiv=appendMsg('assistant',cleanText,prods);
   else{var b=$('.ai-chat-msg-bubble',mDiv);if(b){b.innerHTML='<p>'+md(esc(cleanText))+'</p>';if(prods&&prods.length){var isShowcase2=PRODUCT_CARD_STYLE==='showcase';var styleSuffix2=isShowcase2?' ai-chat-products--showcase':'';var ph='<div class="ai-chat-products'+styleSuffix2+'">';for(var pi=0;pi<prods.length;pi++)ph+=prodCard(prods[pi]);ph+='</div>';b.insertAdjacentHTML('beforeend',isShowcase2?showcaseWrap(ph):ph);if(isShowcase2){var w2=b.querySelector('.ai-chat-products-wrap');if(w2)initShowcaseArrows(w2)}}}}
