@@ -499,64 +499,70 @@ const COMPARE_SHAPE_RE =
   /\b(?:which\s+of\s+(?:these|those|them)|which\s+(?:is|one\s+is)\s+(?:better|worse|more|best|the\s+most)|compare\s+(?:the\s+)?(?:first|top|two|these)|side[\s-]?by[\s-]?side)\b/i;
 
 function engineWantsThisTurn(scope, resolverState = null, ctx = {}) {
+  // ──────────────────────────────────────────────────────────────────
+  // OPT-IN gate. Default = LLM owns the turn. The engine only claims
+  // when there's POSITIVE evidence this is a product-retrieval shape
+  // it can author confidently. Architectural shift from opt-OUT (claim
+  // unless one of N declines fires) to opt-IN — removes whole classes
+  // of "engine grabbed something it shouldn't" bugs that used to need
+  // a new decline regex each time.
+  // ──────────────────────────────────────────────────────────────────
+  const raw = String(scope.rawMessage || "");
   const hasResolverCandidates = resolverHasCandidateRecommendation(resolverState);
-  const hasCatalogRequirement = scope.requiredCatalogTerms?.length > 0;
+  const hasCatalogRequirement = (scope.requiredCatalogTerms?.length || 0) > 0;
   const priorCards = Array.isArray(ctx.priorProductCards) ? ctx.priorProductCards : [];
-  // Fit / review / sizing follow-up about prior products. When the
-  // customer asks "do these run small?", "what's the return rate?",
-  // "which has the highest review?", they're asking ABOUT the
-  // products currently in scope (carried by session memory) OR
-  // about a named product anchor in the message ("return rate on
-  // Jillian"). The engine has the prior scope (or can resolve the
-  // anchor) and can enrich the relevant candidates with Yotpo +
-  // AfterShip data — that's a clean engine-owned answer. Without
-  // this, the LLM agent loop owns the turn and its postprocessors
-  // (capability-check suppress, code-owned product listing,
-  // policy-question suppress) strip the reply to nothing OR
-  // overwrite it with a generic "I found N sandals" template that
-  // doesn't actually answer the question.
+
+  // Hard declines first — shapes the engine should never claim, even
+  // when scope has signal. These are turn-class boundaries (account,
+  // comparison, named-product lookup, multi-criteria) where the LLM
+  // is fundamentally a better fit.
+  if (NAMED_PRODUCT_ANCHOR_RE.test(raw)) return false;
+  if (COMPARE_SHAPE_RE.test(raw)) return false;
+  if (isComplexMultiCriteriaTurn(raw)) return false;
+  if (scope.namedProduct && !hasResolverCandidates && !hasCatalogRequirement) return false;
+
+  // Special claim — review/fit/return follow-up about cards on screen.
+  // Even without other scope signal, the engine owns this because it
+  // has the prior cards and can enrich them with Yotpo/AfterShip.
   if (
-    isReviewShapedQuestion(scope.rawMessage)
-    && (
-      scope.category || scope.color || scope.gender || scope.namedProduct
-      // Pronoun follow-up about the cards already on screen — engine
-      // owns this even if scope is otherwise empty (memory cleared).
-      || (hasPronounReference(scope.rawMessage) && priorCards.length > 0)
-    )
+    isReviewShapedQuestion(raw)
+    && hasPronounReference(raw)
+    && priorCards.length > 0
   ) {
     return true;
   }
-  // V1 gate: handle clear claim-carrying retrieval shapes only.
-  // Decline named-product lookups (compare/similar/specific-product)
-  // and turns missing both a category and a concrete catalog concept.
-  // A verified product concept ("BioRocker", "cork", "memory foam")
-  // is sufficient retrieval scope even without a category; keeping those
-  // in the engine prevents the fallback agent from confidently describing
-  // products after an unverified/empty search.
+
+  // Standard claim — review/fit/return question with active scope.
+  // ("do women's sandals run small?", "return rate on sneakers?")
   if (
-    !scope.category
-    && !scope.color
-    && !scope.colorFamily
-    && !scope.badge
-    && !scope.onSale
-    && !scope.modifier
-    && !hasResolverCandidates
-    && !hasCatalogRequirement
-  ) return false;
-  if (scope.namedProduct && !hasResolverCandidates && !hasCatalogRequirement) return false;
-  const raw = scope.rawMessage || "";
-  if (NAMED_PRODUCT_ANCHOR_RE.test(raw)) return false;
-  if (COMPARE_SHAPE_RE.test(raw)) return false;
-  // Complex multi-criteria turn — let the LLM agent handle it.
-  // The engine is a category + claim filter; it can't synthesize
-  // "dressy AND walkable AND restaurant-appropriate". Live trace
-  // 2026-06-03 Italy turn: customer asked for ONE pair of shoes
-  // that works for sightseeing + dinner at nicer restaurants
-  // with flat feet support — the engine reduced it to
-  // category=sandals + condition=flat_feet and returned flip-flops
-  // because they happened to be tagged for flat feet. Declining
-  // lets the LLM read the whole nuanced ask and apply judgement.
-  if (isComplexMultiCriteriaTurn(raw)) return false;
+    isReviewShapedQuestion(raw)
+    && (scope.category || scope.color || scope.gender)
+  ) {
+    return true;
+  }
+
+  // Positive product-retrieval evidence. Engine needs at least ONE of:
+  //   - explicit category ("sandals", "sneakers", "footwear")
+  //   - color or color family ("pink", "neutrals")
+  //   - condition ("plantar fasciitis", "bunions") — claim-backed
+  //   - useCase ("for walking", "for work") — recommendation signal
+  //   - modifier ("bestseller", "new", "on sale")
+  //   - badge ("new arrivals") or onSale flag
+  //   - catalog requirement ("cork", "BioRocker", "memory foam")
+  //   - resolver-promised candidates (legacy resolver already picked)
+  const hasRetrievalEvidence =
+    !!scope.category
+    || !!scope.color
+    || !!scope.colorFamily
+    || !!scope.condition
+    || !!scope.useCase
+    || !!scope.modifier
+    || !!scope.badge
+    || scope.onSale === true
+    || hasCatalogRequirement
+    || hasResolverCandidates;
+
+  if (!hasRetrievalEvidence) return false;
   return true;
 }
 
@@ -695,9 +701,23 @@ function buildBrowseClarification({ ctx = {}, scope = {} } = {}) {
   return null;
 }
 
+// Product / shopping nouns that signal the customer is browsing the
+// catalog, not asking about an account/policy/loyalty/order topic that
+// just happens to share a "have"/"need" verb with browse intent.
+// Without this gate, "how many points i have?" used to trigger the
+// browse clarifier ("Which styles would you like to browse?") because
+// "have" matched BROAD_BROWSE_RE.
+const BROWSE_PRODUCT_NOUN_RE =
+  /\b(?:shoe|shoes|footwear|sneaker|sneakers|sandal|sandals|boot|boots|loafer|loafers|oxford|oxfords|clog|clogs|slipper|slippers|wedge|wedges|heel|heels|mary[- ]?jane|slip[- ]?on|flat|flats|orthotic|orthotics|insole|insoles|accessor(?:y|ies)|product|products|item|items|merchandise|style|styles|pair|pairs|something|anything\s+(?:new|else|cute|comfortable))\b/i;
+
 function isBroadBrowseClarificationCandidate(scope = {}) {
   const raw = String(scope.rawMessage || "").trim();
   if (!raw || !BROAD_BROWSE_RE.test(raw)) return false;
+  // Opt-in: clarifier only fires when the customer named a real
+  // shopping noun (shoes / sandals / footwear / orthotics / etc.).
+  // "how many points i have" and "where is my order" no longer trip
+  // this just because they contain "have" / "my order".
+  if (!BROWSE_PRODUCT_NOUN_RE.test(raw)) return false;
   const vagueNeedNewFootwear =
     /\b(?:need|want|looking\s+for|look\s+for)\b[^.?!]{0,40}\bnew\b[^.?!]{0,40}\b(?:shoes?|footwear)\b/i.test(raw) &&
     !/\b(?:show|browse|shop|what'?s\s+new|new\s+arrivals?|latest)\b/i.test(raw);

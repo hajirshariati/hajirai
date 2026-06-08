@@ -1234,6 +1234,91 @@ await test("D24 — pronoun-only follow-up without priorProductCards goes throug
   assert.equal(searchCalled, true, "no prior cards → engine falls back to normal search");
 });
 
+// ─── Opt-IN engine inversion ──────────────────────────────────────
+
+await test("D26 — engine OPT-IN: 'how many points do I have?' declines (no product noun)", async () => {
+  let searchCalled = false;
+  const out = await runProductTurn({
+    ...ctxBase,
+    latestUserMessage: "how many points do I have?",
+    sessionMemory: { explicit: {}, inferred: {} },
+  }, {
+    forceEnable: true,
+    searchFn: async () => { searchCalled = true; return []; },
+    claimConfig: FIXTURE_CLAIM_CONFIG,
+  });
+  assert.ok(out && out.decline, "no product noun + no scope evidence → engine declines");
+  assert.equal(searchCalled, false);
+});
+
+await test("D27 — engine OPT-IN: 'have any sandals?' claims (product noun + browse verb)", async () => {
+  const out = await runProductTurn({
+    ...ctxBase,
+    latestUserMessage: "have any sandals?",
+    sessionMemory: { explicit: { category: "sandals" }, inferred: {} },
+  }, {
+    forceEnable: true,
+    searchFn: async () => [uiCandidate({ title: "Vicki", handle: "vicki" })],
+    claimConfig: FIXTURE_CLAIM_CONFIG,
+  });
+  assert.ok(out && !out.decline, "browse verb + product noun + scope → engine claims");
+});
+
+await test("D28 — engine OPT-IN: pure browse with no scope ('show me products') asks group clarifier", async () => {
+  const out = await runProductTurn({
+    ...BROWSE_CTX,
+    latestUserMessage: "show me products",
+    sessionMemory: { explicit: {}, inferred: {} },
+  }, {
+    forceEnable: true,
+    searchFn: async () => { throw new Error("should not search"); },
+    claimConfig: FIXTURE_CLAIM_CONFIG,
+  });
+  assert.ok(out && !out.decline && Array.isArray(out.choices),
+    "browse with product noun but no scope → clarifier chips");
+});
+
+await test("D29 — engine OPT-IN: gibberish 'asdfghjkl' declines", async () => {
+  let searchCalled = false;
+  const out = await runProductTurn({
+    ...ctxBase,
+    latestUserMessage: "asdfghjkl",
+    sessionMemory: { explicit: {}, inferred: {} },
+  }, {
+    forceEnable: true,
+    searchFn: async () => { searchCalled = true; return []; },
+    claimConfig: FIXTURE_CLAIM_CONFIG,
+  });
+  assert.ok(out && out.decline);
+  assert.equal(searchCalled, false);
+});
+
+await test("D30 — engine OPT-IN: useCase alone is sufficient retrieval evidence", async () => {
+  const out = await runProductTurn({
+    ...ctxBase,
+    latestUserMessage: "I need shoes for hiking",
+    sessionMemory: { explicit: { useCase: "hiking", gender: "women" }, inferred: {} },
+  }, {
+    forceEnable: true,
+    searchFn: async () => [uiCandidate({ title: "Sierra Hiker", handle: "sierra", productType: "Boots", attributes: { category: "Boots", gender: "Women" } })],
+    claimConfig: FIXTURE_CLAIM_CONFIG,
+  });
+  assert.ok(out && !out.decline, "useCase IS retrieval evidence in opt-in model");
+});
+
+await test("D31 — engine OPT-IN: condition alone is sufficient retrieval evidence", async () => {
+  const out = await runProductTurn({
+    ...ctxBase,
+    latestUserMessage: "I have plantar fasciitis",
+    sessionMemory: { explicit: { condition: "plantar_fasciitis" }, inferred: {} },
+  }, {
+    forceEnable: true,
+    searchFn: async () => [uiCandidate({ title: "Arch Pro", handle: "arch-pro" })],
+    claimConfig: FIXTURE_CLAIM_CONFIG,
+  });
+  assert.ok(out && !out.decline, "condition IS retrieval evidence in opt-in model");
+});
+
 // ─── Multi-criteria conflict (dressy + active) on short messages ──
 
 await test("D25 — short 'walking 8 miles, dressy shoe' declines (multi-criteria conflict)", async () => {

@@ -250,6 +250,11 @@ await test("E2E-3 — 'best dress shoes for men' after pink-sandals/bunions cont
   // runs. Here we simulate that result: explicit memory shows only
   // the NEW scope (men + dress) after the turn-intent pivot, with
   // pink/sandals/bunions moved to stale.
+  //
+  // With the opt-in engine inversion, useCase=dress IS positive
+  // retrieval evidence — engine can author "best dress shoes for
+  // men" from the dress-tagged pool. Critical assertion remains the
+  // same: stale scope (pink/sandals/bunions) must NOT leak.
   const out = await runProductTurn({
     ...ctxBase,
     latestUserMessage: "What are the best dress shoes for men?",
@@ -263,12 +268,8 @@ await test("E2E-3 — 'best dress shoes for men' after pink-sandals/bunions cont
     searchFn: fixedSearch(MENS_DRESS_POOL),
     claimConfig: FIXTURE_CLAIM_CONFIG,
   });
-  // No category in explicit memory yet — the engine declines so the
-  // resolver/agent path can clarify "oxfords or loafers." Per spec
-  // the engine V1 owns only clear claim-carrying turns; this turn
-  // genuinely needs a category clarifier.
-  assert.ok(out && out.decline,
-    `engine should decline when category isn't resolved; got ${JSON.stringify(out)}`);
+  assert.ok(out && !out.decline,
+    `engine should claim with useCase=dress + gender evidence; got ${JSON.stringify(out?.diagnostics)}`);
   // Critical: the scope the engine resolved must NOT contain stale
   // pink/sandals/bunions.
   assert.equal(out.diagnostics.scope.color, null,

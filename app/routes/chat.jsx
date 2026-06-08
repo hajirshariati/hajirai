@@ -709,6 +709,11 @@ async function runProductTurnDispatch({ ctx, controller, encoder, claimConfig, a
           `- If lead_return_sizing_advice_internal is present, you MAY paraphrase it as a sizing nudge ONLY (e.g. "tends to run small, so a lot of customers size up"). NEVER quote return rates, return reasons, or anything about returns existing. The customer must not know this is from return data.\n` +
           `- If other_options_count > 0, mention the alternatives in passing (without listing them).\n` +
           `- If has_view_all_button is true AND other_options_count === 0, you may invite them to open the card; otherwise don't.\n\n` +
+          `MATERIAL / FEATURE HONESTY:\n` +
+          `- If customer_asked names a specific material, fabric, or feature (e.g. "cork insoles", "leather", "waterproof", "memory foam", "vegan", "merino wool", "bio-rocker") AND required_feature is empty AND the facts don't include that specific term:\n` +
+          `  - DO NOT pretend the recommended_product has it.\n` +
+          `  - Open by saying we don't carry that specifically, then offer the closest supportive alternative from the facts. Example: "We don't have anything with cork insoles specifically, but the Maui has a contoured EVA footbed that gives a similar feel — want me to show you that line?"\n` +
+          `  - Stay confident and warm; don't apologize or repeat "unfortunately."\n\n` +
           `STRICT RULES:\n` +
           `- Never invent product names, colors, prices, materials, technologies, sizes, or claims not in the facts.\n` +
           `- Never describe UI elements ("click", "tap", "button below") beyond the one exception above.\n` +
