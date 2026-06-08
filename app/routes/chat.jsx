@@ -3430,6 +3430,25 @@ export const action = async ({ request }) => {
       return Response.json({ error: "message is required" }, { status: 400 });
     }
 
+    // Input length cap. Pathologically long messages (pastes of
+    // entire reviews, complaints, articles) push past Anthropic's
+    // context window once added to the 60-65K char system prompt +
+    // RAG chunks + history, and the request fails with a generic
+    // "I'm having trouble" widget error. Real customer questions
+    // rarely exceed 500 chars; capping at 2000 leaves plenty of
+    // room for legitimate long-form descriptions while protecting
+    // every downstream engine from input-size failures. Truncates
+    // the END (keeping the START) since the customer's actual
+    // intent is usually in the first sentence or two of a long
+    // paste.
+    const MAX_MESSAGE_CHARS = 2000;
+    if (typeof body.message === "string" && body.message.length > MAX_MESSAGE_CHARS) {
+      console.log(
+        `[chat] input cap: message len=${body.message.length} truncated to ${MAX_MESSAGE_CHARS}`,
+      );
+      body.message = body.message.slice(0, MAX_MESSAGE_CHARS);
+    }
+
     const priorProductCards = extractPriorProductCards(body.history);
     const allPriorProductCards = extractAllPriorProductCards(body.history);
     const history = sanitizeHistory(body.history);
