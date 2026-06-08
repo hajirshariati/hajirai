@@ -620,3 +620,36 @@ model ColorFamily {
   @@unique([shop, name])
   @@index([shop])
 }
+
+// Live "viewing now" signal for the storefront social-proof popup.
+// One row per (shop, product, anonymous tab). A session counts as
+// "viewing" if it pinged in the last 60s (see SocialProof.server.js).
+// Stale rows are swept opportunistically by the social-proof action.
+model ProductViewerPing {
+  id        String   @id @default(cuid())
+  shop      String
+  productId String
+  sessionId String
+  lastSeen  DateTime @default(now())
+
+  @@unique([shop, productId, sessionId])
+  @@index([shop, productId, lastSeen])
+  @@index([lastSeen])
+}
+
+// Real recent purchases for the social-proof popup, recorded by the
+// orders/create webhook. City only — deliberately no customer name or
+// email — so the storefront can show "Someone in [City] just bought this".
+model RecentPurchase {
+  id           String   @id @default(cuid())
+  shop         String
+  orderId      String
+  productId    String
+  productTitle String?
+  city         String?
+  createdAt    DateTime @default(now())
+
+  @@unique([shop, orderId, productId])
+  @@index([shop, productId, createdAt])
+  @@index([createdAt])
+}

@@ -1,5 +1,6 @@
 import { authenticate } from "../shopify.server";
 import { recordChatConversion } from "../models/ChatConversion.server";
+import { recordRecentPurchases } from "../models/SocialProof.server";
 
 const ATTR_NAME = "_seos_attributed";
 const ORDER_TAG = "SEoS";
@@ -14,6 +15,25 @@ const ORDER_TAG = "SEoS";
 // not surface to Shopify (which would retry) or to customers.
 export const action = async ({ request }) => {
   const { shop, payload, topic, admin } = await authenticate.webhook(request);
+
+  // Record the purchase for the storefront social-proof popup (city only, no
+  // PII). Runs for ALL orders, independent of SEoS chat attribution, so it
+  // must happen before the attribution early-return below. Best-effort.
+  try {
+    const city =
+      payload?.shipping_address?.city ||
+      payload?.billing_address?.city ||
+      payload?.customer?.default_address?.city ||
+      null;
+    await recordRecentPurchases({
+      shop,
+      orderId: payload.id,
+      lineItems: Array.isArray(payload.line_items) ? payload.line_items : [],
+      city,
+    });
+  } catch (err) {
+    console.error(`[webhook ${topic}] social-proof capture failed:`, err?.message || err);
+  }
 
   try {
     const noteAttrs = Array.isArray(payload?.note_attributes) ? payload.note_attributes : [];
