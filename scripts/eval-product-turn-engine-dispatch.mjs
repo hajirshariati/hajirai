@@ -1104,6 +1104,36 @@ await test("D22 — 'how many points do I have?' DECLINES (LLM path owns account
   );
 });
 
+await test("D22d — 'cancel my last order' declines (account action, even with stale sneaker memory)", async () => {
+  let searchCalled = false;
+  const out = await runProductTurn({
+    ...ctxBase,
+    latestUserMessage: "cancel my last order",
+    sessionMemory: {
+      explicit: { gender: "men", category: "sneakers", useCase: "athletic" },
+      inferred: {},
+    },
+  }, {
+    forceEnable: true,
+    searchFn: async () => { searchCalled = true; return []; },
+    claimConfig: FIXTURE_CLAIM_CONFIG,
+  });
+  assert.ok(out && out.decline, "cancel-order turn must decline so LLM owns it");
+  assert.equal(searchCalled, false, "engine must not run a product search on cancel-order");
+});
+
+await test("D22e — 'i want to refund my order' declines", async () => {
+  const out = await runProductTurn({
+    ...ctxBase,
+    latestUserMessage: "i want to refund my order",
+  }, {
+    forceEnable: true,
+    searchFn: async () => [],
+    claimConfig: FIXTURE_CLAIM_CONFIG,
+  });
+  assert.ok(out && out.decline);
+});
+
 await test("D22b — order tracking declines", async () => {
   const out = await runProductTurn({
     ...ctxBase,

@@ -65,6 +65,21 @@ const PRONOUN_BACK_REF_RE = /\b(?:all|any|both)\s+of\s+(?:them|those|these|it)\b
 // "same color" without naming one.
 const SAME_COLOR_RE = /\b(?:same|those|that)\s+colou?rs?\b|\bstill\s+(?:in\s+)?(?:the\s+)?same\s+colou?rs?\b/i;
 
+// Account / order-action pivot. Cancel/refund/billing/damaged-item
+// shapes — NOT product questions even if prior memory carries a
+// product scope. Engine declines elsewhere via ACCOUNT_QUESTION_RE;
+// here we make sure session memory drops the stale product scope so
+// the LLM's reply doesn't get a free product carousel attached.
+const ACCOUNT_ACTION_PIVOT_RE =
+  /\b(?:cancel|cancellation)\s+(?:my|the|an?|this|that|recent|last|previous)?\s*(?:order|purchase|item)?\b|\bi\s+(?:want|need|would\s+like)\s+to\s+(?:cancel|refund|return)\b|\brefund\s+(?:my|the|an?|this|that)\s+(?:order|purchase|payment)\b|\b(?:damaged|broken|wrong|missing)\s+(?:item|order|product|package|shipment)\b|\b(?:billing|charge|charged|payment)\s+(?:issue|problem|wrong|error)\b/i;
+
+// Negative-meta question — asks for the BAD/WORST/LOWEST product.
+// Synthesizer composes positive copy by default and ends up praising
+// a 4.6-star product when the customer asked "which has the worst
+// reviews". Drop product scope so the LLM owns the answer honestly.
+const NEGATIVE_META_RE =
+  /\b(?:worst|lowest[- ]rated|lowest\s+reviews?|most[- ]returned|highest\s+return|hate|bad\s+(?:review|rating)|disappoint|complaint|complain|terrible|awful|never\s+buy)\b/i;
+
 // Meta / fact-question shapes. Customer is asking a yes/no factual
 // question or expressing frustration / calling out the bot. Don't
 // touch scope; downstream listing template should not run.
@@ -323,11 +338,55 @@ export function resolveTurnIntent({
     !extracted.badge &&
     extracted.onSale !== true;
   if (META_CONVERSATIONAL_RE.test(text) || COMPARE_RE.test(text)) {
+    // Comparison turns that name FRESH subjects ("X vs Y", "compare
+    // A and B", "which is better, A or B") drop stale category-bound
+    // scope so downstream filters don't wipe the cards. Back-reference
+    // compares ("compare the first two", "compare these") keep scope —
+    // they refer to the displayed set whose scope still applies.
+    // Live trace 2026-06-08: "which is better, Vicki or Jillian?" with
+    // memory.category=footwear (from a prior gym turn) had Vicki and
+    // Jillian sandal cards wiped, then empty-pool repair erased the
+    // LLM's whole comparison.
+    const COMPARE_BACK_REF_RE =
+      /\b(?:the\s+(?:first|top|last|second)\s+(?:two|three|few|one|pair)?|(?:these|those|them)\s+(?:two|three)|which\s+of\s+(?:these|those|them))\b/i;
+    const compareNamesFreshSubjects =
+      COMPARE_RE.test(text) && !COMPARE_BACK_REF_RE.test(text);
+    const dropOnCompare = compareNamesFreshSubjects
+      ? ["category", ...CATEGORY_BOUND_KEYS].filter((k) => prev[k] != null)
+      : [];
     return {
       label: LABEL.META,
       confidence: 0.9,
       reason: META_CONVERSATIONAL_RE.test(text) ? "meta_conversational" : "compare_request",
-      staleKeysToDrop: [],
+      staleKeysToDrop: dropOnCompare,
+    };
+  }
+  // Hard topic change to account/order action — cancel, refund, return-an-order,
+  // billing, damaged-item, customer-service. These are NOT product turns
+  // and any prior product scope (category=sneakers from a gym turn) pollutes
+  // the engine into searching products under a "reach support" preamble.
+  // Live trace 2026-06-08: "cancel my last order" with memory.category=sneakers
+  // → engine pitched men's sneakers next to "reach out to customer service".
+  if (ACCOUNT_ACTION_PIVOT_RE.test(text)) {
+    const drop = SUBJECT_BOUND_KEYS.filter((k) => prev[k] != null);
+    return {
+      label: LABEL.PIVOT_FULL,
+      confidence: 0.95,
+      reason: "account_action_pivot",
+      staleKeysToDrop: drop,
+    };
+  }
+  // Negative-meta question — "worst", "lowest rated", "most returned".
+  // The engine's synthesizer composes POSITIVE copy; on these turns it
+  // contradicts the customer. Drop subject-bound scope so the LLM owns
+  // the turn and can answer honestly.
+  if (NEGATIVE_META_RE.test(text)) {
+    const drop = SUBJECT_BOUND_KEYS.filter((k) => prev[k] != null);
+    return {
+      label: LABEL.PIVOT_FULL,
+      confidence: 0.9,
+      reason: "negative_meta_question",
+      staleKeysToDrop: drop,
     };
   }
   if (DISPLAY_REFERENCE_RE.test(text) && onlyBroadFootwearCategory && REFINE_PRICE_RE.test(text)) {

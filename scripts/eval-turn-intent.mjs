@@ -539,6 +539,48 @@ await test("T28 — kids scope → first-person hiking shoe turn drops kids subj
   }
 });
 
+await test("T29 — 'cancel my last order' is account-action pivot; drops product scope", () => {
+  const intent = resolveTurnIntent({
+    latestUserText: "cancel my last order",
+    previousScope: { gender: "men", category: "sneakers", useCase: "athletic" },
+  });
+  assert.equal(intent.reason, "account_action_pivot",
+    `expected account_action_pivot; got reason=${intent.reason}`);
+  for (const key of ["category", "useCase"]) {
+    assert.ok(intent.staleKeysToDrop.includes(key),
+      `expected ${key} dropped; got ${JSON.stringify(intent.staleKeysToDrop)}`);
+  }
+});
+
+await test("T30 — 'which products have the worst reviews?' is negative-meta; drops product scope", () => {
+  const intent = resolveTurnIntent({
+    latestUserText: "which products have the worst reviews?",
+    previousScope: { gender: "men", category: "sneakers", useCase: "athletic" },
+  });
+  assert.equal(intent.reason, "negative_meta_question",
+    `expected negative_meta_question; got reason=${intent.reason}`);
+  assert.ok(intent.staleKeysToDrop.includes("category"));
+});
+
+await test("T31 — 'which is better, Vicki or Jillian?' drops stale category", () => {
+  const intent = resolveTurnIntent({
+    latestUserText: "which is better, Vicki or Jillian?",
+    previousScope: { gender: "women", category: "footwear", useCase: "athletic" },
+  });
+  assert.equal(intent.reason, "compare_request");
+  assert.ok(intent.staleKeysToDrop.includes("category"),
+    `expected category dropped on fresh-subject compare; got ${JSON.stringify(intent.staleKeysToDrop)}`);
+});
+
+await test("T32 — 'compare the first two' (back-ref) preserves scope", () => {
+  const intent = resolveTurnIntent({
+    latestUserText: "compare the first two",
+    previousScope: { gender: "women", category: "sneakers" },
+  });
+  assert.equal(intent.label, L.META);
+  assert.deepEqual(intent.staleKeysToDrop, []);
+});
+
 // ---------------------------------------------------------------------------
 // Summary
 // ---------------------------------------------------------------------------

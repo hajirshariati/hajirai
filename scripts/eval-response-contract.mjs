@@ -135,6 +135,33 @@ test("R5 — scoped card filter drops off-category semantic cards", () => {
   assert.equal(scoped.enforcedColor, true);
 });
 
+test("R5b — scope.category=footwear (umbrella) matches sandal/sneaker/boot subcategories", () => {
+  const pool = [
+    { title: "Vicki Sandal", _gender: "women", _category: "sandals", _attributes: { Gender: "Women", Category: "Sandals" } },
+    { title: "Jillian Sport Sandal", _gender: "women", _category: "sandals", _attributes: { Gender: "Women", Category: "Sandals" } },
+    { title: "Danika Sneaker", _gender: "women", _category: "sneakers", _attributes: { Gender: "Women", Category: "Sneakers" } },
+  ];
+  const scoped = filterProductCardsToCatalogScope(pool, {
+    sessionMemory: { explicit: { gender: "women", category: "footwear" } },
+  });
+  assert.equal(scoped.products.length, 3,
+    `footwear umbrella must accept sandal+sneaker subs; got ${scoped.products.length}`);
+  assert.equal(scoped.dropped, 0);
+});
+
+test("R5c — scope.category=sandals still strictly filters out sneakers", () => {
+  const pool = [
+    { title: "Vicki Sandal", _gender: "women", _category: "sandals", _attributes: { Gender: "Women", Category: "Sandals" } },
+    { title: "Danika Sneaker", _gender: "women", _category: "sneakers", _attributes: { Gender: "Women", Category: "Sneakers" } },
+  ];
+  const scoped = filterProductCardsToCatalogScope(pool, {
+    sessionMemory: { explicit: { gender: "women", category: "sandals" } },
+  });
+  assert.equal(scoped.products.length, 1,
+    "concrete category=sandals must still drop sneakers");
+  assert.equal(scoped.products[0].title, "Vicki Sandal");
+});
+
 test("R6 — scoped card filter keeps same-category alternatives when exact color is unavailable", () => {
   const alternatives = [
     {

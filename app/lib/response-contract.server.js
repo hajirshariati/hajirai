@@ -530,7 +530,18 @@ function cardMatchesCatalogScope(card, scope = {}, { enforceColor = true, requir
   if (gender && requireKnown && !cardGender) return false;
   if (category && requireKnown && !cardCategory) return false;
   if (gender && cardGender && cardGender !== gender && cardGender !== "unisex") return false;
-  if (category && cardCategory && cardCategory !== category) return false;
+  if (category && cardCategory && cardCategory !== category) {
+    // Umbrella match: scope.category="footwear" is a hypernym for
+    // every concrete footwear sub-category. Without this rule the
+    // filter wipes sandal/sneaker/boot cards when a stale broad-
+    // footwear scope is carried over from a prior turn. Live trace
+    // 2026-06-08: "compare Vicki and Jillian" → cards returned were
+    // sandals, scope.category=footwear (stale), all dropped, empty-
+    // pool repair erased the LLM's comparison.
+    const scopeIsFootwearUmbrella = category === "footwear";
+    const cardIsFootwearSub = FOOTWEAR_CATEGORY_SET.has(cardCategory);
+    if (!(scopeIsFootwearUmbrella && cardIsFootwearSub)) return false;
+  }
   if (color && enforceColor && !cardMatchesColor(card, color)) return false;
   return true;
 }
