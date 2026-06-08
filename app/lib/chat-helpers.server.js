@@ -378,15 +378,17 @@ export function ensureHeaderLineBreaks(text) {
   // Pattern 2: Long bold span (≥12 chars excluding the `**`) preceded
   // by non-newline content on same line. Length is a strong signal for
   // section header (inline emphasis is almost always short).
+  // Require prev char to be prose (alphanumeric / sentence punctuation),
+  // NOT a bullet marker — otherwise "- **Item**" gets split into "-\n\n**Item**".
   next = next.replace(
-    /([^\n*])([ \t]+)(\*\*[A-Z][^*\n]{11,}\*\*)/g,
+    /([A-Za-z0-9'":!?.,)\]])([ \t]+)(\*\*[A-Z][^*\n]{11,}\*\*)/g,
     (_m, prev, _ws, header) => `${prev}\n\n${header}`,
   );
   // Pattern 3: Shorter bold span (3–11 chars) preceded by content
   // on same line, but only when it contains a section keyword. Catches
   // "**Tech**" or "**Method 2**".
   next = next.replace(
-    /([^\n*])([ \t]+)(\*\*([A-Z][^*\n]{2,10})\*\*)/g,
+    /([A-Za-z0-9'":!?.,)\]])([ \t]+)(\*\*([A-Z][^*\n]{2,10})\*\*)/g,
     (m, prev, _ws, header, inner) =>
       SECTION_HEADER_KEYWORD_RE.test(inner) ? `${prev}\n\n${header}` : m,
   );

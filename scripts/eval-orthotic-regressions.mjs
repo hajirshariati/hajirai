@@ -1370,6 +1370,28 @@ await test("23n — tightenSequentialFactLines normalizes CRLF before splitting"
   assert.ok(/\*\*Jillian/.test(out), "header must survive normalization");
 });
 
+await test("23p — ensureHeaderLineBreaks preserves bullet markers on bolded items", () => {
+  // Live trace 2026-06-08: "what other technologies your shoes has?" →
+  // synthesizer produced a clean bulleted list of techs, but
+  // ensureHeaderLineBreaks Pattern 2 matched "- **Header**" treating the
+  // bullet dash as content and the long bold span as a section header,
+  // inserting "\n\n" between "-" and "**Header**" — breaking the bullets
+  // into orphan dashes with the header text moved to a new paragraph.
+  const text =
+    "Here are the technologies:\n" +
+    "- **Aetrex Orthotic System (Built-In)** — Built-in orthotic for support.\n" +
+    "- **Ultra-Light Cork Midsole** — Lightweight cushioning.\n" +
+    "- **Antimicrobial Microfiber Lining** — Keeps feet fresh.\n";
+  const out = ensureHeaderLineBreaks(text);
+  // Bullets must stay intact — no orphan "-" lines.
+  assert.ok(!/\n-\n/.test(out),
+    `bullet marker must not get split onto its own line. Output:\n${out}`);
+  assert.ok(/- \*\*Ultra-Light Cork Midsole\*\*/.test(out),
+    `bullet+bold must remain joined. Output:\n${out}`);
+  assert.ok(/- \*\*Antimicrobial Microfiber Lining\*\*/.test(out),
+    `bullet+bold must remain joined. Output:\n${out}`);
+});
+
 await test("23h — reflowInlineList leaves single-mention text untouched", () => {
   // Only one ` - **Label** — ` in the text → not a list, don't reflow.
   const text = "We offer the Vania - **Premium** — a comfortable platform sandal.";
