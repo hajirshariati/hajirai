@@ -317,6 +317,17 @@ export function detectNamedProductMismatch(text, pool) {
       if (!/[A-Z]/.test(n)) return false;
       // Skip generic emphasis bolds — "Great news!" / "Important" etc.
       if (/^(?:yes|no|note|important|warning|tip|here|now|today|great)\b/i.test(n)) return false;
+      // Skip technology / feature / brand bolds. Trademark/registered
+      // symbols and "Technology"/"System"/"Method"/"Feature" suffixes
+      // signal the LLM is naming a tech concept, not a product family.
+      // Live 2026-06-08: customer asked "what makes BioRocker different?"
+      // LLM bolded "**BioRocker™ Technology**". Guard treated "biorocker"
+      // as a product family, found no overlap with pool families
+      // [darcy,savannah,jenny,...] (which ARE the BioRocker products),
+      // and wiped the entire pool — customer saw the explanation with
+      // zero products attached.
+      if (/[™®©]/.test(n)) return false;
+      if (/\b(?:Technology|System|Method|Approach|Feature|Series|Collection|Platform|Footbed|Midsole|Outsole|Insole|Foam|Material|Lining|Upper)\b/i.test(n)) return false;
       return true;
     });
   const textFamilies = new Set(

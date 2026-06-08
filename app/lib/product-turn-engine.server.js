@@ -160,14 +160,43 @@ export async function runProductTurn(ctx = {}, options = {}) {
   // those by mistake. The customer expected an answer ABOUT what's
   // already on screen.
   const priorCards = Array.isArray(ctx.priorProductCards) ? ctx.priorProductCards : [];
-  const reusePriorCards =
+  const reusePriorCardsForReview =
     priorCards.length > 0
     && isReviewShapedQuestion(scope.rawMessage)
     && hasPronounReference(scope.rawMessage);
+  // Attribute-filter follow-up reuse: "do you have these for women?",
+  // "any of these in black?". Customer is narrowing prior products by
+  // a new attribute, not starting a fresh search. Filter prior cards
+  // by the new attribute (gender/color) so we keep the prior subject.
+  const reusePriorCardsForFilter =
+    priorCards.length > 0
+    && hasPronounReference(scope.rawMessage)
+    && isAttributeFilterFollowUp(scope.rawMessage);
   let rawCandidates;
-  if (reusePriorCards) {
+  if (reusePriorCardsForReview) {
     rawCandidates = priorCards.slice(0, ctx.productCardCap || 6);
     diagnostics.rungs.push(`retrieved:${rawCandidates.length}_prior_cards`);
+  } else if (reusePriorCardsForFilter) {
+    const beforeFilter = priorCards.length;
+    let narrowed = priorCards;
+    if (scope.gender) {
+      const wantedGender = String(scope.gender).toLowerCase();
+      const filtered = priorCards.filter((card) => {
+        const g = String(card?._gender || card?.gender || "").toLowerCase();
+        return !g || g === wantedGender || g === "unisex";
+      });
+      if (filtered.length > 0) narrowed = filtered;
+    }
+    if (scope.color) {
+      const wantedColor = String(scope.color).toLowerCase();
+      const filtered = narrowed.filter((card) => {
+        const colors = Array.isArray(card?._colors) ? card._colors : [];
+        return colors.length === 0 || colors.some((c) => String(c || "").toLowerCase().includes(wantedColor));
+      });
+      if (filtered.length > 0) narrowed = filtered;
+    }
+    rawCandidates = narrowed.slice(0, ctx.productCardCap || 6);
+    diagnostics.rungs.push(`retrieved:${rawCandidates.length}_prior_cards_filtered:${beforeFilter}`);
   } else {
     rawCandidates = await options.searchFn(scope);
     diagnostics.rungs.push(`retrieved:${rawCandidates.length}`);
@@ -553,6 +582,18 @@ function engineWantsThisTurn(scope, resolverState = null, ctx = {}) {
     return true;
   }
 
+  // Special claim — attribute-filter follow-up about cards on screen.
+  // "do you have these for women?" / "any of these in black?" — narrow
+  // the prior turn's products by the new attribute. Without this the
+  // engine fires a fresh generic browse and forgets the prior subject.
+  if (
+    isAttributeFilterFollowUp(raw)
+    && hasPronounReference(raw)
+    && priorCards.length > 0
+  ) {
+    return true;
+  }
+
   // Standard claim — review/fit/return question with active scope.
   // ("do women's sandals run small?", "return rate on sneakers?")
   if (
@@ -671,6 +712,23 @@ const PRONOUN_REFERENCE_RE =
 function hasPronounReference(message) {
   return PRONOUN_REFERENCE_RE.test(String(message || ""));
 }
+
+// Availability / attribute-filter follow-ups combined with a pronoun:
+// "do you have these for women?", "any of these in black?", "these in
+// size 8?". Customer is narrowing the prior turn's products by a new
+// attribute, NOT starting a fresh search. The engine must reuse the
+// prior cards and filter by the new attribute — otherwise it runs a
+// generic browse search and forgets the prior subject.
+// Live 2026-06-08: customer asked about BioRocker, bot showed BioRocker
+// styles, customer clicked quick reply "Do you have these for women?",
+// bot ran search("footwear", gender=women) → returned random women's
+// sandals (Whit Sport Sandal, Sofie, Piper, Kaia) — none BioRocker.
+const ATTRIBUTE_FILTER_FOLLOWUP_RE =
+  /\b(?:do\s+you\s+have|any\s+(?:of\s+)?(?:these|those|them)|are\s+(?:there|any)|come\s+in|available\s+in|got\s+(?:any|these)|in\s+(?:black|white|brown|navy|blue|red|pink|grey|gray|tan|taupe|silver|gold|cream|ivory|beige|purple|green|orange|yellow|men|women|kids|girls|boys|size))\b/i;
+function isAttributeFilterFollowUp(message) {
+  return ATTRIBUTE_FILTER_FOLLOWUP_RE.test(String(message || ""));
+}
+export { isAttributeFilterFollowUp };
 
 const BROAD_BROWSE_RE =
   /\b(?:show|find|search|shop|browse|need|want|looking\s+for|recommend|suggest|carry|have)\b/i;

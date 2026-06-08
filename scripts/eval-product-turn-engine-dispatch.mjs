@@ -1236,6 +1236,53 @@ await test("D24 — pronoun-only follow-up without priorProductCards goes throug
 
 // ─── Opt-IN engine inversion ──────────────────────────────────────
 
+await test("D25c — pronoun + attribute filter follow-up reuses prior cards (no fresh search)", async () => {
+  // Live trace 2026-06-08: customer asked about BioRocker, bot showed
+  // BioRocker styles. Customer clicked quick reply "Do you have these
+  // for women?". Engine fired search("footwear", gender=women) and
+  // returned random women's footwear (Whit Sport Sandal, Sofie, Piper,
+  // Kaia) — none BioRocker. Expected behavior: reuse prior cards,
+  // filter by women's gender.
+  let searchCalled = false;
+  const priorBioRockerCards = [
+    { title: "Darcy Slip-On Sneaker - Black", handle: "darcy-black", _gender: "women", _category: "sneakers", _claimFacts: { archSupport: { value: true, source: "test" } } },
+    { title: "Savannah Quarter Strap Sandal - Tan", handle: "savannah-tan", _gender: "women", _category: "sandals", _claimFacts: { archSupport: { value: true, source: "test" } } },
+    { title: "Donna Thong Sandal - Brown", handle: "donna-brown", _gender: "women", _category: "sandals", _claimFacts: { archSupport: { value: true, source: "test" } } },
+  ];
+  const out = await runProductTurn({
+    ...ctxBase,
+    latestUserMessage: "Do you have these for women?",
+    sessionMemory: { explicit: { category: "footwear", gender: "women" }, inferred: {} },
+    priorProductCards: priorBioRockerCards,
+  }, {
+    forceEnable: true,
+    searchFn: async () => { searchCalled = true; return []; },
+    claimConfig: FIXTURE_CLAIM_CONFIG,
+  });
+  assert.ok(out && !out.decline, "pronoun + filter follow-up + prior cards → engine claims");
+  assert.equal(searchCalled, false, "must NOT call searchFn — reuse prior cards instead");
+});
+
+await test("D25d — 'any of these in black?' also triggers prior-card reuse", async () => {
+  let searchCalled = false;
+  const priorCards = [
+    { title: "Darcy Slip-On Sneaker - Black", handle: "darcy-black", _gender: "women", _colors: ["black"], _claimFacts: { archSupport: { value: true, source: "test" } } },
+    { title: "Donna Thong Sandal - Brown", handle: "donna-brown", _gender: "women", _colors: ["brown"], _claimFacts: { archSupport: { value: true, source: "test" } } },
+  ];
+  const out = await runProductTurn({
+    ...ctxBase,
+    latestUserMessage: "any of these in black?",
+    sessionMemory: { explicit: { category: "footwear", color: "black" }, inferred: {} },
+    priorProductCards: priorCards,
+  }, {
+    forceEnable: true,
+    searchFn: async () => { searchCalled = true; return []; },
+    claimConfig: FIXTURE_CLAIM_CONFIG,
+  });
+  assert.ok(out && !out.decline);
+  assert.equal(searchCalled, false, "color filter follow-up must reuse, not re-search");
+});
+
 await test("D26 — engine OPT-IN: 'how many points do I have?' declines (no product noun)", async () => {
   let searchCalled = false;
   const out = await runProductTurn({

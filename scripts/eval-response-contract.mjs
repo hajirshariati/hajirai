@@ -1664,6 +1664,43 @@ test("R82 — empty / null inputs return overlap=true (no false positives)", () 
   assert.equal(detectNamedProductMismatch("**Andrea**", []).overlap, true);
 });
 
+test("R83a — trademark/technology bolds do NOT count as product names", () => {
+  // Live trace 2026-06-08: customer asked "what makes BioRocker different?"
+  // LLM correctly bolded "**BioRocker™ Technology**" — describing the tech,
+  // not a product. The guard previously treated "biorocker" as a product
+  // family, found no overlap with the BioRocker shoe families
+  // [darcy, savannah, jenny, ...], and wiped all 6 cards.
+  const text =
+    "**BioRocker™ Technology** is our rocker-bottom outsole built into " +
+    "select styles like the Darcy and Savannah.";
+  const pool = [
+    { title: "Darcy Slip-On Sneaker - Black", handle: "darcy-black" },
+    { title: "Savannah Quarter Strap Sandal - Tan", handle: "savannah-tan" },
+  ];
+  const out = detectNamedProductMismatch(text, pool);
+  assert.ok(!out.textFamilies.includes("biorocker"),
+    `BioRocker is a technology, not a product family. textFamilies=${JSON.stringify(out.textFamilies)}`);
+  assert.equal(out.overlap, true, "tech-only bolds should leave overlap=true");
+});
+
+test("R83b — 'UltraSKY™ Technology' bold is treated as tech, not product", () => {
+  const text = "**UltraSKY™ Technology** is a lightweight EVA foam used in many shoes.";
+  const pool = [{ title: "Maya Slide Sandal - Hazy Blue", handle: "maya" }];
+  const out = detectNamedProductMismatch(text, pool);
+  assert.ok(!out.textFamilies.includes("ultrasky"),
+    `UltraSKY is tech, not product. textFamilies=${JSON.stringify(out.textFamilies)}`);
+  assert.equal(out.overlap, true);
+});
+
+test("R83c — 'Memory Foam Footbed' bold is treated as feature, not product", () => {
+  const text = "**Memory Foam Footbed** conforms to your foot for personalized cushioning.";
+  const pool = [{ title: "Kaia Two Band Slide - Champagne", handle: "kaia" }];
+  const out = detectNamedProductMismatch(text, pool);
+  assert.ok(!out.textFamilies.includes("memory"),
+    `feature bold should not be a product family. textFamilies=${JSON.stringify(out.textFamilies)}`);
+  assert.equal(out.overlap, true);
+});
+
 test("R83 — multiple bolded products: overlap=true when ANY card matches ANY name", () => {
   // AI compares two named products; one is in the pool, one isn't.
   // Still considered overlapping — at least one card is correct.
