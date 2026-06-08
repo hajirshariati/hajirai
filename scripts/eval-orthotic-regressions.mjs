@@ -29,6 +29,7 @@ import {
   isCapabilityCheckAboutPriorProducts,
   reflowInlineList,
   ensureHeaderLineBreaks,
+  tightenSequentialFactLines,
   truncateAtWordBoundary,
   isBrandOrInfoQuestion,
 } from "../app/lib/chat-helpers.server.js";
@@ -1282,6 +1283,51 @@ await test("23j — ensureHeaderLineBreaks leaves inline bold emphasis alone", (
   const text = "This is **really important** but please read more.";
   const out = ensureHeaderLineBreaks(text);
   assert.equal(out, text, "inline emphasis shouldn't be split into paragraphs");
+});
+
+await test("23k — ensureHeaderLineBreaks promotes own-line header preceded by single newline", () => {
+  // Live trace 2026-06-08: LLM emitted header on its own line but with
+  // only a single \n before it (no blank line) → markdown treated whole
+  // block as one paragraph. Force blank line.
+  const text =
+    "Found in our newer sandal styles like Savannah and Jenny, as well as the Darcy sneaker\n" +
+    "**UltraSKY™ Technology**\n" +
+    "A lightweight, injected EVA foam compound...\n";
+  const out = ensureHeaderLineBreaks(text);
+  assert.ok(/Darcy sneaker\n\n\*\*UltraSKY/.test(out),
+    `expected blank line before header. Output:\n${out}`);
+  assert.ok(/\*\*UltraSKY™ Technology\*\*\n\nA lightweight/.test(out),
+    `expected blank line AFTER header too. Output:\n${out}`);
+});
+
+await test("23l — tightenSequentialFactLines turns 'Label: Value' paragraphs into bullets", () => {
+  // Live trace 2026-06-08: comparing Jillian and Danika, the LLM
+  // emitted each spec as its own paragraph (separated by \n\n) under
+  // a bold product header. The widget renders each paragraph with
+  // vertical margin → screenshots had huge vertical gaps between
+  // "Category: Sandal", "Closure: Hook & loop...", etc.
+  const text =
+    "**Jillian Braided Quarter Strap Sandal — $139.95**\n\n" +
+    "Category: Sandal\n\n" +
+    "Closure: Hook & loop adjustable straps\n\n" +
+    "Upper: Genuine leather with signature braided detailing\n\n" +
+    "Footbed: Memory foam + cork midsole\n\n" +
+    "Heel height: 1.1\"\n";
+  const out = tightenSequentialFactLines(text);
+  // Sequential facts should be joined with single \n now (bullet list)
+  assert.ok(/- \*\*Category:\*\* Sandal\n- \*\*Closure:\*\*/.test(out),
+    `expected Category and Closure as adjacent bullets. Output:\n${out}`);
+  assert.ok(/- \*\*Footbed:\*\* Memory foam \+ cork midsole/.test(out),
+    `expected Footbed as a bullet. Output:\n${out}`);
+});
+
+await test("23m — tightenSequentialFactLines preserves regular prose paragraphs", () => {
+  const text =
+    "This is the first paragraph of regular prose.\n\n" +
+    "This is the second paragraph, also regular prose. Nothing here looks like a Label: Value.\n\n" +
+    "Third paragraph.";
+  const out = tightenSequentialFactLines(text);
+  assert.equal(out, text, "regular prose paragraphs must not be touched");
 });
 
 await test("23h — reflowInlineList leaves single-mention text untouched", () => {

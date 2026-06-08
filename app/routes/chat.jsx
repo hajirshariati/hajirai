@@ -25,6 +25,7 @@ import {
   hasChoiceButtons,
   dedupeConsecutiveSentences,
   ensureHeaderLineBreaks,
+  tightenSequentialFactLines,
   isSingularPrescriptive,
   hasPluralIntroFraming,
   detectConditionOrOccasion,
@@ -2305,6 +2306,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       { fn: dedupeConsecutiveSentences,    name: "dedupe" },
       { fn: reflowInlineList,              name: "reflow-list" },
       { fn: ensureHeaderLineBreaks,        name: "header-breaks" },
+      { fn: tightenSequentialFactLines,    name: "tighten-facts" },
     ];
     const cleanupLogs = [];
     for (const step of cleanupSteps) {

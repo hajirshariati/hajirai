@@ -370,21 +370,112 @@ export function ensureHeaderLineBreaks(text) {
   // promote same-line bold to a fresh paragraph.
   next = next.replace(/(:)[ \t]+(\*\*[A-Z][^*\n]{2,}\*\*)/g, "$1\n\n$2");
   // Pattern 2: Long bold span (≥12 chars excluding the `**`) preceded
-  // by non-newline content. Length is a strong signal for section
-  // header (inline emphasis is almost always short).
+  // by non-newline content on same line. Length is a strong signal for
+  // section header (inline emphasis is almost always short).
   next = next.replace(
     /([^\n*])([ \t]+)(\*\*[A-Z][^*\n]{11,}\*\*)/g,
     (_m, prev, _ws, header) => `${prev}\n\n${header}`,
   );
-  // Pattern 3: Shorter bold span (3–11 chars) preceded by content,
-  // but only when it contains a section keyword. Catches things like
+  // Pattern 3: Shorter bold span (3–11 chars) preceded by content
+  // on same line, but only when it contains a section keyword. Catches
   // "**Tech**" or "**Method 2**".
   next = next.replace(
     /([^\n*])([ \t]+)(\*\*([A-Z][^*\n]{2,10})\*\*)/g,
     (m, prev, _ws, header, inner) =>
       SECTION_HEADER_KEYWORD_RE.test(inner) ? `${prev}\n\n${header}` : m,
   );
+  // Pattern 4: Bold header on its OWN line but preceded by a single \n
+  // (content immediately above with no blank line). Live trace
+  // 2026-06-08: LLM emitted "...the Darcy sneaker\n**UltraSKY™
+  // Technology**\nA lightweight..." — the header was on its own line
+  // but glued to the prior bullet by a single newline, so markdown
+  // renders the whole thing as ONE paragraph. Promote to blank line.
+  next = next.replace(
+    /([^\n])\n(\*\*[A-Z][^*\n]{11,}\*\*)/g,
+    (_m, prev, header) => `${prev}\n\n${header}`,
+  );
+  next = next.replace(
+    /([^\n])\n(\*\*([A-Z][^*\n]{2,10})\*\*)/g,
+    (m, prev, header, inner) =>
+      SECTION_HEADER_KEYWORD_RE.test(inner) ? `${prev}\n\n${header}` : m,
+  );
+  // Pattern 5: Same header on own line, FOLLOWED by content on next
+  // line with single \n (no blank line after). The markdown widget
+  // needs blank line after the header too, otherwise the next sentence
+  // gets read as a continuation of the header line.
+  next = next.replace(
+    /(\*\*[A-Z][^*\n]{11,}\*\*)\n([^\n])/g,
+    (_m, header, next2) => `${header}\n\n${next2}`,
+  );
+  next = next.replace(
+    /(\*\*([A-Z][^*\n]{2,10})\*\*)\n([^\n])/g,
+    (m, header, inner, next2) =>
+      SECTION_HEADER_KEYWORD_RE.test(inner) ? `${header}\n\n${next2}` : m,
+  );
   return next;
+}
+
+// Tighten sequential single-line "Label: Value" paragraphs into a
+// proper bullet list. Live trace 2026-06-08: comparing Jillian and
+// Danika, the LLM emitted each spec as its own paragraph:
+//   **Jillian Braided Quarter Strap Sandal — $139.95**
+//
+//   Category: Sandal
+//
+//   Closure: Hook & loop adjustable straps
+//
+//   Upper: Genuine leather...
+// The widget renders each paragraph with vertical margin → wide gaps.
+// Convert sequential short "Label: Value" paragraphs that follow a
+// bold header into a tight bulleted list. The widget renders adjacent
+// bullets with less vertical space.
+const FACT_LINE_RE = /^\s*([A-Z][A-Za-z][\w ]{1,30}):\s+([^\n]{2,180})\s*$/;
+export function tightenSequentialFactLines(text) {
+  if (!text || typeof text !== "string") return text;
+  const blocks = text.split(/\n{2,}/);
+  if (blocks.length < 4) return text;
+  const out = [];
+  let factsInRow = 0;
+  let lastWasHeader = false;
+  for (let i = 0; i < blocks.length; i++) {
+    const block = blocks[i].trim();
+    if (!block) {
+      out.push(blocks[i]);
+      continue;
+    }
+    const isHeader = /^\*\*[A-Z][^*\n]{2,}\*\*$/.test(block);
+    const factMatch = block.match(FACT_LINE_RE);
+    if (isHeader) {
+      out.push(block);
+      lastWasHeader = true;
+      factsInRow = 0;
+    } else if (factMatch && (lastWasHeader || factsInRow > 0)) {
+      const label = factMatch[1].trim();
+      const value = factMatch[2].trim();
+      // Mark with sentinel — final pass will join sentinels with \n
+      out.push(`__FACT__- **${label}:** ${value}`);
+      factsInRow += 1;
+      lastWasHeader = false;
+    } else {
+      out.push(block);
+      lastWasHeader = false;
+      factsInRow = 0;
+    }
+  }
+  // Join: facts separated by single \n; everything else by \n\n.
+  let result = "";
+  for (let i = 0; i < out.length; i++) {
+    const cur = out[i];
+    if (i > 0) {
+      const prev = out[i - 1];
+      const curIsFact = cur.startsWith("__FACT__");
+      const prevIsFact = prev.startsWith("__FACT__");
+      if (curIsFact && prevIsFact) result += "\n";
+      else result += "\n\n";
+    }
+    result += cur.replace(/^__FACT__/, "");
+  }
+  return result;
 }
 
 // Word-boundary truncation. The previous cap could chop mid-word
