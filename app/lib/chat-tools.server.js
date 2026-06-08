@@ -1954,15 +1954,35 @@ async function getProductReviews({ handle }, { shop, yotpoApiKey }) {
 
   const fitCounts = { runs_small: 0, runs_large: 0, true_to_size: 0, narrow: 0, wide: 0 };
   const snippets = [];
+  // Pick the strongest 4-5 star quote (highest rating, longest body)
+  // to highlight in chat — "Diana said this fits true to size and is
+  // her go-to walking shoe" reads like a real associate. Reviewer
+  // name comes from Yotpo's display field (typically first name +
+  // last initial); we never use it without a positive rating.
+  let topPositive = null;
   for (const r of reviews) {
     const content = `${r.title || ""} ${r.content || ""}`.trim();
     const hits = classifyFit(content);
     for (const k of hits) fitCounts[k] = (fitCounts[k] || 0) + 1;
     if (snippets.length < 8 && content.length > 20) {
+      const name = String(r?.user?.display_name || r?.user?.name || r?.name || "").trim();
       snippets.push({
         rating: r.score,
+        name: name || null,
         text: truncate(content.replace(/\s+/g, " "), 220),
       });
+    }
+    if ((r.score >= 4) && content.length >= 40 && content.length <= 220) {
+      const cand = {
+        rating: r.score,
+        name: String(r?.user?.display_name || r?.user?.name || r?.name || "").trim() || null,
+        text: content.replace(/\s+/g, " "),
+      };
+      if (!topPositive
+        || cand.rating > topPositive.rating
+        || (cand.rating === topPositive.rating && cand.text.length > topPositive.text.length)) {
+        topPositive = cand;
+      }
     }
   }
 
@@ -1988,6 +2008,9 @@ async function getProductReviews({ handle }, { shop, yotpoApiKey }) {
     fitSummary,
     fitCounts,
     sampleReviews: snippets,
+    topPositiveReview: topPositive
+      ? { rating: topPositive.rating, name: topPositive.name, text: topPositive.text }
+      : null,
   };
 }
 

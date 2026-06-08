@@ -637,9 +637,20 @@ async function runProductTurnDispatch({ ctx, controller, encoder, claimConfig, a
               merged.averageScore = rev.averageScore;
               merged.totalReviews = rev.totalReviews;
               merged.fitSummary = rev.fitSummary;
+              if (rev.topPositiveReview?.text) {
+                merged.topPositiveReview = rev.topPositiveReview;
+              }
             }
             if (ret && !ret.error) {
-              merged.returnInsights = ret;
+              // AfterShip data is INTERNAL — only the sizingAdvice
+              // string ("Returns skew toward 'too small' — recommend
+              // sizing up.") is allowed to reach the LLM-voice
+              // synthesizer. Raw totals, return reasons, and counts
+              // never leave the engine. Customers must not see "X%
+              // of orders are returned" or "common reason: too tight."
+              if (ret.sizingAdvice) {
+                merged.returnSizingAdvice = ret.sizingAdvice;
+              }
             }
             return [h, merged];
           }),
@@ -674,27 +685,35 @@ async function runProductTurnDispatch({ ctx, controller, encoder, claimConfig, a
           selection_reason: selectionReason || "",
           has_view_all_button: !!willHaveCta,
           template_for_reference: deterministicText,
-          // Yotpo / AfterShip data — present only on review-shaped
-          // turns where the engine enriched the lead card. The
-          // synthesizer may mention these numbers verbatim; if a
-          // field is empty/null, ignore it (don't invent).
+          // Yotpo data — present only on review-shaped turns. May be
+          // quoted verbatim (rating, count, fit summary, positive
+          // review snippet). Empty/null fields must be ignored.
           lead_review_average: leadCard?._reviewAvg ?? null,
           lead_review_count: leadCard?._reviewCount ?? null,
           lead_review_fit_summary: leadCard?._reviewFit || "",
+          lead_top_positive_review: leadCard?._topPositiveReview || null,
+          // AfterShip data — INTERNAL ONLY. May be paraphrased into
+          // a sizing nudge ("tends to run small — many people size
+          // up"). MUST NOT be quoted as return rate / reason / count.
+          lead_return_sizing_advice_internal: leadCard?._returnSizingAdvice || "",
         };
         const prompt =
           `You are a warm, professional sales associate writing the assistant's reply for a footwear store chat.\n\n` +
           `FACTS YOU MAY USE (do NOT invent anything outside this list):\n${JSON.stringify(facts, null, 2)}\n\n` +
-          `Write 1-2 short sentences that:\n` +
+          `Write 1-3 short sentences that:\n` +
           `- Sound like a real associate — friendly, natural, not robotic.\n` +
           `- Lead with the recommended_product by name.\n` +
           `- Briefly say why it's a good fit using only the listed facts (selection_reason, requested_claim, requested_condition, required_feature, or the scope fields).\n` +
+          `- If lead_review_count > 0, you MAY weave in the rating + count naturally (e.g. "4.7 stars across 142 reviews"). Skip if 0 or null.\n` +
+          `- If lead_top_positive_review is present AND the customer asked about reviews/quality/fit, you MAY add a short customer quote attributed by first name (e.g. \`Diana said, "fits true to size and so comfortable for all-day wear."\`). Pick the most relevant line. Skip if the snippet is null.\n` +
+          `- If lead_return_sizing_advice_internal is present, you MAY paraphrase it as a sizing nudge ONLY (e.g. "tends to run small, so a lot of customers size up"). NEVER quote return rates, return reasons, or anything about returns existing. The customer must not know this is from return data.\n` +
           `- If other_options_count > 0, mention the alternatives in passing (without listing them).\n` +
           `- If has_view_all_button is true AND other_options_count === 0, you may invite them to open the card; otherwise don't.\n\n` +
           `STRICT RULES:\n` +
           `- Never invent product names, colors, prices, materials, technologies, sizes, or claims not in the facts.\n` +
           `- Never describe UI elements ("click", "tap", "button below") beyond the one exception above.\n` +
           `- Vary phrasing across turns — do NOT reuse the template_for_reference verbatim.\n` +
+          `- NEVER mention return rates, return percentages, return reasons, "we see returns", or that you have return data. Sizing advice MUST sound like it's based on customer feedback or experience, never returns.\n` +
           `- No greetings ("Hi!", "Sure!"), no sign-offs, no emojis.\n` +
           `- Plain prose, no bullets, no markdown.\n\n` +
           `Customer-facing reply (1-2 sentences):`;

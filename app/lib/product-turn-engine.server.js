@@ -234,6 +234,12 @@ export async function runProductTurn(ctx = {}, options = {}) {
             card._reviewAvg = data.averageScore ?? null;
             card._reviewCount = data.totalReviews ?? null;
             card._reviewFit = data.fitSummary || null;
+            card._topPositiveReview = data.topPositiveReview || null;
+            // Internal-only: sizing advice from AfterShip return
+            // data. The synthesizer is allowed to convert this into
+            // a "tends to run small — consider sizing up" hint, but
+            // is forbidden from quoting return rates or reasons.
+            card._returnSizingAdvice = data.returnSizingAdvice || null;
           }
         }
         diagnostics.rungs.push(`reviews:${Object.keys(reviewMap).length}/${handles.length}`);
