@@ -291,6 +291,18 @@ function sseChunk(obj) {
   return `data: ${JSON.stringify(obj)}\n\n`;
 }
 
+// Knowledge / info questions — kept in sync with KNOWLEDGE_QUESTION_RE
+// in product-turn-engine.server.js. Used to skip the response-contract
+// verifier and the auto-search CTA on knowledge turns where the LLM is
+// describing technologies/materials in prose; the verifier would strip
+// real-but-not-cataloged feature words (e.g., "memory foam footbed"
+// vs catalog footbed="bw") and leave orphan trademark fragments.
+const KNOWLEDGE_QUESTION_LOCAL_RE =
+  /\b(?:what\s+(?:other|else|kind\s+of|kinds\s+of|sort\s+of|sorts\s+of|type\s+of|types\s+of)\s+(?:technolog|material|feature|brand|tech|spec|fabric|sole|midsole|footbed|insole|method|system|certification)|what\s+(?:technolog|material|feature|brand|tech)|what\s+(?:is|are)\s+(?:your|the)\s+(?:technolog|material|feature|brand|tech|story|mission)|tell\s+me\s+about\s+(?:your|the|aetrex)|how\s+(?:does|do)\s+(?:your|the|biorocker|ultrasky|aetrex)|why\s+(?:aetrex|your|do\s+you)|beside[s]?\s+[A-Z][a-z]+|besides\s+[A-Z][a-z]+|other\s+than\s+[A-Z][a-z]+|explain\s+(?:your|the|biorocker|ultrasky|how)|what\s+makes\s+(?:your|aetrex|biorocker|ultrasky)|history\s+of\s+(?:aetrex|biorocker)|founded\s+(?:by|in))\b/i;
+function isKnowledgeQuestionLocal(msg) {
+  return KNOWLEDGE_QUESTION_LOCAL_RE.test(String(msg || ""));
+}
+
 const SIMPLE_PATTERN = /^(hi|hey|hello|thanks|thank you|ok|okay|yes|no|bye|goodbye|cool|great|got it|perfect|sure|nice|awesome|alright|yep|nope|sounds good|that helps|appreciate it)\s*[.!?]*$/i;
 const LOW_RISK_SHOPPING_RE = /\b(?:show|find|browse|shop|looking for|look for|need|want|have|carry|any|in|under|below|less than|cheaper|cheap|sale|deals?|how about|what about)\b/i;
 const PRODUCT_LISTING_TERM_RE = /\b(?:shoes?|footwear|sneakers?|sandals?|boots?|loafers?|clogs?|wedges?|heels?|slippers?|oxfords?|mary janes?|slip[-\s]?ons?|slides?|flats?|styles?|pairs?|men'?s|women'?s|kids?|boys?|girls?|black|white|brown|navy|blue|pink|red|grey|gray|tan|taupe|silver|gold|cream|ivory|beige|purple|green|orange|yellow|\$\s*\d+)\b/i;
@@ -2908,11 +2920,15 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     //   facts. Both are per-product distinctions, not universals.
     const userMsg = String(ctx?.latestUserMessage || "");
     const isCompareTurn = /\b(?:compare|comparison|vs\.?|versus|difference\s+between|which\s+(?:is|one\s+is)\s+(?:better|worse|best))\b/i.test(userMsg);
-    const skipVerifier = isCompareTurn;
+    const isKnowledgeTurn = isKnowledgeQuestionLocal(userMsg);
+    const skipVerifier = isCompareTurn || isKnowledgeTurn;
     if (skipVerifier) {
+      const reason = isKnowledgeTurn
+        ? "knowledge turn — LLM is naming technologies/materials in prose, " +
+          "catalog attribute names don't match the customer-facing tech labels"
+        : "compare turn — LLM is making per-product distinctions, not universal claims";
       console.log(
-        `[chat] response-contract: skipping verifier on compare turn — ` +
-          `LLM is making per-product distinctions, not universal claims`,
+        `[chat] response-contract: skipping verifier on ${reason}`,
       );
     } else {
       const before = fullResponseText;
@@ -3517,6 +3533,16 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
           url: collection.cta.url,
           label: collection.cta.label,
         })));
+      } else if (isKnowledgeQuestionLocal(ctx?.latestUserMessage)) {
+        // Knowledge-turn auto-search CTA suppression. Live trace
+        // 2026-06-08: customer asked "what other tech do you have?",
+        // LLM described technologies in prose, but the auto-search
+        // CTA derived "View All Women's Orthotics" from a few cards
+        // the LLM had attached — a misleading link for a tech Q&A.
+        console.log(
+          `[cta] ${ctx.shop} auto-search suppressed: knowledge turn — ` +
+            `customer asked about technologies/materials, not browsing`,
+        );
       } else {
         const productLink = resolveProductTurnLink({ categoryCounts, genderCounts, ctx });
         if (productLink.link) {

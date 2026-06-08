@@ -1370,6 +1370,57 @@ await test("23n — tightenSequentialFactLines normalizes CRLF before splitting"
   assert.ok(/\*\*Jillian/.test(out), "header must survive normalization");
 });
 
+await test("23q — reflowInlineList catches unbolded ' - Label: Value' inline lists", () => {
+  // Live trace 2026-06-08: "compare Jillian and Danika" produced a
+  // wall of text where each spec was separated by inline " - Category:
+  // Sandal - Upper: Genuine leather - Midsole: Memory foam...".
+  // No bold around labels, so the existing regex (which required
+  // `- **Label**`) didn't match. The widget rendered it as one
+  // paragraph of run-on text.
+  const text =
+    "Here's how they stack up: **Jillian — $139.95** " +
+    "- Category: Sandal " +
+    "- Upper: Genuine leather with braided detailing " +
+    "- Midsole: Memory foam + ultra-light cork " +
+    "- Closure: Hook & loop (fully adjustable) " +
+    "- Heel height: 1.1\"";
+  const out = reflowInlineList(text);
+  // Each label should now be on its own bulleted line.
+  assert.ok(/\n-\s+\*\*Category:\*\*/.test(out),
+    `Category should be on its own bullet line. Output:\n${out}`);
+  assert.ok(/\n-\s+\*\*Upper:\*\*/.test(out),
+    `Upper should be on its own bullet line. Output:\n${out}`);
+  assert.ok(/\n-\s+\*\*Midsole:\*\*/.test(out),
+    `Midsole should be on its own bullet line. Output:\n${out}`);
+});
+
+await test("23r — tightenSequentialFactLines splits glued header+fact blocks", () => {
+  // Live trace 2026-06-08: Vicki/Jillian compare. LLM emitted
+  // "**Vicki — $69.95**\nStyle: Thong\n\nUpper: ...\n\nMidsole: ..."
+  // — the header was glued to the first fact line with a single \n,
+  // so the function's header-detect regex (which requires the WHOLE
+  // block to be **X**) failed and bailed. Result: each fact line
+  // rendered as a paragraph with wide vertical gaps.
+  const text =
+    "Here's how they compare:\n\n" +
+    "**Vicki Braided Thong Sandal — $69.95**\n" +
+    "Style: Thong (flip-flop silhouette)\n\n" +
+    "Upper: Lightweight UltraSKY EVA foam\n\n" +
+    "Midsole: UltraSKY EVA — extreme cushioning\n\n" +
+    "Closure: Soft toe post\n\n" +
+    "Heel height: 1.09\"";
+  const out = tightenSequentialFactLines(text);
+  // Style/Upper/Midsole/etc. should now be bulleted under the header,
+  // separated by single \n (tight bullets), not \n\n (wide paragraphs).
+  assert.ok(/- \*\*Style:\*\*/.test(out),
+    `Style should be a bullet. Output:\n${out}`);
+  assert.ok(/- \*\*Upper:\*\*/.test(out),
+    `Upper should be a bullet. Output:\n${out}`);
+  // Tight bullets: bullet lines separated by \n, not \n\n.
+  const bulletBlock = out.match(/(?:- \*\*[^*]+\*\*[^\n]+\n){2,}/);
+  assert.ok(bulletBlock, `expected ≥2 adjacent tight bullet lines. Output:\n${out}`);
+});
+
 await test("23p — ensureHeaderLineBreaks preserves bullet markers on bolded items", () => {
   // Live trace 2026-06-08: "what other technologies your shoes has?" →
   // synthesizer produced a clean bulleted list of techs, but

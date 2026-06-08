@@ -450,6 +450,25 @@ export function resolveTurnScope({ latestUserMessage, messages = [], sessionMemo
     catalogQueryContinuedFromPrior: false,
   };
 
+  // Negative-filter detection. The classifier extracts attributes from
+  // the message at face value: "show me sandals but NOT in black" was
+  // tagged color=black, and the engine searched for black sandals.
+  // Detect "NOT/not in/except/other than/no <color|gender|category>" and
+  // either clear the affected positive filter, or move it to an exclusion.
+  // Live trace 2026-06-08: customer asked "show me sandals but NOT in
+  // black" and got all-black-sandal results with CTA "View All Black
+  // Sandals" — completely backwards.
+  const negativeMatch = detectNegativeAttributeFilter(scope.rawMessage);
+  if (negativeMatch) {
+    scope.excluded = scope.excluded || {};
+    for (const [field, value] of Object.entries(negativeMatch)) {
+      if (scope[field] && String(scope[field]).toLowerCase() === String(value).toLowerCase()) {
+        scope[field] = null;
+      }
+      scope.excluded[field] = value;
+    }
+  }
+
   const latestModifier = detectStorefrontSearchModifier(scope.rawMessage);
   if (latestModifier) {
     scope.modifier = latestModifier;
@@ -515,6 +534,34 @@ export function resolveTurnScope({ latestUserMessage, messages = [], sessionMemo
   return scope;
 }
 
+// Negative-filter detection. "show me sandals but NOT in black",
+// "any color except black", "not black", "other than navy",
+// "no women's styles". Returns { color, gender, category } map of
+// excluded values, or null when no negation found. The caller clears
+// the positive filter when it equals the excluded value and stores
+// the exclusion so downstream filters can drop matching cards.
+const NEGATIVE_COLOR_RE =
+  /\b(?:not|but\s+not|except|other\s+than|no(?:t)?\s+in|nothing\s+in|but\s+no|anything\s+but)\s+(?:in\s+)?(black|white|brown|navy|blue|red|pink|grey|gray|tan|taupe|silver|gold|cream|ivory|beige|purple|green|orange|yellow|cognac|burgundy|olive|cork|chilli)\b/i;
+const NEGATIVE_GENDER_RE =
+  /\b(?:not|but\s+not|except|other\s+than|no)\s+(?:for\s+)?(men|women|kids|girls|boys|men's|women's|kids')\b/i;
+const NEGATIVE_CATEGORY_RE =
+  /\b(?:not|but\s+not|except|other\s+than|no)\s+(sandals?|sneakers?|boots?|loafers?|clogs?|wedges?|heels?|slippers?|oxfords?|mary\s+janes?|slip[-\s]?ons?|slides?|flats?|orthotics?)\b/i;
+
+export function detectNegativeAttributeFilter(message) {
+  const text = String(message || "");
+  if (!text) return null;
+  const out = {};
+  const colorMatch = text.match(NEGATIVE_COLOR_RE);
+  if (colorMatch) out.color = colorMatch[1].toLowerCase();
+  const genderMatch = text.match(NEGATIVE_GENDER_RE);
+  if (genderMatch) out.gender = genderMatch[1].toLowerCase().replace(/'s$/, "");
+  const categoryMatch = text.match(NEGATIVE_CATEGORY_RE);
+  if (categoryMatch) {
+    out.category = categoryMatch[1].toLowerCase().replace(/s$/, "");
+  }
+  return Object.keys(out).length > 0 ? out : null;
+}
+
 // Compare / similar-to / named-anchor phrasing. When the customer
 // says "like the X" / "similar to X" / "same support as X", the
 // turn is a named-product lookup — the LLM agent's catalog-resolver
@@ -537,6 +584,9 @@ const COMPARE_SHAPE_RE =
 // about other tech.
 const KNOWLEDGE_QUESTION_RE =
   /\b(?:what\s+(?:other|else|kind\s+of|kinds\s+of|sort\s+of|sorts\s+of|type\s+of|types\s+of)\s+(?:technolog|material|feature|brand|tech|spec|fabric|sole|midsole|footbed|insole|method|system|certification)|what\s+(?:technolog|material|feature|brand|tech)|what\s+(?:is|are)\s+(?:your|the)\s+(?:technolog|material|feature|brand|tech|story|mission)|tell\s+me\s+about\s+(?:your|the|aetrex)|how\s+(?:does|do)\s+(?:your|the|biorocker|ultrasky|aetrex)|why\s+(?:aetrex|your|do\s+you)|beside[s]?\s+[A-Z][a-z]+|besides\s+[A-Z][a-z]+|other\s+than\s+[A-Z][a-z]+|explain\s+(?:your|the|biorocker|ultrasky|how)|what\s+makes\s+(?:your|aetrex|biorocker|ultrasky)|history\s+of\s+(?:aetrex|biorocker)|founded\s+(?:by|in)\b)/i;
+export function isKnowledgeQuestion(message) {
+  return KNOWLEDGE_QUESTION_RE.test(String(message || ""));
+}
 
 function engineWantsThisTurn(scope, resolverState = null, ctx = {}) {
   // ──────────────────────────────────────────────────────────────────

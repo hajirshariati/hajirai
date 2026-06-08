@@ -638,6 +638,28 @@ async function searchProducts(
   const attrFilters = filters && typeof filters === "object"
     ? canonicalizeCatalogConstraints(filters)
     : {};
+  // Negative-attribute filter override. The LLM agent sometimes lifts
+  // a color/gender/category from the user message at face value even
+  // when negated ("NOT in black", "but not for women", "anything but
+  // sandals"). If we detect a negation referring to the same value
+  // the LLM put in filters, drop that filter and remember to exclude
+  // it during card scoring.
+  // Live trace 2026-06-08: customer asked "show me sandals but NOT in
+  // black" → search ran with color=black filter, CTA was "View All
+  // Black Sandals" — exact opposite of the customer's intent.
+  let excludedColor = null;
+  const negationCheckText = String(latestUserMessage || userText || conversationText || query || "");
+  const NEG_COLOR_RE_LOCAL =
+    /\b(?:not|but\s+not|except|other\s+than|no(?:t)?\s+in|nothing\s+in|but\s+no|anything\s+but)\s+(?:in\s+)?(black|white|brown|navy|blue|red|pink|grey|gray|tan|taupe|silver|gold|cream|ivory|beige|purple|green|orange|yellow|cognac|burgundy|olive|cork|chilli)\b/i;
+  const negColorMatch = negationCheckText.match(NEG_COLOR_RE_LOCAL);
+  if (negColorMatch) {
+    const excluded = negColorMatch[1].toLowerCase();
+    excludedColor = excluded;
+    if (attrFilters.color && String(attrFilters.color).toLowerCase() === excluded) {
+      console.log(`[search] negation override: dropping color=${excluded} filter — message says NOT ${excluded}`);
+      delete attrFilters.color;
+    }
+  }
   const variantScope = variantScopeFromFilters(attrFilters);
 
 const detected = detectAndStripGender(q);

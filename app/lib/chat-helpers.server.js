@@ -333,6 +333,16 @@ export function isCapabilityCheckAboutPriorProducts(text) {
 // render proper line breaks. Merchant trace 2026-05-13 12:12:48
 // ("tell me more about aetrex" → 1061-char wall).
 const INLINE_LIST_ITEM_RE = /\s+-\s+(\*\*[^*]{2,40}\*\*)\s+[—–-]\s+/g;
+// Inline-list without bold labels — " - Label: Value - Label: Value".
+// Live trace 2026-06-08: "compare Jillian and Danika" produced a wall
+// of text where each spec was separated by inline " - Category: ... -
+// Upper: ... - Midsole: ...". reflowInlineList only matched bold-label
+// shape and missed this one. The shape "<whitespace>-<whitespace><Cap
+// word>:<whitespace>" is specific enough that 2+ occurrences in a row
+// is reliably a label list (random mid-sentence " - " phrases don't
+// have a label-colon shape).
+const INLINE_LIST_LABELED_RE =
+  /\s+-\s+([A-Z][A-Za-z][\w ]{1,25}):\s+/g;
 
 export function reflowInlineList(text) {
   if (!text) return text;
@@ -340,10 +350,19 @@ export function reflowInlineList(text) {
   // there are 2+, otherwise a single mid-sentence " - **X** — " is
   // probably not a list intent.
   const matches = text.match(INLINE_LIST_ITEM_RE);
-  if (!matches || matches.length < 2) return text;
-  // Insert a newline before each list marker. The widget's markdown
-  // renderer turns `\n- **X** — ...` into a proper bullet line.
-  return text.replace(INLINE_LIST_ITEM_RE, (_m, label) => `\n- ${label} — `).trim();
+  let next = text;
+  if (matches && matches.length >= 2) {
+    next = next.replace(INLINE_LIST_ITEM_RE, (_m, label) => `\n- ${label} — `);
+  }
+  // Unbolded inline-label list. Same 2+ guard.
+  const labeled = next.match(INLINE_LIST_LABELED_RE);
+  if (labeled && labeled.length >= 2) {
+    next = next.replace(
+      INLINE_LIST_LABELED_RE,
+      (_m, label) => `\n- **${label.trim()}:** `,
+    );
+  }
+  return next.trim();
 }
 
 // Ensure bold section headers (`**Heading**`) start on their own line.
@@ -451,7 +470,19 @@ export function tightenSequentialFactLines(text) {
     .replace(/\r\n/g, "\n")
     .replace(/\r/g, "\n")
     .replace(/\n[ \t]+\n/g, "\n\n");
-  const blocks = normalized.split(/\n{2,}/);
+  // Pre-split: a block like "**Header**\nLabel: Value" glues the
+  // bold header to the first fact line with a single \n, so the
+  // header-detect regex below misses it (it requires the block to be
+  // *only* the header). Split such blocks into header + body.
+  // Live trace 2026-06-08: Vicki/Jillian compare emitted
+  // "**Vicki — $69.95**\nStyle: Thong\n\nUpper: EVA..." → the first
+  // block was "**Vicki — $69.95**\nStyle: Thong", not a header, so
+  // the function bailed and the widget rendered wide paragraphs.
+  const blocks = normalized.split(/\n{2,}/).flatMap((block) => {
+    const m = block.match(/^(\*\*[A-Z][^*\n]{2,}\*\*)\n([\s\S]+)$/);
+    if (m) return [m[1], m[2]];
+    return [block];
+  });
   if (blocks.length < 4) return text;
   const out = [];
   let factsInRow = 0;

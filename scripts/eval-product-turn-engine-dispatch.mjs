@@ -18,7 +18,7 @@
 // (same shape getMerchantClaimConfig produces after seed).
 
 import assert from "node:assert/strict";
-import { runProductTurn } from "../app/lib/product-turn-engine.server.js";
+import { runProductTurn, detectNegativeAttributeFilter, isKnowledgeQuestion } from "../app/lib/product-turn-engine.server.js";
 import {
   attachClaimFactsToCard,
   buildProductClaimFacts,
@@ -1235,6 +1235,39 @@ await test("D24 — pronoun-only follow-up without priorProductCards goes throug
 });
 
 // ─── Opt-IN engine inversion ──────────────────────────────────────
+
+await test("D25e — 'show me sandals but NOT in black' detected as negation, color cleared", () => {
+  const result = detectNegativeAttributeFilter("show me sandals but NOT in black");
+  assert.ok(result, "negation must be detected");
+  assert.equal(result.color, "black", `expected color=black exclusion; got ${JSON.stringify(result)}`);
+});
+
+await test("D25f — 'anything but black' detected as color negation", () => {
+  const result = detectNegativeAttributeFilter("anything but black sandals");
+  assert.ok(result && result.color === "black", `expected color=black; got ${JSON.stringify(result)}`);
+});
+
+await test("D25g — 'no women's styles' detected as gender negation", () => {
+  const result = detectNegativeAttributeFilter("show me sneakers, no women's styles");
+  assert.ok(result && result.gender === "women", `expected gender=women; got ${JSON.stringify(result)}`);
+});
+
+await test("D25h — 'except sandals' detected as category negation", () => {
+  const result = detectNegativeAttributeFilter("show me shoes except sandals");
+  assert.ok(result && result.category === "sandal", `expected category=sandal; got ${JSON.stringify(result)}`);
+});
+
+await test("D25i — plain 'show me black sandals' is NOT detected as negation", () => {
+  const result = detectNegativeAttributeFilter("show me black sandals");
+  assert.equal(result, null, `non-negative request must not flag; got ${JSON.stringify(result)}`);
+});
+
+await test("D25j — isKnowledgeQuestion exported and matches tech questions", () => {
+  assert.equal(isKnowledgeQuestion("what other technologies do you have?"), true);
+  assert.equal(isKnowledgeQuestion("besides BioRocker, what else?"), true);
+  assert.equal(isKnowledgeQuestion("tell me about Aetrex"), true);
+  assert.equal(isKnowledgeQuestion("show me sandals"), false);
+});
 
 await test("D25c — pronoun + attribute filter follow-up reuses prior cards (no fresh search)", async () => {
   // Live trace 2026-06-08: customer asked about BioRocker, bot showed
