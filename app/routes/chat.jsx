@@ -1430,6 +1430,19 @@ function shouldAttachProductCardsForTurn({ text, ctx, recommenderAskedForMoreInf
   // so the postprocessor forced a search with query="yes" and attached
   // 6 random orthotic cards under a referral message.
   if (SIMPLE_PATTERN.test(String(latest).trim())) return false;
+  // Knowledge / info questions: customer asked about technologies,
+  // materials, brand story, etc. The answer is a text-only knowledge
+  // reply — attaching random product cards under a tech-list answer
+  // pollutes the response. Live trace 2026-06-08: "beside BioRocker
+  // and UltraSky, what other technologies your shoes has?" → LLM
+  // listed Lynco/memory foam/etc., but the system attached 10 random
+  // footwear cards from a category-locked search.
+  // Mirror of the engine's KNOWLEDGE_QUESTION_RE — keep the two in
+  // sync when adding new patterns.
+  if (
+    /\b(?:what\s+(?:other|else|kind\s+of|kinds\s+of|sort\s+of|sorts\s+of|type\s+of|types\s+of)\s+(?:technolog|material|feature|brand|tech|spec|fabric|sole|midsole|footbed|insole|method|system|certification)|what\s+(?:technolog|material|feature|brand|tech)|what\s+(?:is|are)\s+(?:your|the)\s+(?:technolog|material|feature|brand|tech|story|mission)|tell\s+me\s+about\s+(?:your|the|aetrex)|how\s+(?:does|do)\s+(?:your|the|biorocker|ultrasky|aetrex)|why\s+(?:aetrex|your|do\s+you)|beside[s]?\s+[A-Z][a-z]+|besides\s+[A-Z][a-z]+|other\s+than\s+[A-Z][a-z]+|explain\s+(?:your|the|biorocker|ultrasky|how)|what\s+makes\s+(?:your|aetrex|biorocker|ultrasky))\b/i
+      .test(latest)
+  ) return false;
   const compound = isCompoundPolicyProductQuestion(latest);
   const latestIsPolicyOnly = isPolicyOrServiceQuestion(latest) && !compound;
   if (latestIsPolicyOnly || recommenderAskedForMoreInfo) return false;
@@ -2390,7 +2403,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   // customers are saying about the Maui Orthotic Flips." with nothing
   // after it. Same for "BioRocker vs UltraSky" tech compare.
   const REVIEW_FIT_RETURN_OR_COMPARE_RE =
-    /\b(?:review|reviews|rated|rating|ratings|reviewed|star|stars|score|popular|best[- ]?selling|bestseller|customer[s']*\s+(?:say|saying|love|favor)|what\s+(?:do\s+)?(?:people|customers|buyers|others)\s+(?:say|think)|return|returns|refund|refunds|exchange|exchanges|run|runs|fit|fits|true\s+to\s+size|size\s+up|size\s+down|compare|comparison|vs\.?|versus|difference\s+between|cheap|cheapest|cheaper|expensive|price|priced|cost|costs|how\s+much|under\s+\$?\d+|points?\s+(?:need|i\s+need|to\s+(?:buy|get|redeem))|for\s+free)\b/i;
+    /\b(?:review|reviews|rated|rating|ratings|reviewed|star|stars|score|popular|best[- ]?selling|bestseller|customer[s']*\s+(?:say|saying|love|favor)|what\s+(?:do\s+)?(?:people|customers|buyers|others)\s+(?:say|think)|return|returns|refund|refunds|exchange|exchanges|run|runs|fit|fits|true\s+to\s+size|size\s+up|size\s+down|compare|comparison|vs\.?|versus|difference\s+between|cheap|cheapest|cheaper|expensive|price|priced|cost|costs|how\s+much|under\s+\$?\d+|points?\s+(?:need|i\s+need|to\s+(?:buy|get|redeem))|for\s+free|technolog|material|feature|brand|tech\b|spec|fabric|midsole|footbed|insole|method|system|certification|story|mission|history|founded|beside|besides|other\s+than|explain|what\s+makes)\b/i;
   const skipHardCap =
     REVIEW_FIT_RETURN_OR_COMPARE_RE.test(String(ctx?.latestUserMessage || ""));
   if (
