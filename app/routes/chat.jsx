@@ -2824,29 +2824,26 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   // text alone.
 
   if (pool.length > 0 && fullResponseText) {
-    // Skip the claim verifier on tech/concept comparison turns. The
-    // LLM is describing technologies (BioRocker, UltraSky, memory foam),
-    // not making claims about the specific product cards that happen
-    // to use those technologies. The verifier was treating "rolling
-    // gait", "walking", "cushioning" etc. as product-level useCase
-    // claims and stripping the LLM's whole comparison.
-    // Live trace 2026-06-08: "BioRocker vs UltraSky" → LLM wrote 775
-    // chars of accurate tech comparison, verifier saw "walking" not
-    // tagged on the 10 sandal cards → stripped to 55 chars
-    // ("Many styles actually combine both for the full package!").
+    // Skip the claim verifier on ALL comparison turns. The verifier
+    // checks "universal claims" — does THIS claim hold for every card in
+    // the pool? On a compare turn the LLM is making PER-PRODUCT
+    // distinctions ("Jillian has bunions tag, Danika has removable
+    // insole") — those are the WHOLE POINT of the comparison, not
+    // universal claims to verify against every card. Live traces:
+    // - "BioRocker vs UltraSky" (concept compare) → 775→55 chars
+    //   when verifier saw "walking" on sandal cards.
+    // - "compare Jillian and Danika" (product compare) → 1153→121
+    //   chars when verifier saw "bunions" universal on Janey card
+    //   (which doesn't have the bunions tag) and "removable insole"
+    //   feature claim on pool that didn't have any removable-insole
+    //   facts. Both are per-product distinctions, not universals.
     const userMsg = String(ctx?.latestUserMessage || "");
-    const isTechConceptCompare = /\b(?:compare|comparison|vs\.?|versus|difference\s+between)\b/i.test(userMsg)
-      && /\b[A-Z][a-z]{3,}\b/.test(userMsg);
-    const titles = pool.map((c) => String(c?.title || "").toLowerCase());
-    const compareSubjects = userMsg.match(/\b([A-Z][A-Za-z0-9'-]{3,})\b/g) || [];
-    const subjectsInPool = compareSubjects.some((s) =>
-      titles.some((t) => t.includes(s.toLowerCase())),
-    );
-    const skipVerifier = isTechConceptCompare && !subjectsInPool;
+    const isCompareTurn = /\b(?:compare|comparison|vs\.?|versus|difference\s+between|which\s+(?:is|one\s+is)\s+(?:better|worse|best))\b/i.test(userMsg);
+    const skipVerifier = isCompareTurn;
     if (skipVerifier) {
       console.log(
-        `[chat] response-contract: skipping verifier on tech-compare turn — ` +
-          `subjects (${compareSubjects.join(", ")}) are concepts, not products in pool`,
+        `[chat] response-contract: skipping verifier on compare turn — ` +
+          `LLM is making per-product distinctions, not universal claims`,
       );
     } else {
       const before = fullResponseText;

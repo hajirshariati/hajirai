@@ -347,32 +347,42 @@ export function reflowInlineList(text) {
 }
 
 // Ensure bold section headers (`**Heading**`) start on their own line.
-// Live trace 2026-06-08: "BioRocker vs UltraSky" → LLM wrote
-// "Here's how the two technologies compare: **BioRocker™ Technology**
-//   - bullet
-//   - bullet
-//   Found in our newer sandal and sneaker styles like Savannah and Jenny **UltraSKY™ Technology**
-//   - bullet"
-// The second header ran inline with the prior bullet because the LLM
-// emitted `... Jenny **UltraSKY**` without a paragraph break. Prompt
-// rule alone isn't enough — the LLM still concatenates occasionally.
-// Postprocess to guarantee a blank line precedes any header that's
-// followed by bullets or another paragraph.
+// Live traces 2026-06-08:
+//   1. "BioRocker vs UltraSky" → LLM wrote
+//      "...sneakers like Darcy **UltraSKY™ Technology**" (header
+//      glued onto end of prior bullet's last sentence).
+//   2. "...compare: **BioRocker™ Technology**" (header on same line
+//      as the lead-in colon).
+// Prompt rule alone isn't sticky enough — the LLM emits these
+// patterns occasionally. Postprocess to guarantee paragraph break.
+//
+// Detection: a bold span is treated as a section header when it's
+// ≥12 chars OR contains a section keyword (Technology, Method,
+// System, Approach, Feature, Series, Line, Collection). Inline
+// emphasis ("really", "important", "now") is short and never
+// contains those keywords, so it doesn't trip this.
+const SECTION_HEADER_KEYWORD_RE = /\b(?:Technology|Method|System|Feature|Approach|Series|Line|Collection)\b/i;
+
 export function ensureHeaderLineBreaks(text) {
   if (!text || typeof text !== "string") return text;
   let next = text;
-  // 1. After a colon ("compare:" / "summary:" / etc.) before a bold
-  //    header — promote inline-space to blank-line.
-  next = next.replace(/(:)\s+(\*\*[A-Z][^*\n]{2,}\*\*)(?=\s*\n)/g, "$1\n\n$2");
-  // 2. Bold header that appears AFTER non-whitespace text on the same
-  //    physical position (LLM joined two sections without \n\n).
-  //    Heuristic: word char or punctuation immediately preceding `**` on
-  //    same line → insert \n\n. Only fires when the header is followed
-  //    by a bullet (`\n-`) or another paragraph break (so we don't break
-  //    inline bold emphasis like "**important**").
+  // Pattern 1: After a colon ("compare:" / "summary:" / etc.) →
+  // promote same-line bold to a fresh paragraph.
+  next = next.replace(/(:)[ \t]+(\*\*[A-Z][^*\n]{2,}\*\*)/g, "$1\n\n$2");
+  // Pattern 2: Long bold span (≥12 chars excluding the `**`) preceded
+  // by non-newline content. Length is a strong signal for section
+  // header (inline emphasis is almost always short).
   next = next.replace(
-    /([^\n*])(\s*)(\*\*[A-Z][^*\n]{2,}\*\*)(?=\s*\n\s*(?:[-*]|\*\*|\n))/g,
+    /([^\n*])([ \t]+)(\*\*[A-Z][^*\n]{11,}\*\*)/g,
     (_m, prev, _ws, header) => `${prev}\n\n${header}`,
+  );
+  // Pattern 3: Shorter bold span (3–11 chars) preceded by content,
+  // but only when it contains a section keyword. Catches things like
+  // "**Tech**" or "**Method 2**".
+  next = next.replace(
+    /([^\n*])([ \t]+)(\*\*([A-Z][^*\n]{2,10})\*\*)/g,
+    (m, prev, _ws, header, inner) =>
+      SECTION_HEADER_KEYWORD_RE.test(inner) ? `${prev}\n\n${header}` : m,
   );
   return next;
 }
