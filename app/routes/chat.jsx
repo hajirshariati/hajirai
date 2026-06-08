@@ -698,30 +698,42 @@ async function runProductTurnDispatch({ ctx, controller, encoder, claimConfig, a
           lead_return_sizing_advice_internal: leadCard?._returnSizingAdvice || "",
         };
         const prompt =
-          `You are a warm, professional sales associate writing the assistant's reply for a footwear store chat.\n\n` +
+          `You're texting a friend who's shopping for shoes. Quick, helpful, warm — like a real associate, not a product description writer.\n\n` +
           `FACTS YOU MAY USE (do NOT invent anything outside this list):\n${JSON.stringify(facts, null, 2)}\n\n` +
-          `Write 1-3 short sentences that:\n` +
-          `- Sound like a real associate — friendly, natural, not robotic.\n` +
-          `- Lead with the recommended_product by name.\n` +
-          `- Briefly say why it's a good fit using only the listed facts (selection_reason, requested_claim, requested_condition, required_feature, or the scope fields).\n` +
-          `- If lead_review_count > 0, you MAY weave in the rating + count naturally (e.g. "4.7 stars across 142 reviews"). Skip if 0 or null.\n` +
-          `- If lead_top_positive_review is present AND the customer asked about reviews/quality/fit, you MAY add a short customer quote attributed by first name (e.g. \`Diana said, "fits true to size and so comfortable for all-day wear."\`). Pick the most relevant line. Skip if the snippet is null.\n` +
-          `- If lead_return_sizing_advice_internal is present, you MAY paraphrase it as a sizing nudge ONLY (e.g. "tends to run small, so a lot of customers size up"). NEVER quote return rates, return reasons, or anything about returns existing. The customer must not know this is from return data.\n` +
-          `- If other_options_count > 0, mention the alternatives in passing (without listing them).\n` +
-          `- If has_view_all_button is true AND other_options_count === 0, you may invite them to open the card; otherwise don't.\n\n` +
+          `Write 1–2 short sentences. Lead with the recommended product by name and one specific reason it fits. Keep it conversational.\n\n` +
+          `VOICE — what to AVOID (these are the templated phrases you keep falling into):\n` +
+          `- "I'd recommend our [Product] — it's a great choice for [scope]" ← banned. Sounds like a brochure.\n` +
+          `- "is a solid choice at $X" ← banned. No "solid choice".\n` +
+          `- "is the perfect pick / best match / great option" ← banned. No superlatives without a reason.\n` +
+          `- "We have N other styles available too if you'd like to explore different colors or fits" ← banned filler. If alternatives matter, mention them naturally.\n` +
+          `- Starting with "Great question!", "Perfect!", "Absolutely!", "Of course!" ← banned. Skip the warm-up; get to the answer.\n` +
+          `- Listing back the customer's question ("Looking for women's sandals? Here are some great options!") ← banned.\n\n` +
+          `VOICE — examples of warmer phrasing the assistant SHOULD sound like:\n` +
+          `- "The Whit Sport Sandal is a strong pick for long-day walking — the contoured footbed takes the pressure off your arch."\n` +
+          `- "If you want something dressy that's still walkable, the Andrea works — it's leather but lined for comfort."\n` +
+          `- "Danika has 4.7 stars across 142 reviews. Dana said the cushion holds up after weeks of daily wear."\n` +
+          `- "Jillian runs a little narrow up front — a lot of customers size up half a size."\n` +
+          `- "Honestly, your best bet is the Reagan — it's built for boots-but-flat days."\n` +
+          `Notice the pattern: name the product, give ONE concrete reason rooted in the facts, no superlative without proof.\n\n` +
+          `RULES FOR WEAVING IN OPTIONAL FACTS:\n` +
+          `- If lead_review_count > 0: you MAY weave in the rating + count naturally ("4.7 stars across 142 reviews"). Skip if 0/null.\n` +
+          `- If lead_top_positive_review is present AND the customer asked about reviews/fit/quality: include ONE short quote attributed by first name (e.g. \`Diana said, "fits true to size and so comfortable."\`). Skip if null.\n` +
+          `- If lead_return_sizing_advice_internal is present: you MAY paraphrase it as a sizing nudge ONLY ("tends to run small, so a lot of customers size up"). NEVER quote return rates or mention returns existing.\n` +
+          `- If other_options_count > 0, drop ONE phrase like "a few more options in the cards too" — don't list them.\n` +
+          `- If has_view_all_button is true AND other_options_count === 0, you may say "open the card to see colors" once.\n\n` +
           `MATERIAL / FEATURE HONESTY:\n` +
-          `- If customer_asked names a specific material, fabric, or feature (e.g. "cork insoles", "leather", "waterproof", "memory foam", "vegan", "merino wool", "bio-rocker") AND required_feature is empty AND the facts don't include that specific term:\n` +
-          `  - DO NOT pretend the recommended_product has it.\n` +
-          `  - Open by saying we don't carry that specifically, then offer the closest supportive alternative from the facts. Example: "We don't have anything with cork insoles specifically, but the Maui has a contoured EVA footbed that gives a similar feel — want me to show you that line?"\n` +
-          `  - Stay confident and warm; don't apologize or repeat "unfortunately."\n\n` +
+          `- If customer_asked names a specific material/tech (cork, leather, waterproof, memory foam, vegan, merino, BioRocker, etc.) AND required_feature is empty AND the facts don't include that term:\n` +
+          `  - DO NOT pretend the recommended product has it.\n` +
+          `  - Open by saying we don't carry that specifically, then offer the closest alternative from the facts. Example: "We don't carry anything with cork insoles, but the Maui has a contoured EVA footbed that feels similar."\n` +
+          `  - Stay confident; no "unfortunately" or apology.\n\n` +
           `STRICT RULES:\n` +
-          `- Never invent product names, colors, prices, materials, technologies, sizes, or claims not in the facts.\n` +
-          `- Never describe UI elements ("click", "tap", "button below") beyond the one exception above.\n` +
-          `- Vary phrasing across turns — do NOT reuse the template_for_reference verbatim.\n` +
-          `- NEVER mention return rates, return percentages, return reasons, "we see returns", or that you have return data. Sizing advice MUST sound like it's based on customer feedback or experience, never returns.\n` +
-          `- No greetings ("Hi!", "Sure!"), no sign-offs, no emojis.\n` +
-          `- Plain prose, no bullets, no markdown.\n\n` +
-          `Customer-facing reply (1-2 sentences):`;
+          `- Never invent names, colors, prices, materials, tech, sizes, or claims not in the facts.\n` +
+          `- Never describe UI ("click", "tap", "button below") except the one allowed "open the card" line.\n` +
+          `- Vary phrasing across turns. Do NOT mirror the template_for_reference.\n` +
+          `- NEVER mention return rates, return percentages, return reasons, or that you have return data.\n` +
+          `- No greetings ("Hi!", "Sure!"), no sign-offs, no emojis, no bullets, no markdown.\n` +
+          `- Plain prose. 1–2 sentences. Max ~35 words total.\n\n` +
+          `Customer-facing reply:`;
         try {
           const r = await anthropic.messages.create({
             model: HAIKU_MODEL,
@@ -2213,53 +2225,37 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   }
 
   if (fullResponseText) {
-    const result = stripInternalLeaks(fullResponseText);
-    if (result.changed) {
-      console.log(`[chat] stripped internal language leak${result.replaced ? " (whole-reply fallback)" : ""}`);
-      fullResponseText = result.text;
+    // Always-on text cleanup pipeline. Six independent mutators that
+    // run unconditionally after every LLM turn — none gate the next,
+    // none conflict with each other, all are about removing speech
+    // patterns we don't want surfaced. Consolidated into one block
+    // with a single summary log so future regressions are easy to
+    // diagnose. ORDER MATTERS only in that meta-narration removal
+    // happens after banned-narration removal (banned is more specific).
+    const cleanupSteps = [
+      { fn: stripInternalLeaks,            name: "internal-leak" },
+      { fn: scrubInternalEnums,            name: "internal-enum" },
+      { fn: stripBannedNarration,          name: "banned-narration" },
+      { fn: stripMetaNarration,            name: "meta-narration" },
+      { fn: dedupeConsecutiveSentences,    name: "dedupe" },
+      { fn: reflowInlineList,              name: "reflow-list" },
+    ];
+    const cleanupLogs = [];
+    for (const step of cleanupSteps) {
+      const before = fullResponseText;
+      const result = step.fn(before);
+      // Steps return either a string or { text, changed } — normalize.
+      const next = typeof result === "string" ? result : result?.text ?? before;
+      const changed = typeof result === "string"
+        ? next.trim() !== before.trim()
+        : Boolean(result?.changed);
+      if (changed && next != null) {
+        cleanupLogs.push(step.name);
+        fullResponseText = next;
+      }
     }
-  }
-
-  if (fullResponseText) {
-    const scrubbed = scrubInternalEnums(fullResponseText);
-    if (scrubbed.changed) {
-      console.log(`[chat] scrubbed orthotic internal enum token(s) before emit`);
-      fullResponseText = scrubbed.text;
-    }
-  }
-
-  if (fullResponseText) {
-    const stripped = stripBannedNarration(fullResponseText);
-    if (stripped !== fullResponseText.trim()) {
-      console.log(`[chat] stripped banned narration`);
-      fullResponseText = stripped;
-    }
-  }
-
-  if (fullResponseText) {
-    const beforeMeta = fullResponseText;
-    const stripped = stripMetaNarration(fullResponseText);
-    if (stripped !== beforeMeta.trim()) {
-      console.log(`[chat] stripped meta-narration`);
-      fullResponseText = stripped;
-    }
-  }
-
-  if (fullResponseText) {
-    const beforeDedupe = fullResponseText;
-    const deduped = dedupeConsecutiveSentences(fullResponseText);
-    if (deduped !== beforeDedupe.trim()) {
-      console.log(`[chat] deduped repeated sentences`);
-      fullResponseText = deduped;
-    }
-  }
-
-  if (fullResponseText) {
-    const before = fullResponseText;
-    const reflowed = reflowInlineList(fullResponseText);
-    if (reflowed !== before) {
-      console.log(`[chat] reflowed inline list into bullets`);
-      fullResponseText = reflowed;
+    if (cleanupLogs.length > 0) {
+      console.log(`[chat] cleanup pipeline: ${cleanupLogs.join("+")}`);
     }
   }
 
