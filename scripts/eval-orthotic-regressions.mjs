@@ -961,7 +961,12 @@ await test("19c — denial guard does not over-block neutral messages", () => {
 //     named-product pattern and drop the category filter so the
 //     search can find Vania across categories.
 // ──────────────────────────────────────────────────────────────
-await test("20a — 'show me Vania in red' drops the category filter (named-product detection)", () => {
+await test("20a — 'show me Vania in red' drops category AND gender filter (named-product detection)", () => {
+  // Gender is dropped because the customer named a specific product and
+  // the search should find it across the catalog. Live trace 2026-06-08:
+  // "how many points to buy Jillian for free" with stale memory.gender=men
+  // searched men's sandals and returned Maui/Milos instead of Jillian.
+  // Dropping gender on named-product searches lets the actual product win.
   const toolCall = {
     name: "search_products",
     input: {
@@ -976,7 +981,8 @@ await test("20a — 'show me Vania in red' drops the category filter (named-prod
     undefined,
     "category filter must be dropped when query mentions a named product",
   );
-  assert.equal(result.input.filters?.gender, "Women", "gender filter must be preserved");
+  assert.equal(result.input.filters?.gender, undefined,
+    "gender filter must be dropped so named-product search isn't blocked by stale gender memory");
   assert.equal(result.input.filters?.color, "red", "color filter must be preserved");
   assert.equal(result.input.query, "Vania", "query string must be preserved");
 });

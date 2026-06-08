@@ -613,6 +613,16 @@ export function resolveTurnIntent({
   //    replace it. price/size/width filters, "show more like these".
   // -----------------------------------------------------------------------
   if (REFINE_PRICE_RE.test(text) || REFINE_SIZE_WIDTH_RE.test(text) || REFINE_GENERIC_RE.test(text)) {
+    // Price refinement ("cheapest", "cheaper", "under $X") contradicts a
+    // stale bestseller modifier. Without dropping it, the engine still
+    // sorts/labels by bestseller and the synthesizer pitches "our
+    // bestselling choice at $139.95" when the customer asked for the
+    // cheapest ($74.95 in the same pool). Drop modifier+badge so the
+    // price refine can take over without competing intent.
+    const dropOnPriceRefine =
+      REFINE_PRICE_RE.test(text)
+        ? ["modifier", "badge", "onSale"].filter((k) => prev[k] != null)
+        : [];
     return {
       label: LABEL.REFINE,
       confidence: 0.9,
@@ -621,7 +631,7 @@ export function resolveTurnIntent({
         : REFINE_SIZE_WIDTH_RE.test(text)
           ? "refine_size_width"
           : "refine_more_like",
-      staleKeysToDrop: [],
+      staleKeysToDrop: dropOnPriceRefine,
     };
   }
 

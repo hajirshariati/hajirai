@@ -572,6 +572,17 @@ await test("T31 — 'which is better, Vicki or Jillian?' drops stale category", 
     `expected category dropped on fresh-subject compare; got ${JSON.stringify(intent.staleKeysToDrop)}`);
 });
 
+await test("T33 — 'what's the cheapest one?' drops stale bestseller modifier", () => {
+  const intent = resolveTurnIntent({
+    latestUserText: "what's the cheapest one?",
+    previousScope: { gender: "women", category: "sandals", modifier: "bestseller", badge: "best" },
+  });
+  assert.equal(intent.reason, "refine_price");
+  assert.ok(intent.staleKeysToDrop.includes("modifier"),
+    `modifier must be dropped on cheapest refine; got ${JSON.stringify(intent.staleKeysToDrop)}`);
+  assert.ok(intent.staleKeysToDrop.includes("badge"));
+});
+
 await test("T32 — 'compare the first two' (back-ref) preserves scope", () => {
   const intent = resolveTurnIntent({
     latestUserText: "compare the first two",

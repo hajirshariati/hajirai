@@ -139,7 +139,12 @@ const NAMED_PRODUCT_COMMON_WORDS = new Set([
 export function relaxCategoryOnNamedProduct(toolCall, ctx) {
   if (toolCall.name !== "search_products") return toolCall;
   const filters = toolCall.input?.filters;
-  if (!filters || !filters.category) return toolCall;
+  // Run when EITHER a category or a gender filter is set. Previously this
+  // function only fired when category was present, which missed the case
+  // where injectLockedGender stamps a stale gender on a named-product
+  // search ("show me Jillian" with session.gender=men → search injects
+  // gender=men → returns wrong products because Jillian is women-only).
+  if (!filters || (!filters.category && !filters.gender)) return toolCall;
 
   const query = String(toolCall.input?.query || "").trim();
   if (!query) return toolCall;
@@ -168,9 +173,20 @@ export function relaxCategoryOnNamedProduct(toolCall, ctx) {
   if (!namedProduct) return toolCall;
 
   const droppedCategory = filters.category;
-  const { category: _drop, ...remainingFilters } = filters;
+  const droppedGender = filters.gender;
+  const { category: _dropCat, gender: _dropGen, ...remainingFilters } = filters;
+  // Also drop gender. Live trace 2026-06-08: customer asked "how many
+  // points to buy Jillian for free?" with memory.gender=men from a
+  // prior turn. Jillian is a women's-only style; search with gender=men
+  // returned 0 Jillian + 2 random men's sandals (Maui flips, Milos
+  // slides), then the bot attached those wrong products to the answer.
+  // Customer-named products override stored gender — let search find
+  // the actual product across genders.
+  const droppedFields = [];
+  if (droppedCategory) droppedFields.push(`category="${droppedCategory}"`);
+  if (droppedGender) droppedFields.push(`gender="${droppedGender}"`);
   console.log(
-    `[chat] named-product detected: "${namedProduct}" — dropping category filter "${droppedCategory}" so search can find it across categories`,
+    `[chat] named-product detected: "${namedProduct}" — dropping ${droppedFields.join(", ")} so search can find it across the catalog`,
   );
   return {
     ...toolCall,

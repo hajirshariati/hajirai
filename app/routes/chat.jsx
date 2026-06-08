@@ -2259,7 +2259,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   // customers are saying about the Maui Orthotic Flips." with nothing
   // after it. Same for "BioRocker vs UltraSky" tech compare.
   const REVIEW_FIT_RETURN_OR_COMPARE_RE =
-    /\b(?:review|reviews|rated|rating|ratings|reviewed|star|stars|score|popular|best[- ]?selling|bestseller|customer[s']*\s+(?:say|saying|love|favor)|what\s+(?:do\s+)?(?:people|customers|buyers|others)\s+(?:say|think)|return|returns|refund|refunds|exchange|exchanges|run|runs|fit|fits|true\s+to\s+size|size\s+up|size\s+down|compare|comparison|vs\.?|versus|difference\s+between)\b/i;
+    /\b(?:review|reviews|rated|rating|ratings|reviewed|star|stars|score|popular|best[- ]?selling|bestseller|customer[s']*\s+(?:say|saying|love|favor)|what\s+(?:do\s+)?(?:people|customers|buyers|others)\s+(?:say|think)|return|returns|refund|refunds|exchange|exchanges|run|runs|fit|fits|true\s+to\s+size|size\s+up|size\s+down|compare|comparison|vs\.?|versus|difference\s+between|cheap|cheapest|cheaper|expensive|price|priced|cost|costs|how\s+much|under\s+\$?\d+|points?\s+(?:need|i\s+need|to\s+(?:buy|get|redeem))|for\s+free)\b/i;
   const skipHardCap =
     REVIEW_FIT_RETURN_OR_COMPARE_RE.test(String(ctx?.latestUserMessage || ""));
   if (

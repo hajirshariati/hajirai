@@ -93,7 +93,24 @@ const CATALOG_COLOR_RE =
 
 function letsCatalogResolverOwnFootwearRequest(text) {
   if (!text) return false;
-  return CATALOG_SPECIFIC_FOOTWEAR_RE.test(text) || CATALOG_COLOR_RE.test(text);
+  if (CATALOG_SPECIFIC_FOOTWEAR_RE.test(text) || CATALOG_COLOR_RE.test(text)) return true;
+  // Compare turns ("compare Jillian and Danika", "BioRocker vs UltraSky")
+  // and named-product turns ("about the Jillian", "do you have Maui") name
+  // their own anchors and don't need an upfront gender ask. Live trace
+  // 2026-06-08: "compare Jillian and Danika" hit the gender gate which
+  // asked "shopping for men's or women's?" — useless when the customer
+  // already named two specific products.
+  if (/\b(?:compare|comparison|vs\.?|versus|difference\s+between|which\s+(?:is|one\s+is)\s+(?:better|worse|more|best))\b/i.test(text)) {
+    return true;
+  }
+  // Proper-noun product anchor (capitalized 4+ char word that isn't a
+  // common stop-noun). Matches "Jillian", "Maui", "BioRocker", etc.
+  // Same vocabulary the chat-tool-rewrite uses for named-product
+  // anchor detection.
+  if (/\b[A-Z][a-z]{3,}\b/.test(text) && !/^\s*(?:the|a|an|hi|hello|thanks|ok|yes|no|hey)\s+\w+/i.test(text.trim())) {
+    return true;
+  }
+  return false;
 }
 
 // Detect "this assistant turn is a footwear gender clarifier" STRUCTURALLY,
