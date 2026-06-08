@@ -1351,6 +1351,50 @@ await test("D33 — engine OPT-IN: 'BioRocker vs UltraSky' declines (tech compar
   assert.ok(out && out.decline, "tech vs tech is comparison, LLM owns it");
 });
 
+// ─── Knowledge/info questions decline ───────────────────────────
+
+await test("D34 — 'what other technologies do your shoes have?' DECLINES (knowledge question, LLM owns)", async () => {
+  let searchCalled = false;
+  const out = await runProductTurn({
+    ...ctxBase,
+    latestUserMessage: "beside BioRocker and UltraSky, what other technologies your shoes has?",
+    sessionMemory: { explicit: { category: "footwear" }, inferred: {} },
+  }, {
+    forceEnable: true,
+    searchFn: async () => { searchCalled = true; return []; },
+    claimConfig: FIXTURE_CLAIM_CONFIG,
+  });
+  assert.ok(out && out.decline,
+    `knowledge question must decline so LLM with RAG answers; got rungs=${(out?.diagnostics?.rungs || []).join("|")}`);
+  assert.equal(searchCalled, false);
+});
+
+await test("D34b — 'tell me about your technologies' declines", async () => {
+  const out = await runProductTurn({
+    ...ctxBase,
+    latestUserMessage: "tell me about your technologies",
+    sessionMemory: { explicit: { category: "sandals" }, inferred: {} },
+  }, {
+    forceEnable: true,
+    searchFn: async () => [],
+    claimConfig: FIXTURE_CLAIM_CONFIG,
+  });
+  assert.ok(out && out.decline);
+});
+
+await test("D34c — 'what makes Aetrex different' declines", async () => {
+  const out = await runProductTurn({
+    ...ctxBase,
+    latestUserMessage: "what makes Aetrex different from other brands?",
+    sessionMemory: { explicit: {}, inferred: {} },
+  }, {
+    forceEnable: true,
+    searchFn: async () => [],
+    claimConfig: FIXTURE_CLAIM_CONFIG,
+  });
+  assert.ok(out && out.decline);
+});
+
 // ─── Multi-criteria conflict (dressy + active) on short messages ──
 
 await test("D25 — short 'walking 8 miles, dressy shoe' declines (multi-criteria conflict)", async () => {

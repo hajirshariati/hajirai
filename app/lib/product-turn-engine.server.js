@@ -498,6 +498,17 @@ const NAMED_PRODUCT_ANCHOR_RE =
 const COMPARE_SHAPE_RE =
   /\b(?:compare|comparison|vs\.?|versus|difference\s+between|better\s+between|between\s+[a-z0-9'-]+\s+(?:and|or)\s+[a-z0-9'-]+|which\s+(?:is|one\s+is)\s+(?:better|worse|more|best|the\s+most)|which\s+of\s+(?:these|those|them)|side[\s-]?by[\s-]?side|tell\s+me\s+the\s+difference|the\s+(?:first|top)\s+two)\b/i;
 
+// Knowledge / info question shapes — the customer is asking ABOUT the
+// brand, technologies, materials, certifications, etc., not browsing
+// for products. The LLM with RAG knowledge handles these; the engine
+// would surface a generic category carousel that doesn't answer the
+// question. Live trace 2026-06-08: "beside BioRocker and UltraSky,
+// what other technologies your shoes has?" → engine pitched Whit
+// Sport Sandal saying it "has BioRocker and UltraSky" — zero info
+// about other tech.
+const KNOWLEDGE_QUESTION_RE =
+  /\b(?:what\s+(?:other|else|kind\s+of|kinds\s+of|sort\s+of|sorts\s+of|type\s+of|types\s+of)\s+(?:technolog|material|feature|brand|tech|spec|fabric|sole|midsole|footbed|insole|method|system|certification)|what\s+(?:technolog|material|feature|brand|tech)|what\s+(?:is|are)\s+(?:your|the)\s+(?:technolog|material|feature|brand|tech|story|mission)|tell\s+me\s+about\s+(?:your|the|aetrex)|how\s+(?:does|do)\s+(?:your|the|biorocker|ultrasky|aetrex)|why\s+(?:aetrex|your|do\s+you)|beside[s]?\s+[A-Z][a-z]+|besides\s+[A-Z][a-z]+|other\s+than\s+[A-Z][a-z]+|explain\s+(?:your|the|biorocker|ultrasky|how)|what\s+makes\s+(?:your|aetrex|biorocker|ultrasky)|history\s+of\s+(?:aetrex|biorocker)|founded\s+(?:by|in)\b)/i;
+
 function engineWantsThisTurn(scope, resolverState = null, ctx = {}) {
   // ──────────────────────────────────────────────────────────────────
   // OPT-IN gate. Default = LLM owns the turn. The engine only claims
@@ -520,6 +531,16 @@ function engineWantsThisTurn(scope, resolverState = null, ctx = {}) {
   if (COMPARE_SHAPE_RE.test(raw)) return false;
   if (isComplexMultiCriteriaTurn(raw)) return false;
   if (scope.namedProduct && !hasResolverCandidates && !hasCatalogRequirement) return false;
+  // Knowledge / info questions — customer is asking ABOUT something
+  // (technologies, materials, brands, certifications, story, mission),
+  // not browsing for product cards. Engine would surface a generic
+  // category browse; LLM with RAG knowledge owns these.
+  // Live trace 2026-06-08: "beside BioRocker and UltraSky, what other
+  // technologies your shoes has?" had memory.category=footwear carried
+  // over → engine claimed → pitched Whit Sport Sandal with text "has
+  // BioRocker and UltraSky, plus we've got a few more options" — zero
+  // answer to the actual technologies question.
+  if (KNOWLEDGE_QUESTION_RE.test(raw)) return false;
 
   // Special claim — review/fit/return follow-up about cards on screen.
   // Even without other scope signal, the engine owns this because it
