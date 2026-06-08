@@ -28,6 +28,7 @@ import {
   stripFillerIntensifiers,
   isCapabilityCheckAboutPriorProducts,
   reflowInlineList,
+  ensureHeaderLineBreaks,
   truncateAtWordBoundary,
   isBrandOrInfoQuestion,
 } from "../app/lib/chat-helpers.server.js";
@@ -1255,6 +1256,32 @@ await test("23g — reflowInlineList converts ` - **Label** — ...` packed list
   assert.ok(/Mission/.test(out), "Mission preserved");
   assert.ok(/Headquarters/.test(out), "Headquarters preserved");
   assert.ok(/Tech/.test(out), "Tech preserved");
+});
+
+await test("23i — ensureHeaderLineBreaks promotes inline bold header after colon", () => {
+  // Live trace 2026-06-08: "BioRocker vs UltraSky" → LLM emitted
+  // "Here's how the two technologies compare: **BioRocker™ Technology**"
+  // on one line, then bullets, then "**UltraSKY™ Technology**" inline
+  // with the previous bullet's text. Widget rendered the second header
+  // mid-paragraph.
+  const text =
+    "Here's how the two technologies compare: **BioRocker™ Technology**\n" +
+    "- A rocker-shaped outsole.\n" +
+    "- Reduces stress on joints.\n" +
+    "- Found in newer sandals like Savannah and Jenny **UltraSKY™ Technology**\n" +
+    "- A lightweight EVA foam.\n";
+  const out = ensureHeaderLineBreaks(text);
+  assert.ok(/compare:\n\n\*\*BioRocker/.test(out),
+    `header after colon must get blank line before it. Output:\n${out}`);
+  assert.ok(/Jenny\n\n\*\*UltraSKY/.test(out),
+    `mid-line header must be broken into its own paragraph. Output:\n${out}`);
+});
+
+await test("23j — ensureHeaderLineBreaks leaves inline bold emphasis alone", () => {
+  // Plain inline emphasis (not a section header) should not be broken.
+  const text = "This is **really important** but please read more.";
+  const out = ensureHeaderLineBreaks(text);
+  assert.equal(out, text, "inline emphasis shouldn't be split into paragraphs");
 });
 
 await test("23h — reflowInlineList leaves single-mention text untouched", () => {

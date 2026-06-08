@@ -24,6 +24,7 @@ import {
   looksLikeDefinitionalHallucination,
   hasChoiceButtons,
   dedupeConsecutiveSentences,
+  ensureHeaderLineBreaks,
   isSingularPrescriptive,
   hasPluralIntroFraming,
   detectConditionOrOccasion,
@@ -226,6 +227,49 @@ function extractPriorProductCards(history) {
     if (products.length > 0) return products;
   }
   return [];
+}
+
+// Capitalized 4+ char tokens the LLM mentioned in prior assistant text
+// that aren't already represented in the rendered product cards. When
+// the LLM says "our bestseller is Danika" but doesn't attach Danika as
+// a card, Danika still becomes the conversation's CURRENT anchor — the
+// next turn's pronoun ("does it run small?" / "is that in stock?")
+// should resolve to Danika, not to the most-recently-displayed pool.
+//
+// Returns a Set of lowercased anchor tokens from the MOST RECENT
+// assistant turn (one turn back). Caller can pass these to the resolver
+// to seed memory.inferred.specificProduct so the next turn isn't blind
+// to what the LLM just talked about.
+const NAMED_ANCHOR_STOPWORDS = new Set([
+  "women", "womens", "men", "mens", "kids", "girls", "boys", "child", "youth", "unisex",
+  "sandal", "sandals", "sneaker", "sneakers", "heel", "heels", "wedge", "wedges",
+  "boot", "boots", "loafer", "loafers", "oxford", "oxfords", "clog", "clogs",
+  "slipper", "slippers", "footwear", "shoe", "shoes", "slip", "orthotic", "orthotics",
+  "the", "this", "that", "those", "these", "here", "there", "they",
+  "perfect", "great", "best", "good", "really", "very", "available", "view", "all",
+  "color", "colors", "style", "styles", "size", "sizes", "fit", "feel", "feels",
+  "morton", "plantar", "fasciitis", "bunion", "bunions",
+  "yotpo", "aetrex", "klaviyo", "shopify",
+  "biorocker", "ultrasky", "lynco",
+]);
+
+function extractLLMNamedAnchors(history) {
+  const lastAssistant = [...(history || [])].reverse().find((t) => t?.role === "assistant");
+  if (!lastAssistant?.content) return [];
+  const text = typeof lastAssistant.content === "string"
+    ? lastAssistant.content
+    : Array.isArray(lastAssistant.content)
+      ? lastAssistant.content.map((c) => (typeof c?.text === "string" ? c.text : "")).join(" ")
+      : "";
+  if (!text) return [];
+  const anchors = new Set();
+  const re = /\b([A-Z][a-z]{3,})\b/g;
+  let m;
+  while ((m = re.exec(text)) !== null) {
+    const lower = m[1].toLowerCase();
+    if (!NAMED_ANCHOR_STOPWORDS.has(lower)) anchors.add(lower);
+  }
+  return [...anchors];
 }
 
 // All cards shown across the entire conversation (cumulative, not just
@@ -607,7 +651,29 @@ async function runProductTurnDispatch({ ctx, controller, encoder, claimConfig, a
     try {
       const strict = await detectSpecificProduct(ctx.shop, message);
       if (strict) return strict;
-      return await findProductHandleForSimilarAnchor(ctx.shop, message);
+      const fuzzy = await findProductHandleForSimilarAnchor(ctx.shop, message);
+      if (fuzzy) return fuzzy;
+      // LLM-named-anchor fallback. When the customer's latest message
+      // uses a pronoun ("is it in stock?", "does that come in black?")
+      // and the resolver can't find an anchor in the message itself,
+      // fall back to whatever product the LLM most recently named in
+      // text. ctx.llmNamedAnchors is extracted from the prior assistant
+      // turn's prose by extractLLMNamedAnchors. This is how "Danika is
+      // our bestseller — does it run small?" stays anchored to Danika
+      // across turns even though Danika never made it into a card pool.
+      const anchors = Array.isArray(ctx.llmNamedAnchors) ? ctx.llmNamedAnchors : [];
+      const pronounRefRe = /\b(?:it|this|that|these|those|them|they)\b/i;
+      if (anchors.length > 0 && pronounRefRe.test(message)) {
+        for (const name of anchors) {
+          const hit = await detectSpecificProduct(ctx.shop, name)
+            || await findProductHandleForSimilarAnchor(ctx.shop, name);
+          if (hit) {
+            console.log(`[product-turn-engine] anchor resolver: LLM-named fallback → "${name}" matched`);
+            return hit;
+          }
+        }
+      }
+      return null;
     } catch (err) {
       console.warn(`[product-turn-engine] anchor resolver failed: ${err?.message || err}`);
       return null;
@@ -2239,6 +2305,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       { fn: stripMetaNarration,            name: "meta-narration" },
       { fn: dedupeConsecutiveSentences,    name: "dedupe" },
       { fn: reflowInlineList,              name: "reflow-list" },
+      { fn: ensureHeaderLineBreaks,        name: "header-breaks" },
     ];
     const cleanupLogs = [];
     for (const step of cleanupSteps) {
@@ -2744,63 +2811,18 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     }
   }
 
-  if (pool.length >= 2 && ctx?.sessionMemory?.latestTurnIntent?.reason === "compare_request") {
-    // Tech / concept / feature comparison detection. When the customer
-    // asks "BioRocker vs UltraSky" or "memory foam vs gel" — the
-    // comparison subjects are technologies, not products. The pool
-    // is whatever happened to surface from searching those terms
-    // (often unrelated styles that use those techs). The template
-    // would describe THOSE products by color/category/price and
-    // erase the LLM's actual tech comparison. Live trace 2026-06-08:
-    // "BioRocker vs UltraSky" → pool was Savannah/Jenny sandals,
-    // template said "Savannah is Taupe, sandals, $134.95; Jenny is
-    // Navy, sandals, $124.95" — zero answer to the actual question.
-    //
-    // Heuristic: pull comparison subjects from the user's message
-    // ("X vs Y", "X versus Y", "difference between X and Y", "X or Y").
-    // If neither subject appears in any pool card title (i.e. the
-    // subjects aren't products, they're concepts), AND the LLM's
-    // text mentions both subjects, the LLM is doing the right thing.
-    // Leave its answer alone.
-    const userMsg = String(ctx.latestUserMessage || "");
-    const subjectMatch =
-      userMsg.match(/([A-Za-z][A-Za-z0-9'-]{2,})\s+(?:vs\.?|versus|or)\s+([A-Za-z][A-Za-z0-9'-]{2,})/i) ||
-      userMsg.match(/difference\s+between\s+([A-Za-z][A-Za-z0-9'-]{2,})\s+(?:and|or)\s+([A-Za-z][A-Za-z0-9'-]{2,})/i) ||
-      userMsg.match(/compare\s+([A-Za-z][A-Za-z0-9'-]{2,})\s+(?:and|to|with|vs\.?|versus)\s+([A-Za-z][A-Za-z0-9'-]{2,})/i);
-    let llmAlreadyComparesNonProductSubjects = false;
-    if (subjectMatch) {
-      const a = subjectMatch[1];
-      const b = subjectMatch[2];
-      const titles = pool.map((c) => String(c?.title || "").toLowerCase());
-      const inPoolTitles = (term) =>
-        titles.some((t) => t.includes(String(term || "").toLowerCase()));
-      const textHas = (term) =>
-        new RegExp(`\\b${String(term).replace(/[.*+?^${}()|[\\]\\\\]/g, "\\\\$&")}\\b`, "i")
-          .test(fullResponseText || "");
-      if (!inPoolTitles(a) && !inPoolTitles(b) && textHas(a) && textHas(b)) {
-        llmAlreadyComparesNonProductSubjects = true;
-        console.log(
-          `[chat] response-contract: skipping code-owned comparison — ` +
-            `subjects (${a}, ${b}) are concepts/tech (not in pool titles) and ` +
-            `LLM already mentions both`,
-        );
-      }
-    }
-    if (!llmAlreadyComparesNonProductSubjects) {
-      const comparison = buildCodeOwnedComparisonText({
-        text: fullResponseText,
-        cards: pool,
-      });
-      if (comparison.changed) {
-        const before = fullResponseText;
-        fullResponseText = comparison.text;
-        console.log(
-          `[chat] response-contract: code-owned comparison ` +
-            `(${before.length}→${fullResponseText.length} chars, pool=${pool.length}, reason=${comparison.reason})`,
-        );
-      }
-    }
-  }
+  // REMOVED: code_owned_comparison postprocessor (2026-06-08).
+  // It replaced the LLM's real comparison text with a 2-product
+  // template — "X is Color, category, $price; Y is Color, category,
+  // $price. Pick the first if that style feels closer, or the
+  // second if you prefer its look." That template was strictly
+  // worse than what the LLM writes. The engine now declines
+  // compare-shape turns (engineWantsThisTurn → COMPARE_SHAPE_RE),
+  // so the LLM is the only path that authors compare answers — and
+  // it does so with multi-paragraph, actually-useful prose. Verifier
+  // skip (next block) already protects tech-concept compares; product
+  // compares with subjects in pool also benefit from leaving the LLM
+  // text alone.
 
   if (pool.length > 0 && fullResponseText) {
     // Skip the claim verifier on tech/concept comparison turns. The
@@ -2840,29 +2862,16 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     }
   }
 
-  if (pool.length > 0 && fullResponseText) {
-    if (ctx?.sessionMemory?.latestTurnIntent?.reason !== "compare_request") {
-      const listing = buildCodeOwnedProductListingText({
-        text: fullResponseText,
-        cards: pool,
-        ctx,
-        recommenderInvoked: recommenderInvokedThisTurn,
-      });
-      if (listing.changed) {
-        const before = fullResponseText;
-        const serviceAnswer = isCompoundPolicyProductQuestion(ctx.latestUserMessage)
-          ? compoundPolicyFallbackText(ctx.latestUserMessage)
-          : "";
-        fullResponseText = serviceAnswer
-          ? `${serviceAnswer} ${listing.text}`
-          : listing.text;
-        console.log(
-          `[chat] response-contract: code-owned product listing ` +
-            `(${before.length}→${fullResponseText.length} chars, pool=${pool.length}, reason=${listing.reason})`,
-        );
-      }
-    }
-  }
+  // REMOVED: main-path code_owned_listing postprocessor (2026-06-08).
+  // Like code_owned_comparison above, this was replacing LLM text with
+  // a templated listing line ("Here are six women's sandals..."). With
+  // the warmed-up synthesizer prompt the LLM writes better copy than
+  // the template, and the synthesizer is constrained to ground claims
+  // in real card facts. The LAST-RESORT code_owned_listing at line
+  // ~2860 stays as an empty-text safety net (poolSize>0 ∧ textLen===0
+  // is the canonical broken-state to rescue).
+  // For compound policy+product turns, ensureCompoundPolicyClause
+  // already prepends the policy clause (search "ensureCompoundPolicyClause").
 
   if (fullResponseText) {
     const inlineChips = stripUnsafeInlineChips(fullResponseText, { hasProducts: pool.length > 0 });
@@ -3602,6 +3611,7 @@ export const action = async ({ request }) => {
 
     const priorProductCards = extractPriorProductCards(body.history);
     const allPriorProductCards = extractAllPriorProductCards(body.history);
+    const llmNamedAnchors = extractLLMNamedAnchors(body.history);
     const history = sanitizeHistory(body.history);
     const messages = [...history, { role: "user", content: String(body.message) }];
 
@@ -4050,6 +4060,7 @@ export const action = async ({ request }) => {
       latestUserMessage: String(body.message || ""),
       priorProductCards,
       allPriorProductCards,
+      llmNamedAnchors,
       debugChatEvents: body?.debug === true,
       messages,
     };

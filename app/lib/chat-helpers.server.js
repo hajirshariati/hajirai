@@ -346,6 +346,37 @@ export function reflowInlineList(text) {
   return text.replace(INLINE_LIST_ITEM_RE, (_m, label) => `\n- ${label} — `).trim();
 }
 
+// Ensure bold section headers (`**Heading**`) start on their own line.
+// Live trace 2026-06-08: "BioRocker vs UltraSky" → LLM wrote
+// "Here's how the two technologies compare: **BioRocker™ Technology**
+//   - bullet
+//   - bullet
+//   Found in our newer sandal and sneaker styles like Savannah and Jenny **UltraSKY™ Technology**
+//   - bullet"
+// The second header ran inline with the prior bullet because the LLM
+// emitted `... Jenny **UltraSKY**` without a paragraph break. Prompt
+// rule alone isn't enough — the LLM still concatenates occasionally.
+// Postprocess to guarantee a blank line precedes any header that's
+// followed by bullets or another paragraph.
+export function ensureHeaderLineBreaks(text) {
+  if (!text || typeof text !== "string") return text;
+  let next = text;
+  // 1. After a colon ("compare:" / "summary:" / etc.) before a bold
+  //    header — promote inline-space to blank-line.
+  next = next.replace(/(:)\s+(\*\*[A-Z][^*\n]{2,}\*\*)(?=\s*\n)/g, "$1\n\n$2");
+  // 2. Bold header that appears AFTER non-whitespace text on the same
+  //    physical position (LLM joined two sections without \n\n).
+  //    Heuristic: word char or punctuation immediately preceding `**` on
+  //    same line → insert \n\n. Only fires when the header is followed
+  //    by a bullet (`\n-`) or another paragraph break (so we don't break
+  //    inline bold emphasis like "**important**").
+  next = next.replace(
+    /([^\n*])(\s*)(\*\*[A-Z][^*\n]{2,}\*\*)(?=\s*\n\s*(?:[-*]|\*\*|\n))/g,
+    (_m, prev, _ws, header) => `${prev}\n\n${header}`,
+  );
+  return next;
+}
+
 // Word-boundary truncation. The previous cap could chop mid-word
 // ("casual-wea..." in production trace 2026-05-13 12:12:40). Given
 // the desired soft maximum (e.g., 300 chars), walk back to the
