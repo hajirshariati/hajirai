@@ -165,8 +165,22 @@ function requirementTokens(requirement) {
 }
 
 function textHasTokens(text, tokens) {
-  const words = new Set(String(text || "").split(" ").filter(Boolean));
-  return tokens.every((token) => words.has(token));
+  const raw = String(text || "");
+  const words = new Set(raw.split(" ").filter(Boolean));
+  // Direct token match — every requirement token appears as a word.
+  // Covers "bio rocker" (customer typed with space) against a doc
+  // that contains "bio rocker" (CamelCase-split from "BioRocker").
+  if (tokens.every((token) => words.has(token))) return true;
+  // Compound-token fallback — when the customer types a brand name
+  // as a single word ("ultrasky", "biorocker"), it tokenizes as one
+  // requirement but the doc has the split form ("ultra sky", "bio
+  // rocker"). Concatenate doc words and check the joined requirement
+  // as a substring. Symmetric: also handle a multi-token requirement
+  // against a doc that happens to be glued (rare but cheap to check).
+  const docCondensed = raw.replace(/\s+/g, "");
+  const reqCondensed = tokens.join("");
+  if (reqCondensed.length >= 4 && docCondensed.includes(reqCondensed)) return true;
+  return false;
 }
 
 export function matchCatalogRequirement(product, requirement) {
