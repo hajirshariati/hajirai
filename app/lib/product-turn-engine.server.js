@@ -577,7 +577,11 @@ const COMFORT_USE_RE =
 
 function isComplexMultiCriteriaTurn(rawMessage) {
   const msg = String(rawMessage || "");
-  if (msg.length < 200) return false;
+  // No length floor for the canonical dressy-vs-active conflict —
+  // it shows up in short messages too ("walking 8 miles, dressy
+  // shoe?" — 36 chars). The 200-char threshold below still applies
+  // to the more nuanced dressy+comfort case where length is a real
+  // signal of multi-criteria complexity.
   const hasDressy = DRESSY_USE_RE.test(msg);
   const hasActive = ACTIVE_USE_RE.test(msg);
   const hasComfort = COMFORT_USE_RE.test(msg);
@@ -585,6 +589,7 @@ function isComplexMultiCriteriaTurn(rawMessage) {
   // the customer wants a single product that satisfies two
   // ordinarily-opposing use cases. Engine can't reason about that.
   if (hasDressy && hasActive) return true;
+  if (msg.length < 200) return false;
   // "Dressy + long day on feet" is the same shape from the other
   // side (the comfort signal is about endurance, not formality).
   if (hasDressy && hasComfort) return true;

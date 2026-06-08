@@ -2251,7 +2251,19 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   }
 
   const PRODUCT_REPLY_HARD_CAP = 300;
+  // Review / fit / return / comparison answers are LONG by nature
+  // (review quotes, fit summary, multi-feature compare). The 300-char
+  // cap chops them to a useless one-liner preamble. Live trace:
+  // "What do customers say about Maui?" → LLM wrote 685 chars of real
+  // review content, cap chopped to 63 chars → emitted "Here's what
+  // customers are saying about the Maui Orthotic Flips." with nothing
+  // after it. Same for "BioRocker vs UltraSky" tech compare.
+  const REVIEW_FIT_RETURN_OR_COMPARE_RE =
+    /\b(?:review|reviews|rated|rating|ratings|reviewed|star|stars|score|popular|best[- ]?selling|bestseller|customer[s']*\s+(?:say|saying|love|favor)|what\s+(?:do\s+)?(?:people|customers|buyers|others)\s+(?:say|think)|return|returns|refund|refunds|exchange|exchanges|run|runs|fit|fits|true\s+to\s+size|size\s+up|size\s+down|compare|comparison|vs\.?|versus|difference\s+between)\b/i;
+  const skipHardCap =
+    REVIEW_FIT_RETURN_OR_COMPARE_RE.test(String(ctx?.latestUserMessage || ""));
   if (
+    !skipHardCap &&
     pool.length > 0 &&
     fullResponseText &&
     fullResponseText.length > PRODUCT_REPLY_HARD_CAP &&
@@ -2724,17 +2736,60 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   }
 
   if (pool.length >= 2 && ctx?.sessionMemory?.latestTurnIntent?.reason === "compare_request") {
-    const comparison = buildCodeOwnedComparisonText({
-      text: fullResponseText,
-      cards: pool,
-    });
-    if (comparison.changed) {
-      const before = fullResponseText;
-      fullResponseText = comparison.text;
-      console.log(
-        `[chat] response-contract: code-owned comparison ` +
-          `(${before.length}→${fullResponseText.length} chars, pool=${pool.length}, reason=${comparison.reason})`,
-      );
+    // Tech / concept / feature comparison detection. When the customer
+    // asks "BioRocker vs UltraSky" or "memory foam vs gel" — the
+    // comparison subjects are technologies, not products. The pool
+    // is whatever happened to surface from searching those terms
+    // (often unrelated styles that use those techs). The template
+    // would describe THOSE products by color/category/price and
+    // erase the LLM's actual tech comparison. Live trace 2026-06-08:
+    // "BioRocker vs UltraSky" → pool was Savannah/Jenny sandals,
+    // template said "Savannah is Taupe, sandals, $134.95; Jenny is
+    // Navy, sandals, $124.95" — zero answer to the actual question.
+    //
+    // Heuristic: pull comparison subjects from the user's message
+    // ("X vs Y", "X versus Y", "difference between X and Y", "X or Y").
+    // If neither subject appears in any pool card title (i.e. the
+    // subjects aren't products, they're concepts), AND the LLM's
+    // text mentions both subjects, the LLM is doing the right thing.
+    // Leave its answer alone.
+    const userMsg = String(ctx.latestUserMessage || "");
+    const subjectMatch =
+      userMsg.match(/([A-Za-z][A-Za-z0-9'-]{2,})\s+(?:vs\.?|versus|or)\s+([A-Za-z][A-Za-z0-9'-]{2,})/i) ||
+      userMsg.match(/difference\s+between\s+([A-Za-z][A-Za-z0-9'-]{2,})\s+(?:and|or)\s+([A-Za-z][A-Za-z0-9'-]{2,})/i) ||
+      userMsg.match(/compare\s+([A-Za-z][A-Za-z0-9'-]{2,})\s+(?:and|to|with|vs\.?|versus)\s+([A-Za-z][A-Za-z0-9'-]{2,})/i);
+    let llmAlreadyComparesNonProductSubjects = false;
+    if (subjectMatch) {
+      const a = subjectMatch[1];
+      const b = subjectMatch[2];
+      const titles = pool.map((c) => String(c?.title || "").toLowerCase());
+      const inPoolTitles = (term) =>
+        titles.some((t) => t.includes(String(term || "").toLowerCase()));
+      const textHas = (term) =>
+        new RegExp(`\\b${String(term).replace(/[.*+?^${}()|[\\]\\\\]/g, "\\\\$&")}\\b`, "i")
+          .test(fullResponseText || "");
+      if (!inPoolTitles(a) && !inPoolTitles(b) && textHas(a) && textHas(b)) {
+        llmAlreadyComparesNonProductSubjects = true;
+        console.log(
+          `[chat] response-contract: skipping code-owned comparison — ` +
+            `subjects (${a}, ${b}) are concepts/tech (not in pool titles) and ` +
+            `LLM already mentions both`,
+        );
+      }
+    }
+    if (!llmAlreadyComparesNonProductSubjects) {
+      const comparison = buildCodeOwnedComparisonText({
+        text: fullResponseText,
+        cards: pool,
+      });
+      if (comparison.changed) {
+        const before = fullResponseText;
+        fullResponseText = comparison.text;
+        console.log(
+          `[chat] response-contract: code-owned comparison ` +
+            `(${before.length}→${fullResponseText.length} chars, pool=${pool.length}, reason=${comparison.reason})`,
+        );
+      }
     }
   }
 

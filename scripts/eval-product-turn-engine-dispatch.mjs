@@ -1204,6 +1204,37 @@ await test("D24 — pronoun-only follow-up without priorProductCards goes throug
   assert.equal(searchCalled, true, "no prior cards → engine falls back to normal search");
 });
 
+// ─── Multi-criteria conflict (dressy + active) on short messages ──
+
+await test("D25 — short 'walking 8 miles, dressy shoe' declines (multi-criteria conflict)", async () => {
+  const out = await runProductTurn({
+    ...ctxBase,
+    latestUserMessage: "i'm walking 8 miles, i need a dressy shoe, what do you suggest?",
+  }, {
+    forceEnable: true,
+    searchFn: async () => [uiCandidate({ title: "Whit Sandal", handle: "whit" })],
+    claimConfig: FIXTURE_CLAIM_CONFIG,
+  });
+  assert.ok(out && out.decline,
+    `dressy+walking conflict must decline regardless of length; got rungs=${(out?.diagnostics?.rungs || []).join("|")}`);
+});
+
+await test("D25b — focused 'sandals for plantar fasciitis' still owned by engine (no false multi-criteria trigger)", async () => {
+  const out = await runProductTurn({
+    ...ctxBase,
+    latestUserMessage: "women's sandals for plantar fasciitis",
+    sessionMemory: {
+      explicit: { gender: "women", category: "sandals", condition: "plantar_fasciitis" },
+      inferred: {},
+    },
+  }, {
+    forceEnable: true,
+    searchFn: async () => [uiCandidate({ title: "Vicki", handle: "vicki" })],
+    claimConfig: FIXTURE_CLAIM_CONFIG,
+  });
+  assert.ok(out && !out.decline, "focused single-criteria query must stay with engine");
+});
+
 // ──────────────────────────────────────────────────────────────
 console.log("");
 if (failed === 0) {
