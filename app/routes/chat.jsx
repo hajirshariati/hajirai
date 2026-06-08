@@ -537,6 +537,50 @@ async function runProductTurnDispatch({ ctx, controller, encoder, claimConfig, a
 
   const searchFn = async (scope) => {
     const limit = ctx?.productCardCap || 6;
+    // Named-product anchor: customer's latest message contains a
+    // specific catalog product ("what's the spec on Reagan?", "tell
+    // me about the Maui", "show me Jillian"). Look it up DIRECTLY
+    // and use it as the lead candidate. Without this, the resolver's
+    // 6 generic candidates (category-only) shadow the customer's
+    // explicit choice — live trace 2026-06-08: "what's the spec on
+    // the Reagan boot?" returned Luna, Victoria, Addie boots (the
+    // resolver's top 6 women's boots), not Reagan.
+    const latestMsg = String(ctx.latestUserMessage || "");
+    if (latestMsg && /\b[A-Z][a-z]{3,}\b/.test(latestMsg)) {
+      try {
+        const namedHandle = await detectSpecificProduct(ctx.shop, latestMsg);
+        if (namedHandle) {
+          const details = await dispatchTool("get_product_details", { handle: namedHandle }, ctx);
+          const namedCards = extractProductCards("get_product_details", details, ctx);
+          if (namedCards.length > 0) {
+            console.log(
+              `[product-turn-engine] searchFn lead candidate: named product "${namedHandle}" detected in message`,
+            );
+            // Lead with the named product, then top up with resolver
+            // candidates / category alternatives so the customer can
+            // browse if Reagan isn't quite right. Cap at `limit`.
+            const out = [...namedCards];
+            if (out.length < limit && resolverPromisedRecommendation(ctx.resolverState)) {
+              const altHandles = (ctx.resolverState.candidate_products || [])
+                .map((p) => p?.handle)
+                .filter(Boolean)
+                .filter((h) => h !== namedHandle)
+                .slice(0, limit - out.length);
+              for (const h of altHandles) {
+                try {
+                  const altDetails = await dispatchTool("get_product_details", { handle: h }, ctx);
+                  out.push(...extractProductCards("get_product_details", altDetails, ctx));
+                } catch {/* skip */}
+                if (out.length >= limit) break;
+              }
+            }
+            return out.slice(0, limit);
+          }
+        }
+      } catch (err) {
+        console.warn(`[product-turn-engine] named-product lead lookup failed: ${err?.message || err}`);
+      }
+    }
     if (resolverPromisedRecommendation(ctx.resolverState)) {
       const handles = (ctx.resolverState.candidate_products || [])
         .map((p) => p?.handle)
