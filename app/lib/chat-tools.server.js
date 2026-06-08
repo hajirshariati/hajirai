@@ -957,19 +957,41 @@ const searchQuery = detected.gender ? detected.query : q;
     }
   }
 
-  // Concrete requirements are proof constraints, not ranking hints. Apply
-  // them to the full eligible catalog before keyword/semantic ranking so the
-  // ranker can order proven matches but can never discard them first.
+  // Catalog requirements as a SOFT signal, not a hard wipe. If the
+  // literal tokenizer can find products that match every requirement
+  // word, narrow to those (high-precision proof). If it finds zero,
+  // FAIL OPEN — keep the broader pool so the keyword scorer +
+  // semantic embedding search can find products by meaning instead
+  // of by exact word match.
+  //
+  // This is what makes the search engine smart about brand /
+  // technology spelling variants. Customer types "ultrasky" but the
+  // catalog has "UltraSky" → tokenizer splits to "ultra sky" → exact
+  // match fails → semantic search recognizes "ultrasky" ≈ "ultra
+  // sky" and surfaces the right products. Same for "biorocker",
+  // "lynco", "p3", any future brand. No per-term patching.
+  //
+  // The catalogRequirementMatches map still records which products
+  // had literal proof so the synthesizer can cite them honestly.
+  // Products that surface only via semantic similarity simply don't
+  // get a "verified evidence" badge.
   let catalogRequirementMatches = new Map();
   if (wantedCatalogTerms.length > 0) {
     const beforeRequirements = products.length;
     const requirementResult = filterByCatalogRequirements(products, wantedCatalogTerms);
-    products = requirementResult.products;
     catalogRequirementMatches = requirementResult.matches;
-    console.log(
-      `[search]   catalog requirements source filter: terms="${wantedCatalogTerms.join(" | ")}" ` +
-        `kept=${products.length}/${beforeRequirements}`,
-    );
+    if (requirementResult.products.length > 0) {
+      products = requirementResult.products;
+      console.log(
+        `[search]   catalog requirements: terms="${wantedCatalogTerms.join(" | ")}" ` +
+          `kept=${products.length}/${beforeRequirements} (literal evidence found)`,
+      );
+    } else {
+      console.log(
+        `[search]   catalog requirements: terms="${wantedCatalogTerms.join(" | ")}" ` +
+          `WIPED ALL ${beforeRequirements} → fail-open for semantic search`,
+      );
+    }
   }
 
   const expandKeywordTerms = (kw) => {

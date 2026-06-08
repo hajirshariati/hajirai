@@ -146,21 +146,32 @@ export async function runProductTurn(ctx = {}, options = {}) {
   let rawCandidates = await options.searchFn(scope);
   diagnostics.rungs.push(`retrieved:${rawCandidates.length}`);
 
-  // 2b. Verify concrete catalog requirements against canonical product
-  // evidence. This is vocabulary-agnostic: cork, memory foam, BioRocker,
-  // or a merchant-defined attribute all use the same evidence contract.
-  // SearchFn performs the same filter at source in production; keeping it
-  // here makes resolver candidates and injected test candidates obey it too.
+  // 2b. Catalog requirements as a SOFT narrowing — high-precision
+  // when the literal tokenizer finds matches, fail-open otherwise so
+  // semantic retrieval (running upstream in searchFn) keeps its
+  // results. Mirrors the same pattern in chat-tools.searchProducts
+  // so the engine and the search layer behave consistently.
+  // Vocabulary-agnostic: cork, memory foam, BioRocker, UltraSky, any
+  // merchant-defined attribute all use the same evidence contract.
   if (scope.requiredCatalogTerms?.length > 0) {
     const before = rawCandidates.length;
     const requirementResult = filterByCatalogRequirements(
       rawCandidates,
       scope.requiredCatalogTerms,
     );
-    rawCandidates = requirementResult.products;
-    diagnostics.rungs.push(
-      `catalog_requirements:${scope.requiredCatalogTerms.join("+")}=${rawCandidates.length}/${before}`,
-    );
+    if (requirementResult.products.length > 0) {
+      rawCandidates = requirementResult.products;
+      diagnostics.rungs.push(
+        `catalog_requirements:${scope.requiredCatalogTerms.join("+")}=${rawCandidates.length}/${before}`,
+      );
+    } else {
+      // Fail-open: literal tokenizer found nothing, but semantic
+      // candidates from searchFn may still answer the customer's
+      // question. Don't wipe.
+      diagnostics.rungs.push(
+        `catalog_requirements:${scope.requiredCatalogTerms.join("+")}=0/${before}_failopen`,
+      );
+    }
   }
 
   // 3. Attach facts. Cards without _claimFacts after this step are
