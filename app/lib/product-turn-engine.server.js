@@ -207,6 +207,42 @@ export async function runProductTurn(ctx = {}, options = {}) {
   diagnostics.rungs.push(`selected:${selected.length}/deferred:${deferred.length}`);
   diagnostics.selectionReason = selectionReason;
 
+  // 5b. Yotpo / AfterShip enrichment. When the customer's question
+  // is review-shaped ("which has the highest review", "best rated",
+  // "what do people say") or return-shaped ("which returns most",
+  // "do these run small per returns"), fetch the merchant's review
+  // and return data for the lead families and attach it as facts.
+  // The synthesizer then has real rating + return numbers to mention,
+  // instead of dead-ending with "I couldn't find that feature."
+  //
+  // Owned by the engine, not the agent loop: the engine has the
+  // candidate set, knows which question shape needs review data,
+  // and is the only path that emits the final answer for engine-
+  // handled turns. One source of authority.
+  if (typeof options.fetchReviewsFn === "function" && isReviewShapedQuestion(scope.rawMessage)) {
+    const leadFamilies = [...selected, ...deferred].slice(0, 6);
+    const handles = leadFamilies
+      .map((f) => (f?.primary?.handle || f?.variants?.[0]?.handle || ""))
+      .filter(Boolean);
+    if (handles.length > 0) {
+      try {
+        const reviewMap = await options.fetchReviewsFn(handles);
+        for (const fam of leadFamilies) {
+          const card = fam?.primary || fam?.variants?.[0];
+          const data = card?.handle ? reviewMap[card.handle] : null;
+          if (card && data) {
+            card._reviewAvg = data.averageScore ?? null;
+            card._reviewCount = data.totalReviews ?? null;
+            card._reviewFit = data.fitSummary || null;
+          }
+        }
+        diagnostics.rungs.push(`reviews:${Object.keys(reviewMap).length}/${handles.length}`);
+      } catch (err) {
+        console.warn(`[product-turn-engine] review enrichment failed: ${err?.message || err}`);
+      }
+    }
+  }
+
   // 6. Compose deterministic seller-spirit copy. willHaveCta
   // mirrors the same scope gate that decides whether the
   // dispatcher will emit a storefront-search button — keeps the
@@ -499,6 +535,15 @@ function resolverHasCandidateRecommendation(resolverState) {
 // configuration and catalog coverage. This keeps the old agent from
 // inventing unsupported chips like Kids' shoes or Accessories under a
 // shoe-style question.
+// Customer's question is about reviews, ratings, or returns —
+// signals that the engine should enrich the candidate cards with
+// Yotpo / AfterShip data before composing the answer.
+const REVIEW_SHAPED_RE =
+  /\b(?:review|reviews|rated|rating|ratings|reviewed|star|stars|score|scored|popular|best[- ]?selling|bestseller|customer[s']*\s+(?:say|saying|love|favor)|what\s+(?:do\s+)?(?:people|customers|buyers|others)\s+(?:say|think))\b|\b(?:return|returns|returned|refund|refunds|exchange|exchanges)\s+(?:rate|reason|reasons|policy|history|data)?\b/i;
+function isReviewShapedQuestion(message) {
+  return REVIEW_SHAPED_RE.test(String(message || ""));
+}
+
 const BROAD_BROWSE_RE =
   /\b(?:show|find|search|shop|browse|need|want|looking\s+for|recommend|suggest|carry|have)\b/i;
 

@@ -614,6 +614,40 @@ async function runProductTurnDispatch({ ctx, controller, encoder, claimConfig, a
     }
   };
 
+  // Yotpo / AfterShip enrichment. Engine asks for review + return
+  // data only on review-shaped turns ("highest review", "best
+  // rated", "return rate"). Parallel fetches per handle; failures
+  // per handle don't take down the whole turn (engine still
+  // composes from whatever did succeed).
+  const fetchReviewsFn = (ctx?.yotpoApiKey || ctx?.aftershipApiKey)
+    ? async (handles) => {
+        const { executeTool } = await import("../lib/chat-tools.server");
+        const results = await Promise.all(
+          handles.map(async (h) => {
+            const [rev, ret] = await Promise.all([
+              ctx.yotpoApiKey
+                ? executeTool("get_product_reviews", { handle: h }, ctx).catch(() => null)
+                : Promise.resolve(null),
+              ctx.aftershipApiKey
+                ? executeTool("get_return_insights", { handle: h }, ctx).catch(() => null)
+                : Promise.resolve(null),
+            ]);
+            const merged = {};
+            if (rev && !rev.error) {
+              merged.averageScore = rev.averageScore;
+              merged.totalReviews = rev.totalReviews;
+              merged.fitSummary = rev.fitSummary;
+            }
+            if (ret && !ret.error) {
+              merged.returnInsights = ret;
+            }
+            return [h, merged];
+          }),
+        );
+        return Object.fromEntries(results.filter(([, v]) => v && Object.keys(v).length > 0));
+      }
+    : null;
+
   // Voice synthesizer. Engine still owns selection, lead pick, CTA,
   // chips — this only rewrites the deterministic template into
   // warmer prose using ONLY the facts the engine grounded. Strict
@@ -640,6 +674,13 @@ async function runProductTurnDispatch({ ctx, controller, encoder, claimConfig, a
           selection_reason: selectionReason || "",
           has_view_all_button: !!willHaveCta,
           template_for_reference: deterministicText,
+          // Yotpo / AfterShip data — present only on review-shaped
+          // turns where the engine enriched the lead card. The
+          // synthesizer may mention these numbers verbatim; if a
+          // field is empty/null, ignore it (don't invent).
+          lead_review_average: leadCard?._reviewAvg ?? null,
+          lead_review_count: leadCard?._reviewCount ?? null,
+          lead_review_fit_summary: leadCard?._reviewFit || "",
         };
         const prompt =
           `You are a warm, professional sales associate writing the assistant's reply for a footwear store chat.\n\n` +
@@ -679,6 +720,7 @@ async function runProductTurnDispatch({ ctx, controller, encoder, claimConfig, a
       resolveNamedProductFn,
       claimConfig,
       synthesizeFn,
+      fetchReviewsFn,
     });
   } catch (err) {
     console.error(`[product-turn-engine] runProductTurn threw: ${err?.stack || err?.message || err}`);

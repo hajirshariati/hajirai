@@ -31,6 +31,17 @@ const SUBJECTIVE_PREFERENCE_WORDS = new Set([
   "cool", "cute", "dressy", "elegant", "fashionable", "favorite", "formal",
   "lovely", "modern", "nice", "popular", "pretty", "professional", "stylish",
   "supportive", "trendy",
+  // Meta-query words — "highest review", "best rated", "most returns",
+  // "lowest price" are questions about ORDERING or AGGREGATES across
+  // the result set, not features that should appear in a single
+  // product's description. Treating them as catalog requirements
+  // empties the pool ("I couldn't find sneakers that list 'highest
+  // review' as a feature") which is exactly the wrong answer.
+  "highest", "lowest", "best", "worst", "most", "least", "top", "bottom",
+  "review", "reviews", "rating", "ratings", "rated", "reviewed",
+  "star", "stars", "score", "scored",
+  "return", "returns", "returned", "refund", "refunds",
+  "price", "priced", "cheap", "cheapest", "expensive", "affordable",
 ]);
 
 const ANAPHORA_RE =
