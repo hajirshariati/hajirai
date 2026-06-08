@@ -59,7 +59,6 @@ import {
   detectFalseGenderCategoryAffirmation,
   dropSiblingCards,
   buildCodeOwnedProductListingText,
-  buildCodeOwnedComparisonText,
   buildCodeOwnedExactNoMatchText,
   buildSoftBrowseFallbackText,
   ensureProductTurnCards,
