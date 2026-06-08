@@ -32,16 +32,24 @@ const SUBJECTIVE_PREFERENCE_WORDS = new Set([
   "lovely", "modern", "nice", "popular", "pretty", "professional", "stylish",
   "supportive", "trendy",
   // Meta-query words — "highest review", "best rated", "most returns",
-  // "lowest price" are questions about ORDERING or AGGREGATES across
-  // the result set, not features that should appear in a single
-  // product's description. Treating them as catalog requirements
-  // empties the pool ("I couldn't find sneakers that list 'highest
-  // review' as a feature") which is exactly the wrong answer.
+  // "lowest price", "return rate" are questions about ORDERING or
+  // AGGREGATES across the result set, not features that should
+  // appear in a single product's description. Treating them as
+  // catalog requirements empties the pool ("I couldn't find
+  // sneakers that list 'highest review' as a feature") which is
+  // exactly the wrong answer. Include common typos.
   "highest", "lowest", "best", "worst", "most", "least", "top", "bottom",
   "review", "reviews", "rating", "ratings", "rated", "reviewed",
   "star", "stars", "score", "scored",
-  "return", "returns", "returned", "refund", "refunds",
+  "return", "returns", "returned", "refund", "refunds", "retun", "retrun",
+  "rate", "rates", "ratio", "percentage", "percent",
   "price", "priced", "cheap", "cheapest", "expensive", "affordable",
+  // Fit/sizing follow-up shape — "run small", "fit small", "true to
+  // size". The customer isn't asking for products whose descriptions
+  // contain these words; they're asking how the prior products fit.
+  // The engine answers from Yotpo fit data, not from text match.
+  "run", "runs", "running", "true", "fit", "fits", "fitting", "small",
+  "big", "large", "narrow", "wide",
 ]);
 
 const ANAPHORA_RE =

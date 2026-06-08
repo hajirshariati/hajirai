@@ -463,6 +463,17 @@ const COMPARE_SHAPE_RE =
 function engineWantsThisTurn(scope, resolverState = null) {
   const hasResolverCandidates = resolverHasCandidateRecommendation(resolverState);
   const hasCatalogRequirement = scope.requiredCatalogTerms?.length > 0;
+  // Fit / review / sizing follow-up about prior products. When the
+  // customer asks "do these run small?", "what's the return rate?",
+  // "which has the highest review?", they're asking ABOUT the
+  // products currently in scope (carried by session memory). The
+  // engine has the prior scope, can re-fetch the same candidates,
+  // and enrich them with Yotpo + AfterShip data — that's a clean
+  // engine-owned answer. Without this, the LLM agent loop owns the
+  // turn and its postprocessors strip the reply to nothing.
+  if (isReviewShapedQuestion(scope.rawMessage) && (scope.category || scope.color || scope.gender)) {
+    return true;
+  }
   // V1 gate: handle clear claim-carrying retrieval shapes only.
   // Decline named-product lookups (compare/similar/specific-product)
   // and turns missing both a category and a concrete catalog concept.
@@ -541,11 +552,13 @@ function resolverHasCandidateRecommendation(resolverState) {
 // configuration and catalog coverage. This keeps the old agent from
 // inventing unsupported chips like Kids' shoes or Accessories under a
 // shoe-style question.
-// Customer's question is about reviews, ratings, or returns —
-// signals that the engine should enrich the candidate cards with
-// Yotpo / AfterShip data before composing the answer.
+// Customer's question is about reviews, ratings, returns, OR fit/
+// sizing — signals that the engine should enrich the candidate
+// cards with Yotpo (averageScore, totalReviews, fitSummary,
+// topPositiveReview) and AfterShip (sizingAdvice) data before
+// composing the answer.
 const REVIEW_SHAPED_RE =
-  /\b(?:review|reviews|rated|rating|ratings|reviewed|star|stars|score|scored|popular|best[- ]?selling|bestseller|customer[s']*\s+(?:say|saying|love|favor)|what\s+(?:do\s+)?(?:people|customers|buyers|others)\s+(?:say|think))\b|\b(?:return|returns|returned|refund|refunds|exchange|exchanges)\s+(?:rate|reason|reasons|policy|history|data)?\b/i;
+  /\b(?:review|reviews|rated|rating|ratings|reviewed|star|stars|score|scored|popular|best[- ]?selling|bestseller|customer[s']*\s+(?:say|saying|love|favor)|what\s+(?:do\s+)?(?:people|customers|buyers|others)\s+(?:say|think))\b|\b(?:return|returns|returned|retun|refund|refunds|exchange|exchanges)\b|\b(?:run|runs|running|fit|fits|fitting)\s+(?:small|big|large|true|narrow|wide|tight|loose)\b|\btrue\s+to\s+size\b|\bdo(?:es)?\s+(?:this|these|they)\s+(?:fit|run|feel)\b|\bhow\s+(?:do|does)\s+(?:this|these|they)\s+fit\b|\bsize\s+up\b|\bsize\s+down\b/i;
 function isReviewShapedQuestion(message) {
   return REVIEW_SHAPED_RE.test(String(message || ""));
 }
