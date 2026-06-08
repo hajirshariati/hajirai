@@ -668,6 +668,25 @@ await test("S15 — broad shoes request replaces stale orthotics category", asyn
     `gender can carry until catalog says no exact match, but category must not; got ${JSON.stringify(mem.explicit)}`);
 });
 
+await test("S16 — compare turn drops both explicit AND inferred category", async () => {
+  // Live trace 2026-06-08: customer asked "do you have cork insoles?" →
+  // resolver inferred category=orthotics. Then asked "compare Jillian
+  // and Danika". Without dropping inferred too, the inferred category
+  // survived and the engine ran an orthotics search instead of letting
+  // the LLM compare the named products.
+  const mem = buildSessionMemory({
+    messages: [
+      u("do you have anything with cork insoles?"),
+      a("Here are our orthotics."),
+      u("compare Jillian and Danika"),
+    ],
+  });
+  assert.notEqual(mem.explicit.category, "orthotics",
+    `explicit category=orthotics must drop on compare; got ${mem.explicit.category}`);
+  assert.notEqual(mem.inferred?.category, "orthotics",
+    `inferred category=orthotics must also drop on compare so it doesn't pollute the next turn; got ${mem.inferred?.category}`);
+});
+
 console.log("");
 if (failed === 0) {
   console.log(`PASS  ${passed} passed, 0 failed`);

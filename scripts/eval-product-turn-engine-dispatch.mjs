@@ -1319,6 +1319,38 @@ await test("D31 — engine OPT-IN: condition alone is sufficient retrieval evide
   assert.ok(out && !out.decline, "condition IS retrieval evidence in opt-in model");
 });
 
+await test("D32 — engine OPT-IN: 'compare Jillian and Danika' declines (compare-shape catches plain 'compare X and Y')", async () => {
+  let searchCalled = false;
+  const out = await runProductTurn({
+    ...ctxBase,
+    latestUserMessage: "compare Jillian and Danika",
+    sessionMemory: {
+      explicit: {},
+      inferred: { category: "orthotics" }, // stale carry-over from prior turn
+    },
+  }, {
+    forceEnable: true,
+    searchFn: async () => { searchCalled = true; return []; },
+    claimConfig: FIXTURE_CLAIM_CONFIG,
+  });
+  assert.ok(out && out.decline,
+    `'compare X and Y' MUST decline; engine cannot author a 2-product comparison. got rungs=${(out?.diagnostics?.rungs || []).join("|")}`);
+  assert.equal(searchCalled, false);
+});
+
+await test("D33 — engine OPT-IN: 'BioRocker vs UltraSky' declines (tech compare)", async () => {
+  const out = await runProductTurn({
+    ...ctxBase,
+    latestUserMessage: "BioRocker vs UltraSky",
+    sessionMemory: { explicit: {}, inferred: {} },
+  }, {
+    forceEnable: true,
+    searchFn: async () => [],
+    claimConfig: FIXTURE_CLAIM_CONFIG,
+  });
+  assert.ok(out && out.decline, "tech vs tech is comparison, LLM owns it");
+});
+
 // ─── Multi-criteria conflict (dressy + active) on short messages ──
 
 await test("D25 — short 'walking 8 miles, dressy shoe' declines (multi-criteria conflict)", async () => {

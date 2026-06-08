@@ -496,7 +496,7 @@ const NAMED_PRODUCT_ANCHOR_RE =
 // Compare-shape phrasing ("which of these", "compare the first
 // two") — engine declines and the agent path handles the compare.
 const COMPARE_SHAPE_RE =
-  /\b(?:which\s+of\s+(?:these|those|them)|which\s+(?:is|one\s+is)\s+(?:better|worse|more|best|the\s+most)|compare\s+(?:the\s+)?(?:first|top|two|these)|side[\s-]?by[\s-]?side)\b/i;
+  /\b(?:compare|comparison|vs\.?|versus|difference\s+between|better\s+between|between\s+[a-z0-9'-]+\s+(?:and|or)\s+[a-z0-9'-]+|which\s+(?:is|one\s+is)\s+(?:better|worse|more|best|the\s+most)|which\s+of\s+(?:these|those|them)|side[\s-]?by[\s-]?side|tell\s+me\s+the\s+difference|the\s+(?:first|top)\s+two)\b/i;
 
 function engineWantsThisTurn(scope, resolverState = null, ctx = {}) {
   // ──────────────────────────────────────────────────────────────────

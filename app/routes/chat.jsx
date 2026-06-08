@@ -2807,14 +2807,40 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   }
 
   if (pool.length > 0 && fullResponseText) {
-    const before = fullResponseText;
-    const repaired = repairProductTurnAssembly({ text: fullResponseText, pool, ctx });
-    fullResponseText = repaired.text;
-    if (repaired.changed) {
+    // Skip the claim verifier on tech/concept comparison turns. The
+    // LLM is describing technologies (BioRocker, UltraSky, memory foam),
+    // not making claims about the specific product cards that happen
+    // to use those technologies. The verifier was treating "rolling
+    // gait", "walking", "cushioning" etc. as product-level useCase
+    // claims and stripping the LLM's whole comparison.
+    // Live trace 2026-06-08: "BioRocker vs UltraSky" → LLM wrote 775
+    // chars of accurate tech comparison, verifier saw "walking" not
+    // tagged on the 10 sandal cards → stripped to 55 chars
+    // ("Many styles actually combine both for the full package!").
+    const userMsg = String(ctx?.latestUserMessage || "");
+    const isTechConceptCompare = /\b(?:compare|comparison|vs\.?|versus|difference\s+between)\b/i.test(userMsg)
+      && /\b[A-Z][a-z]{3,}\b/.test(userMsg);
+    const titles = pool.map((c) => String(c?.title || "").toLowerCase());
+    const compareSubjects = userMsg.match(/\b([A-Z][A-Za-z0-9'-]{3,})\b/g) || [];
+    const subjectsInPool = compareSubjects.some((s) =>
+      titles.some((t) => t.includes(s.toLowerCase())),
+    );
+    const skipVerifier = isTechConceptCompare && !subjectsInPool;
+    if (skipVerifier) {
       console.log(
-        `[chat] response-contract: repaired product turn (${repaired.logs.join("+")}) ` +
-          `(${before.length}→${fullResponseText.length} chars, pool=${pool.length})`,
+        `[chat] response-contract: skipping verifier on tech-compare turn — ` +
+          `subjects (${compareSubjects.join(", ")}) are concepts, not products in pool`,
       );
+    } else {
+      const before = fullResponseText;
+      const repaired = repairProductTurnAssembly({ text: fullResponseText, pool, ctx });
+      fullResponseText = repaired.text;
+      if (repaired.changed) {
+        console.log(
+          `[chat] response-contract: repaired product turn (${repaired.logs.join("+")}) ` +
+            `(${before.length}→${fullResponseText.length} chars, pool=${pool.length})`,
+        );
+      }
     }
   }
 

@@ -163,6 +163,15 @@ function applyStaleDrops(memory, keys) {
       memory.stale[k] = memory.explicit[k];
       delete memory.explicit[k];
     }
+    // Also drop the same key from inferred. Without this, the resolver's
+    // inferred category/gender/etc. from a PRIOR turn (e.g. "cork insoles"
+    // → inferred=orthotics) survives a comparison or pivot and pollutes
+    // the NEXT turn ("compare Jillian and Danika") — engine sees
+    // scope.category=orthotics from inferred and runs an orthotics search
+    // even though the customer just named two footwear products.
+    if (memory.inferred && memory.inferred[k] != null) {
+      delete memory.inferred[k];
+    }
   }
 }
 
