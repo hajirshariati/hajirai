@@ -466,12 +466,20 @@ function engineWantsThisTurn(scope, resolverState = null) {
   // Fit / review / sizing follow-up about prior products. When the
   // customer asks "do these run small?", "what's the return rate?",
   // "which has the highest review?", they're asking ABOUT the
-  // products currently in scope (carried by session memory). The
-  // engine has the prior scope, can re-fetch the same candidates,
-  // and enrich them with Yotpo + AfterShip data — that's a clean
-  // engine-owned answer. Without this, the LLM agent loop owns the
-  // turn and its postprocessors strip the reply to nothing.
-  if (isReviewShapedQuestion(scope.rawMessage) && (scope.category || scope.color || scope.gender)) {
+  // products currently in scope (carried by session memory) OR
+  // about a named product anchor in the message ("return rate on
+  // Jillian"). The engine has the prior scope (or can resolve the
+  // anchor) and can enrich the relevant candidates with Yotpo +
+  // AfterShip data — that's a clean engine-owned answer. Without
+  // this, the LLM agent loop owns the turn and its postprocessors
+  // (capability-check suppress, code-owned product listing,
+  // policy-question suppress) strip the reply to nothing OR
+  // overwrite it with a generic "I found N sandals" template that
+  // doesn't actually answer the question.
+  if (
+    isReviewShapedQuestion(scope.rawMessage)
+    && (scope.category || scope.color || scope.gender || scope.namedProduct)
+  ) {
     return true;
   }
   // V1 gate: handle clear claim-carrying retrieval shapes only.

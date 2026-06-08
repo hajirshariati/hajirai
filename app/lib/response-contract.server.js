@@ -19,6 +19,15 @@ import {
   normalizeVariantWidth,
 } from "./variant-matcher.server.js";
 
+// Customer question shapes where the LLM was actively answering a
+// meta question about the products (reviews, ratings, returns, fit,
+// sizing). Used to gate the code-owned product listing override so
+// it doesn't replace the LLM's answer with a generic "I found N
+// products" template on those turns. Mirrors REVIEW_SHAPED_RE in
+// product-turn-engine but inlined to avoid a cross-module dependency.
+const REVIEW_FIT_RETURN_SHAPE_RE =
+  /\b(?:review|reviews|rated|rating|ratings|reviewed|star|stars|score|scored|popular|best[- ]?selling|bestseller|highest|lowest|best|worst|customer[s']*\s+(?:say|saying|love|favor)|what\s+(?:do\s+)?(?:people|customers|buyers|others)\s+(?:say|think))\b|\b(?:return|returns|returned|retun|refund|refunds|exchange|exchanges)\b|\b(?:run|runs|running|fit|fits|fitting)\s+(?:small|big|large|true|narrow|wide|tight|loose)\b|\btrue\s+to\s+size\b|\bdo(?:es)?\s+(?:this|these|they)\s+(?:fit|run|feel)\b|\bhow\s+(?:do|does)\s+(?:this|these|they)\s+fit\b|\bsize\s+up\b|\bsize\s+down\b/i;
+
 const SIBLING_GENERIC_WORDS = new Set([
   "the", "a", "an", "for", "and", "or", "in", "on", "with", "men", "mens",
   "women", "womens", "black", "white", "tan", "brown", "red", "blue", "grey",
@@ -2090,6 +2099,19 @@ export function buildCodeOwnedProductListingText({ text = "", cards = [], ctx = 
   }
   if (isDirectProductFactQuestion(ctx?.latestUserMessage)) {
     return { text, changed: false, reason: "direct_product_fact_question" };
+  }
+  // Review/return/fit-shaped follow-up — the LLM was actively trying
+  // to answer a meta question about the products (which has the
+  // highest review, do these run small, what's the return rate).
+  // Replacing whatever answer it produced with a generic "I found N
+  // sandals" listing is the worst possible move: it ignores the
+  // actual question and looks robotic. Trust the LLM's text here.
+  // Live trace 2026-06-08: "which one has the highest review?" got
+  // LLM text scrubbed down to 3 chars, then response-contract
+  // replaced it with the 92-char generic listing — the customer
+  // never saw an answer.
+  if (REVIEW_FIT_RETURN_SHAPE_RE.test(String(ctx?.latestUserMessage || ""))) {
+    return { text, changed: false, reason: "review_fit_return_follow_up" };
   }
   // ONE shared intent signal — read what session-memory already
   // resolved for this turn instead of re-detecting in two places.
