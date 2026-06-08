@@ -1290,6 +1290,14 @@ function scopedProductSearchInput(ctx = {}) {
 
 function shouldAttachProductCardsForTurn({ text, ctx, recommenderAskedForMoreInfo }) {
   const latest = ctx?.latestUserMessage || "";
+  // Simple acknowledgments ("yes", "thanks", "ok", "sure", etc.) never
+  // attach products even if the prior assistant text looks pitch-y.
+  // Live trace 2026-06-08: customer typed "yes" after a referral-share
+  // offer. LLM wrote "Perfect! Share your link and earn $20..." which
+  // matched the product-pitch regex (contains "perfect" + "here are"),
+  // so the postprocessor forced a search with query="yes" and attached
+  // 6 random orthotic cards under a referral message.
+  if (SIMPLE_PATTERN.test(String(latest).trim())) return false;
   const compound = isCompoundPolicyProductQuestion(latest);
   const latestIsPolicyOnly = isPolicyOrServiceQuestion(latest) && !compound;
   if (latestIsPolicyOnly || recommenderAskedForMoreInfo) return false;
