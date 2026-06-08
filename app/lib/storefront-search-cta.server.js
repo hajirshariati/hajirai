@@ -36,7 +36,7 @@ const MODIFIER_PATTERNS = [
   // handles. Better to over-trigger than miss legitimate "new" intent.
   { match: /\b(new(?:\s+arrivals?|\s+release)?|brand[- ]new|latest)\b/i, token: "new" },
   { match: /\b(on\s+sale|sale|clearance|discounted?|deals?|markdowns?|specials?)\b/i, token: "sale" },
-  { match: /\b(bestsell(ers?|ing)|most\s+popular|top\s+rated|trending)\b/i, token: "bestseller" },
+  { match: /\b(?:bestsell(?:ers?|ing)|best\s+sell(?:ers?|ing)|top\s+sell(?:ers?|ing)|top\s+seller|most\s+popular|top\s+rated|trending|highest\s+rated|fan\s+favo(?:u?)rites?)\b/i, token: "bestseller" },
 ];
 
 export function detectStorefrontSearchModifier(text) {

@@ -104,6 +104,15 @@ export async function runProductTurn(ctx = {}, options = {}) {
   });
   diagnostics.scope = scope;
 
+  // Account / loyalty / order-status / referral questions belong to
+  // the LLM path which has loyalty + order + Klaviyo data in its
+  // system prompt. The engine has no business answering "how many
+  // points do I have?" with a product search or browse clarifier.
+  if (isAccountQuestion(scope.rawMessage)) {
+    diagnostics.rungs.push("declined:account_question");
+    return { decline: true, diagnostics };
+  }
+
   // Phase 2 — named-product / similar-to / same-support-as path.
   // When the turn carries a named-product anchor, route to the
   // similar-product flow which REUSES the existing merchant-
@@ -137,14 +146,32 @@ export async function runProductTurn(ctx = {}, options = {}) {
     };
   }
 
-  if (!engineWantsThisTurn(scope, ctx.resolverState)) {
+  if (!engineWantsThisTurn(scope, ctx.resolverState, ctx)) {
     diagnostics.rungs.push("declined:scope-too-thin");
     return { decline: true, diagnostics };
   }
 
   // 2. Retrieve
-  let rawCandidates = await options.searchFn(scope);
-  diagnostics.rungs.push(`retrieved:${rawCandidates.length}`);
+  // Pronoun + review-shape follow-up ("return rate on these?", "do
+  // they run small?", "highest rated of these"). Reuse the cards
+  // from the prior assistant turn instead of re-searching with the
+  // literal pronoun text — semantic search on "return rate on these"
+  // surfaces unrelated wedges, then the synthesizer picks one of
+  // those by mistake. The customer expected an answer ABOUT what's
+  // already on screen.
+  const priorCards = Array.isArray(ctx.priorProductCards) ? ctx.priorProductCards : [];
+  const reusePriorCards =
+    priorCards.length > 0
+    && isReviewShapedQuestion(scope.rawMessage)
+    && hasPronounReference(scope.rawMessage);
+  let rawCandidates;
+  if (reusePriorCards) {
+    rawCandidates = priorCards.slice(0, ctx.productCardCap || 6);
+    diagnostics.rungs.push(`retrieved:${rawCandidates.length}_prior_cards`);
+  } else {
+    rawCandidates = await options.searchFn(scope);
+    diagnostics.rungs.push(`retrieved:${rawCandidates.length}`);
+  }
 
   // 2b. Catalog requirements as a SOFT narrowing — high-precision
   // when the literal tokenizer finds matches, fail-open otherwise so
@@ -471,9 +498,10 @@ const NAMED_PRODUCT_ANCHOR_RE =
 const COMPARE_SHAPE_RE =
   /\b(?:which\s+of\s+(?:these|those|them)|which\s+(?:is|one\s+is)\s+(?:better|worse|more|best|the\s+most)|compare\s+(?:the\s+)?(?:first|top|two|these)|side[\s-]?by[\s-]?side)\b/i;
 
-function engineWantsThisTurn(scope, resolverState = null) {
+function engineWantsThisTurn(scope, resolverState = null, ctx = {}) {
   const hasResolverCandidates = resolverHasCandidateRecommendation(resolverState);
   const hasCatalogRequirement = scope.requiredCatalogTerms?.length > 0;
+  const priorCards = Array.isArray(ctx.priorProductCards) ? ctx.priorProductCards : [];
   // Fit / review / sizing follow-up about prior products. When the
   // customer asks "do these run small?", "what's the return rate?",
   // "which has the highest review?", they're asking ABOUT the
@@ -489,7 +517,12 @@ function engineWantsThisTurn(scope, resolverState = null) {
   // doesn't actually answer the question.
   if (
     isReviewShapedQuestion(scope.rawMessage)
-    && (scope.category || scope.color || scope.gender || scope.namedProduct)
+    && (
+      scope.category || scope.color || scope.gender || scope.namedProduct
+      // Pronoun follow-up about the cards already on screen — engine
+      // owns this even if scope is otherwise empty (memory cleared).
+      || (hasPronounReference(scope.rawMessage) && priorCards.length > 0)
+    )
   ) {
     return true;
   }
@@ -580,6 +613,31 @@ const REVIEW_SHAPED_RE =
   /\b(?:review|reviews|rated|rating|ratings|reviewed|star|stars|score|scored|popular|best[- ]?selling|bestseller|customer[s']*\s+(?:say|saying|love|favor)|what\s+(?:do\s+)?(?:people|customers|buyers|others)\s+(?:say|think))\b|\b(?:return|returns|returned|retun|refund|refunds|exchange|exchanges)\b|\b(?:run|runs|running|fit|fits|fitting)\s+(?:small|big|large|true|narrow|wide|tight|loose)\b|\btrue\s+to\s+size\b|\bdo(?:es)?\s+(?:this|these|they)\s+(?:fit|run|feel)\b|\bhow\s+(?:do|does)\s+(?:this|these|they)\s+fit\b|\bsize\s+up\b|\bsize\s+down\b/i;
 function isReviewShapedQuestion(message) {
   return REVIEW_SHAPED_RE.test(String(message || ""));
+}
+
+// Account / loyalty / order-status / referral questions. These belong
+// to the LLM path which has Yotpo loyalty (points, tier, referral
+// link), Klaviyo, and recent-orders data injected into the system
+// prompt. The engine must NOT claim these turns — its searchFn would
+// run a product search on "how many points do I have?" and emit a
+// browse clarifier ("Which styles would you like?") which is what
+// the customer just saw on screen. One engine owns the turn, but
+// the LLM is the owner here.
+const ACCOUNT_QUESTION_RE =
+  /\b(?:how\s+many\s+points|how\s+much\s+(?:credit|store\s+credit|in\s+rewards?)|points?\s+(?:balance|do\s+i\s+have|i\s+have|i'?ve\s+got)|(?:my|the)\s+(?:points?|balance|rewards?|tier|loyalty|account|profile|store\s+credit)|loyalty\s+(?:points?|status|balance|tier|account)|vip\s+(?:status|tier|perks?)|redeem(?:able)?\s+(?:rewards?|points?)|where\s+is\s+my\s+order|track\s+(?:my\s+)?(?:order|package|shipment)|order\s+(?:status|number|tracking|history|details)|my\s+order|recent\s+orders?|past\s+(?:order|purchase)s?|order\s+history|referral\s+(?:link|page|program|code|url)|my\s+referral|refer\s+(?:a\s+)?friend|give\s+\$?\d+\s+get|share\s+(?:my\s+)?(?:link|referral))\b/i;
+function isAccountQuestion(message) {
+  return ACCOUNT_QUESTION_RE.test(String(message || ""));
+}
+
+// Pronoun referring to products already shown ("these", "them",
+// "those", "it", "this one"). Combined with a review/fit/return-shaped
+// question this means "answer ABOUT the products on screen" — so the
+// engine reuses ctx.priorProductCards instead of re-running a search
+// with the literal pronoun text (which finds wrong products).
+const PRONOUN_REFERENCE_RE =
+  /\b(?:these|them|those|they|it|this\s+(?:one|pair|shoe|style)|that\s+(?:one|pair|shoe|style))\b/i;
+function hasPronounReference(message) {
+  return PRONOUN_REFERENCE_RE.test(String(message || ""));
 }
 
 const BROAD_BROWSE_RE =

@@ -1080,6 +1080,130 @@ await test("D10 — non-empty pool DOES emit a CTA (regression check)", async ()
   assert.equal(out.cta.kind, "storefront_search");
 });
 
+// ─── Account/loyalty/order questions decline ─────────────────────
+
+await test("D22 — 'how many points do I have?' DECLINES (LLM path owns account data)", async () => {
+  let searchCalled = false;
+  const out = await runProductTurn({
+    ...ctxBase,
+    latestUserMessage: "how many points i have?",
+    sessionMemory: {
+      explicit: { gender: "women", category: "sneakers" },
+      inferred: {},
+    },
+  }, {
+    forceEnable: true,
+    searchFn: async () => { searchCalled = true; return []; },
+    claimConfig: FIXTURE_CLAIM_CONFIG,
+  });
+  assert.ok(out && out.decline, "loyalty turn must decline so LLM with loyalty context answers");
+  assert.equal(searchCalled, false, "engine must NOT search the catalog on loyalty turns");
+  assert.ok(
+    (out.diagnostics?.rungs || []).some((r) => r === "declined:account_question"),
+    `expected declined:account_question rung; got ${(out.diagnostics?.rungs || []).join("|")}`,
+  );
+});
+
+await test("D22b — order tracking declines", async () => {
+  const out = await runProductTurn({
+    ...ctxBase,
+    latestUserMessage: "where is my order?",
+  }, {
+    forceEnable: true,
+    searchFn: async () => [],
+    claimConfig: FIXTURE_CLAIM_CONFIG,
+  });
+  assert.ok(out && out.decline);
+});
+
+await test("D22c — referral question declines", async () => {
+  const out = await runProductTurn({
+    ...ctxBase,
+    latestUserMessage: "how do I share my referral link?",
+  }, {
+    forceEnable: true,
+    searchFn: async () => [],
+    claimConfig: FIXTURE_CLAIM_CONFIG,
+  });
+  assert.ok(out && out.decline);
+});
+
+// ─── Pronoun + review-shape reuses prior product cards ──────────
+
+await test("D23 — 'return rate on these?' reuses priorProductCards (no fresh search)", async () => {
+  let searchCalled = false;
+  const priorCards = [
+    {
+      title: "Danika Navy Sneaker",
+      handle: "danika-navy-ap105w",
+      image: "https://cdn/danika.jpg",
+      url: "https://shop/products/danika-navy-ap105w",
+      price: "159.95",
+      priceRange: "$159.95",
+      productType: "Sneakers",
+      description: "Sneaker with arch support.",
+      descriptionSnippet: "",
+      tags: [],
+      attributes: { category: "Sneakers", gender: "Women" },
+    },
+    {
+      title: "Charlotte Sneaker",
+      handle: "charlotte-sneaker",
+      image: "https://cdn/charlotte.jpg",
+      url: "https://shop/products/charlotte-sneaker",
+      price: "149.95",
+      priceRange: "$149.95",
+      productType: "Sneakers",
+      description: "Casual sneaker.",
+      descriptionSnippet: "",
+      tags: [],
+      attributes: { category: "Sneakers", gender: "Women" },
+    },
+  ];
+  const out = await runProductTurn({
+    ...ctxBase,
+    latestUserMessage: "what is the return rate on these?",
+    sessionMemory: {
+      explicit: { gender: "women", category: "sneakers" },
+      inferred: {},
+    },
+    priorProductCards: priorCards,
+  }, {
+    forceEnable: true,
+    searchFn: async () => { searchCalled = true; return []; },
+    claimConfig: FIXTURE_CLAIM_CONFIG,
+  });
+  assert.ok(out && !out.decline, "review+pronoun follow-up should be engine-handled");
+  assert.equal(searchCalled, false, "engine must reuse priorProductCards, not re-search");
+  assert.ok(
+    (out.diagnostics?.rungs || []).some((r) => r.startsWith("retrieved:") && r.endsWith("_prior_cards")),
+    `expected retrieved:N_prior_cards rung; got ${(out.diagnostics?.rungs || []).join("|")}`,
+  );
+  // The two prior cards must come through unchanged (engine drops nothing
+  // here — both have category/gender tags so claim fact attach succeeds).
+  const titles = out.products.map((p) => p.title).sort();
+  assert.deepEqual(titles, ["Charlotte Sneaker", "Danika Navy Sneaker"]);
+});
+
+await test("D24 — pronoun-only follow-up without priorProductCards goes through normal search", async () => {
+  let searchCalled = false;
+  const out = await runProductTurn({
+    ...ctxBase,
+    latestUserMessage: "do these run small?",
+    sessionMemory: {
+      explicit: { gender: "women", category: "sneakers" },
+      inferred: {},
+    },
+    priorProductCards: [],
+  }, {
+    forceEnable: true,
+    searchFn: async () => { searchCalled = true; return [uiCandidate({ title: "Maui", handle: "maui" })]; },
+    claimConfig: FIXTURE_CLAIM_CONFIG,
+  });
+  assert.ok(out && !out.decline);
+  assert.equal(searchCalled, true, "no prior cards → engine falls back to normal search");
+});
+
 // ──────────────────────────────────────────────────────────────
 console.log("");
 if (failed === 0) {
