@@ -857,7 +857,11 @@ async function runProductTurnDispatch({ ctx, controller, encoder, claimConfig, a
           `- If customer_asked names a specific material/tech (cork, leather, waterproof, memory foam, vegan, merino, BioRocker, etc.) AND required_feature is empty AND the facts don't include that term:\n` +
           `  - DO NOT pretend the recommended product has it.\n` +
           `  - Open by saying we don't carry that specifically, then offer the closest alternative from the facts. Example: "We don't carry anything with cork insoles, but the Maui has a contoured EVA footbed that feels similar."\n` +
-          `  - Stay confident; no "unfortunately" or apology.\n\n` +
+          `  - Stay confident; no "unfortunately" or apology.\n` +
+          `- If customer_asked uses RELATIONAL phrasing referring to prior conversation ("both technologies", "all of these", "either of those features", "with that tech", "the same combo"):\n` +
+          `  - DO NOT claim the recommended product has "both" / "all" / "either" of anything. You don't know what the customer is referring to — that lives in the prior turn, not in your facts.\n` +
+          `  - Pivot to a generic, honest answer: name the product, give ONE concrete reason from the facts you DO have, and invite them to browse. Example: "The Maui is a popular pick for everyday wear — I'm not certain which specific tech combo you're asking about, but you can check the spec on each card."\n` +
+          `  - Never echo "both technologies" / "all the features" / "same combo" as if it were verified.\n\n` +
           `STRICT RULES:\n` +
           `- Never invent names, colors, prices, materials, tech, sizes, or claims not in the facts.\n` +
           `- Never describe UI ("click", "tap", "button below") except the one allowed "open the card" line.\n` +

@@ -14,6 +14,17 @@ const REQUEST_WORDS = new Set([
   "uses", "using", "try", "want", "what", "which", "with", "you", "your",
   "cheap", "cheaper", "budget", "affordable", "good", "great", "top",
   "except", "excluding", "instead", "without",
+  // Quantifiers / relational words. Live trace 2026-06-09: customer
+  // asked "shoe that has both technologies" (referring to BioRocker +
+  // UltraSky from the prior turn) — "both" was extracted as a literal
+  // catalog required term, search filtered to 49 random products that
+  // happen to contain the word "both" in their description, and the
+  // synthesizer pitched Noelle as "having both technologies built in"
+  // — pure confabulation. Quantifier words point at PRIOR-CONTEXT
+  // references, not concrete catalog attributes.
+  "both", "all", "every", "each", "either", "neither", "many", "much",
+  "several", "few", "more", "less", "fewer", "lots", "plenty",
+  "examples", "example", "kind", "kinds", "sort", "sorts", "type", "types",
 ]);
 
 const GENERIC_CATALOG_WORDS = new Set([
