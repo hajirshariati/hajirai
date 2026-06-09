@@ -574,6 +574,25 @@ const NAMED_PRODUCT_ANCHOR_RE =
 const COMPARE_SHAPE_RE =
   /\b(?:compare|comparison|vs\.?|versus|difference\s+between|better\s+between|between\s+[a-z0-9'-]+\s+(?:and|or)\s+[a-z0-9'-]+|which\s+(?:is|one\s+is)\s+(?:better|worse|more|best|the\s+most)|which\s+of\s+(?:these|those|them)|side[\s-]?by[\s-]?side|tell\s+me\s+the\s+difference|the\s+(?:first|top)\s+two)\b/i;
 
+// Relational reference to prior-turn features/tech. "shoes with both
+// technologies", "any with all of these", "either of those features",
+// "examples of products with the same tech". The customer's intent
+// requires resolving "both/all/either" against PRIOR CONVERSATION
+// (specific tech names mentioned earlier) AND verifying the catalog
+// — which the engine can't do safely. Without this gate the engine
+// runs a generic browse and the synthesizer confabulates that random
+// products "have both technologies built in".
+// Live trace 2026-06-09: customer asked "examples of shoes that have
+// BOTH technologies" (referring to BioRocker + UltraSky from the
+// prior turn) → engine returned 10 random footwear cards, synthesizer
+// pitched Noelle Arch Support Wedge as "having both technologies
+// built in" — Noelle has neither.
+const RELATIONAL_PRIOR_FEATURE_RE =
+  /\b(?:both|all|either|neither|each|every|same)\s+(?:of\s+(?:these|those|them|the\s+(?:two|three|four))\s+)?(?:technolog|feature|material|tech|spec|brand|method|system|certification)|\b(?:with|that\s+(?:has|have)|having)\s+(?:both|all|either|each|every)\s+(?:of\s+(?:these|those|them)\s+)?(?:technolog|feature|material|tech|spec|method|system)|\bshoes?\s+(?:with|that\s+(?:has|have))\s+(?:both|all|either)\b/i;
+export function hasRelationalPriorFeatureReference(message) {
+  return RELATIONAL_PRIOR_FEATURE_RE.test(String(message || ""));
+}
+
 // Knowledge / info question shapes — the customer is asking ABOUT the
 // brand, technologies, materials, certifications, etc., not browsing
 // for products. The LLM with RAG knowledge handles these; the engine
@@ -620,6 +639,12 @@ function engineWantsThisTurn(scope, resolverState = null, ctx = {}) {
   // BioRocker and UltraSky, plus we've got a few more options" — zero
   // answer to the actual technologies question.
   if (KNOWLEDGE_QUESTION_RE.test(raw)) return false;
+  // Relational reference to prior-turn features ("both technologies",
+  // "all of these", "either of those features") — engine cannot
+  // safely verify "both" against catalog because the resolution
+  // requires conversation history the engine doesn't fully read.
+  // Decline → LLM owns it with full history + RAG knowledge.
+  if (RELATIONAL_PRIOR_FEATURE_RE.test(raw)) return false;
 
   // Special claim — review/fit/return follow-up about cards on screen.
   // Even without other scope signal, the engine owns this because it

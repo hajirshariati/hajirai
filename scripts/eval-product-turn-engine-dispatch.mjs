@@ -18,7 +18,7 @@
 // (same shape getMerchantClaimConfig produces after seed).
 
 import assert from "node:assert/strict";
-import { runProductTurn, detectNegativeAttributeFilter, isKnowledgeQuestion } from "../app/lib/product-turn-engine.server.js";
+import { runProductTurn, detectNegativeAttributeFilter, isKnowledgeQuestion, hasRelationalPriorFeatureReference } from "../app/lib/product-turn-engine.server.js";
 import {
   attachClaimFactsToCard,
   buildProductClaimFacts,
@@ -1267,6 +1267,39 @@ await test("D25j — isKnowledgeQuestion exported and matches tech questions", (
   assert.equal(isKnowledgeQuestion("besides BioRocker, what else?"), true);
   assert.equal(isKnowledgeQuestion("tell me about Aetrex"), true);
   assert.equal(isKnowledgeQuestion("show me sandals"), false);
+});
+
+await test("D25k — 'shoes with both technologies' triggers relational-feature decline", () => {
+  // Live trace 2026-06-09: customer asked "examples of shoes that
+  // have both technologies" (BioRocker + UltraSky from prior turn).
+  // Engine returned 10 random footwear cards, synthesizer claimed
+  // Noelle had "both technologies built in" — confabulation.
+  assert.equal(hasRelationalPriorFeatureReference("examples of shoes that have both technologies"), true);
+  assert.equal(hasRelationalPriorFeatureReference("any shoes with both technologies?"), true);
+  assert.equal(hasRelationalPriorFeatureReference("what about all of these features?"), true);
+  assert.equal(hasRelationalPriorFeatureReference("either of those technologies"), true);
+  assert.equal(hasRelationalPriorFeatureReference("shoes that have both"), true);
+});
+
+await test("D25l — relational phrasing does NOT trigger on plain product browse", () => {
+  assert.equal(hasRelationalPriorFeatureReference("show me sandals"), false);
+  assert.equal(hasRelationalPriorFeatureReference("any sneakers in black?"), false);
+  assert.equal(hasRelationalPriorFeatureReference("I need both for work and travel"), false);
+});
+
+await test("D25m — relational-feature turn declined by engine (no confabulation)", async () => {
+  let searchCalled = false;
+  const out = await runProductTurn({
+    ...ctxBase,
+    latestUserMessage: "give me examples of shoes that have both technologies",
+    sessionMemory: { explicit: { category: "footwear" }, inferred: {} },
+  }, {
+    forceEnable: true,
+    searchFn: async () => { searchCalled = true; return []; },
+    claimConfig: FIXTURE_CLAIM_CONFIG,
+  });
+  assert.ok(out && out.decline, "relational-feature turn must decline to LLM (with full history)");
+  assert.equal(searchCalled, false, "decline must short-circuit BEFORE searchFn runs");
 });
 
 await test("D25c — pronoun + attribute filter follow-up reuses prior cards (no fresh search)", async () => {
