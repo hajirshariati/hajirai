@@ -16,20 +16,15 @@ const ORDER_TAG = "SEoS";
 export const action = async ({ request }) => {
   const { shop, payload, topic, admin } = await authenticate.webhook(request);
 
-  // Record the purchase for the storefront social-proof popup (city only, no
-  // PII). Runs for ALL orders, independent of SEoS chat attribution, so it
-  // must happen before the attribution early-return below. Best-effort.
+  // Record the purchase for the storefront social-proof popup. Stores only the
+  // purchased product + timestamp — NO address/city or any customer PII. Runs
+  // for ALL orders, independent of SEoS chat attribution, so it must happen
+  // before the attribution early-return below. Best-effort.
   try {
-    const city =
-      payload?.shipping_address?.city ||
-      payload?.billing_address?.city ||
-      payload?.customer?.default_address?.city ||
-      null;
     await recordRecentPurchases({
       shop,
       orderId: payload.id,
       lineItems: Array.isArray(payload.line_items) ? payload.line_items : [],
-      city,
     });
   } catch (err) {
     console.error(`[webhook ${topic}] social-proof capture failed:`, err?.message || err);

@@ -9,17 +9,14 @@ import {
 // Storefront social-proof popup data, served through the Shopify app proxy at
 // /apps/hajirai/social-proof. authenticate.public.appProxy verifies the proxy
 // HMAC, so unsigned/forged requests never reach the DB. Returns ONLY a viewer
-// count and a city — no customer names or emails. On any error we return an
-// empty (zero/null) payload so the storefront popup simply hides itself rather
-// than surfacing an error.
+// count and a purchase timestamp — no city, names, or emails. On any error we
+// return an empty (zero/null) payload so the storefront popup simply hides
+// itself rather than surfacing an error.
 
 function payload(viewers, purchase) {
   return {
     viewers: viewers || 0,
-    purchase:
-      purchase && purchase.city
-        ? { city: purchase.city, purchasedAt: purchase.createdAt }
-        : null,
+    purchase: purchase ? { purchasedAt: purchase.createdAt } : null,
   };
 }
 
