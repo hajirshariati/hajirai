@@ -30,14 +30,16 @@ export async function countViewers({ shop, productId }) {
   }
 }
 
-// Most recent real purchase of this product (city only, no PII).
+// Most recent real purchase of this product. Returns the timestamp only —
+// no city, no name, no customer identifier — so the storefront can show a
+// privacy-safe "Someone just bought this".
 export async function getRecentPurchase({ shop, productId }) {
   const since = new Date(Date.now() - PURCHASE_LOOKBACK_MS);
   try {
     return await prisma.recentPurchase.findFirst({
-      where: { shop, productId, createdAt: { gte: since }, NOT: { city: null } },
+      where: { shop, productId, createdAt: { gte: since } },
       orderBy: { createdAt: "desc" },
-      select: { city: true, createdAt: true },
+      select: { createdAt: true },
     });
   } catch {
     return null;
@@ -54,10 +56,11 @@ export async function gcViewerPings() {
   }
 }
 
-// Record one row per distinct purchased product. City only (no name/email).
-// Idempotent on (shop, orderId, productId).
-export async function recordRecentPurchases({ shop, orderId, lineItems, city }) {
-  if (!shop || !orderId || !city || !Array.isArray(lineItems)) return;
+// Record one row per distinct purchased product. Stores only the product +
+// timestamp — NO city, name, email, or any address — just enough to show
+// "Someone just bought this". Idempotent on (shop, orderId, productId).
+export async function recordRecentPurchases({ shop, orderId, lineItems }) {
+  if (!shop || !orderId || !Array.isArray(lineItems)) return;
   const seen = new Set();
   for (const li of lineItems) {
     const productId = li?.product_id ? String(li.product_id) : null;
@@ -72,7 +75,6 @@ export async function recordRecentPurchases({ shop, orderId, lineItems, city }) 
           orderId: String(orderId),
           productId,
           productTitle: li?.title ? String(li.title).slice(0, 140) : null,
-          city: String(city).slice(0, 80),
         },
       });
     } catch (err) {
