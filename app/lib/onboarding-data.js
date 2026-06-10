@@ -53,7 +53,7 @@ export const STEPS = [
     title: "Connect the AI engine",
     short: "Paste your Anthropic API key. Choose Smart routing.",
     body: "Settings → AI engine → API key. Paste your Anthropic API key from console.anthropic.com. Choose Smart routing as the strategy.",
-    tip: "Smart routing sends 'thanks' / 'ok' follow-ups to the Fast model and full product questions to the Standard model, cutting cost on chatty conversations without affecting answer quality.",
+    tip: "Smart routing runs standard shopping turns on the Fast model and escalates product comparisons and complex queries to the Standard model. Every reply is fact-checked against live catalog data before it reaches the customer; if a check fails, the turn automatically re-runs on the Standard model. Best balance of cost and quality.",
   },
   {
     phase: "install",
@@ -75,7 +75,7 @@ export const STEPS = [
     icon: "📚",
     title: "Upload knowledge files (optional)",
     short: "FAQs, brand voice, sizing guides, product specs.",
-    body: "Knowledge → Knowledge files. Upload anything the assistant should know that isn't in the product catalog: FAQs, return policy, brand voice notes, sizing charts, fit glossary, or a SKU-keyed CSV of extra product attributes (material, care, fit notes). Each file is one resource the AI can reference per chat turn.",
+    body: "Knowledge → Knowledge files. Upload anything the assistant should know that isn't in the product catalog: FAQs, return policy, brand voice notes, sizing charts, fit glossary, or a SKU-keyed CSV of extra product attributes (material, care, fit notes). With RAG enabled (next step), only the sections relevant to each question are sent to the AI per turn.",
     list: [
       "FAQ markdown — sizing, returns, shipping, technology questions",
       "Brand voice — tone guidelines (e.g. warm, expert, never pushy)",
@@ -204,8 +204,8 @@ export const STEPS = [
     cadence: "as-needed",
     icon: "🧠",
     title: "Re-embed the catalog after big content edits",
-    short: "Click Backfill in Catalog → Semantic search after bulk product changes.",
-    body: "Individual product create/update webhooks auto-re-embed in the background. But bulk operations (CSV import, mass title rename, bulk description rewrite via a third-party tool) often skip webhooks. After such an operation, open Catalog → Semantic search and click Backfill to refresh embeddings for any products that changed.",
+    short: "Check the embedding bar in Catalog → Semantic search after bulk product changes.",
+    body: "Product create/update webhooks re-sync and re-embed changed products automatically within seconds — rapid-fire updates are batched, and a bulk edit touching 40+ products automatically triggers one full catalog re-sync instead of thousands of single updates. The one gap: tools that bypass Shopify webhooks entirely (rare, but some direct-database migration apps do). After any bulk operation, glance at Catalog → Semantic search — if the embedded count sits below the product count, click Backfill to close the gap.",
     tip: "If the embedded count drops below the total products count and you didn't expect it, that's the sign — click Backfill until the bar hits 100% again.",
   },
   {
@@ -267,7 +267,7 @@ export const STEPS = [
     list: [
       "Indexing (one-time per file): the chunker splits each file on `═══` dividers — paragraph-pack fallback if there are no dividers. Each section is embedded via your configured embedding provider (OpenAI or Voyage) and stored in the KnowledgeChunk table with a 1024-dim vector.",
       "Retrieval (every chat turn): the customer's message is embedded with the same provider. A pgvector cosine-similarity query pulls the top-5 chunks above 0.35 similarity. Those chunks (~3KB) are injected into the system prompt instead of the full ~22KB corpus.",
-      "Fallback safety net: if retrieval returns nothing (no chunks embedded yet, or none meet the threshold), the prompt builder falls back to the legacy full-dump path. Nothing breaks — worst case is unchanged behavior.",
+      "Fallback safety net: if retrieval can't run at all (no chunks embedded yet, or the embedding provider is unreachable), the prompt builder falls back to the full-dump path so nothing breaks. If retrieval runs and finds no section relevant to the question, nothing is injected — the AI answers from catalog data alone instead of being fed unrelated text.",
       "Cost: ~$0.0000004 per chat turn for embedding the customer query (effectively free). Token savings on the Anthropic call usually offset embedding cost 10x over.",
       "Multi-tenant: every chunk is scoped by shop column. One Postgres instance can serve any number of stores — each sees only its own data.",
     ],
@@ -280,8 +280,8 @@ export const STEPS = [
     cadence: "reference",
     icon: "🧪",
     title: "How chat quality is measured",
-    short: "Three layers of automated checks plus a real-customer feedback loop. Requires terminal access.",
-    body: "If you have engineering access to the app's repository, the chat is protected by four layers of testing. Each one catches a different kind of bug before customers see it. These commands need terminal access — they're for the engineering team, not something you run from the admin UI.",
+    short: "A live grounding fact-checker plus four layers of automated tests and a real-customer feedback loop.",
+    body: "The first layer runs live on every single reply: a grounding validator checks every product name, price, and feature claim the AI makes against the actual catalog data it retrieved that turn. If a claim isn't backed by evidence, the reply is rejected and the turn automatically re-runs on the stronger model with the errors spelled out — the customer only ever sees the corrected answer. On top of that, four layers of engineering tests catch regressions before deploys. The commands below need terminal access — they're for the engineering team, not something you run from the admin UI.",
     list: [
       "Quick automated checks (eval) — instant offline tests on the chat's logic. Free, takes 2 seconds. Run after any code change.",
       "Real-AI scenario tests (eval:scenarios) — simulated customer conversations sent to the real Anthropic API. Costs a few cents. Pass-rate tells you how the AI is actually behaving.",

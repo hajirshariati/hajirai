@@ -3,6 +3,8 @@
 // privacy policy field. The route is intentionally outside `/app/*` so it
 // doesn't go through admin authentication and can be visited by anyone.
 
+import seosLogo from "../assets/SEoS.png";
+
 const LAST_UPDATED = "April 26, 2026";
 const SUPPORT_EMAIL = "hajiraiapp@gmail.com";
 
@@ -28,47 +30,74 @@ const STYLES = `
   body {
     font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI",
                  Roboto, "Helvetica Neue", Arial, sans-serif;
-    color: #1a1a1a;
-    background: #fafafa;
+    color: #1a2e26;
+    background: #f6f7f6;
     line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
   }
   .privacy {
-    max-width: 760px;
+    max-width: 780px;
     margin: 0 auto;
-    padding: 56px 24px 96px;
+    padding: 48px 24px 96px;
   }
-  .privacy header {
-    border-bottom: 1px solid #e5e7eb;
-    padding-bottom: 24px;
-    margin-bottom: 32px;
+  .privacy .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    margin-bottom: 22px;
+  }
+  .privacy .brand img { display: block; height: 26px; width: auto; }
+  .privacy .brand span {
+    font-size: 11.5px;
+    font-weight: 650;
+    letter-spacing: 1.6px;
+    text-transform: uppercase;
+    color: #2D6B4F;
+  }
+  .privacy .sheet {
+    background: #ffffff;
+    border: 1px solid rgba(26,46,38,0.10);
+    border-radius: 16px;
+    padding: 40px 44px 32px;
+    box-shadow: 0 1px 2px rgba(26,46,38,0.05);
+  }
+  @media (max-width: 640px) {
+    .privacy .sheet { padding: 24px 20px; }
+  }
+  .privacy header.head {
+    border-bottom: 1px solid rgba(26,46,38,0.10);
+    padding-bottom: 22px;
+    margin-bottom: 28px;
   }
   .privacy h1 {
-    font-size: 32px;
-    font-weight: 700;
+    font-size: 30px;
+    font-weight: 650;
     margin: 0 0 8px;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.4px;
+    color: #1a2e26;
   }
   .privacy h2 {
-    font-size: 20px;
-    font-weight: 600;
-    margin: 40px 0 12px;
-    color: #111827;
+    font-size: 19px;
+    font-weight: 650;
+    margin: 38px 0 12px;
+    color: #1a2e26;
+    letter-spacing: -0.1px;
   }
   .privacy .meta {
-    color: #6b7280;
+    color: #5e6f67;
     font-size: 14px;
     margin: 0;
   }
   .privacy p, .privacy li {
-    font-size: 16px;
-    color: #374151;
+    font-size: 15.5px;
+    color: #36473f;
   }
   .privacy ul {
     padding-left: 20px;
     margin: 12px 0;
   }
   .privacy li { margin: 6px 0; }
-  .privacy strong { color: #111827; }
+  .privacy strong { color: #1a2e26; }
   .privacy a {
     color: #2D6B4F;
     text-decoration: underline;
@@ -78,15 +107,16 @@ const STYLES = `
   .privacy code {
     font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
     font-size: 14px;
-    background: #f3f4f6;
+    background: rgba(45,107,79,0.08);
+    color: #2D6B4F;
     padding: 1px 6px;
     border-radius: 4px;
   }
   .privacy footer {
-    margin-top: 64px;
-    padding-top: 24px;
-    border-top: 1px solid #e5e7eb;
-    color: #6b7280;
+    margin-top: 56px;
+    padding-top: 22px;
+    border-top: 1px solid rgba(26,46,38,0.10);
+    color: #5e6f67;
     font-size: 14px;
   }
 `;
@@ -96,7 +126,12 @@ export default function PrivacyPolicy() {
     <>
       <style dangerouslySetInnerHTML={{ __html: STYLES }} />
       <main className="privacy">
-        <header>
+        <div className="brand">
+          <img src={seosLogo} alt="SEoS" />
+          <span>SEoS Assistant</span>
+        </div>
+        <div className="sheet">
+        <header className="head">
           <h1>SEoS Assistant Privacy Policy</h1>
           <p className="meta">Last updated: {LAST_UPDATED}</p>
         </header>
@@ -194,6 +229,7 @@ export default function PrivacyPolicy() {
         <footer>
           © HajirAi · SEoS Assistant
         </footer>
+        </div>
       </main>
     </>
   );
