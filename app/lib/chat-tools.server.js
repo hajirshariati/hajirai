@@ -1488,11 +1488,38 @@ const isExcludedByRule = (p) => {
 
   if (effectiveCategory) {
     const beforeCategoryGuard = filtered.length;
-    filtered = filtered.filter((p) => productMatchesCategoryConstraint(p, effectiveCategory));
+    // TITLE-MATCH EXEMPTION. A product whose TITLE contains the
+    // query's distinctive (non-category, non-generic) keywords is
+    // what the customer asked for BY NAME — the category guard must
+    // never remove it, even when its category attribute is missing
+    // or mislabeled. Live trace 2026-06-10: "what's the spec on the
+    // Reagan boot?" → Reagan's category attribute was wiped in a
+    // product edit at 14:12, the guard derived category=boots from
+    // the query word "boot", and dropped all three in-stock Reagan
+    // products → bot told the customer "I don't see a Reagan in our
+    // boot lineup" about a product with 600+ units in stock.
+    const categoryWords = new Set(
+      String(effectiveCategory).toLowerCase().split(/[\s-]+/).filter(Boolean),
+    );
+    const nameTokens = keywords.filter((kw) => {
+      const k = String(kw).toLowerCase();
+      if (categoryWords.has(k)) return false;
+      if (k.endsWith("s") && categoryWords.has(k.slice(0, -1))) return false;
+      if (categoryWords.has(`${k}s`)) return false;
+      return k.length >= 3;
+    });
+    const titleMatchesName = (p) => {
+      if (nameTokens.length === 0) return false;
+      const title = String(p.title || "").toLowerCase();
+      return nameTokens.every((t) => title.includes(t));
+    };
+    filtered = filtered.filter(
+      (p) => productMatchesCategoryConstraint(p, effectiveCategory) || titleMatchesName(p),
+    );
     if (filtered.length !== beforeCategoryGuard) {
       console.log(
         `[search]   category hard-guard ${effectiveCategory}: ${filtered.length}/${beforeCategoryGuard} ` +
-          `(removed off-category semantic/near matches)`,
+          `(removed off-category semantic/near matches; title-name matches exempt)`,
       );
     }
   }

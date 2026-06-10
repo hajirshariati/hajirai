@@ -57,6 +57,12 @@ function extractBoldedProductFamilies(text) {
     if (/^(?:yes|no|note|important|warning|tip|here|now|today|great)\b/i.test(inner)) continue;
     if (/[™®©]/.test(inner)) continue;
     if (/\b(?:Technology|System|Method|Approach|Feature|Series|Collection|Platform|Footbed|Midsole|Outsole|Insole|Foam|Material|Lining|Upper|Mission|HQ|Headquarters|Bottom\s+line)\b/i.test(inner)) continue;
+    // Brand-prefixed tech phrases ("Aetrex Signature Arch Support",
+    // "Aetrex Orthotic System") are brand/technology references —
+    // product titles never start with the brand name. Live trace
+    // 2026-06-10: "**Aetrex Signature Arch Support**" was flagged as
+    // an ungrounded product and burned a retry on a grounded answer.
+    if (/^Aetrex\b/i.test(inner)) continue;
     // Heading-style bolds end in punctuation (colon, em/en dash) —
     // "**The key difference:**", "**Quick take —**", "**Bottom line:**".
     // These are sentence headings, not product names. Live trace
