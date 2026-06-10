@@ -34,7 +34,17 @@
 //     superlative — "what's the best" wants ONE answer).
 import { COMPARE_RE } from "./turn-intent.server.js";
 
-export const SINGULAR_INTENT_RE = /\btell me (?:more |a (?:bit|little) more )?about\b|\bmore (?:info|information|details) (?:on|about)\b|\b(?:what|how) about\s+(?:this|that|the\s+\w+\s+one\b)|\bhow is\b|\bis the\b|\bdoes (?:the|this|that)\b|\b(?:this|that) one\b|\bthe (?:first|second|third|last|cheapest|cheaper|priciest|most expensive|best|top|finest|red|blue|black|white|same)\s+(?:one\b|[a-z'-]+s?\b)|\bwhich\s+[a-z'-]+\s+(?:is|are)\s+(?:best|most|finest|top|the\s+(?:best|most))\b|\bwhat\s*'?s\s+(?:the\s+)?(?:best|cheapest|priciest|most expensive|finest|top|most\s+[a-z'-]+)\b/i;
+export const SINGULAR_INTENT_RE = /\btell me (?:more |a (?:bit|little) more )?about\b|\bmore (?:info|information|details) (?:on|about)\b|\b(?:what|how) about\s+(?:this|that|the\s+\w+\s+one\b)|\bhow is\b|\bis the\b|\bdoes (?:the|this|that)\b|\b(?:this|that) one\b|\bthe (?:first|second|third|last|cheapest|cheaper|priciest|most expensive|best|top|finest|red|blue|black|white)\s+(?:one\b|[a-z'-]+s?\b)|\bwhich\s+[a-z'-]+\s+(?:is|are)\s+(?:best|most|finest|top|the\s+(?:best|most))\b|\bwhat\s*'?s\s+(?:the\s+|your\s+|our\s+)?(?:best|cheapest|priciest|most expensive|finest|top|most\s+[a-z'-]+)\b/i;
+
+// Referential-plural phrasing: the customer is pointing back at the
+// SET the assistant just showed ("the same thing for women", "show me
+// those in black", "what about these"). Live trace 2026-06-10: "Now
+// show me the same thing for women" after a 2-card men's-sandals turn
+// got singular-narrowed to 1 card — "same thing" meant "another
+// lineup like that", not one product. These phrases override singular
+// narrowing. ("same" was also removed from SINGULAR_INTENT_RE's
+// the-X-one alternation for the same reason.)
+export const REFERENTIAL_PLURAL_RE = /\b(?:the\s+)?same\s+(?:thing|ones?|styles?|stuff|lineup|selection)\b|\bshow\s+me\s+(?:those|these|them)\b|\bwhat\s+about\s+(?:those|these|them)\b/i;
 
 // Comparison detection — single source of truth lives in
 // turn-intent.server.js (`COMPARE_RE`). The helper below and
@@ -47,6 +57,8 @@ export function detectSingularIntent(text) {
   // Comparison overrides singular: 'which is better, X or Y' is plural
   // even though it matches singular phrasing.
   if (COMPARE_RE.test(text)) return false;
+  // Referring back to a previously shown SET overrides singular.
+  if (REFERENTIAL_PLURAL_RE.test(text)) return false;
   return true;
 }
 
