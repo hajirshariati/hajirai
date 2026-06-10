@@ -613,12 +613,13 @@ const THEME_INIT_SCRIPT = `
 
 // ---------------------------------------------------------------------------
 // Globe — the slow-spinning dotted sphere, pinned to the viewport's
-// top-right corner behind the content. Quiet grey-sage dots, plus a
-// "setup mode" layer: individual nodes keep coming online — a random dot
-// lights up brand green, emits a soft expanding ping ring, then settles
-// back down — like systems booting one by one. `boostRef` lets the page
-// trigger a brief hyper-spin (easter egg). Respects prefers-reduced-motion
-// with a single static frame.
+// top-right corner behind the content. Quiet grey-sage dots in normal
+// cruise. When the easter egg fires (type "hajir" / Konami), the sphere
+// whips through five rotations and every visible dot becomes a comet:
+// a light-green glowing head with a motion trail streaking behind it
+// along its actual path. Trail length and glow follow the spin speed,
+// so comets ignite as the sphere accelerates and fade out as it glides
+// back to cruise. Respects prefers-reduced-motion with a static frame.
 // ---------------------------------------------------------------------------
 function Globe({ size = 820, points = 1700, theme = "light", boostRef = null }) {
   const ref = useRef(null);
@@ -649,15 +650,11 @@ function Globe({ size = 820, points = 1700, theme = "light", boostRef = null }) 
     const cosT = Math.cos(tilt);
     const sinT = Math.sin(tilt);
     const dark = theme === "dark";
-    // Per-frame projected coordinates, reused by the blip pass.
-    const px = new Float32Array(N);
-    const py = new Float32Array(N);
-    const pd = new Float32Array(N);
-    // Nodes currently "coming online".
-    const blips = [];
-    let lastSpawn = 0;
+    // Comet colours — light green, tuned per theme so the glow reads
+    // on both backgrounds.
+    const comet = dark ? "124,242,174" : "96,203,146";
 
-    const drawFrame = (rot, tMs) => {
+    const drawFrame = (rot, tailAngle, glow) => {
       ctx.clearRect(0, 0, size, size);
       const grad = ctx.createRadialGradient(cx - R * 0.35, cy - R * 0.35, R * 0.1, cx, cy, R);
       if (dark) {
@@ -676,7 +673,12 @@ function Globe({ size = 820, points = 1700, theme = "light", boostRef = null }) 
 
       const cosR = Math.cos(rot);
       const sinR = Math.sin(rot);
+      // Trail anchor: where each dot was `tailAngle` of rotation ago.
+      const cosP = Math.cos(rot - tailAngle);
+      const sinP = Math.sin(rot - tailAngle);
       const dotScale = Math.max(1, size / 280) * 0.75;
+      const trailing = glow > 0.02 && tailAngle > 0.001;
+      ctx.lineCap = "round";
       for (let i = 0; i < N; i++) {
         const [x, y, z] = pts[i];
         const xr = x * cosR + z * sinR;
@@ -686,48 +688,44 @@ function Globe({ size = 820, points = 1700, theme = "light", boostRef = null }) 
         const depth = (zt + 1) / 2;
         const sx = cx + xr * R;
         const sy = cy + yr * R;
-        px[i] = sx; py[i] = sy; pd[i] = depth;
-        // Grey-sage on light (visible on the grey page background),
-        // soft green on dark.
+        const radius = (0.6 + depth * 1.25) * dotScale;
+
+        // Comet trail first, so the head draws on top of its own tail.
+        if (trailing && depth > 0.35) {
+          const xr2 = x * cosP + z * sinP;
+          const zr2 = -x * sinP + z * cosP;
+          const yr2 = y * cosT - zr2 * sinT;
+          const tx = cx + xr2 * R;
+          const ty = cy + yr2 * R;
+          ctx.strokeStyle = `rgba(${comet},${((0.08 + depth * 0.30) * glow).toFixed(3)})`;
+          ctx.lineWidth = radius;
+          ctx.beginPath();
+          ctx.moveTo(tx, ty);
+          ctx.lineTo(sx, sy);
+          ctx.stroke();
+        }
+
+        // Base dot — grey-sage on light, soft green on dark.
         ctx.fillStyle = dark
           ? `rgba(74,222,128,${0.05 + depth * 0.24})`
           : `rgba(101,117,109,${0.04 + depth * 0.15})`;
         ctx.beginPath();
-        ctx.arc(sx, sy, (0.6 + depth * 1.25) * dotScale, 0, Math.PI * 2);
+        ctx.arc(sx, sy, radius, 0, Math.PI * 2);
         ctx.fill();
-      }
 
-      // Setup-mode blips: spawn a node every ~300ms, let it flare brand
-      // green with an expanding ping ring, then fade. Front hemisphere
-      // only, so the effect reads as activity ON the visible sphere.
-      if (tMs - lastSpawn > 300 && blips.length < 9) {
-        lastSpawn = tMs;
-        blips.push({ idx: Math.floor(Math.random() * N), born: tMs, life: 1500 + Math.random() * 1300 });
-      }
-      const coreColor = dark ? "74,222,128" : "45,107,79";
-      for (let b = blips.length - 1; b >= 0; b--) {
-        const age = (tMs - blips[b].born) / blips[b].life;
-        if (age >= 1) { blips.splice(b, 1); continue; }
-        const i = blips[b].idx;
-        if (pd[i] < 0.45) continue; // node is on the far side right now
-        const env = age < 0.22 ? age / 0.22 : 1 - (age - 0.22) / 0.78;
-        // Lit core.
-        ctx.fillStyle = `rgba(${coreColor},${(0.85 * env).toFixed(3)})`;
-        ctx.beginPath();
-        ctx.arc(px[i], py[i], (1.6 + pd[i] * 1.6) * dotScale, 0, Math.PI * 2);
-        ctx.fill();
-        // Expanding ping ring.
-        ctx.strokeStyle = `rgba(${coreColor},${(0.4 * (1 - age)).toFixed(3)})`;
-        ctx.lineWidth = 1.2;
-        ctx.beginPath();
-        ctx.arc(px[i], py[i], 4 + age * 22, 0, Math.PI * 2);
-        ctx.stroke();
+        // Glowing comet head layered over the base while boosted.
+        if (trailing && depth > 0.35) {
+          ctx.fillStyle = `rgba(${comet},${((0.15 + depth * 0.55) * glow).toFixed(3)})`;
+          ctx.beginPath();
+          ctx.arc(sx, sy, radius * 1.15, 0, Math.PI * 2);
+          ctx.fill();
+        }
       }
     };
 
     const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
     if (reduced) {
-      drawFrame(0.6, 0);
+      drawFrame(0.6, 0, 0);
       return undefined;
     }
     let raf;
@@ -736,9 +734,11 @@ function Globe({ size = 820, points = 1700, theme = "light", boostRef = null }) 
     // Easter-egg boost: five lightning-fast full rotations over ~4s.
     // easeInOutCubic has zero slope at both ends, so the sphere
     // accelerates smoothly out of its glacial cruise, blurs through
-    // the middle, and glides back to cruise with no visible snap —
-    // and because the extra rotation is an exact multiple of 2π, the
-    // hand-off back to the base rotation is seamless.
+    // the middle, and glides back with no visible snap — the extra
+    // rotation is an exact multiple of 2π, making the hand-off back
+    // to the base rotation seamless. Comet glow and trail length
+    // follow sin(p·π): they ignite with the acceleration, peak at
+    // max speed, and die away as the spin settles.
     const BOOST_TURNS = 5;
     const BOOST_MS = 4200;
     const easeInOutCubic = (p) => (p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2);
@@ -748,11 +748,17 @@ function Globe({ size = 820, points = 1700, theme = "light", boostRef = null }) 
       // Glacial cruise — one rotation every ~3.5 minutes.
       rot += dt * 0.00003;
       let extra = 0;
+      let glow = 0;
+      let tailAngle = 0;
       if (boostRef) {
         const p = (t - (boostRef.current || -1e9)) / BOOST_MS;
-        if (p >= 0 && p < 1) extra = BOOST_TURNS * 2 * Math.PI * easeInOutCubic(p);
+        if (p >= 0 && p < 1) {
+          extra = BOOST_TURNS * 2 * Math.PI * easeInOutCubic(p);
+          glow = Math.sin(p * Math.PI);
+          tailAngle = 0.22 * glow;
+        }
       }
-      drawFrame(rot + extra, t);
+      drawFrame(rot + extra, tailAngle, glow);
       raf = requestAnimationFrame(loop);
     };
     raf = requestAnimationFrame(loop);
