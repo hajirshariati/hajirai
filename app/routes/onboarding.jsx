@@ -705,9 +705,13 @@ function Globe({ size = 820, points = 1700, theme = "light", boostRef = null }) 
             const tx = cx + xr2 * R;
             const ty = cy + yr2 * R;
             // Steeper fade so the tail dies to nothing — no blunt end.
-            const fade = Math.pow(1 - seg / (TAIL_SEGMENTS + 1), 1.6);
-            const coreAlpha = (0.05 + depth * 0.18) * glow * fade;
-            const coreWidth = radius * (0.35 + 0.65 * fade);
+            const fade = Math.pow(1 - seg / (TAIL_SEGMENTS + 1), 1.4);
+            // Near the head the tail is as bright and nearly as wide as
+            // the head itself, so head + tail merge into one streak of
+            // light (a separate bright blob with a thin string reads
+            // as... not a comet).
+            const coreAlpha = (0.07 + depth * 0.26) * glow * fade;
+            const coreWidth = radius * (0.6 + 0.9 * fade);
             // Soft halo under the core stroke — wide, very faint —
             // gives the trail a glow instead of a hard-edged line.
             ctx.strokeStyle = `rgba(${comet},${(coreAlpha * 0.3).toFixed(3)})`;
@@ -735,16 +739,18 @@ function Globe({ size = 820, points = 1700, theme = "light", boostRef = null }) 
         ctx.arc(sx, sy, radius, 0, Math.PI * 2);
         ctx.fill();
 
-        // Glowing comet head: a wide faint halo under a brighter core.
+        // Glowing comet head — the dot itself lights up with a tight
+        // halo, sized to flow into the tail width so the whole thing
+        // reads as one elongated streak, not a bulb with a string.
         if (trailing && depth > 0.55) {
           const headAlpha = (0.08 + depth * 0.30) * glow;
-          ctx.fillStyle = `rgba(${comet},${(headAlpha * 0.25).toFixed(3)})`;
+          ctx.fillStyle = `rgba(${comet},${(headAlpha * 0.35).toFixed(3)})`;
           ctx.beginPath();
-          ctx.arc(sx, sy, radius * 2.6, 0, Math.PI * 2);
+          ctx.arc(sx, sy, radius * 1.7, 0, Math.PI * 2);
           ctx.fill();
           ctx.fillStyle = `rgba(${comet},${headAlpha.toFixed(3)})`;
           ctx.beginPath();
-          ctx.arc(sx, sy, radius * 1.15, 0, Math.PI * 2);
+          ctx.arc(sx, sy, radius * 1.0, 0, Math.PI * 2);
           ctx.fill();
         }
       }
@@ -774,7 +780,7 @@ function Globe({ size = 820, points = 1700, theme = "light", boostRef = null }) 
         if (p >= 0 && p < 1) {
           glow = 1 - p;
           speed = 1 + 11 * glow;
-          tailAngle = 0.09 * glow;
+          tailAngle = 0.075 * glow;
         }
       }
       // Glacial cruise — one rotation every ~3.5 minutes.
