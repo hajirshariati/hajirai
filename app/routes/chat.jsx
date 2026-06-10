@@ -310,6 +310,20 @@ function isKnowledgeQuestionLocal(msg) {
   return KNOWLEDGE_QUESTION_LOCAL_RE.test(String(msg || ""));
 }
 
+// Phase 4 slice — same env-flag rule as llm-owns-turn.server.js.
+// When the LLM-owns path is active, the legacy in-loop mutators that
+// FIGHT the model (length cap, definition-question pool wipe,
+// named-product mismatch wipe, cosmetic text rewrites) are skipped:
+// the grounding validator with retry supersedes them, and the live
+// traces from 2026-06-10 show each of them damaging correct answers
+// (compare amputated 915→295 chars; Reagan spec retried 3× against a
+// guard-wiped pool; stray "-" lines from half-applied reflow).
+function llmOwnsTurnActive() {
+  const raw = String(process.env.LLM_OWNS_ALL_TURNS || "").toLowerCase();
+  if (raw === "false") return false;
+  return true;
+}
+
 const SIMPLE_PATTERN = /^(hi|hey|hello|thanks|thank you|ok|okay|yes|no|bye|goodbye|cool|great|got it|perfect|sure|nice|awesome|alright|yep|nope|sounds good|that helps|appreciate it)\s*[.!?]*$/i;
 const LOW_RISK_SHOPPING_RE = /\b(?:show|find|browse|shop|looking for|look for|need|want|have|carry|any|in|under|below|less than|cheaper|cheap|sale|deals?|how about|what about)\b/i;
 const PRODUCT_LISTING_TERM_RE = /\b(?:shoes?|footwear|sneakers?|sandals?|boots?|loafers?|clogs?|wedges?|heels?|slippers?|oxfords?|mary janes?|slip[-\s]?ons?|slides?|flats?|styles?|pairs?|men'?s|women'?s|kids?|boys?|girls?|black|white|brown|navy|blue|pink|red|grey|gray|tan|taupe|silver|gold|cream|ivory|beige|purple|green|orange|yellow|\$\s*\d+)\b/i;
@@ -2394,9 +2408,16 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       { fn: stripBannedNarration,          name: "banned-narration" },
       { fn: stripMetaNarration,            name: "meta-narration" },
       { fn: dedupeConsecutiveSentences,    name: "dedupe" },
-      { fn: reflowInlineList,              name: "reflow-list" },
-      { fn: ensureHeaderLineBreaks,        name: "header-breaks" },
-      { fn: tightenSequentialFactLines,    name: "tighten-facts" },
+      // Cosmetic markdown rewriters run on the LEGACY path only.
+      // On the LLM-owns path the prompt's formatting rules govern,
+      // and live trace 2026-06-10 showed these half-splitting the
+      // Reagan spec list into orphan "-" lines. Safety/leak scrubs
+      // above stay on for both paths.
+      ...(llmOwnsTurnActive() ? [] : [
+        { fn: reflowInlineList,              name: "reflow-list" },
+        { fn: ensureHeaderLineBreaks,        name: "header-breaks" },
+        { fn: tightenSequentialFactLines,    name: "tighten-facts" },
+      ]),
     ];
     const cleanupLogs = [];
     for (const step of cleanupSteps) {
@@ -2427,7 +2448,13 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   // after it. Same for "BioRocker vs UltraSky" tech compare.
   const REVIEW_FIT_RETURN_OR_COMPARE_RE =
     /\b(?:review|reviews|rated|rating|ratings|reviewed|star|stars|score|popular|best[- ]?selling|bestseller|customer[s']*\s+(?:say|saying|love|favor)|what\s+(?:do\s+)?(?:people|customers|buyers|others)\s+(?:say|think)|return|returns|refund|refunds|exchange|exchanges|run|runs|fit|fits|true\s+to\s+size|size\s+up|size\s+down|compare|comparison|vs\.?|versus|difference\s+between|cheap|cheapest|cheaper|expensive|price|priced|cost|costs|how\s+much|under\s+\$?\d+|points?\s+(?:need|i\s+need|to\s+(?:buy|get|redeem))|for\s+free|technolog|material|feature|brand|tech\b|spec|fabric|midsole|footbed|insole|method|system|certification|story|mission|history|founded|beside|besides|other\s+than|explain|what\s+makes)\b/i;
+  // LLM-owns: never hard-cap. Live trace 2026-06-10: "which is
+  // better, Vicki or Jillian?" → model wrote a 915-char structured
+  // compare; cap chopped to 295 mid-word leaving "**Jillian Braided
+  // Quarter…" dangling on screen. Brevity is a prompt rule now, not
+  // a post-hoc scissors.
   const skipHardCap =
+    llmOwnsTurnActive() ||
     REVIEW_FIT_RETURN_OR_COMPARE_RE.test(String(ctx?.latestUserMessage || ""));
   if (
     !skipHardCap &&
@@ -3273,7 +3300,12 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     // pool card shares a style family with them. When there's no
     // overlap, wipe the pool — better to show no card than the
     // wrong one. Pure title-token math, no merchant vocabulary.
-    if (filteredPool.length > 0 && fullResponseText) {
+    //
+    // SKIPPED on the LLM-owns path: the grounding validator covers
+    // the text side (ungrounded product names trigger a model retry
+    // with the error spelled out), so a text/card mismatch resolves
+    // by FIXING THE TEXT instead of silently wiping correct cards.
+    if (!llmOwnsTurnActive() && filteredPool.length > 0 && fullResponseText) {
       const m = detectNamedProductMismatch(fullResponseText, filteredPool);
       if (m.textFamilies.length > 0 && !m.overlap) {
         console.log(
@@ -3305,7 +3337,15 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     // Compare turn for UltraSky which DID bold the name: the prior
     // guard fired and wiped 6 cards. This guard generalizes that
     // behavior to the bolded-or-not case.
-    if (filteredPool.length > 0 && ctx.latestUserMessage) {
+    //
+    // SKIPPED on the LLM-owns path. Live trace 2026-06-10: the guard
+    // matched "what's the spec on the Reagan boot?" as a definition
+    // question (it isn't — it's a product-fact ask), wiped 6 valid
+    // Reagan cards, and the grounding validator then saw the model's
+    // correct "**Reagan Ankle Boot**" answer against an EMPTY display
+    // pool → 3 retry attempts (~35s) for an answer that was right the
+    // first time. The validator + evidence-pool check supersede this.
+    if (!llmOwnsTurnActive() && filteredPool.length > 0 && ctx.latestUserMessage) {
       const msg = String(ctx.latestUserMessage).trim();
       // Match common definition / technology-question shapes and
       // capture the topic. Greedy capture, then strip filler suffixes
@@ -3625,6 +3665,16 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     turnResult,
     turnWarnings,
     qualitySignals,
+    // EVERY product the model received from tool calls this turn,
+    // BEFORE display guards/filters ran. The grounding validator must
+    // check claims against this — the model's actual evidence — not
+    // against turnResult.products (the post-guard display set). Live
+    // trace 2026-06-10: the definition-question guard wiped 6 valid
+    // Reagan cards from the display pool, the validator then saw the
+    // model's correct "**Reagan Ankle Boot**" answer against an empty
+    // pool and burned 3 retries (~35s) on an answer that was grounded
+    // all along.
+    evidencePool: Array.from(allProductPool.values()),
   };
 }
 

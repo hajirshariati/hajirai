@@ -83,17 +83,27 @@ export function gatherPoolFromMessages(messages = []) {
 // reply attached 5 cards, because runAgenticLoop doesn't return its
 // internal messages array — it returns turnResult.products.
 export function gatherPoolFromResult(result, fallbackMessages = []) {
-  // 1) Preferred: post-processed final cards from the agent loop.
+  // 1) Preferred: the EVIDENCE pool — every product the model received
+  //    from tool calls this turn, before display guards filtered the
+  //    visible card set. Grounding is about what the model SAW, not
+  //    what the UI shows. Live trace 2026-06-10: a display guard wiped
+  //    6 valid Reagan cards; validating against the post-guard display
+  //    pool flagged a perfectly grounded answer and burned 3 retries.
+  const evidence = result?.evidencePool;
+  if (Array.isArray(evidence) && evidence.length > 0) {
+    return evidence;
+  }
+  // 2) Post-processed final display cards from the agent loop.
   const turnProducts = result?.turnResult?.products;
   if (Array.isArray(turnProducts) && turnProducts.length > 0) {
     return turnProducts;
   }
-  // 2) Direct finalProductCards (some callers expose it).
+  // 3) Direct finalProductCards (some callers expose it).
   const finalCards = result?.finalProductCards;
   if (Array.isArray(finalCards) && finalCards.length > 0) {
     return finalCards;
   }
-  // 3) Message-history scan (test fixtures + raw agent outputs).
+  // 4) Message-history scan (test fixtures + raw agent outputs).
   return gatherPoolFromMessages(result?.messages || fallbackMessages);
 }
 
