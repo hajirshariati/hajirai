@@ -2185,10 +2185,10 @@ function SearchRulesCard({ initial }) {
         <BlockStack gap="100">
           <InlineStack gap="200" blockAlign="center">
             <Text as="h2" variant="headingMd">Search rules</Text>
-            <Badge tone="critical">Hard filter — highest priority</Badge>
+            <Badge tone="critical">Hard filter</Badge>
           </InlineStack>
           <Text as="p" tone="subdued">
-            When a trigger keyword appears in the conversation, matching products are hidden from search results before the AI sees them. Rules are evaluated top-to-bottom — first match wins.
+            When a trigger keyword appears in the conversation, matching products are hidden from search results before the AI sees them. Rules are evaluated top-to-bottom — first match wins. Skipped when the customer’s search already targets a specific category (a focused category search overrides broad exclusions) or when an override trigger matches.
           </Text>
           <Text as="p" tone="subdued" variant="bodySm">
             Example: trigger <code>foot pain, plantar</code> → exclude <code>sneaker, sandal, boot</code>. The customer sees only relief products like orthotics. Add an <em>override</em> like <code>new footwear, new shoes</code> to let the rule be skipped when the customer explicitly asks for shoes.
@@ -2792,7 +2792,7 @@ export default function RulesKnowledge() {
         <BlockStack gap="400">
           <SectionHeading
             title="Product data from Shopify"
-            description="Keep the AI's product index in sync with your Shopify catalog. Re-sync after large bulk imports, or let webhooks handle incremental changes automatically."
+            description="Keep the AI's product index in sync with your Shopify catalog. Webhooks apply incremental changes automatically within seconds, and large bulk edits trigger an automatic full re-sync. Manual re-sync is only needed if something looks out of date."
           />
           <CatalogSyncCard data={data} />
         </BlockStack>

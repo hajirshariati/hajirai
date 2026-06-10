@@ -138,6 +138,19 @@ export async function runWithGroundingRetry({
   let attempt = 0;
   let last = null;
   let lastErrors = [];
+  // Usage accumulates across ALL attempts so the caller bills what was
+  // actually spent — a validator retry costs a full extra model
+  // round-trip and must not vanish from the usage record.
+  const accUsage = {
+    input_tokens: 0,
+    output_tokens: 0,
+    cache_creation_input_tokens: 0,
+    cache_read_input_tokens: 0,
+  };
+  const mergeUsage = (u) => {
+    if (!u || typeof u !== "object") return;
+    for (const k of Object.keys(accUsage)) accUsage[k] += u[k] || 0;
+  };
 
   while (attempt <= maxRetries) {
     // `attempt` lets the caller route models per attempt — e.g. run
@@ -145,6 +158,7 @@ export async function runWithGroundingRetry({
     // rejection gets the stronger model for the correction.
     const result = await runLoop({ messages: messages.slice(), attempt });
     last = result;
+    mergeUsage(result?.totalUsage);
     const text = result?.fullResponseText || "";
     const pool = gatherPoolFromResult(result, messages);
     const validation = validateGrounding({ text, pool });
@@ -156,6 +170,7 @@ export async function runWithGroundingRetry({
     if (validation.ok) {
       return {
         ...result,
+        totalUsage: { ...accUsage },
         validation: { ok: true, errors: [], attempts: attempt + 1 },
       };
     }
@@ -189,6 +204,7 @@ export async function runWithGroundingRetry({
 
   return {
     ...last,
+    totalUsage: { ...accUsage },
     validation: { ok: false, errors: lastErrors, attempts: attempt + 1 },
   };
 }
