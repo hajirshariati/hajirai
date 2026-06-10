@@ -114,6 +114,7 @@ import {
   scrubInternalEnums,
   resolverPromisedRecommendation,
   dropNonFootwearWhenFootwearIntent,
+  detectComparisonIntent,
 } from "../lib/chat-postprocessing";
 import prisma from "../db.server";
 import { recordChatUsage, getTodayMessageCount } from "../models/ChatUsage.server";
@@ -1832,7 +1833,7 @@ function hasCompetitorBrandMention(text) {
 // containsAvailabilityDenial lives in app/lib/chat-helpers.server.js so
 // the test suite can import it without dragging the route loader graph.
 
-async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, controller, encoder, promptCaching, tools }) {
+async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, controller, encoder, promptCaching, tools, promptStableLength = 0 }) {
   const totalUsage = { input_tokens: 0, output_tokens: 0, cache_creation_input_tokens: 0, cache_read_input_tokens: 0 };
   let toolCallCount = 0;
   // Track whether ANY recommend_* tool fired this turn. Used to
@@ -1890,8 +1891,25 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   let hasKlaviyoForm = false;
 
 
+  // Two-block system when the prompt builder marked a stable prefix:
+  // the breakpoint goes on the stable-per-shop block so it's a cheap
+  // cache READ on every warm turn, while the per-turn suffix (RAG,
+  // scoped lists, VIP, injected directives) is billed as plain input
+  // instead of invalidating and re-WRITING the whole prompt. Cache
+  // writes were ~60% of the LLM bill before this split.
+  const stableLen =
+    Number.isFinite(promptStableLength) &&
+    promptStableLength > 0 &&
+    promptStableLength < systemPrompt.length
+      ? promptStableLength
+      : 0;
   const system = promptCaching
-    ? [{ type: "text", text: systemPrompt, cache_control: { type: "ephemeral" } }]
+    ? (stableLen > 0
+        ? [
+            { type: "text", text: systemPrompt.slice(0, stableLen), cache_control: { type: "ephemeral" } },
+            { type: "text", text: systemPrompt.slice(stableLen) },
+          ]
+        : [{ type: "text", text: systemPrompt, cache_control: { type: "ephemeral" } }])
     : systemPrompt;
 
   const activeTools = tools || TOOLS;
@@ -4159,7 +4177,7 @@ export const action = async ({ request }) => {
       }
     }
 
-    let systemPrompt = buildSystemPrompt({
+    const promptBuild = buildSystemPrompt({
       config,
       knowledge,
       retrievedChunks,
@@ -4181,7 +4199,12 @@ export const action = async ({ request }) => {
       categoryGenderMap,
       activeCampaigns,
       merchantGroups,
-    });
+    }, { withCacheInfo: true });
+    let systemPrompt = promptBuild.text;
+    // Index where the stable (cacheable) prefix ends. Appends below
+    // (`systemPrompt += ...`) land in the volatile suffix and never
+    // invalidate the cached prefix.
+    const promptStableLength = promptBuild.stableLength || 0;
     const kidsCoverage = buildKidsCoveragePrompt({ sessionGender, catalogProductTypes });
     if (kidsCoverage.prompt) {
       console.log(
@@ -4612,17 +4635,42 @@ export const action = async ({ request }) => {
               const stored = config.anthropicModel || DEFAULT_MODEL;
               return DEPRECATED_MODELS.has(stored) ? DEFAULT_MODEL : stored;
             })();
+            // Hybrid model routing (cost). Haiku 4.5 is 3× cheaper than
+            // Sonnet and handles the bread-and-butter turns (search,
+            // show, follow-up) well — the grounding validator polices
+            // facts identically on both. Sonnet handles the turns that
+            // need synthesis: compares, and any validator RETRY (a
+            // rejected attempt escalates to the stronger model for the
+            // correction). HYBRID_MODEL_ROUTING=false pins everything
+            // back to the configured Sonnet model.
+            const hybridRouting =
+              String(process.env.HYBRID_MODEL_ROUTING || "").toLowerCase() !== "false";
+            const HAIKU_MODEL = "claude-haiku-4-5";
+            const latestForRouting = String(body.message || "");
+            const needsSonnet =
+              detectComparisonIntent(latestForRouting) ||
+              /\b(?:vs\.?|versus|difference between|compare)\b/i.test(latestForRouting);
+            const pickModel = (attempt) => {
+              if (!hybridRouting) return sonnetModelForClean;
+              if (attempt > 0 || needsSonnet) return sonnetModelForClean;
+              return HAIKU_MODEL;
+            };
             // Each attempt runs into its OWN buffer — only the accepted
             // attempt's chunks flush to the live controller. Without
             // this, a failed attempt's text would stream to the widget
             // and the retry's text would stream again (duplicate reply).
             let attemptBuf = [];
-            const runLoopOnce = async ({ messages: msgs }) => {
+            const runLoopOnce = async ({ messages: msgs, attempt = 0 }) => {
               attemptBuf = [];
+              const turnModel = pickModel(attempt);
+              if (turnModel !== sonnetModelForClean) {
+                console.log(`[llm-owns-turn] ${ctx.shop} model=${turnModel} (hybrid, attempt=${attempt + 1})`);
+              }
               return await runAgenticLoop({
                 anthropic,
-                model: sonnetModelForClean,
+                model: turnModel,
                 systemPrompt,
+                promptStableLength,
                 messages: msgs.slice(),
                 ctx: { ...ctx },
                 controller: { enqueue: (c) => attemptBuf.push(c) },

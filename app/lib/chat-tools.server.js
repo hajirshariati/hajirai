@@ -1589,7 +1589,12 @@ const isExcludedByRule = (p) => {
       productType: p.productType || undefined,
       tags: p.tags?.length ? p.tags : undefined,
       attributes: p.attributesJson || undefined,
-      description: p.description || undefined,
+      // Token diet: full descriptions run 1-3K chars × 6-10 products
+      // per search and dominated the per-turn input bill. 700 chars
+      // covers the feature-bearing opening of every catalog
+      // description; the query-centered descriptionSnippet below
+      // catches term matches that land deeper in the text.
+      description: p.description ? truncate(p.description, 700) : undefined,
       descriptionSnippet: descriptionSnippet(p.description, q, 280),
       catalogRequirementEvidence: catalogRequirementMatches.get(p.handle) || undefined,
       requiredCatalogTerms: wantedCatalogTerms.length ? wantedCatalogTerms : undefined,
