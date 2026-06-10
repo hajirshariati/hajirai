@@ -140,7 +140,10 @@ export async function runWithGroundingRetry({
   let lastErrors = [];
 
   while (attempt <= maxRetries) {
-    const result = await runLoop({ messages: messages.slice() });
+    // `attempt` lets the caller route models per attempt — e.g. run
+    // attempt 0 on Haiku and escalate retries to Sonnet so a validator
+    // rejection gets the stronger model for the correction.
+    const result = await runLoop({ messages: messages.slice(), attempt });
     last = result;
     const text = result?.fullResponseText || "";
     const pool = gatherPoolFromResult(result, messages);

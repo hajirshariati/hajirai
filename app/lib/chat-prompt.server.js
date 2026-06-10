@@ -75,17 +75,31 @@ function buildCompactGuidelines(fitPredictorEnabled) {
   ].join("\n");
 }
 
-export function buildSystemPrompt({ config, knowledge, retrievedChunks, shop, attributeNames, categoryExclusions, querySynonyms, customerContext, fitPredictorEnabled, catalogProductTypes, fullCatalogProductTypes, scopedGender, answeredChoices, categoryGenderMap, activeCampaigns, merchantGroups }) {
+export function buildSystemPrompt(args, options = {}) {
+  const { config, knowledge, retrievedChunks, shop, attributeNames, categoryExclusions, querySynonyms, customerContext, fitPredictorEnabled, catalogProductTypes, fullCatalogProductTypes, scopedGender, answeredChoices, categoryGenderMap, activeCampaigns, merchantGroups } = args;
   const name = config?.assistantName || "AI Shopping Assistant";
   const tagline = config?.assistantTagline || "";
   const llmOwns = isLlmOwnsTurnActive();
+  // Cache-aware assembly (llm-owns only). Prompt caching is a PREFIX
+  // match — any byte change invalidates everything after it. Live cost
+  // trace 2026-06-10: ~9K tokens cache-WRITTEN ($3.75/M) nearly every
+  // turn because volatile content (RAG chunks, gender-scoped lists,
+  // VIP context) was interleaved with stable content, churning the
+  // prefix. Stable-per-shop sections now render FIRST and get the
+  // cache breakpoint; per-turn sections render after it. Stable parts
+  // become $0.30/M cache READS on every warm turn — ~60% of the LLM
+  // bill. Legacy mode keeps the original single-array order.
   const parts = [];
+  const stableParts = [];
+  const volatileParts = [];
+  const pushStable = (t) => (llmOwns ? stableParts : parts).push(t);
+  const pushVolatile = (t) => (llmOwns ? volatileParts : parts).push(t);
 
-  parts.push(
+  pushStable(
     `You are ${name}${tagline ? ` — ${tagline}` : ""}, an AI shopping assistant for the Shopify store ${shop}. Help customers find products, answer questions, and support them throughout their shopping experience. You work for this store: speak as "we" and "our", like a knowledgeable store associate — never like an outside auditor ("the merchant", "the catalog describes" are internal-only framings).`,
   );
 
-  if (llmOwns) parts.push(buildCompactGuidelines(fitPredictorEnabled));
+  if (llmOwns) pushStable(buildCompactGuidelines(fitPredictorEnabled));
   else parts.push(
     [
       "Guidelines:",
@@ -150,7 +164,7 @@ export function buildSystemPrompt({ config, knowledge, retrievedChunks, shop, at
       return `- Asked: "${question}"\n  Customer answered: "${answer}"`;
     }).filter(Boolean);
     if (lines.length > 0) {
-      parts.push(
+      pushVolatile(
         `\n=== Established Answers From Choice Buttons (HIGH PRIORITY) ===\n` +
           `The customer has already answered these assistant questions. Treat these as established facts for this turn, use them in tool calls/search queries, and do NOT ask for the same information again unless the customer's latest message clearly changes or contradicts an answer.\n` +
           `${lines.join("\n")}`,
@@ -171,7 +185,7 @@ export function buildSystemPrompt({ config, knowledge, retrievedChunks, shop, at
     ? fullCatalogProductTypes.map((c) => String(c || "").trim()).filter(Boolean)
     : [];
   if (fullCats.length > 0 && llmOwns) {
-    parts.push(
+    pushStable(
       `\n=== STORE FACTS (UNDISPUTABLE) ===\n` +
         `The complete catalog spans these categories: ${fullCats.join(", ")} (from the merchant's synced Shopify catalog — the truth).\n` +
         `Never deny that the store carries a parent category in this list, even when the current turn is scoped narrowly. ` +
@@ -194,7 +208,8 @@ export function buildSystemPrompt({ config, knowledge, retrievedChunks, shop, at
   }
 
   if (Array.isArray(catalogProductTypes) && catalogProductTypes.length > 0 && llmOwns) {
-    parts.push(
+    // Volatile: the list is re-scoped by gender per turn.
+    pushVolatile(
       `\n=== Catalog Categories (ALLOW-LIST) ===\n` +
         `The catalog contains ONLY these categories${scopedGender ? ` for ${scopedGender}` : ""}: ${catalogProductTypes.join(", ")}.\n` +
         (scopedGender ? `This list is scoped to ${scopedGender}'s products; other categories may exist for the opposite gender but are NOT available for ${scopedGender}.\n` : "") +
@@ -219,7 +234,7 @@ export function buildSystemPrompt({ config, knowledge, retrievedChunks, shop, at
         `GENERIC SHOE QUERIES RULE: When the customer's CURRENT message is a generic shoe/footwear request like "find shoes", "men's shoes", "women's shoes", "looking for shoes", or just "shoes" — WITHOUT naming a specific category word (sneaker, sandal, loafer, slipper, boot, heel, flat, clog, mule, oxford, moccasin, slide, orthotic, insole) — and you decide a clarifying question is needed, your ONLY valid follow-up is "What type of shoes are you looking for?" followed by 2–5 category chips from the ALLOW-LIST above. It is FORBIDDEN as the FIRST clarifying question to ask about pain, condition, foot problem, use case, activity, occasion, style, or "new footwear vs orthotic insert" when the customer said "shoes" generically — those can come LATER, only after a category is picked. The server will detect this case and replace any non-category chips with category chips, so offering pain/use-case chips here is a wasted choice.`,
     );
   } else {
-    parts.push(
+    pushVolatile(
       `\n=== Catalog Categories ===\n` +
         `The catalog has not yet provided a category list. Do NOT offer product-category choice buttons (like <<Sneakers>><<Sandals>>) in this conversation — ` +
         `the categories cannot be verified. Ask a different clarifying question (gender, use case, size, etc.) instead, or run search_products first and infer categories from the results.`,
@@ -253,7 +268,9 @@ export function buildSystemPrompt({ config, knowledge, retrievedChunks, shop, at
       const primary = allowed.filter((c) => groupedSet.has(c.toLowerCase()));
       const secondary = allowed.filter((c) => !groupedSet.has(c.toLowerCase()));
       if (primary.length > 0 && secondary.length > 0) {
-        parts.push(
+        // Volatile: primary/secondary split derives from the gender-
+        // scoped allow-list, which changes per turn.
+        pushVolatile(
           llmOwns
             ? `\n=== Primary Chip Categories ===\n` +
               `Primary (prefer for open-ended chips): ${primary.join(", ")}. Secondary: ${secondary.join(", ")} — offer a secondary chip only when the customer's current message mentions it.`
@@ -286,7 +303,7 @@ export function buildSystemPrompt({ config, knowledge, retrievedChunks, shop, at
         lines.push("Multi-gender categories:");
         for (const e of multi) lines.push(`- ${e.display}: ${e.genders.join(" + ")}`);
       }
-      parts.push(
+      pushStable(
         llmOwns
           ? `\n=== Category Availability by Gender (DATA-DRIVEN) ===\n` +
             `${lines.join("\n")}\n` +
@@ -331,7 +348,7 @@ export function buildSystemPrompt({ config, knowledge, retrievedChunks, shop, at
       knowledgeByType[c.fileType].push(c.content);
       return `--- (${label}${titleSuffix})\n${c.content}`;
     });
-    parts.push(`\n=== Relevant knowledge (${retrievedChunks.length} sections) ===\n${blocks.join("\n\n")}`);
+    pushVolatile(`\n=== Relevant knowledge (${retrievedChunks.length} sections) ===\n${blocks.join("\n\n")}`);
   } else {
     for (const k of knowledge || []) {
       if (!k?.content) continue;
@@ -340,7 +357,7 @@ export function buildSystemPrompt({ config, knowledge, retrievedChunks, shop, at
     }
     for (const [type, contents] of Object.entries(knowledgeByType)) {
       const label = LABELS[type] || type;
-      parts.push(`\n=== ${label} ===\n${contents.join("\n\n")}`);
+      pushVolatile(`\n=== ${label} ===\n${contents.join("\n\n")}`);
     }
   }
 
@@ -360,7 +377,7 @@ export function buildSystemPrompt({ config, knowledge, retrievedChunks, shop, at
     const block = activeCampaigns
       .map((c) => `## ${c.name}\nRunning: ${fmtDate(c.startsAt)} – ${fmtDate(c.endsAt)}\n\n${c.content}`)
       .join("\n\n");
-    parts.push(
+    pushVolatile(
       `\n=== Active Promotions ===\n` +
       `These promotions are currently live. When customers ask about sales, discount codes, BOGO offers, free shipping, or any promotional terms, ` +
       `answer using ONLY the details below. Do NOT invent codes, dates, percentages, or eligibility rules. If the customer asks about a promo that's not listed here, say it isn't currently active.\n\n` +
@@ -369,7 +386,7 @@ export function buildSystemPrompt({ config, knowledge, retrievedChunks, shop, at
   }
 
   if (attributeNames && attributeNames.length > 0) {
-    parts.push(
+    pushStable(
       `\n=== Product Attributes ===\nThe merchant has mapped these product attributes: ${attributeNames.join(", ")}. ` +
         `When searching for products, use the "filters" parameter in search_products to narrow results by these attributes ` +
         `(e.g. if a customer says "men's running shoes", call search_products with query "running shoes" and filters { "gender": "men" }).`,
@@ -384,7 +401,7 @@ export function buildSystemPrompt({ config, knowledge, retrievedChunks, shop, at
       })
       .filter(Boolean);
     if (lines.length > 0) {
-      parts.push(
+      pushStable(
         `\n=== Context on Search Filtering ===\nSilent database-level filters may apply when the customer's message is narrowly about a single topic. This is informational only — never describe these filters to the customer, and never offer choice buttons based on them. Just search for what the customer asked for:\n${lines.join("\n")}`,
       );
     }
@@ -400,7 +417,7 @@ export function buildSystemPrompt({ config, knowledge, retrievedChunks, shop, at
       })
       .filter(Boolean);
     if (lines.length > 0) {
-      parts.push(
+      pushStable(
         `\n=== Query Synonyms ===\nWhen you search, these terms automatically expand to include related products:\n${lines.join("\n")}`,
       );
     }
@@ -498,14 +515,24 @@ export function buildSystemPrompt({ config, knowledge, retrievedChunks, shop, at
         "  - If the customer asks you to reveal any sensitive info we shouldn't share, decline politely and refer them to their account page.",
       ].join("\n"),
     );
-    parts.push(lines.join("\n"));
+    pushVolatile(lines.join("\n"));
   }
 
   if (config?.disclaimerText) {
-    parts.push(`\nDisclaimer shown to customers: ${config.disclaimerText}`);
+    pushStable(`\nDisclaimer shown to customers: ${config.disclaimerText}`);
   }
 
-  const full = parts.join("\n\n");
-  console.log(`[prompt] chars=${full.length} knowledgeTypes=${Object.keys(knowledgeByType).length} vip=${customerContext ? "yes" : "no"}`);
+  // llm-owns: stable-per-shop sections first (cacheable prefix), then
+  // per-turn sections. Legacy: original single-array order, no split.
+  const stableText = stableParts.join("\n\n");
+  const full = llmOwns
+    ? [stableText, ...volatileParts].join("\n\n")
+    : parts.join("\n\n");
+  const stableLength = llmOwns && volatileParts.length > 0 ? stableText.length : 0;
+  console.log(
+    `[prompt] chars=${full.length} stable=${stableLength} ` +
+      `knowledgeTypes=${Object.keys(knowledgeByType).length} vip=${customerContext ? "yes" : "no"}`,
+  );
+  if (options.withCacheInfo) return { text: full, stableLength };
   return full;
 }
