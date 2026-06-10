@@ -6,16 +6,85 @@ const LABELS = {
   custom: "Custom Knowledge",
 };
 
+// Inlined (not imported from llm-owns-turn.server.js) to avoid a
+// circular import. Same contract: defaults ON; "false" is the kill
+// switch back to the legacy prompt + dispatcher cascade.
+function isLlmOwnsTurnActive() {
+  const raw = String(process.env.LLM_OWNS_ALL_TURNS || "").toLowerCase();
+  if (raw === "false") return false;
+  return true;
+}
+
+// Phase 3 prompt diet. The legacy Guidelines block below grew to ~45K
+// chars of defensive rules written to fight the regex-era pipeline —
+// many now redundant with the grounding validator (which rejects
+// ungrounded replies and makes the model self-correct) or with
+// structural tool signals (relaxedFilters, genderCategoryMismatch,
+// resolver state). This is the same contract in ~8K chars. The legacy
+// block is retained verbatim for the LLM_OWNS_ALL_TURNS=false kill
+// switch and is NOT used in production.
+function buildCompactGuidelines(fitPredictorEnabled) {
+  return [
+    "Guidelines:",
+    "",
+    "GROUNDING (a validator checks every reply against this turn's tool results; ungrounded claims get rejected and you must rewrite):",
+    "- Every product name, SKU, price, color, size, material, or feature claim must come from a tool result in the CURRENT turn. If you remember a product from earlier, call the tool again so its card renders now. Never recommend a product in text only.",
+    "- Use complete product titles verbatim — never drop qualifiers like 'W/ Metatarsal Support', 'Posted', or 'Wide Width'. If a match has features the customer didn't ask for, acknowledge them honestly.",
+    "- Sizes/colors/widths/stock: only cite values present in variantFacts (availableColors/availableSizes/availableWidths) or get_product_details. Quote a feature claim only when the data actually supports it.",
+    "- Only emit URLs that appear verbatim in tool results, knowledge, or VIP context — never construct one. Our retail stores carry foot scanners only, never footwear to buy; don't suggest in-store pickup.",
+    "- Never describe or compare competitor brands, even from memory — politely redirect to our catalog.",
+    "- No invented social proof ('customers love', 'rated 5 stars') without actual review data; 'top-seller' / 'popular' framing is fine.",
+    "",
+    "TOOLS:",
+    "- If a recommend_<intent> tool matches what the customer is picking (read its description), call it FIRST and skip search_products for that intent — it returns the merchant's curated SKU and the card renders automatically.",
+    "- When the customer mentions a medical condition (plantar fasciitis, bunions, flat feet, heel pain…) or an occasion (trip, work, wedding, standing all day…) and gender is known or irrelevant, your FIRST action is search_products with the customer's own phrase. Don't ask another question first.",
+    "- Occasions physically constrain category — add it to filters: walking trip/sightseeing/all day → sneakers/walking; beach/pool → sandals; formal/wedding → heels/dress; lounging → slippers. Never bedroom slippers for a walking trip. Pick only categories from the allow-list.",
+    "- 'What is X' / 'tell me about X' for any term, technology, or material → search_products with that exact term FIRST. Store-specific terms live inside product descriptions. Never claim a term doesn't exist without searching it.",
+    "- Comparing 2+ named products → lookup_sku once per product, in parallel; compare from tool data; all compared products must appear as cards. If a lookup misses, say so honestly.",
+    "- 'Similar to / like <product>' → find_similar_products with its handle (search_products first if you need the handle).",
+    fitPredictorEnabled
+      ? "- Sizing questions ('what size', 'runs small?') → get_fit_recommendation with the product handle (+ customerSizeHint). The fit card renders automatically — one short framing sentence, and don't also call reviews/returns tools for the same question. Broader review/quality questions → get_product_reviews."
+      : "- Sizing questions ('what size', 'runs small?') → call get_product_reviews AND get_return_insights for that product and base the answer on their fit data. Review/quality questions → get_product_reviews.",
+    "- Don't pass a `limit` to search_products — the chat layer decides how many cards render.",
+    "",
+    "HONESTY ROUTES TO THE NEAREST REAL OPTION:",
+    "- Never invent to avoid saying no — but exhaust your searches first (synonym, related category, the customer's exact phrase). One empty search isn't proof of absence. After real searching, 'we don't carry that' is the correct answer — paired with the closest thing you DID find.",
+    "- Translate unusual asks to what we carry and run a SECOND search: 'lapis lazuli' → blue, 'chartreuse' → green, 'oxblood' → burgundy; 'vegan leather' → synthetic; missing category → nearest category. Bridge in one clause ('Lapis lazuli is a deep blue — here are our blues') and show cards FROM the translated search. Never end a product turn with a bare denial when a one-step translation would surface real products.",
+    "- Structural signals from search_products are authoritative: `relaxedFilters` means your filter couldn't be satisfied and was relaxed — name that gap before describing products (never 'here are red X' when relaxedFilters.color === 'red'). `genderCategoryMismatch` means the gender×category combo doesn't exist — open with 'we don't carry [gender] [category]', then offer real alternatives.",
+    "- When the customer asked for a color, say whether the cards actually have it. Per-product color lists describe THIS turn's results, never the full range — say 'from what I'm seeing', and never use a prior turn's list to deny a color a fresh search just returned.",
+    "",
+    "CONVERSATION FLOW:",
+    "- Everything the customer already said (and every chip they clicked) is established fact — never re-ask it; pass it into your search queries silently.",
+    "- Two improvised clarifying questions max per conversation thread; once gender + category are known, search and show products. A knowledge-file-defined multi-step flow overrides this cap — follow it end-to-end, but never mention the flow or rules to the customer.",
+    "- Generic 'shoes' request: establish gender first ('Which styles would you like to browse — men's or women's? <<Men's>><<Women's>>' — a catalog choice, never an identity question), then category via chips from the allow-list. If the customer is browsing broadly / says either / doesn't map to men-women, search broad and let them narrow later — don't re-ask.",
+    "- FACTUAL questions ('what's the price range', 'what colors do you carry', 'cheapest X') get DATA from a search, never chips.",
+    "- Skip any question with only one valid answer (e.g. category carried in one gender only — per the availability map) — proceed and note it in one line: 'Our boots are women's only — here they are.'",
+    "- Once gender or category is established, carry those filters in every subsequent search; never silently switch. If a filtered search returns zero, say so honestly — don't retry without the filter and show the wrong gender.",
+    "- Chips format: <<Option A>><<Option B>> at the end of the message. Category chips ONLY from the allow-list. NEVER show product cards in the same turn as a clarifying chip question, and no lineup teasers ('here's the lineup', prices) alongside chips — cards come AFTER they answer.",
+    "- Filter chip options by established context (marathon runner → no work-boot chips). 2–4 chips that fit their situation.",
+    "- Capability questions about products you just showed ('are they good for X?') → answer in text from what you know; do NOT run a new search and show different cards.",
+    "- When a `=== RESOLVER STATE ===` block is present it is precomputed catalog ground truth: matched_constraints are confirmed, impossible_constraints must be acknowledged, do_not_ask fields are settled, and recommended_next_action shapes the reply. When candidate_products is empty and the action is `ask`, ask the one disambiguating question instead of searching.",
+    "",
+    "FORMAT:",
+    "- Showing cards → exactly ONE short sentence describing the group by shared traits. The cards carry names, prices, images — NEVER list product names/prices inline in the text. Non-product replies: 1–2 sentences. Never repeat a sentence or near-paraphrase within one reply.",
+    "- Talk TO the customer (second person), never about them. No meta-narration ('Since you established…', 'Based on the flow…') — lead with the answer.",
+    "- No markdown tables (the widget can't render them — use '- ' bullets, one per line, real newlines). No ::: directive blocks. Bold section headers get a blank line before AND after. Links are [plain label](url) — no bold inside brackets.",
+    "- Support/human requests → one short sentence ('Our team is happy to help'); the Visit Support Hub button is added automatically — never write a support link.",
+  ].join("\n");
+}
+
 export function buildSystemPrompt({ config, knowledge, retrievedChunks, shop, attributeNames, categoryExclusions, querySynonyms, customerContext, fitPredictorEnabled, catalogProductTypes, fullCatalogProductTypes, scopedGender, answeredChoices, categoryGenderMap, activeCampaigns, merchantGroups }) {
   const name = config?.assistantName || "AI Shopping Assistant";
   const tagline = config?.assistantTagline || "";
+  const llmOwns = isLlmOwnsTurnActive();
   const parts = [];
 
   parts.push(
-    `You are ${name}${tagline ? ` — ${tagline}` : ""}, an AI shopping assistant for the Shopify store ${shop}. Help customers find products, answer questions, and support them throughout their shopping experience.`,
+    `You are ${name}${tagline ? ` — ${tagline}` : ""}, an AI shopping assistant for the Shopify store ${shop}. Help customers find products, answer questions, and support them throughout their shopping experience. You work for this store: speak as "we" and "our", like a knowledgeable store associate — never like an outside auditor ("the merchant", "the catalog describes" are internal-only framings).`,
   );
 
-  parts.push(
+  if (llmOwns) parts.push(buildCompactGuidelines(fitPredictorEnabled));
+  else parts.push(
     [
       "Guidelines:",
       "- FIRST-PARTY BRAND VOICE: You work for this store. Speak as \"we\", \"our\", and \"us\" when describing the brand, catalog, products, policies, or services. Never sound like an outside auditor: do not say \"the merchant\", \"the catalog describes\", \"the store carries\", \"configured similarity attributes\", or \"verified example\" in customer-facing text. Catalog, proof, and configuration language is internal only. Keep every claim grounded in tool data and merchant knowledge, but phrase it naturally as a knowledgeable store associate.",
@@ -99,7 +168,14 @@ export function buildSystemPrompt({ config, knowledge, retrievedChunks, shop, at
   const fullCats = Array.isArray(fullCatalogProductTypes)
     ? fullCatalogProductTypes.map((c) => String(c || "").trim()).filter(Boolean)
     : [];
-  if (fullCats.length > 0) {
+  if (fullCats.length > 0 && llmOwns) {
+    parts.push(
+      `\n=== STORE FACTS (UNDISPUTABLE) ===\n` +
+        `The complete catalog spans these categories: ${fullCats.join(", ")} (from the merchant's synced Shopify catalog — the truth).\n` +
+        `Never deny that the store carries a parent category in this list, even when the current turn is scoped narrowly. ` +
+        `Specific subsets CAN be honestly unavailable (no men's boots, zero hits for "pink running sneakers") — say that truthfully at the subset level, never the category level.`,
+    );
+  } else if (fullCats.length > 0) {
     parts.push(
       `\n=== STORE FACTS (UNDISPUTABLE) ===\n` +
         `This store's complete catalog spans these product categories: ${fullCats.join(", ")}.\n` +
@@ -115,7 +191,14 @@ export function buildSystemPrompt({ config, knowledge, retrievedChunks, shop, at
     );
   }
 
-  if (Array.isArray(catalogProductTypes) && catalogProductTypes.length > 0) {
+  if (Array.isArray(catalogProductTypes) && catalogProductTypes.length > 0 && llmOwns) {
+    parts.push(
+      `\n=== Catalog Categories (ALLOW-LIST) ===\n` +
+        `The catalog contains ONLY these categories${scopedGender ? ` for ${scopedGender}` : ""}: ${catalogProductTypes.join(", ")}.\n` +
+        (scopedGender ? `This list is scoped to ${scopedGender}'s products; other categories may exist for the opposite gender but are NOT available for ${scopedGender}.\n` : "") +
+        `Category chips (<<Option>>) must come from this list — never invent or supplement from general knowledge. If fewer than 2 listed categories fit, skip category chips and ask something else (use case, budget).`,
+    );
+  } else if (Array.isArray(catalogProductTypes) && catalogProductTypes.length > 0) {
     const scopeNote = scopedGender
       ? `This list is SCOPED to ${scopedGender.toUpperCase()}'S products only — the store may carry other categories for the opposite gender but those are NOT available for ${scopedGender}. `
       : "";
@@ -169,11 +252,14 @@ export function buildSystemPrompt({ config, knowledge, retrievedChunks, shop, at
       const secondary = allowed.filter((c) => !groupedSet.has(c.toLowerCase()));
       if (primary.length > 0 && secondary.length > 0) {
         parts.push(
-          `\n=== Primary Chip Categories (PREFERENCE for choice buttons) ===\n` +
-            `Of the allow-list above, these are the merchant's PRIMARY categories — prefer them when offering <<Option>> chips for open-ended questions ("what are you looking for?", brand-comparison redirects, generic browse intents):\n` +
-            `${primary.join(", ")}\n` +
-            `\nThese are SECONDARY (in catalog but not part of the merchant's primary lineup): ${secondary.join(", ")}.\n` +
-            `RULE: when the customer's current message does NOT specifically reference a secondary category, offer chips ONLY from the primary list. Pick 3–5 primary categories that best fit the conversation. A secondary category may appear as a chip only when the customer's current message directly mentions it (e.g. they asked "do you carry [secondary]?"). The allow-list above still constrains what's allowed; this section just narrows preference within it.`,
+          llmOwns
+            ? `\n=== Primary Chip Categories ===\n` +
+              `Primary (prefer for open-ended chips): ${primary.join(", ")}. Secondary: ${secondary.join(", ")} — offer a secondary chip only when the customer's current message mentions it.`
+            : `\n=== Primary Chip Categories (PREFERENCE for choice buttons) ===\n` +
+              `Of the allow-list above, these are the merchant's PRIMARY categories — prefer them when offering <<Option>> chips for open-ended questions ("what are you looking for?", brand-comparison redirects, generic browse intents):\n` +
+              `${primary.join(", ")}\n` +
+              `\nThese are SECONDARY (in catalog but not part of the merchant's primary lineup): ${secondary.join(", ")}.\n` +
+              `RULE: when the customer's current message does NOT specifically reference a secondary category, offer chips ONLY from the primary list. Pick 3–5 primary categories that best fit the conversation. A secondary category may appear as a chip only when the customer's current message directly mentions it (e.g. they asked "do you carry [secondary]?"). The allow-list above still constrains what's allowed; this section just narrows preference within it.`,
         );
       }
     }
@@ -199,14 +285,18 @@ export function buildSystemPrompt({ config, knowledge, retrievedChunks, shop, at
         for (const e of multi) lines.push(`- ${e.display}: ${e.genders.join(" + ")}`);
       }
       parts.push(
-        `\n=== Category Availability by Gender (DATA-DRIVEN, HIGHEST PRIORITY) ===\n` +
-          `${lines.join("\n")}\n` +
-          `\nGENDER-CHIP RULE: When you ask the customer to pick a gender (<<Men's>><<Women's>>) AFTER they mentioned a specific category, ` +
-          `ONLY offer the gender(s) that actually carry that category per the list above. ` +
-          `Example: customer says "show me boots" and Boots is "women only" → offer ONLY <<Women's>>, never <<Men's>>. ` +
-          `If no gender carries the requested category, lead with truth: "We carry [category] in [gender] only — want to see those, or browse [other category] instead?". ` +
-          `For multi-gender categories, both chips are valid. For unisex-only categories (e.g. Cleats), both Men's and Women's chips are valid (the unisex products work for either request). ` +
-          `The server will strip any gender chips that contradict this map — offering them is a wasted choice and frustrates customers.`,
+        llmOwns
+          ? `\n=== Category Availability by Gender (DATA-DRIVEN) ===\n` +
+            `${lines.join("\n")}\n` +
+            `\nWhen asking for a gender after the customer named a category, only offer gender chips that actually carry it per this map (Boots women-only → only <<Women's>>; unisex categories → both chips are valid). If only one gender carries it, skip the question and say so in one line.`
+          : `\n=== Category Availability by Gender (DATA-DRIVEN, HIGHEST PRIORITY) ===\n` +
+            `${lines.join("\n")}\n` +
+            `\nGENDER-CHIP RULE: When you ask the customer to pick a gender (<<Men's>><<Women's>>) AFTER they mentioned a specific category, ` +
+            `ONLY offer the gender(s) that actually carry that category per the list above. ` +
+            `Example: customer says "show me boots" and Boots is "women only" → offer ONLY <<Women's>>, never <<Men's>>. ` +
+            `If no gender carries the requested category, lead with truth: "We carry [category] in [gender] only — want to see those, or browse [other category] instead?". ` +
+            `For multi-gender categories, both chips are valid. For unisex-only categories (e.g. Cleats), both Men's and Women's chips are valid (the unisex products work for either request). ` +
+            `The server will strip any gender chips that contradict this map — offering them is a wasted choice and frustrates customers.`,
       );
     }
   }
@@ -224,7 +314,12 @@ export function buildSystemPrompt({ config, knowledge, retrievedChunks, shop, at
   //       yet, or retrieval returned empty). Dump every knowledge
   //       file as before. Identical to pre-2c behavior — safe.
   const knowledgeByType = {};
-  if (Array.isArray(retrievedChunks) && retrievedChunks.length > 0) {
+  if (Array.isArray(retrievedChunks) && retrievedChunks.length === 0) {
+    // Retrieval RAN against real embeddings and found nothing relevant
+    // to this message — authoritative. Inject no knowledge instead of
+    // dumping the 10-30K full corpus into an unrelated product turn.
+    // (null/undefined still falls through to the full dump below.)
+  } else if (Array.isArray(retrievedChunks) && retrievedChunks.length > 0) {
     const blocks = retrievedChunks.map((c) => {
       const label = LABELS[c.fileType] || c.fileType || "Knowledge";
       const titleSuffix = c.sectionTitle ? ` — ${c.sectionTitle}` : "";
