@@ -96,6 +96,24 @@ test("gatherPoolFromMessages dedupes by handle across multiple tool calls", () =
   assert.equal(pool.length, 2);
 });
 
+test("gatherPoolFromResult prefers evidencePool over display pool (Reagan retry-storm fix)", () => {
+  // Live trace 2026-06-10: definition-question guard wiped 6 valid
+  // Reagan cards from turnResult.products. The validator must check
+  // against evidencePool — the model's actual tool evidence — so a
+  // grounded answer doesn't get flagged because a DISPLAY guard hid
+  // the cards.
+  const result = {
+    evidencePool: [
+      { handle: "reagan-black", title: "Reagan Ankle Boot - Black" },
+      { handle: "reagan-red", title: "Reagan Ankle Boot - Red" },
+    ],
+    turnResult: { products: [] }, // display guard wiped these
+  };
+  const pool = gatherPoolFromResult(result, []);
+  assert.equal(pool.length, 2);
+  assert.equal(pool[0].handle, "reagan-black");
+});
+
 test("gatherPoolFromResult reads turnResult.products first (live agent loop shape)", () => {
   // Live trace 2026-06-10: validator was reporting pool=0 even when
   // the reply had 5 cards because runAgenticLoop returns
