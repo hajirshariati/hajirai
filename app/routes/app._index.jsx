@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useLoaderData, useFetcher, Link } from "react-router";
 import {
   Page,
@@ -6,13 +6,11 @@ import {
   BlockStack,
   InlineStack,
   Text,
-  InlineGrid,
   Box,
   Button,
   Icon,
   Badge,
   Banner,
-  Divider,
 } from "@shopify/polaris";
 import { CheckCircleIcon } from "@shopify/polaris-icons";
 import { TitleBar } from "@shopify/app-bridge-react";
@@ -20,15 +18,15 @@ import { authenticate } from "../shopify.server";
 import { getShopConfig, getKnowledgeFiles, updateShopConfig } from "../models/ShopConfig.server";
 import { getCatalogSyncState, syncCatalogAsync } from "../models/Product.server";
 import { countEnrichmentsByShop } from "../models/ProductEnrichment.server";
-import { getUsageSummary } from "../models/ChatUsage.server";
+import { getUsageSummary, getDailySeries } from "../models/ChatUsage.server";
 import { getFeedbackSummary } from "../models/ChatFeedback.server";
-import { getConversionSummary } from "../models/ChatConversion.server";
+import { getConversionSummary, getConversionDailySeries } from "../models/ChatConversion.server";
 import { listDecisionTrees } from "../models/DecisionTree.server";
 import seosLogo from "../assets/SEoS.png";
 
 export const loader = async ({ request }) => {
   const { admin, session } = await authenticate.admin(request);
-  const [config, files, syncState, enrichmentCount, usage, feedback, conversions, decisionTrees] = await Promise.all([
+  const [config, files, syncState, enrichmentCount, usage, feedback, conversions, decisionTrees, dailySeries, conversionSeries] = await Promise.all([
     getShopConfig(session.shop),
     getKnowledgeFiles(session.shop),
     getCatalogSyncState(session.shop),
@@ -37,6 +35,8 @@ export const loader = async ({ request }) => {
     getFeedbackSummary(session.shop, 30),
     getConversionSummary(session.shop, 30),
     listDecisionTrees(session.shop).catch(() => []),
+    getDailySeries(session.shop, 30).catch(() => []),
+    getConversionDailySeries(session.shop, 30).catch(() => []),
   ]);
 
   if (!syncState.lastSyncedAt && syncState.status !== "running") {
@@ -59,8 +59,8 @@ export const loader = async ({ request }) => {
 
   // Catalog freshness: anything older than 7 days suggests the
   // merchant changed inventory but the sync didn't run. Surfaces in
-  // the home banner status cluster as 'Stale' to prompt a manual
-  // sync from Catalog → Refresh.
+  // the status cluster as 'Stale' to prompt a manual sync from
+  // Catalog → Refresh.
   const lastSyncedAt = syncState.lastSyncedAt
     ? new Date(syncState.lastSyncedAt).toISOString()
     : null;
@@ -107,6 +107,9 @@ export const loader = async ({ request }) => {
     hoursSinceSync,
     recommenderActive,
     enabledRecommenderCount,
+    // 30-day daily series for the metric strip sparklines / detail charts
+    dailySeries,
+    conversionSeries,
   };
 };
 
@@ -119,6 +122,390 @@ export const action = async ({ request }) => {
   }
   return null;
 };
+
+function formatCost(n) {
+  if (!n) return "$0.00";
+  if (n < 0.01) return "<$0.01";
+  if (n < 1000) return `$${n.toFixed(2)}`;
+  return `$${n.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
+}
+
+function formatRevenue(n, currency) {
+  const code = (currency && String(currency).trim()) || "USD";
+  try {
+    return new Intl.NumberFormat(undefined, {
+      style: "currency",
+      currency: code,
+      maximumFractionDigits: n >= 1000 ? 0 : 2,
+    }).format(n || 0);
+  } catch {
+    return `${code} ${(n || 0).toFixed(2)}`;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Globe — slow-spinning dotted sphere on a <canvas>, drawn in brand greens.
+// Points are distributed with a Fibonacci sphere, rotated around Y with a
+// gentle axial tilt, and projected orthographically. Front-facing dots are
+// brighter and larger; back-facing dots fade out, which is what reads as a
+// 3-D globe without any 3-D library. Respects prefers-reduced-motion by
+// rendering one static frame.
+// ---------------------------------------------------------------------------
+function Globe({ size = 280 }) {
+  const ref = useRef(null);
+  useEffect(() => {
+    const canvas = ref.current;
+    if (!canvas) return;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = size * dpr;
+    canvas.height = size * dpr;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    ctx.scale(dpr, dpr);
+
+    const N = 800;
+    const pts = [];
+    const golden = Math.PI * (3 - Math.sqrt(5));
+    for (let i = 0; i < N; i++) {
+      const y = 1 - (i / (N - 1)) * 2;
+      const r = Math.sqrt(Math.max(0, 1 - y * y));
+      const th = golden * i;
+      pts.push([Math.cos(th) * r, y, Math.sin(th) * r]);
+    }
+    const R = size / 2 - 10;
+    const cx = size / 2;
+    const cy = size / 2;
+    const tilt = -0.4;
+    const cosT = Math.cos(tilt);
+    const sinT = Math.sin(tilt);
+
+    const drawFrame = (rot) => {
+      ctx.clearRect(0, 0, size, size);
+      // Soft inner sphere shading so the dot field sits on a body.
+      const grad = ctx.createRadialGradient(cx - R * 0.35, cy - R * 0.35, R * 0.1, cx, cy, R);
+      grad.addColorStop(0, "rgba(58,138,102,0.16)");
+      grad.addColorStop(0.7, "rgba(45,107,79,0.08)");
+      grad.addColorStop(1, "rgba(45,107,79,0.02)");
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(cx, cy, R, 0, Math.PI * 2);
+      ctx.fill();
+
+      const cosR = Math.cos(rot);
+      const sinR = Math.sin(rot);
+      for (const [x, y, z] of pts) {
+        // Spin around Y, then tilt around X.
+        const xr = x * cosR + z * sinR;
+        const zr = -x * sinR + z * cosR;
+        const yr = y * cosT - zr * sinT;
+        const zt = y * sinT + zr * cosT;
+        const depth = (zt + 1) / 2; // 0 = back, 1 = front
+        const sx = cx + xr * R;
+        const sy = cy + yr * R;
+        const alpha = 0.06 + depth * 0.78;
+        ctx.fillStyle = depth > 0.72
+          ? `rgba(58,138,102,${alpha})`
+          : `rgba(45,107,79,${alpha})`;
+        ctx.beginPath();
+        ctx.arc(sx, sy, 0.6 + depth * 1.25, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    };
+
+    const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+    if (reduced) {
+      drawFrame(0.6);
+      return undefined;
+    }
+    let raf;
+    const loop = (t) => {
+      drawFrame(t * 0.00013);
+      raf = requestAnimationFrame(loop);
+    };
+    raf = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(raf);
+  }, [size]);
+
+  return (
+    <canvas
+      ref={ref}
+      aria-hidden="true"
+      style={{ width: size, height: size, display: "block" }}
+    />
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Sparkline — tiny inline area chart used inside each metric cell.
+// ---------------------------------------------------------------------------
+function Sparkline({ points, width = 104, height = 28, id }) {
+  if (!points || points.length < 2) return <div style={{ width, height }} />;
+  const max = Math.max(...points);
+  const min = Math.min(...points);
+  const range = max - min || 1;
+  const stepX = width / (points.length - 1);
+  const coords = points.map((v, i) => [
+    i * stepX,
+    height - 3 - ((v - min) / range) * (height - 6),
+  ]);
+  const line = coords.map(([x, y], i) => `${i === 0 ? "M" : "L"}${x.toFixed(1)},${y.toFixed(1)}`).join(" ");
+  const area = `${line} L${width},${height} L0,${height} Z`;
+  const gid = `seos-spark-${id}`;
+  return (
+    <svg width={width} height={height} aria-hidden="true" style={{ display: "block" }}>
+      <defs>
+        <linearGradient id={gid} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#2D6B4F" stopOpacity="0.28" />
+          <stop offset="100%" stopColor="#2D6B4F" stopOpacity="0" />
+        </linearGradient>
+      </defs>
+      <path d={area} fill={`url(#${gid})`} />
+      <path d={line} fill="none" stroke="#2D6B4F" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// DetailChart — the large area chart revealed when a metric is hovered.
+// Includes a hover crosshair that snaps to the nearest day and shows the
+// exact value, so the strip works as a real mini-dashboard, not decoration.
+// ---------------------------------------------------------------------------
+function DetailChart({ metric }) {
+  const [hover, setHover] = useState(null);
+  const series = metric.series || [];
+  const W = 1000;
+  const H = 220;
+  const PAD = 12;
+  const values = series.map((p) => p.value);
+  const max = Math.max(...values, 1);
+  const min = Math.min(...values, 0);
+  const range = max - min || 1;
+  const stepX = (W - PAD * 2) / Math.max(series.length - 1, 1);
+  const coords = values.map((v, i) => [
+    PAD + i * stepX,
+    H - 24 - ((v - min) / range) * (H - 52),
+  ]);
+  const line = coords.map(([x, y], i) => `${i === 0 ? "M" : "L"}${x.toFixed(1)},${y.toFixed(1)}`).join(" ");
+  const area = `${line} L${W - PAD},${H - 18} L${PAD},${H - 18} Z`;
+
+  const onMove = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const frac = (e.clientX - rect.left) / rect.width;
+    const idx = Math.max(0, Math.min(series.length - 1, Math.round(frac * (series.length - 1))));
+    setHover(idx);
+  };
+
+  const fmtDay = (d) => {
+    try {
+      return new Date(`${d}T00:00:00Z`).toLocaleDateString(undefined, { month: "short", day: "numeric", timeZone: "UTC" });
+    } catch {
+      return d;
+    }
+  };
+
+  const hovered = hover !== null ? series[hover] : null;
+
+  return (
+    <div className="seos-detail-inner">
+      <div className="seos-detail-head">
+        <div>
+          <div className="seos-detail-label">{metric.label} · last 30 days</div>
+          <div className="seos-detail-value">{metric.value}</div>
+          {metric.sublabel ? <div className="seos-detail-sub">{metric.sublabel}</div> : null}
+        </div>
+        {hovered ? (
+          <div className="seos-detail-readout">
+            <span className="seos-detail-readout-date">{fmtDay(hovered.date)}</span>
+            <span className="seos-detail-readout-value">{metric.format(hovered.value)}</span>
+          </div>
+        ) : (
+          <div className="seos-detail-readout seos-detail-readout-hint">Hover the chart for daily detail</div>
+        )}
+      </div>
+      <div className="seos-detail-chart" onMouseMove={onMove} onMouseLeave={() => setHover(null)}>
+        <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" style={{ display: "block", width: "100%", height: "100%" }}>
+          <defs>
+            <linearGradient id="seos-detail-fill" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#2D6B4F" stopOpacity="0.30" />
+              <stop offset="100%" stopColor="#2D6B4F" stopOpacity="0.02" />
+            </linearGradient>
+          </defs>
+          {[0.25, 0.5, 0.75].map((f) => (
+            <line key={f} x1={PAD} x2={W - PAD} y1={28 + (H - 52) * f} y2={28 + (H - 52) * f} stroke="rgba(0,0,0,0.06)" strokeWidth="1" />
+          ))}
+          <path d={area} fill="url(#seos-detail-fill)" />
+          <path d={line} fill="none" stroke="#2D6B4F" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
+          {hovered && coords[hover] ? (
+            <line x1={coords[hover][0]} x2={coords[hover][0]} y1={20} y2={H - 18} stroke="rgba(45,107,79,0.45)" strokeWidth="1.4" vectorEffect="non-scaling-stroke" />
+          ) : null}
+        </svg>
+        {hovered && coords[hover] ? (
+          // The SVG stretches non-uniformly (preserveAspectRatio="none"),
+          // which would squash a <circle> into an ellipse — so the hover
+          // dot is an HTML overlay positioned in percent space instead.
+          <div
+            aria-hidden="true"
+            style={{
+              position: "absolute",
+              left: `${(coords[hover][0] / W) * 100}%`,
+              top: `${(coords[hover][1] / H) * 100}%`,
+              width: 10,
+              height: 10,
+              borderRadius: "50%",
+              background: "#2D6B4F",
+              border: "2px solid #fff",
+              boxShadow: "0 0 0 3px rgba(45,107,79,0.18)",
+              transform: "translate(-50%, -50%)",
+              pointerEvents: "none",
+            }}
+          />
+        ) : null}
+      </div>
+      <div className="seos-detail-axis">
+        <span>{series.length > 0 ? fmtDay(series[0].date) : ""}</span>
+        <span>{series.length > 0 ? fmtDay(series[series.length - 1].date) : ""}</span>
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// MetricStrip — the Shopify-style stats bar. Hovering a cell smoothly
+// expands a detail panel underneath with the full 30-day chart. The panel
+// keeps rendering the last active metric while collapsing so the close
+// animation doesn't snap.
+// ---------------------------------------------------------------------------
+function MetricStrip({ metrics }) {
+  const [active, setActive] = useState(null);
+  const [lastActive, setLastActive] = useState(0);
+  const closeTimer = useRef(null);
+
+  const open = (i) => {
+    if (closeTimer.current) clearTimeout(closeTimer.current);
+    setActive(i);
+    setLastActive(i);
+  };
+  const scheduleClose = () => {
+    if (closeTimer.current) clearTimeout(closeTimer.current);
+    closeTimer.current = setTimeout(() => setActive(null), 220);
+  };
+  useEffect(() => () => closeTimer.current && clearTimeout(closeTimer.current), []);
+
+  return (
+    <div
+      className="seos-metrics-wrap"
+      onMouseLeave={scheduleClose}
+      onMouseEnter={() => closeTimer.current && clearTimeout(closeTimer.current)}
+    >
+      <div className="seos-metrics" role="group" aria-label="Last 30 days at a glance">
+        {metrics.map((m, i) => (
+          <button
+            key={m.label}
+            type="button"
+            className={"seos-metric" + (active === i ? " is-active" : "")}
+            onMouseEnter={() => open(i)}
+            onFocus={() => open(i)}
+            onClick={() => open(i)}
+          >
+            <span className="seos-metric-label">{m.label}</span>
+            <span className="seos-metric-value">{m.value}</span>
+            <span className="seos-metric-spark">
+              <Sparkline points={(m.series || []).map((p) => p.value)} id={i} />
+            </span>
+          </button>
+        ))}
+      </div>
+      <div className={"seos-metric-detail" + (active !== null ? " is-open" : "")} aria-hidden={active === null}>
+        <div className="seos-metric-detail-clip">
+          {metrics[active !== null ? active : lastActive] ? (
+            <DetailChart metric={metrics[active !== null ? active : lastActive]} />
+          ) : null}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// StatusCluster — the pip row carried over from the previous design,
+// restyled for the new light header. Healthy pips read calm (green dot),
+// off pips read quiet, warning / critical pips glow.
+// ---------------------------------------------------------------------------
+function StatusCluster({ items }) {
+  const TONE = {
+    success:  { dot: "#2D6B4F", cls: "" },
+    subdued:  { dot: "#B5BCC4", cls: " seos-pip-off" },
+    warning:  { dot: "#B98900", cls: " seos-pip-warn" },
+    critical: { dot: "#D72C0D", cls: " seos-pip-crit" },
+  };
+  return (
+    <div role="group" aria-label="System status" className="seos-status-bar">
+      {items.map((it) => {
+        const t = TONE[it.tone] || TONE.subdued;
+        const isAttention = it.tone === "warning" || it.tone === "critical";
+        const labelText = `${it.label}${isAttention ? ` · ${it.value}` : ""}`;
+        const tooltip = `${it.label}: ${it.value}${it.tooltip ? " — " + it.tooltip : ""}`;
+        const className = "seos-pip" + t.cls;
+        const inner = (
+          <>
+            <span
+              aria-hidden="true"
+              className={it.tone === "critical" ? "seos-pip-dot seos-pip-pulse" : "seos-pip-dot"}
+              style={{ background: t.dot }}
+            />
+            <span className="seos-pip-label">{labelText}</span>
+          </>
+        );
+        if (!it.url) {
+          return <span key={it.label} className={className} title={tooltip}>{inner}</span>;
+        }
+        if (it.external) {
+          return (
+            <a key={it.label} className={className} href={it.url} target="_blank" rel="noopener noreferrer" title={tooltip}>
+              {inner}
+            </a>
+          );
+        }
+        return (
+          <Link key={it.label} className={className} to={it.url} title={tooltip}>{inner}</Link>
+        );
+      })}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// ActionCard — the card-grid blocks below the metrics. Apple-clean: soft
+// border, gentle hover lift, arrow that slides on hover.
+// ---------------------------------------------------------------------------
+function ActionCard({ emoji, title, description, cta, url, external, stat }) {
+  const inner = (
+    <>
+      <div className="seos-card-top">
+        <div className="seos-card-icon" aria-hidden="true">{emoji}</div>
+        {stat ? <span className="seos-card-stat">{stat}</span> : null}
+      </div>
+      <div className="seos-card-title">{title}</div>
+      <div className="seos-card-desc">{description}</div>
+      <div className="seos-card-cta">
+        {cta}
+        <span className="seos-card-arrow" aria-hidden="true">→</span>
+      </div>
+    </>
+  );
+  if (external) {
+    return (
+      <a className="seos-card" href={url} target="_blank" rel="noopener noreferrer">
+        {inner}
+      </a>
+    );
+  }
+  return (
+    <Link className="seos-card" to={url}>
+      {inner}
+    </Link>
+  );
+}
 
 function StepCircle({ done, number }) {
   if (done) {
@@ -297,275 +684,12 @@ function ChecklistItem({ done, number, title, description, actionLabel, actionUr
   );
 }
 
-function FeatureCard({ icon, title, description, stat }) {
-  return (
-    <Card>
-      <BlockStack gap="300">
-        <InlineStack gap="300" blockAlign="center">
-          <div style={{
-            width: "36px", height: "36px", flexShrink: 0,
-            display: "flex", alignItems: "center", justifyContent: "center",
-            borderRadius: "10px", background: "rgba(45,107,79,0.1)",
-            fontSize: "18px",
-          }}>
-            {icon}
-          </div>
-          <Text as="h3" variant="headingSm">{title}</Text>
-        </InlineStack>
-        <Text as="p" tone="subdued" variant="bodySm">{description}</Text>
-        {stat && (
-          <Box paddingBlockStart="100">
-            <Badge tone="info">{stat}</Badge>
-          </Box>
-        )}
-      </BlockStack>
-    </Card>
-  );
-}
-
-function formatCost(n) {
-  if (!n) return "$0.00";
-  if (n < 0.01) return "<$0.01";
-  if (n < 1000) return `$${n.toFixed(2)}`;
-  return `$${n.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
-}
-
-function formatRevenue(n, currency) {
-  const code = (currency && String(currency).trim()) || "USD";
-  try {
-    return new Intl.NumberFormat(undefined, {
-      style: "currency",
-      currency: code,
-      maximumFractionDigits: n >= 1000 ? 0 : 2,
-    }).format(n || 0);
-  } catch {
-    return `${code} ${(n || 0).toFixed(2)}`;
-  }
-}
-
-// HeroStatusCluster — gauge-cluster pattern rendered INSIDE the green
-// hero banner. Every system is always present, but healthy / off
-// states are nearly invisible (low-opacity dot, faded label) so the
-// hero reads as a clean banner at a glance. Only WARNING and CRITICAL
-// pips light up — coloured dot, halo glow, bright label — pulling the
-// eye exactly where action is needed. Click any pip to jump to the
-// page that manages it. This replaces the separate "System status"
-// card that used to live below the hero (now removed as a duplicate).
-function HeroStatusCluster({ items }) {
-  // Visual states the pips can be in. Active/healthy pips read bright
-  // and confident; off pips read quiet (gentle white). Attention pips
-  // get a coloured dot + halo glow, with the pill itself rim-coloured
-  // via the .seos-pip-warn / .seos-pip-crit classes.
-  const TONE = {
-    success:  { dot: "rgba(255,255,255,0.95)", label: "rgba(255,255,255,0.95)", glow: "none",                                            cls: "" },
-    subdued:  { dot: "rgba(255,255,255,0.45)", label: "rgba(255,255,255,0.55)", glow: "none",                                            cls: " seos-pip-off" },
-    warning:  { dot: "#FFD479",                label: "rgba(255,255,255,1.00)", glow: "0 0 0 3px rgba(255,196,83,0.30), 0 0 10px rgba(255,196,83,0.55)", cls: " seos-pip-warn" },
-    critical: { dot: "#FF7866",                label: "rgba(255,255,255,1.00)", glow: "0 0 0 3px rgba(255,120,102,0.40), 0 0 12px rgba(255,120,102,0.70)", cls: " seos-pip-crit" },
-  };
-  return (
-    <div role="group" aria-label="System status" className="seos-status-bar">
-      {items.map((it) => {
-        const t = TONE[it.tone] || TONE.subdued;
-        const isAttention = it.tone === "warning" || it.tone === "critical";
-        const labelText = `${it.label}${isAttention ? ` · ${it.value}` : ""}`;
-        const tooltip = `${it.label}: ${it.value}${it.tooltip ? " — " + it.tooltip : ""}`;
-        const className = "seos-pip" + t.cls;
-        const inner = (
-          <>
-            <span
-              aria-hidden="true"
-              className={it.tone === "critical" ? "seos-pip-dot seos-pip-pulse" : "seos-pip-dot"}
-              style={{ background: t.dot, boxShadow: t.glow }}
-            />
-            <span
-              className="seos-pip-label"
-              style={{ color: t.label, fontWeight: isAttention ? 700 : 600 }}
-            >
-              {labelText}
-            </span>
-          </>
-        );
-        if (!it.url) {
-          return <span key={it.label} className={className} title={tooltip}>{inner}</span>;
-        }
-        if (it.external) {
-          return (
-            <a key={it.label} className={className} href={it.url} target="_blank" rel="noopener noreferrer" title={tooltip}>
-              {inner}
-            </a>
-          );
-        }
-        return (
-          <Link key={it.label} className={className} to={it.url} title={tooltip}>{inner}</Link>
-        );
-      })}
-    </div>
-  );
-}
-
-// Retained for backward-compat — the old StatusPanel section below the
-// hero is no longer rendered (the gauge cluster inside the hero is
-// the new at-a-glance view). Kept as a no-op so any import elsewhere
-// doesn't break; if nothing imports it, it's dead code we can prune
-// later.
-function StatusPanel({ items }) {
-  // "Check-engine light" pattern: tiles stay visually quiet when
-  // everything is healthy (small grey dot, minimal accent) so the
-  // dashboard reads calmly at a glance. Only WARNING and CRITICAL
-  // tiles light up — coloured left border, coloured chip, subtle glow
-  // on the dot — drawing the eye exactly where action is needed.
-  // SUBDUED (a feature that's simply off) shares the quiet treatment.
-  const TONE = {
-    // Quiet states — barely there. Healthy is the default; subdued is
-    // for optional features the merchant hasn't enabled.
-    success:  { dot: "#8C9196", border: "#E1E3E5", chipBg: "transparent", chipFg: "#5C5F62", glow: false },
-    subdued:  { dot: "#C9CCCF", border: "#E1E3E5", chipBg: "transparent", chipFg: "#8C9196", glow: false },
-    // Attention states — these glow.
-    warning:  { dot: "#B85C00", border: "#FFC453", chipBg: "#FFF3D6", chipFg: "#7A4100", glow: true },
-    critical: { dot: "#D72C0D", border: "#D72C0D", chipBg: "#FFEAE5", chipFg: "#8C1F11", glow: true },
-  };
-  const attentionCount = items.filter((it) => it.tone === "critical" || it.tone === "warning").length;
-  const allHealthy = attentionCount === 0;
-  return (
-    <Card padding="0">
-      <Box padding="400" borderBlockEndWidth="025" borderColor="border">
-        <InlineStack align="space-between" blockAlign="center" wrap>
-          <InlineStack gap="200" blockAlign="center">
-            <Text as="h2" variant="headingMd">System status</Text>
-            {!allHealthy && (
-              <Badge tone={items.some((it) => it.tone === "critical") ? "critical" : "warning"}>
-                {`${attentionCount} item${attentionCount > 1 ? "s" : ""} need${attentionCount > 1 ? "" : "s"} attention`}
-              </Badge>
-            )}
-          </InlineStack>
-          {allHealthy ? (
-            <Text as="span" variant="bodySm" tone="subdued">
-              All clear · click any tile to manage
-            </Text>
-          ) : (
-            <Text as="span" variant="bodySm" tone="subdued">
-              Click any tile to manage.
-            </Text>
-          )}
-        </InlineStack>
-      </Box>
-      <Box padding="400">
-        <InlineGrid columns={{ xs: 1, sm: 2, md: 3 }} gap="300">
-          {items.map((it) => {
-            const t = TONE[it.tone] || TONE.subdued;
-            const isAttention = it.tone === "warning" || it.tone === "critical";
-            const inner = (
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 8,
-                  padding: "14px 16px",
-                  borderRadius: 12,
-                  background: "var(--p-color-bg-surface)",
-                  border: "1px solid var(--p-color-border)",
-                  borderLeft: `4px solid ${t.border}`,
-                  cursor: it.url ? "pointer" : "default",
-                  transition: "transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease",
-                  height: "100%",
-                  minHeight: 78,
-                  // Attention tiles get a soft outer glow ring so they
-                  // pull the eye without screaming. Quiet tiles stay
-                  // flat — the check-engine-light pattern.
-                  boxShadow: isAttention ? `0 0 0 1px ${t.border}33, 0 0 12px ${t.dot}1f` : "none",
-                }}
-                onMouseEnter={(e) => {
-                  if (!it.url) return;
-                  e.currentTarget.style.background = "var(--p-color-bg-surface-secondary)";
-                  e.currentTarget.style.boxShadow = isAttention
-                    ? `0 0 0 1px ${t.border}55, 0 0 14px ${t.dot}33`
-                    : "0 2px 6px rgba(0,0,0,0.06)";
-                }}
-                onMouseLeave={(e) => {
-                  if (!it.url) return;
-                  e.currentTarget.style.background = "var(--p-color-bg-surface)";
-                  e.currentTarget.style.boxShadow = isAttention
-                    ? `0 0 0 1px ${t.border}33, 0 0 12px ${t.dot}1f`
-                    : "none";
-                }}
-                title={it.tooltip || ""}
-              >
-                <InlineStack gap="200" blockAlign="center" wrap={false}>
-                  <span
-                    style={{
-                      width: 10, height: 10, borderRadius: "50%",
-                      background: t.dot, flexShrink: 0,
-                      // Only attention tiles get the halo (the "glow").
-                      boxShadow: t.glow ? `0 0 0 3px ${t.dot}33` : "none",
-                    }}
-                    aria-hidden="true"
-                  />
-                  <Text as="span" variant="bodySm" tone="subdued" fontWeight="semibold">
-                    {it.label.toUpperCase()}
-                  </Text>
-                </InlineStack>
-                <div
-                  style={{
-                    display: "inline-flex",
-                    alignSelf: "flex-start",
-                    padding: t.chipBg === "transparent" ? "0" : "3px 10px",
-                    borderRadius: t.chipBg === "transparent" ? "0" : 999,
-                    background: t.chipBg,
-                    color: t.chipFg,
-                    fontSize: 13,
-                    fontWeight: t.chipBg === "transparent" ? 500 : 600,
-                    lineHeight: 1.3,
-                  }}
-                >
-                  {it.value}
-                </div>
-              </div>
-            );
-            if (!it.url) return <div key={it.label}>{inner}</div>;
-            // External URLs need target=_blank to escape the iframe;
-            // internal admin paths must use react-router Link to keep
-            // the App Bridge session token alive (raw <a> drops it
-            // and bounces to the 'Install from a Shopify-owned
-            // surface' fallback).
-            if (it.external) {
-              return (
-                <a
-                  key={it.label}
-                  href={it.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{ textDecoration: "none", color: "inherit" }}
-                >
-                  {inner}
-                </a>
-              );
-            }
-            return (
-              <Link
-                key={it.label}
-                to={it.url}
-                style={{ textDecoration: "none", color: "inherit" }}
-              >
-                {inner}
-              </Link>
-            );
-          })}
-        </InlineGrid>
-      </Box>
-    </Card>
-  );
-}
-
-function MetricTile({ label, value, sublabel }) {
-  return (
-    <Card>
-      <BlockStack gap="100">
-        <Text as="p" tone="subdued" variant="bodySm">{label}</Text>
-        <Text as="p" variant="heading2xl">{value}</Text>
-        {sublabel ? <Text as="p" tone="subdued" variant="bodySm">{sublabel}</Text> : null}
-      </BlockStack>
-    </Card>
-  );
+function timeGreeting() {
+  const h = new Date().getHours();
+  if (h < 5) return "Working late";
+  if (h < 12) return "Good morning";
+  if (h < 17) return "Good afternoon";
+  return "Good evening";
 }
 
 export default function Home() {
@@ -577,11 +701,18 @@ export default function Home() {
     conversionCount, conversionRevenue, conversionCurrency,
     catalogSyncStatus, lastSyncedAt, hoursSinceSync,
     recommenderActive, enabledRecommenderCount,
+    dailySeries, conversionSeries,
   } = useLoaderData();
 
-  // Build the status-cluster items shown in the hero banner. Each
-  // item has tone (success/warning/critical/subdued), short value
-  // text, optional tooltip, and a click target (URL). Order is from
+  // Server renders with server-clock greeting; correct to the merchant's
+  // local time after mount. The swap happens before the entrance
+  // animation finishes, so it's invisible in practice.
+  const [greeting, setGreeting] = useState(timeGreeting);
+  useEffect(() => { setGreeting(timeGreeting()); }, []);
+
+  // Build the status-cluster items shown under the greeting. Each item
+  // has tone (success/warning/critical/subdued), short value text,
+  // optional tooltip, and a click target (URL). Order is from
   // most-likely-to-need-attention down to nice-to-have.
   const statusItems = (() => {
     const items = [];
@@ -629,256 +760,543 @@ export default function Home() {
     return items;
   })();
 
+  // Metric strip definitions. Each metric carries its 30-day daily
+  // series (date + value) for the sparkline and the hover detail chart.
+  const metrics = useMemo(() => {
+    const days = Array.isArray(dailySeries) ? dailySeries : [];
+    const conv = Array.isArray(conversionSeries) ? conversionSeries : [];
+    const fmtInt = (v) => String(Math.round(v));
+    return [
+      {
+        label: "Chat-driven revenue",
+        value: conversionCount > 0 ? formatRevenue(conversionRevenue, conversionCurrency) : "—",
+        sublabel: conversionCount > 0
+          ? `${conversionCount} order${conversionCount === 1 ? "" : "s"} attributed to chat (tagged "SEoS")`
+          : 'Tracked via the SEoS order tag — awaiting first chat-attributed order',
+        series: conv.map((d) => ({ date: d.date, value: d.revenue })),
+        format: (v) => formatRevenue(v, conversionCurrency),
+      },
+      {
+        label: "Chat-driven orders",
+        value: String(conversionCount || 0),
+        sublabel: conversionCount > 0 ? 'Orders tagged "SEoS" in Shopify' : "Awaiting first chat-attributed order",
+        series: conv.map((d) => ({ date: d.date, value: d.count })),
+        format: fmtInt,
+      },
+      {
+        label: "AI requests",
+        value: String(totalMessages),
+        sublabel: totalMessages > 0 ? `Avg ${formatCost(avgCostPerMessage)} per request` : "Awaiting first chat",
+        series: days.map((d) => ({ date: d.date, value: d.messages })),
+        format: fmtInt,
+      },
+      {
+        label: "Satisfaction",
+        value: feedbackTotal > 0 ? `${satisfactionRate}%` : "—",
+        sublabel: feedbackTotal > 0 ? `${feedbackTotal} customer ratings · chart shows 👍 per day` : "Awaiting first customer rating",
+        series: days.map((d) => ({ date: d.date, value: d.up })),
+        format: fmtInt,
+      },
+      {
+        label: "AI cost",
+        value: formatCost(totalCost),
+        sublabel: "Anthropic API spend, billed pay-as-you-go",
+        series: days.map((d) => ({ date: d.date, value: d.cost })),
+        format: (v) => formatCost(v),
+      },
+    ];
+  }, [dailySeries, conversionSeries, conversionCount, conversionRevenue, conversionCurrency, totalMessages, avgCostPerMessage, feedbackTotal, satisfactionRate, totalCost]);
+
   const rateFetcher = useFetcher();
   const rateDismissed = rateFetcher.state !== "idle" || rateFetcher.data?.dismissed;
   const showRateLimit = rateLimitHits > 0 && !rateDismissed;
 
+  const greetWords = `${greeting}.`.split(" ");
+
   return (
     <Page>
       <TitleBar title="SEoS Assistant" />
-      {/* Styles for the hero status cluster. Each pip is a real
-          pill-shaped button with a persistent subtle background, so
-          it reads as actionable at rest (no separators needed). Hover
-          lifts the background; attention states still glow. */}
       <style>{`
+        /* ------------------------------------------------------------------
+           Home page — Apple-clean, futuristic-AI styling.
+           Brand green #2D6B4F with #3a8a66 as the light end.
+        ------------------------------------------------------------------ */
+        .seos-home { position: relative; }
+
+        /* Hero: greeting left, globe top-right, soft green aura. */
+        .seos-hero {
+          position: relative;
+          border-radius: 16px;
+          padding: 28px 32px 22px;
+          overflow: hidden;
+          background:
+            radial-gradient(1100px 420px at 85% -60%, rgba(58,138,102,0.16), rgba(58,138,102,0) 60%),
+            radial-gradient(700px 320px at -10% 120%, rgba(45,107,79,0.07), rgba(45,107,79,0) 60%),
+            linear-gradient(180deg, #ffffff 0%, #fafcfb 100%);
+          border: 1px solid rgba(45,107,79,0.14);
+        }
+        .seos-hero-brand {
+          display: inline-flex;
+          align-items: center;
+          gap: 10px;
+          margin-bottom: 14px;
+        }
+        .seos-hero-brand img { display: block; height: 30px; width: auto; }
+        .seos-hero-brand-name {
+          font-size: 12px;
+          font-weight: 650;
+          letter-spacing: 1.4px;
+          text-transform: uppercase;
+          color: #2D6B4F;
+        }
+        .seos-hero-brand-tag {
+          font-size: 12px;
+          color: rgba(26,46,38,0.55);
+          border-left: 1px solid rgba(45,107,79,0.25);
+          padding-left: 10px;
+        }
+        .seos-greet {
+          margin: 0;
+          font-size: 30px;
+          line-height: 1.18;
+          font-weight: 650;
+          letter-spacing: -0.4px;
+          color: #1a2e26;
+          max-width: 560px;
+        }
+        .seos-greet .seos-word {
+          display: inline-block;
+          opacity: 0;
+          transform: translateY(10px);
+          animation: seos-rise 0.55s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
+        }
+        .seos-subgreet {
+          margin-top: 8px;
+          font-size: 14px;
+          color: rgba(26,46,38,0.62);
+          max-width: 520px;
+          opacity: 0;
+          animation: seos-rise 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) 0.28s forwards;
+        }
+        @keyframes seos-rise {
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .seos-globe-slot {
+          position: absolute;
+          top: 0;
+          right: 0;
+          transform: translate(26%, -24%);
+          pointer-events: none;
+          filter: drop-shadow(0 0 28px rgba(58,138,102,0.25));
+        }
+        @media (max-width: 760px) {
+          .seos-globe-slot { display: none; }
+          .seos-greet { font-size: 24px; }
+        }
+
+        /* Status pips — light theme. */
         .seos-status-bar {
           display: flex;
           flex-wrap: wrap;
           align-items: center;
           gap: 8px;
-          padding-top: 6px;
+          padding-top: 18px;
+          position: relative;
+          z-index: 1;
         }
         .seos-pip {
           display: inline-flex;
           align-items: center;
           gap: 8px;
-          padding: 5px 11px;
+          padding: 6px 12px;
           border-radius: 999px;
-          background: rgba(255, 255, 255, 0.11);
-          border: 1px solid rgba(255, 255, 255, 0.16);
+          background: rgba(45,107,79,0.06);
+          border: 1px solid rgba(45,107,79,0.16);
           text-decoration: none !important;
-          color: inherit !important;
+          color: #1a2e26 !important;
           line-height: 1;
           user-select: none;
           cursor: pointer;
-          transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+          transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
           outline: none;
         }
         .seos-pip:hover {
-          background: rgba(255, 255, 255, 0.22);
-          border-color: rgba(255, 255, 255, 0.35);
+          background: rgba(45,107,79,0.12);
+          border-color: rgba(45,107,79,0.35);
           transform: translateY(-1px);
+          box-shadow: 0 2px 8px rgba(45,107,79,0.12);
         }
         .seos-pip:focus-visible {
-          background: rgba(255, 255, 255, 0.22);
-          border-color: rgba(255, 255, 255, 0.55);
-          box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.45);
+          border-color: rgba(45,107,79,0.6);
+          box-shadow: 0 0 0 2px rgba(45,107,79,0.3);
         }
-        /* Off / not configured: same shape, but the background drops
-           so the pip reads "available but inactive" without competing
-           with healthy pills. */
         .seos-pip-off {
-          background: rgba(255, 255, 255, 0.05);
-          border-color: rgba(255, 255, 255, 0.10);
+          background: rgba(0,0,0,0.025);
+          border-color: rgba(0,0,0,0.08);
+          color: rgba(26,46,38,0.55) !important;
         }
-        /* Attention pips get a coloured rim so they pop without the
-           pulse alone carrying the visual weight. */
         .seos-pip-warn {
-          background: rgba(255, 196, 83, 0.18);
-          border-color: rgba(255, 196, 83, 0.55);
+          background: rgba(255,196,83,0.16);
+          border-color: rgba(185,137,0,0.5);
         }
-        .seos-pip-warn:hover {
-          background: rgba(255, 196, 83, 0.28);
-          border-color: rgba(255, 196, 83, 0.75);
-        }
+        .seos-pip-warn:hover { background: rgba(255,196,83,0.28); }
         .seos-pip-crit {
-          background: rgba(255, 120, 102, 0.18);
-          border-color: rgba(255, 120, 102, 0.60);
+          background: rgba(215,44,13,0.08);
+          border-color: rgba(215,44,13,0.5);
         }
-        .seos-pip-crit:hover {
-          background: rgba(255, 120, 102, 0.28);
-          border-color: rgba(255, 120, 102, 0.80);
-        }
-        .seos-pip-dot {
-          width: 7px;
-          height: 7px;
-          border-radius: 50%;
-          flex-shrink: 0;
-        }
+        .seos-pip-crit:hover { background: rgba(215,44,13,0.15); }
+        .seos-pip-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
         .seos-pip-label {
           font-size: 10.5px;
+          font-weight: 600;
           letter-spacing: 0.6px;
           text-transform: uppercase;
           white-space: nowrap;
         }
-        .seos-pip-pulse {
-          animation: seos-pulse 1.6s ease-in-out infinite;
-        }
+        .seos-pip-pulse { animation: seos-pulse 1.6s ease-in-out infinite; }
         @keyframes seos-pulse {
-          0%, 100% { box-shadow: 0 0 0 3px rgba(255,120,102,0.40), 0 0 10px rgba(255,120,102,0.65); }
-          50%      { box-shadow: 0 0 0 5px rgba(255,120,102,0.20), 0 0 16px rgba(255,120,102,0.85); }
+          0%, 100% { box-shadow: 0 0 0 3px rgba(215,44,13,0.25), 0 0 10px rgba(215,44,13,0.45); }
+          50%      { box-shadow: 0 0 0 5px rgba(215,44,13,0.12), 0 0 16px rgba(215,44,13,0.6); }
+        }
+
+        /* Metric strip. */
+        .seos-metrics-wrap {
+          border-radius: 14px;
+          border: 1px solid rgba(0,0,0,0.08);
+          background: #fff;
+          overflow: hidden;
+          box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+        }
+        .seos-metrics {
+          display: grid;
+          grid-template-columns: repeat(5, 1fr);
+        }
+        @media (max-width: 900px) {
+          .seos-metrics { grid-template-columns: repeat(2, 1fr); }
+          .seos-metrics .seos-metric:last-child { grid-column: span 2; }
+        }
+        .seos-metric {
+          appearance: none;
+          font: inherit;
+          text-align: left;
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+          padding: 16px 18px 14px;
+          background: transparent;
+          border: none;
+          border-right: 1px solid rgba(0,0,0,0.06);
+          cursor: pointer;
+          position: relative;
+          transition: background 0.18s ease;
+        }
+        .seos-metric:last-child { border-right: none; }
+        .seos-metric::before {
+          content: "";
+          position: absolute;
+          top: 0; left: 0; right: 0;
+          height: 2px;
+          background: linear-gradient(90deg, #2D6B4F, #3a8a66);
+          opacity: 0;
+          transition: opacity 0.18s ease;
+        }
+        .seos-metric:hover, .seos-metric.is-active { background: rgba(45,107,79,0.045); }
+        .seos-metric.is-active::before { opacity: 1; }
+        .seos-metric:focus-visible {
+          outline: 2px solid rgba(45,107,79,0.5);
+          outline-offset: -2px;
+        }
+        .seos-metric-label {
+          font-size: 11.5px;
+          font-weight: 600;
+          letter-spacing: 0.2px;
+          color: rgba(26,46,38,0.6);
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        .seos-metric-value {
+          font-size: 20px;
+          font-weight: 650;
+          letter-spacing: -0.3px;
+          color: #1a2e26;
+          font-variant-numeric: tabular-nums;
+        }
+        .seos-metric-spark { margin-top: 2px; }
+
+        /* Hover-expanding detail panel — the grid-rows trick gives a
+           true smooth height animation without measuring content. */
+        .seos-metric-detail {
+          display: grid;
+          grid-template-rows: 0fr;
+          opacity: 0;
+          transition: grid-template-rows 0.38s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.28s ease;
+          border-top: 1px solid rgba(0,0,0,0);
+        }
+        .seos-metric-detail.is-open {
+          grid-template-rows: 1fr;
+          opacity: 1;
+          border-top-color: rgba(0,0,0,0.06);
+        }
+        .seos-metric-detail-clip { overflow: hidden; min-height: 0; }
+        .seos-detail-inner { padding: 18px 20px 14px; }
+        .seos-detail-head {
+          display: flex;
+          align-items: flex-start;
+          justify-content: space-between;
+          gap: 16px;
+          margin-bottom: 8px;
+        }
+        .seos-detail-label {
+          font-size: 11.5px;
+          font-weight: 600;
+          letter-spacing: 0.2px;
+          color: rgba(26,46,38,0.6);
+        }
+        .seos-detail-value {
+          font-size: 24px;
+          font-weight: 650;
+          letter-spacing: -0.3px;
+          color: #1a2e26;
+          font-variant-numeric: tabular-nums;
+        }
+        .seos-detail-sub { font-size: 12px; color: rgba(26,46,38,0.55); margin-top: 2px; }
+        .seos-detail-readout {
+          display: flex;
+          align-items: baseline;
+          gap: 10px;
+          padding: 6px 12px;
+          border-radius: 8px;
+          background: rgba(45,107,79,0.06);
+          border: 1px solid rgba(45,107,79,0.14);
+          white-space: nowrap;
+        }
+        .seos-detail-readout-date { font-size: 12px; color: rgba(26,46,38,0.6); }
+        .seos-detail-readout-value { font-size: 15px; font-weight: 650; color: #2D6B4F; font-variant-numeric: tabular-nums; }
+        .seos-detail-readout-hint { font-size: 12px; color: rgba(26,46,38,0.45); background: transparent; border-color: transparent; }
+        .seos-detail-chart { height: 180px; cursor: crosshair; position: relative; }
+        .seos-detail-axis {
+          display: flex;
+          justify-content: space-between;
+          font-size: 11px;
+          color: rgba(26,46,38,0.45);
+          padding-top: 4px;
+        }
+
+        /* Section headings. */
+        .seos-section-head {
+          display: flex;
+          align-items: baseline;
+          justify-content: space-between;
+          gap: 12px;
+        }
+
+        /* Card grid. */
+        .seos-card-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+          gap: 14px;
+        }
+        .seos-card {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+          padding: 18px;
+          border-radius: 14px;
+          background: #fff;
+          border: 1px solid rgba(0,0,0,0.08);
+          text-decoration: none !important;
+          color: inherit !important;
+          box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+          transition: transform 0.18s cubic-bezier(0.2, 0.7, 0.2, 1), box-shadow 0.18s ease, border-color 0.18s ease;
+        }
+        .seos-card:hover {
+          transform: translateY(-3px);
+          border-color: rgba(45,107,79,0.35);
+          box-shadow: 0 10px 26px rgba(26,46,38,0.10), 0 2px 6px rgba(26,46,38,0.06);
+        }
+        .seos-card:focus-visible {
+          outline: 2px solid rgba(45,107,79,0.5);
+          outline-offset: 2px;
+        }
+        .seos-card-top {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 8px;
+        }
+        .seos-card-icon {
+          width: 38px; height: 38px;
+          display: flex; align-items: center; justify-content: center;
+          border-radius: 10px;
+          background: linear-gradient(135deg, rgba(45,107,79,0.12), rgba(58,138,102,0.07));
+          font-size: 19px;
+        }
+        .seos-card-stat {
+          font-size: 11px;
+          font-weight: 600;
+          color: #2D6B4F;
+          background: rgba(45,107,79,0.08);
+          border: 1px solid rgba(45,107,79,0.18);
+          border-radius: 999px;
+          padding: 3px 9px;
+          white-space: nowrap;
+        }
+        .seos-card-title { font-size: 14.5px; font-weight: 650; color: #1a2e26; }
+        .seos-card-desc { font-size: 12.5px; line-height: 1.45; color: rgba(26,46,38,0.6); flex: 1; }
+        .seos-card-cta {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          font-size: 12.5px;
+          font-weight: 600;
+          color: #2D6B4F;
+          margin-top: 2px;
+        }
+        .seos-card-arrow {
+          display: inline-block;
+          transition: transform 0.18s cubic-bezier(0.2, 0.7, 0.2, 1);
+        }
+        .seos-card:hover .seos-card-arrow { transform: translateX(4px); }
+
+        @media (prefers-reduced-motion: reduce) {
+          .seos-greet .seos-word, .seos-subgreet { animation: none; opacity: 1; transform: none; }
+          .seos-pip, .seos-card, .seos-card-arrow, .seos-metric, .seos-metric-detail { transition: none; }
+          .seos-pip-pulse { animation: none; }
         }
       `}</style>
-      <BlockStack gap="600">
-        <div style={{
-          background: "linear-gradient(135deg, #2D6B4F 0%, #3a8a66 100%)",
-          borderRadius: "12px", padding: "24px 28px", marginTop: "-8px",
-        }}>
-          <InlineStack align="start" blockAlign="center" wrap gap="500">
-            <div style={{ flex: "1 1 320px", minWidth: 0 }}>
-              <BlockStack gap="200">
-                <Text as="h1" variant="headingXl">
-                  <span style={{ color: "#fff" }}>SEoS Assistant</span>
-                </Text>
-                <Text as="p" variant="bodyMd">
-                  <span style={{ color: "rgba(255,255,255,0.85)" }}>Search Engine on Steroids</span>
-                </Text>
-                <Box paddingBlockStart="300">
-                  <HeroStatusCluster items={statusItems} />
-                </Box>
-              </BlockStack>
+      <div className="seos-home">
+        <BlockStack gap="500">
+          <div className="seos-hero">
+            <div className="seos-globe-slot">
+              <Globe size={300} />
             </div>
-            <div style={{ flex: "0 0 auto", marginLeft: "auto", display: "flex", alignItems: "center" }}>
-              <img
-                src={seosLogo}
-                alt="SEoS"
-                style={{ display: "block", maxWidth: "180px", maxHeight: "140px", width: "auto", height: "auto" }}
-              />
+            <div className="seos-hero-brand">
+              <img src={seosLogo} alt="SEoS" />
+              <span className="seos-hero-brand-name">SEoS Assistant</span>
+              <span className="seos-hero-brand-tag">Search Engine on Steroids</span>
             </div>
-          </InlineStack>
-        </div>
+            <h1 className="seos-greet">
+              {greetWords.map((w, i) => (
+                <span key={`${w}-${i}`} className="seos-word" style={{ animationDelay: `${i * 90}ms` }}>
+                  {w}{i < greetWords.length - 1 ? " " : ""}
+                </span>
+              ))}
+            </h1>
+            <div className="seos-subgreet">
+              Your AI shopping assistant is working the storefront. Here's how the last 30 days look.
+            </div>
+            <StatusCluster items={statusItems} />
+          </div>
 
-        {/* System status now lives inside the hero as a gauge cluster
-            (HeroStatusCluster) — semi-invisible when healthy, glows on
-            issues. The standalone StatusPanel card was removed as a
-            duplicate. */}
+          {showRateLimit && (
+            <Banner
+              title={rateLimitHits >= 10 ? "Customers are being turned away" : "Some customers hit the AI rate limit"}
+              tone={rateLimitHits >= 10 ? "critical" : "warning"}
+              action={{ content: "Increase limits", url: "https://console.anthropic.com/settings/limits", external: true }}
+              secondaryAction={{ content: "Dismiss", onAction: () => rateFetcher.submit({ intent: "dismiss_rate_limit" }, { method: "post" }) }}
+              onDismiss={() => rateFetcher.submit({ intent: "dismiss_rate_limit" }, { method: "post" })}
+            >
+              <Text as="p" variant="bodySm">
+                {rateLimitHits} {rateLimitHits === 1 ? "request was" : "requests were"} rate-limited this month.
+                {rateLimitHits >= 10
+                  ? " Your Anthropic API tier is too low for your traffic. Add credits at console.anthropic.com to auto-upgrade."
+                  : " This happens when many customers chat simultaneously. If this keeps growing, consider upgrading your Anthropic API tier."}
+              </Text>
+            </Banner>
+          )}
 
-        {showRateLimit && (
-          <Banner
-            title={rateLimitHits >= 10 ? "Customers are being turned away" : "Some customers hit the AI rate limit"}
-            tone={rateLimitHits >= 10 ? "critical" : "warning"}
-            action={{ content: "Increase limits", url: "https://console.anthropic.com/settings/limits", external: true }}
-            secondaryAction={{ content: "Dismiss", onAction: () => rateFetcher.submit({ intent: "dismiss_rate_limit" }, { method: "post" }) }}
-            onDismiss={() => rateFetcher.submit({ intent: "dismiss_rate_limit" }, { method: "post" })}
-          >
-            <Text as="p" variant="bodySm">
-              {rateLimitHits} {rateLimitHits === 1 ? "request was" : "requests were"} rate-limited this month.
-              {rateLimitHits >= 10
-                ? " Your Anthropic API tier is too low for your traffic. Add credits at console.anthropic.com to auto-upgrade."
-                : " This happens when many customers chat simultaneously. If this keeps growing, consider upgrading your Anthropic API tier."}
-            </Text>
-          </Banner>
-        )}
-
-        {hasApiKey ? (
-          <BlockStack gap="300">
-            <InlineStack align="space-between" blockAlign="center" wrap>
-              <Text as="h2" variant="headingMd">Last 30 days</Text>
-              <Button url="/app/analytics" variant="plain">View detailed analytics</Button>
-            </InlineStack>
-            <InlineGrid columns={{ xs: 1, sm: 2 }} gap="400">
-              <MetricTile
-                label="Chat-driven orders"
-                value={String(conversionCount || 0)}
-                sublabel={conversionCount > 0 ? `Tagged "SEoS" in Shopify` : "Awaiting first chat-attributed order"}
-              />
-              <MetricTile
-                label="Chat-driven revenue"
-                value={conversionCount > 0 ? formatRevenue(conversionRevenue, conversionCurrency) : "—"}
-                sublabel={conversionCount > 0 ? `${conversionCount} order${conversionCount === 1 ? "" : "s"} attributed to chat` : "Tracked via the SEoS order tag"}
-              />
-            </InlineGrid>
-            <InlineGrid columns={{ xs: 2, md: 4 }} gap="400">
-              <MetricTile
-                label="AI requests"
-                value={String(totalMessages)}
-                sublabel={totalMessages > 0 ? `Avg ${formatCost(avgCostPerMessage)} / request · last 30 days` : "Awaiting first chat"}
-              />
-              <MetricTile
-                label="Satisfaction"
-                value={feedbackTotal > 0 ? `${satisfactionRate}%` : "—"}
-                sublabel={feedbackTotal > 0 ? `${feedbackTotal} ratings` : "Awaiting feedback"}
-              />
-              <MetricTile
-                label="AI cost"
-                value={formatCost(totalCost)}
-                sublabel="Anthropic API spend"
-              />
-              <MetricTile
-                label="Rate-limit hits"
-                value={String(rateLimitHits)}
-                sublabel={rateLimitHits > 0 ? "Increase your Anthropic tier" : "Within limits"}
-              />
-            </InlineGrid>
-          </BlockStack>
-        ) : null}
-
-        <Divider />
-
-        <SetupChecklist
-          hasApiKey={hasApiKey}
-          widgetEnabled={widgetEnabled}
-          fileCount={fileCount}
-          categoryGroupsCount={categoryGroupsCount}
-          semanticEnabled={semanticEnabled}
-          semanticProvider={semanticProvider}
-          themeEditorUrl={themeEditorUrl}
-        />
-
-        {/* Setup guide quick-link — opens the public /onboarding page
-            in a new tab. Rendered as a calm Card (not a second green
-            gradient) so the page reads professionally: one hero up
-            top, the rest neutral. */}
-        <Card>
-          <InlineStack align="space-between" blockAlign="center" wrap gap="400">
-            <InlineStack gap="300" blockAlign="center" wrap={false}>
-              <div
-                style={{
-                  flexShrink: 0,
-                  width: 40,
-                  height: 40,
-                  borderRadius: 10,
-                  background: "rgba(45,107,79,0.08)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: 20,
-                }}
-                aria-hidden="true"
-              >
-                {"📘"}
+          {hasApiKey ? (
+            <BlockStack gap="300">
+              <div className="seos-section-head">
+                <Text as="h2" variant="headingMd">Last 30 days</Text>
+                <Button url="/app/analytics" variant="plain">View detailed analytics</Button>
               </div>
-              <BlockStack gap="050">
-                <Text as="h2" variant="headingMd">Setup guide</Text>
-                <Text as="p" variant="bodySm" tone="subdued">
-                  Full walkthrough for installing, configuring, and going live.
-                </Text>
-              </BlockStack>
-            </InlineStack>
-            <Button url="/onboarding" external variant="primary">
-              Open setup guide
-            </Button>
-          </InlineStack>
-        </Card>
+              <MetricStrip metrics={metrics} />
+            </BlockStack>
+          ) : null}
 
-        <Card>
+          <SetupChecklist
+            hasApiKey={hasApiKey}
+            widgetEnabled={widgetEnabled}
+            fileCount={fileCount}
+            categoryGroupsCount={categoryGroupsCount}
+            semanticEnabled={semanticEnabled}
+            semanticProvider={semanticProvider}
+            themeEditorUrl={themeEditorUrl}
+          />
+
           <BlockStack gap="300">
-            <Text as="h2" variant="headingMd">About SEoS Assistant</Text>
-            <InlineGrid columns={{ xs: 1, sm: 2 }} gap="400">
-              <BlockStack gap="200">
-                <Text as="p" variant="bodySm"><strong>Version:</strong> 1.0.0</Text>
-                <Text as="p" variant="bodySm"><strong>AI Engine:</strong> Anthropic Claude</Text>
-                <Text as="p" variant="bodySm"><strong>Semantic Search:</strong> {semanticEnabled ? `${semanticProvider === "voyage" ? "Voyage AI" : "OpenAI"} (active)` : "Optional — bring your own key"}</Text>
-              </BlockStack>
-              <BlockStack gap="200">
-                <Text as="p" variant="bodySm"><strong>Attribution:</strong> Chat-driven sales tagged "SEoS" on the order; product links carry utm_content=SEoS so other channel UTMs stay intact.</Text>
-                <Text as="p" variant="bodySm"><strong>Privacy:</strong> Feedback data hashed, auto-deleted after 90 days</Text>
-                <Text as="p" variant="bodySm"><strong>Billing:</strong> Pay-as-you-go AI usage — no markup</Text>
-              </BlockStack>
-            </InlineGrid>
+            <Text as="h2" variant="headingMd">Explore</Text>
+            <div className="seos-card-grid">
+              <ActionCard
+                emoji="📘"
+                title="Setup guide"
+                description="Full walkthrough for installing, configuring, and going live with the assistant."
+                cta="Open setup guide"
+                url="/onboarding"
+                external
+              />
+              <ActionCard
+                emoji="📊"
+                title="Analytics"
+                description="Requests, costs, satisfaction trends, and the questions customers actually ask."
+                cta="View analytics"
+                url="/app/analytics"
+              />
+              <ActionCard
+                emoji="🧠"
+                title="Knowledge"
+                description="Upload FAQs, sizing guides, and brand voice so the AI answers in your words."
+                cta="Manage knowledge"
+                url="/app/knowledge"
+                stat={fileCount > 0 ? `${fileCount} file${fileCount > 1 ? "s" : ""}` : null}
+              />
+              <ActionCard
+                emoji="🎯"
+                title="Smart Recommenders"
+                description="Guided product finders that walk customers to the right product, step by step."
+                cta="Configure flows"
+                url="/app/recommenders"
+                stat={recommenderActive ? `${enabledRecommenderCount} active` : null}
+              />
+              <ActionCard
+                emoji="🗂️"
+                title="Catalog"
+                description="Synced products, enrichment, and category groups that keep answers on-topic."
+                cta="Open catalog"
+                url="/app/catalog"
+                stat={productsCount > 0 ? `${productsCount} products` : null}
+              />
+              <ActionCard
+                emoji="⚙️"
+                title="Settings"
+                description="API keys, model strategy, semantic search, and safety limits — all in one place."
+                cta="Open settings"
+                url="/app/api-keys"
+              />
+            </div>
           </BlockStack>
-        </Card>
-      </BlockStack>
+
+          <Card>
+            <BlockStack gap="300">
+              <Text as="h2" variant="headingMd">About SEoS Assistant</Text>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "16px" }}>
+                <BlockStack gap="200">
+                  <Text as="p" variant="bodySm"><strong>Version:</strong> 1.0.0</Text>
+                  <Text as="p" variant="bodySm"><strong>AI Engine:</strong> Anthropic Claude</Text>
+                  <Text as="p" variant="bodySm"><strong>Semantic Search:</strong> {semanticEnabled ? `${semanticProvider === "voyage" ? "Voyage AI" : "OpenAI"} (active)` : "Optional — bring your own key"}</Text>
+                </BlockStack>
+                <BlockStack gap="200">
+                  <Text as="p" variant="bodySm"><strong>Attribution:</strong> Chat-driven sales tagged "SEoS" on the order; product links carry utm_content=SEoS so other channel UTMs stay intact.</Text>
+                  <Text as="p" variant="bodySm"><strong>Privacy:</strong> Feedback data hashed, auto-deleted after 90 days</Text>
+                  <Text as="p" variant="bodySm"><strong>Billing:</strong> Pay-as-you-go AI usage — no markup</Text>
+                </BlockStack>
+              </div>
+            </BlockStack>
+          </Card>
+        </BlockStack>
+      </div>
     </Page>
   );
 }

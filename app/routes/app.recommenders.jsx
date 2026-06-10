@@ -47,6 +47,7 @@ import {
 import prisma from "../db.server";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
+import BrandHeader from "../components/BrandHeader";
 
 export const loader = async ({ request }) => {
   const { session } = await authenticate.admin(request);
@@ -1098,7 +1099,7 @@ export default function SmartRecommenders() {
   return (
     <Page>
       <TitleBar title="Smart Recommenders" />
-      <div style={{ height: "4px", borderRadius: "2px", background: "linear-gradient(90deg, #2D6B4F, #3a8a66, transparent)", marginBottom: "20px" }} />
+      <BrandHeader title="Smart Recommenders" />
       <BlockStack gap="800">
         <BlockStack gap="400">
           <SectionHeading

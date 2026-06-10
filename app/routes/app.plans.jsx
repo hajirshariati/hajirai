@@ -13,6 +13,7 @@ import {
   cancelSubscription, getActiveSubscription,
 } from "../lib/billing.server";
 import { PLANS, PLAN_ORDER, planAllows, formatLimit } from "../lib/plans";
+import BrandHeader from "../components/BrandHeader";
 
 const SUPPORT_EMAIL = "hajiraiapp@gmail.com";
 
@@ -394,7 +395,7 @@ export default function PlansPage() {
   return (
     <Page>
       <TitleBar title="Plan & Support" />
-      <div style={{ height: "6px", background: "linear-gradient(90deg, #2D6B4F 0%, #3a8a66 100%)", borderRadius: "4px", marginBottom: "16px" }} />
+      <BrandHeader title="Plan & Support" />
       <Layout>
         {actionData?.message ? (
           <Layout.Section>

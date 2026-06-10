@@ -49,3 +49,27 @@ export async function getConversionSummary(shop, range = 30) {
   const aov = count > 0 ? revenue / count : 0;
   return { count, revenue, currency, aov };
 }
+
+// One row per calendar day across the range (zero-filled) so the home
+// page metric strip can draw orders / revenue sparklines without
+// re-deriving the date scaffold client-side.
+export async function getConversionDailySeries(shop, range = 30) {
+  const { start, end } = resolveRange(range);
+  const rows = await prisma.chatConversion.findMany({
+    where: { shop, createdAt: { gte: start, lte: end } },
+    select: { totalAmount: true, createdAt: true },
+  });
+  const map = new Map();
+  for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+    const key = d.toISOString().split("T")[0];
+    map.set(key, { date: key, count: 0, revenue: 0 });
+  }
+  for (const r of rows) {
+    const key = r.createdAt.toISOString().split("T")[0];
+    const row = map.get(key);
+    if (!row) continue;
+    row.count += 1;
+    row.revenue += Number(r.totalAmount) || 0;
+  }
+  return Array.from(map.values()).sort((a, b) => a.date.localeCompare(b.date));
+}

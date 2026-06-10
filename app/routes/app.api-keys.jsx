@@ -25,6 +25,7 @@ import { authenticate } from "../shopify.server";
 import { getShopConfig, updateShopConfig } from "../models/ShopConfig.server";
 import { getShopPlan } from "../lib/billing.server";
 import { PlanGate } from "../components/PlanGate";
+import BrandHeader from "../components/BrandHeader";
 
 export const loader = async ({ request }) => {
   const { session } = await authenticate.admin(request);
@@ -732,7 +733,7 @@ export default function ApiKeys() {
       <TitleBar title="Settings" />
       <Form method="post" ref={formRef} onChange={() => setIsDirty(true)}>
         <BlockStack gap="500">
-          <div style={{ height: "4px", borderRadius: "2px", background: "linear-gradient(90deg, #2D6B4F, #3a8a66, transparent)" }} />
+          <BrandHeader title="Settings" gutter={false} />
           {actionData?.success && (
             <Banner title="Settings saved" tone="success" onDismiss={() => {}} />
           )}

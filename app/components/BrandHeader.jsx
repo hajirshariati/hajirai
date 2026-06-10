@@ -1,0 +1,54 @@
+import seosLogo from "../assets/SEoS.png";
+
+// Shared internal-page header — matches the brand row on the redesigned
+// home page (logo mark, wordmark, page name) with the green gradient
+// hairline underneath. Internal pages render this in place of the old
+// bare gradient div; page contents below it are unchanged.
+//
+// `gutter` controls the bottom margin: pages whose parent layout already
+// supplies spacing (a BlockStack gap) pass gutter={false}.
+export default function BrandHeader({ title, gutter = true }) {
+  return (
+    <div style={{ marginBottom: gutter ? "20px" : 0 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: "10px", paddingBottom: "12px" }}>
+        <img
+          src={seosLogo}
+          alt="SEoS"
+          style={{ display: "block", height: "26px", width: "auto" }}
+        />
+        <span
+          style={{
+            fontSize: "12px",
+            fontWeight: 650,
+            letterSpacing: "1.4px",
+            textTransform: "uppercase",
+            color: "#2D6B4F",
+            whiteSpace: "nowrap",
+          }}
+        >
+          SEoS Assistant
+        </span>
+        {title ? (
+          <span
+            style={{
+              fontSize: "12px",
+              color: "rgba(26,46,38,0.55)",
+              borderLeft: "1px solid rgba(45,107,79,0.25)",
+              paddingLeft: "10px",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {title}
+          </span>
+        ) : null}
+      </div>
+      <div
+        style={{
+          height: "3px",
+          borderRadius: "2px",
+          background: "linear-gradient(90deg, #2D6B4F, #3a8a66, transparent)",
+        }}
+      />
+    </div>
+  );
+}
