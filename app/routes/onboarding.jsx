@@ -614,12 +614,11 @@ const THEME_INIT_SCRIPT = `
 // ---------------------------------------------------------------------------
 // Globe — the slow-spinning dotted sphere, pinned to the viewport's
 // top-right corner behind the content. Quiet grey-sage dots in normal
-// cruise. When the easter egg fires (type "hajir" / Konami), the sphere
-// whips through five rotations and every visible dot becomes a comet:
-// a light-green glowing head with a motion trail streaking behind it
-// along its actual path. Trail length and glow follow the spin speed,
-// so comets ignite as the sphere accelerates and fade out as it glides
-// back to cruise. Respects prefers-reduced-motion with a static frame.
+// cruise. When the easter egg fires (type "hajir" / Konami), the spin
+// briefly quickens and every visible dot picks up a subtle comet
+// treatment — a faint light-green head with a soft trail along its
+// path — fading back to calm as the spin settles. Respects
+// prefers-reduced-motion with a static frame.
 // ---------------------------------------------------------------------------
 function Globe({ size = 820, points = 1700, theme = "light", boostRef = null }) {
   const ref = useRef(null);
@@ -697,7 +696,7 @@ function Globe({ size = 820, points = 1700, theme = "light", boostRef = null }) 
           const yr2 = y * cosT - zr2 * sinT;
           const tx = cx + xr2 * R;
           const ty = cy + yr2 * R;
-          ctx.strokeStyle = `rgba(${comet},${((0.08 + depth * 0.30) * glow).toFixed(3)})`;
+          ctx.strokeStyle = `rgba(${comet},${((0.04 + depth * 0.16) * glow).toFixed(3)})`;
           ctx.lineWidth = radius;
           ctx.beginPath();
           ctx.moveTo(tx, ty);
@@ -715,7 +714,7 @@ function Globe({ size = 820, points = 1700, theme = "light", boostRef = null }) 
 
         // Glowing comet head layered over the base while boosted.
         if (trailing && depth > 0.35) {
-          ctx.fillStyle = `rgba(${comet},${((0.15 + depth * 0.55) * glow).toFixed(3)})`;
+          ctx.fillStyle = `rgba(${comet},${((0.08 + depth * 0.30) * glow).toFixed(3)})`;
           ctx.beginPath();
           ctx.arc(sx, sy, radius * 1.15, 0, Math.PI * 2);
           ctx.fill();
@@ -731,34 +730,28 @@ function Globe({ size = 820, points = 1700, theme = "light", boostRef = null }) 
     let raf;
     let last = 0;
     let rot = 0.6;
-    // Easter-egg boost: five lightning-fast full rotations over ~4s.
-    // easeInOutCubic has zero slope at both ends, so the sphere
-    // accelerates smoothly out of its glacial cruise, blurs through
-    // the middle, and glides back with no visible snap — the extra
-    // rotation is an exact multiple of 2π, making the hand-off back
-    // to the base rotation seamless. Comet glow and trail length
-    // follow sin(p·π): they ignite with the acceleration, peak at
-    // max speed, and die away as the spin settles.
-    const BOOST_TURNS = 5;
-    const BOOST_MS = 4200;
-    const easeInOutCubic = (p) => (p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2);
+    // Easter-egg boost: the original gentle sprint — ~12x cruise speed
+    // decaying back to 1x over four seconds. The comet treatment rides
+    // the same curve: subtle light-green heads and trails fade in with
+    // the kick and die away as the spin settles. Deliberately understated.
+    const BOOST_MS = 4000;
     const loop = (t) => {
       const dt = last ? Math.min(t - last, 100) : 16;
       last = t;
-      // Glacial cruise — one rotation every ~3.5 minutes.
-      rot += dt * 0.00003;
-      let extra = 0;
       let glow = 0;
       let tailAngle = 0;
+      let speed = 1;
       if (boostRef) {
         const p = (t - (boostRef.current || -1e9)) / BOOST_MS;
         if (p >= 0 && p < 1) {
-          extra = BOOST_TURNS * 2 * Math.PI * easeInOutCubic(p);
-          glow = Math.sin(p * Math.PI);
-          tailAngle = 0.22 * glow;
+          glow = 1 - p;
+          speed = 1 + 11 * glow;
+          tailAngle = 0.15 * glow;
         }
       }
-      drawFrame(rot + extra, tailAngle, glow);
+      // Glacial cruise — one rotation every ~3.5 minutes.
+      rot += dt * 0.00003 * speed;
+      drawFrame(rot, tailAngle, glow);
       raf = requestAnimationFrame(loop);
     };
     raf = requestAnimationFrame(loop);
