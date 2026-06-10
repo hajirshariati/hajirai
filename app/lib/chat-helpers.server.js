@@ -399,9 +399,23 @@ export function ensureHeaderLineBreaks(text) {
   // section header (inline emphasis is almost always short).
   // Require prev char to be prose (alphanumeric / sentence punctuation),
   // NOT a bullet marker — otherwise "- **Item**" gets split into "-\n\n**Item**".
+  // EXCEPTION: do NOT split when the bold span is a noun phrase the
+  // sentence is referring to — most often when preceded by an article
+  // ("The/A/An/This/That/Our/Your"), a verb ("called/named/like/about"),
+  // or "is/are". Live trace 2026-06-10: "Yes! The **Jillian Braided
+  // Quarter Strap Sandal** does feature..." was getting split into
+  // "Yes! The\n\n**Jillian...**" — the product name belonged INSIDE
+  // the sentence, not on its own line.
   next = next.replace(
     /([A-Za-z0-9'":!?.,)\]])([ \t]+)(\*\*[A-Z][^*\n]{11,}\*\*)/g,
-    (_m, prev, _ws, header) => `${prev}\n\n${header}`,
+    (m, prev, ws, header, offset, input) => {
+      const before = input.slice(0, offset + 1);
+      const prevWord = (before.match(/\b([A-Za-z']+)$/) || [])[1] || "";
+      if (/^(?:the|a|an|this|that|these|those|our|your|my|its|their|is|are|was|were|called|named|like|about|featuring|features|includes|including|with|on|in|of|for|by|and|or|but)$/i.test(prevWord)) {
+        return m;
+      }
+      return `${prev}\n\n${header}`;
+    },
   );
   // Pattern 3: Shorter bold span (3–11 chars) preceded by content
   // on same line, but only when it contains a section keyword. Catches
@@ -419,7 +433,14 @@ export function ensureHeaderLineBreaks(text) {
   // renders the whole thing as ONE paragraph. Promote to blank line.
   next = next.replace(
     /([^\n])\n(\*\*[A-Z][^*\n]{11,}\*\*)/g,
-    (_m, prev, header) => `${prev}\n\n${header}`,
+    (m, prev, header, offset, input) => {
+      const before = input.slice(0, offset + 1);
+      const prevWord = (before.match(/\b([A-Za-z']+)$/) || [])[1] || "";
+      if (/^(?:the|a|an|this|that|these|those|our|your|my|its|their|is|are|was|were|called|named|like|about|featuring|features|includes|including|with|on|in|of|for|by|and|or|but)$/i.test(prevWord)) {
+        return m;
+      }
+      return `${prev}\n\n${header}`;
+    },
   );
   next = next.replace(
     /([^\n])\n(\*\*([A-Z][^*\n]{2,10})\*\*)/g,

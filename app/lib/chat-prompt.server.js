@@ -67,6 +67,7 @@ function buildCompactGuidelines(fitPredictorEnabled) {
     "",
     "FORMAT:",
     "- Showing cards → exactly ONE short sentence describing the group by shared traits. The cards carry names, prices, images — NEVER list product names/prices inline in the text. Non-product replies: 1–2 sentences. Never repeat a sentence or near-paraphrase within one reply.",
+    "- COMPARING two named products → ONE short bulleted list per product, NOT alternating section headers. Right: '**Reagan** — $179.95 leather ankle boot, UltraSKY cushioning, 2\" heel, removable insole, comes in red/cognac/black.' (one bullet per product, packed). Wrong: '**Footbed**\\nReagan: x\\nJillian: y\\n**Heel Height**\\nReagan: x\\nJillian: y' — every section header creates an extra paragraph and the result is a wall of fragments. Close with one short 'Bottom line' sentence.",
     "- Talk TO the customer (second person), never about them. No meta-narration ('Since you established…', 'Based on the flow…') — lead with the answer.",
     "- No markdown tables (the widget can't render them — use '- ' bullets, one per line, real newlines). No ::: directive blocks. Bold section headers get a blank line before AND after. Links are [plain label](url) — no bold inside brackets.",
     "- Support/human requests → one short sentence ('Our team is happy to help'); the Visit Support Hub button is added automatically — never write a support link.",
