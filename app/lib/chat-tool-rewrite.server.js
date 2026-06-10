@@ -326,6 +326,20 @@ export function lookupCategoryGenders(categoryGenderMap, category) {
 }
 
 export function injectLockedGender(toolCall, ctx) {
+  // LLM-owns path: the model's tool args ARE the intent — no
+  // stale-history gender overrides. Live trace 2026-06-10 evening:
+  // "compare the Chrissy and the Kaylee boots" (both women's) hit a
+  // "gender×category mismatch: requested=men" because a "husband"
+  // mention from MUCH earlier in the session was still locked in
+  // sessionGender and overrode the model's correct search. The
+  // prompt's GENDER LOCK rule already instructs the model to carry
+  // gender in filters itself; the Established Answers block gives it
+  // the session gender to carry.
+  {
+    const raw = String(process.env.LLM_OWNS_ALL_TURNS || "").toLowerCase();
+    if (raw !== "false") return toolCall;
+  }
+
   const locked = ctx.sessionGender;
   if (!locked) return toolCall;
 

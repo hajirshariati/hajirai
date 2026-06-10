@@ -18,6 +18,11 @@
 import assert from "node:assert/strict";
 import { injectLockedGender } from "../app/lib/chat-tool-rewrite.server.js";
 
+// This file tests the LEGACY gender-lock injector, which no-ops when
+// LLM_OWNS_ALL_TURNS is active (production default). Pin the flag OFF
+// so the kill-switch path's contract stays covered.
+process.env.LLM_OWNS_ALL_TURNS = "false";
+
 let passed = 0;
 let failed = 0;
 const failures = [];
