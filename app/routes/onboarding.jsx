@@ -788,16 +788,22 @@ function Globe({ size = 820, points = 1700, theme = "light", boostRef = null }) 
         const p = (t - (boostRef.current || -1e9)) / BOOST_MS;
         if (p >= 0 && p < 1) {
           boosting = true;
-          glow = 1 - p;
-          speed = 1 + 11 * glow;
-          tailAngle = 0.075 * glow;
+          // Everything rides one cosine bell — spin, comets, and zoom
+          // peak together mid-dive and ease out together. The spin
+          // multiplier is high enough for well over a full rotation
+          // across the zoom out-and-back, so the sphere is visibly
+          // churning the whole way.
+          const spinBell = (1 - Math.cos(2 * Math.PI * p)) / 2;
+          glow = spinBell;
+          speed = 1 + 140 * spinBell;
+          tailAngle = 0.09 * spinBell;
           // Zoom bell: 0 → 1 → 0, zero slope at both ends and the peak.
           // At the peak the globe covers the ENTIRE viewport: it scales
           // until its diameter clears the widest screen edge and drifts
           // from its corner perch to the viewport centre, all heavily
           // blurred and faded so it washes the background without ever
           // burying the content.
-          const bell = (1 - Math.cos(2 * Math.PI * p)) / 2;
+          const bell = spinBell;
           const vw = window.innerWidth || 1280;
           const vh = window.innerHeight || 800;
           // Canvas centre sits at (vw - 210, 110) given the fixed
