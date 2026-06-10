@@ -230,6 +230,28 @@ test("buildRetryInstruction lists each error and ends with the honesty cue", () 
     `expected the honesty cue inviting "I can't verify"; got:\n${out}`);
 });
 
+test("buildRetryInstruction includes the failed draft so the model can see what it wrote", () => {
+  // runAgenticLoop doesn't return its messages array, so the retry
+  // conversation can't show the model its own failed assistant turn.
+  // The draft must therefore ride inside the correction message.
+  const errors = [
+    { kind: "ungrounded_product_name", claim: "Phantom", message: "Phantom isn't in any tool result." },
+  ];
+  const out = buildRetryInstruction(errors, "The **Phantom Sneaker** is our best pick at $99.");
+  assert.ok(out.includes("The **Phantom Sneaker** is our best pick at $99."),
+    `failed draft must be quoted in the instruction; got:\n${out}`);
+  assert.ok(/previous draft/i.test(out));
+  assert.ok(/never shown to the customer/i.test(out),
+    "must reassure the model the draft never reached the customer");
+});
+
+test("buildRetryInstruction truncates very long drafts at 1500 chars", () => {
+  const errors = [{ kind: "x", claim: "y", message: "z." }];
+  const longDraft = "A".repeat(5000);
+  const out = buildRetryInstruction(errors, longDraft);
+  assert.ok(out.length < 2500, `instruction should stay bounded; got len=${out.length}`);
+});
+
 test("empty errors → empty instruction", () => {
   assert.equal(buildRetryInstruction([]), "");
 });

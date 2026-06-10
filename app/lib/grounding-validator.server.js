@@ -249,11 +249,25 @@ export function validateGrounding({ text, pool = [] } = {}) {
 // Build the retry instruction text the agent loop hands back to the
 // model when validation fails. Phrased as a clear correction request,
 // not a rebuke — the model needs the facts to fix its answer.
-export function buildRetryInstruction(errors = []) {
+//
+// previousText: the failed draft. Included because runAgenticLoop does
+// not return its internal messages array, so the retry conversation
+// would otherwise reference "your previous reply" the model can't see.
+export function buildRetryInstruction(errors = [], previousText = "") {
   if (!errors || errors.length === 0) return "";
   const lines = errors.slice(0, 4).map((e, i) => `${i + 1}. ${e.message}`);
+  const draftBlock = previousText
+    ? [
+        "Your previous draft (never shown to the customer):",
+        '"""',
+        String(previousText).slice(0, 1500),
+        '"""',
+        "",
+      ]
+    : [];
   return [
-    "Your previous reply has factual issues that need correcting before it can go to the customer:",
+    ...draftBlock,
+    "That draft has factual issues that need correcting before it can go to the customer:",
     ...lines,
     "",
     "Rewrite the reply. If the only honest answer is that you can't verify the requested claim, say that plainly — that's a correct answer, not a failure.",

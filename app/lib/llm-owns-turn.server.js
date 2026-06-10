@@ -154,7 +154,11 @@ export async function runWithGroundingRetry({
     // Hand the errors back to the model. The retry instruction is
     // appended as a NEW user turn so the model treats it as a
     // correction request from the system, not a customer message.
-    const retryInstruction = buildRetryInstruction(validation.errors);
+    // Include the failed draft in the instruction: runAgenticLoop does
+    // NOT return its messages array, so result?.messages is undefined
+    // and the retry conversation would otherwise reference "your
+    // previous reply" without the model ever seeing that reply.
+    const retryInstruction = buildRetryInstruction(validation.errors, text);
     messages = (result?.messages || messages).slice();
     messages.push({
       role: "user",
