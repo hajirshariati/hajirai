@@ -76,6 +76,27 @@ export function gatherPoolFromMessages(messages = []) {
   return [...seen.values()];
 }
 
+// Gather the pool from an agent-loop result. Reads turnResult.products
+// (the post-processed final cards — what the customer actually sees)
+// when available, falls back to message-history scan otherwise.
+// Live trace 2026-06-10: validator was reporting pool=0 even when the
+// reply attached 5 cards, because runAgenticLoop doesn't return its
+// internal messages array — it returns turnResult.products.
+export function gatherPoolFromResult(result, fallbackMessages = []) {
+  // 1) Preferred: post-processed final cards from the agent loop.
+  const turnProducts = result?.turnResult?.products;
+  if (Array.isArray(turnProducts) && turnProducts.length > 0) {
+    return turnProducts;
+  }
+  // 2) Direct finalProductCards (some callers expose it).
+  const finalCards = result?.finalProductCards;
+  if (Array.isArray(finalCards) && finalCards.length > 0) {
+    return finalCards;
+  }
+  // 3) Message-history scan (test fixtures + raw agent outputs).
+  return gatherPoolFromMessages(result?.messages || fallbackMessages);
+}
+
 // Wrap an agent-loop call with grounding validation and retry. Caller
 // passes a `runLoop` function that performs ONE model invocation and
 // returns { fullResponseText, finalProductCards, messages }. We:
@@ -112,7 +133,7 @@ export async function runWithGroundingRetry({
     const result = await runLoop({ messages: messages.slice() });
     last = result;
     const text = result?.fullResponseText || "";
-    const pool = gatherPoolFromMessages(result?.messages || messages);
+    const pool = gatherPoolFromResult(result, messages);
     const validation = validateGrounding({ text, pool });
 
     if (typeof onAttempt === "function") {

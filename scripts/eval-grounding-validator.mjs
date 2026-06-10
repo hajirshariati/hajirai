@@ -186,6 +186,36 @@ test("empty inputs → ok (no false positives)", () => {
   assert.equal(validateGrounding({ text: null, pool: null }).ok, true);
 });
 
+// ─── False-positive guards (live-trace fixes) ─────────────────
+
+test("heading-style bold '**The key difference:**' is NOT extracted as a product", () => {
+  // Live trace 2026-06-10: BioRocker compare burned 10s on a wasted
+  // retry because the validator extracted "key" from "**The key
+  // difference:**" — a sentence heading, not a product name. Bolds
+  // ending in colon, em/en dash, or sentence punctuation are headings.
+  const text =
+    "**The key difference:** BioRocker is the rocker-bottom outsole, " +
+    "UltraSKY is the EVA midsole foam — different layers of the same shoe.";
+  const out = validateGrounding({ text, pool: [] });
+  assert.equal(out.ok, true,
+    `heading-style bold should not be flagged as a product; got ${JSON.stringify(out.errors)}`);
+});
+
+test("'**Quick take —**' style bold is treated as heading, not product", () => {
+  const text = "**Quick take —** these are our top three sellers.";
+  const out = validateGrounding({ text, pool: [] });
+  assert.equal(out.ok, true);
+});
+
+test("real product name (no trailing punctuation in bold) still extracted", () => {
+  // Belt-and-suspenders — make sure the heading-end guard doesn't
+  // accidentally swallow legitimate product names.
+  const text = "**Phantom Sneaker** is our pick.";
+  const out = validateGrounding({ text, pool: [] });
+  assert.equal(out.ok, false);
+  assert.ok(out.errors.some((e) => e.kind === "ungrounded_product_name"));
+});
+
 // ─── Retry instruction is well-formed ──────────────────────────
 
 test("buildRetryInstruction lists each error and ends with the honesty cue", () => {

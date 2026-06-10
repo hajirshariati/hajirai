@@ -4558,11 +4558,15 @@ export const action = async ({ request }) => {
             // `done` itself (the legacy path emits it after follow-ups).
             for (const c of attemptBuf) controller.enqueue(c);
             controller.enqueue(encoder.encode(sseChunk({ type: "done" })));
+            const finalCards =
+              cleanResult.turnResult?.products
+              || cleanResult.finalProductCards
+              || [];
             console.log(
               `[llm-owns-turn] ${ctx.shop} final ok=${cleanResult.validation.ok} ` +
                 `attempts=${cleanResult.validation.attempts} ` +
                 `textLen=${(cleanResult.fullResponseText || "").length} ` +
-                `cards=${(cleanResult.finalProductCards || []).length}`,
+                `cards=${finalCards.length}`,
             );
             return;
           }

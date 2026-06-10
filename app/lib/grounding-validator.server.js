@@ -57,6 +57,14 @@ function extractBoldedProductFamilies(text) {
     if (/^(?:yes|no|note|important|warning|tip|here|now|today|great)\b/i.test(inner)) continue;
     if (/[™®©]/.test(inner)) continue;
     if (/\b(?:Technology|System|Method|Approach|Feature|Series|Collection|Platform|Footbed|Midsole|Outsole|Insole|Foam|Material|Lining|Upper|Mission|HQ|Headquarters|Bottom\s+line)\b/i.test(inner)) continue;
+    // Heading-style bolds end in punctuation (colon, em/en dash) —
+    // "**The key difference:**", "**Quick take —**", "**Bottom line:**".
+    // These are sentence headings, not product names. Live trace
+    // 2026-06-10: BioRocker compare retry burned 10s because the
+    // validator extracted "key" from "**The key difference:**".
+    if (/[:!?—–]$/.test(inner)) continue;
+    // Product names don't end with verbs/closers like "is" or "and".
+    if (/\b(?:is|are|was|were|and|or|but|the|a|an)$/i.test(inner)) continue;
     const family = titleFamily(inner);
     if (family) out.push({ phrase: inner, family });
   }
