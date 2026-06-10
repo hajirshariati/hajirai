@@ -549,6 +549,91 @@ function StatusCluster({ items }) {
 }
 
 // ---------------------------------------------------------------------------
+// ScrollRail — horizontal chip/card rail with the same overflow logic as
+// the storefront widget: circular prev/next arrows that appear only when
+// there's actually content to scroll to (prev hides at the start, next at
+// the end), edge fades while content continues past the fold, smooth
+// chip-width scroll steps, and re-measurement on resize and content
+// change.
+// ---------------------------------------------------------------------------
+function ScrollRail({ railClassName = "", wrapClassName = "", deps = [], children }) {
+  const railRef = useRef(null);
+  const [state, setState] = useState({ overflow: false, atStart: true, atEnd: true });
+
+  const update = () => {
+    const el = railRef.current;
+    if (!el) return;
+    const overflow = el.scrollWidth > el.clientWidth + 1;
+    const atStart = el.scrollLeft <= 1;
+    const atEnd = el.scrollLeft + el.clientWidth >= el.scrollWidth - 1;
+    setState((s) =>
+      s.overflow === overflow && s.atStart === atStart && s.atEnd === atEnd
+        ? s
+        : { overflow, atStart, atEnd },
+    );
+  };
+
+  useEffect(() => {
+    update();
+    // Initial paint may not have measured layout yet — re-check shortly.
+    const t = setTimeout(update, 150);
+    window.addEventListener("resize", update);
+    return () => {
+      clearTimeout(t);
+      window.removeEventListener("resize", update);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, deps);
+
+  const step = (dir) => {
+    const el = railRef.current;
+    if (!el) return;
+    const chip = el.firstElementChild;
+    const delta = (chip ? chip.offsetWidth + 8 : el.clientWidth * 0.75) * dir;
+    el.scrollBy({ left: delta, behavior: "smooth" });
+  };
+
+  const wrapCls =
+    "seos-rail-wrap" +
+    (wrapClassName ? " " + wrapClassName : "") +
+    (state.overflow ? " has-overflow" : "") +
+    (state.atStart ? " at-start" : "") +
+    (state.atEnd ? " at-end" : "");
+
+  return (
+    <div className={wrapCls}>
+      {state.overflow && !state.atStart ? (
+        <button
+          type="button"
+          className="seos-rail-arrow seos-rail-arrow--prev"
+          aria-label="Scroll left"
+          onClick={() => step(-1)}
+        >
+          <svg viewBox="0 0 16 16" width="12" height="12" fill="none" aria-hidden="true">
+            <path d="M10 3 5 8l5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </button>
+      ) : null}
+      <div className={"seos-rail " + railClassName} ref={railRef} onScroll={update}>
+        {children}
+      </div>
+      {state.overflow && !state.atEnd ? (
+        <button
+          type="button"
+          className="seos-rail-arrow seos-rail-arrow--next"
+          aria-label="Scroll right"
+          onClick={() => step(1)}
+        >
+          <svg viewBox="0 0 16 16" width="12" height="12" fill="none" aria-hidden="true">
+            <path d="M6 3l5 5-5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </button>
+      ) : null}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // TestChat — Shopify-style "ask anything" box in the centre of the home
 // page. It talks to the EXACT engine customers get: the input posts to
 // /chat with an App Bridge session token, and the action runs the same
@@ -726,7 +811,11 @@ function TestChat({ shop }) {
                   renderRich(cleanContent)
                 )}
                 {choices.length > 0 ? (
-                  <div className={"seos-testchat-choices" + (isStale ? " is-stale" : "")}>
+                  <ScrollRail
+                    railClassName="seos-testchat-choices"
+                    wrapClassName={isStale ? "is-stale" : ""}
+                    deps={[choices.length, streaming]}
+                  >
                     {choices.map((c) => (
                       <button
                         key={c}
@@ -738,10 +827,10 @@ function TestChat({ shop }) {
                         {c}
                       </button>
                     ))}
-                  </div>
+                  </ScrollRail>
                 ) : null}
                 {m.products?.length > 0 ? (
-                  <div className="seos-testchat-prods">
+                  <ScrollRail railClassName="seos-testchat-prods" deps={[m.products.length]}>
                     {m.products.map((p) => (
                       <a
                         key={p.handle || p.title}
@@ -757,7 +846,7 @@ function TestChat({ shop }) {
                         ) : null}
                       </a>
                     ))}
-                  </div>
+                  </ScrollRail>
                 ) : null}
               </div>
             </div>
@@ -1566,26 +1655,79 @@ export default function Home() {
           0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
           30% { transform: translateY(-4px); opacity: 1; }
         }
-        /* Chips row: horizontal scroll, hidden scrollbar (like the
-           storefront widget). Bleed the row to the bubble's edges so
-           the overflow is obvious. */
-        .seos-testchat-choices {
-          display: flex;
-          flex-wrap: nowrap;
-          gap: 8px;
+        /* Scroll rails — horizontal chip/card rows with arrow + fade
+           overflow affordances, mirroring the storefront widget. The
+           wrap bleeds to the bubble's edges; the rail inside scrolls
+           with a hidden scrollbar. */
+        .seos-rail-wrap {
+          position: relative;
           margin: 10px -14px 0;
-          padding: 2px 14px 4px;
-          overflow-x: auto;
-          scroll-snap-type: x proximity;
-          scrollbar-width: none;
         }
-        .seos-testchat-choices::-webkit-scrollbar { display: none; }
-        .seos-testchat-choices.is-stale {
+        .seos-rail-wrap.is-stale {
           opacity: 0.45;
           filter: saturate(0.6);
           pointer-events: none;
           transition: opacity 0.2s ease, filter 0.2s ease;
         }
+        .seos-rail {
+          display: flex;
+          flex-wrap: nowrap;
+          gap: 8px;
+          padding: 2px 14px 4px;
+          overflow-x: auto;
+          scroll-snap-type: x proximity;
+          scrollbar-width: none;
+        }
+        .seos-rail::-webkit-scrollbar { display: none; }
+        /* Edge fades — only while there's more content in that
+           direction. Gradient matches the bot-bubble background. */
+        .seos-rail-wrap::before,
+        .seos-rail-wrap::after {
+          content: "";
+          position: absolute;
+          top: 0;
+          bottom: 0;
+          width: 30px;
+          pointer-events: none;
+          z-index: 1;
+          opacity: 0;
+          transition: opacity 0.15s ease;
+        }
+        .seos-rail-wrap::before {
+          left: 0;
+          background: linear-gradient(90deg, #f2f5f3, rgba(242,245,243,0));
+        }
+        .seos-rail-wrap::after {
+          right: 0;
+          background: linear-gradient(270deg, #f2f5f3, rgba(242,245,243,0));
+        }
+        .seos-rail-wrap.has-overflow:not(.at-start)::before { opacity: 1; }
+        .seos-rail-wrap.has-overflow:not(.at-end)::after { opacity: 1; }
+        /* Arrow buttons — circular, vertically centred, above the fades. */
+        .seos-rail-arrow {
+          position: absolute;
+          top: 50%;
+          transform: translateY(-50%);
+          width: 30px;
+          height: 30px;
+          border-radius: 50%;
+          border: none;
+          background: #2D6B4F;
+          color: #fff;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          z-index: 2;
+          box-shadow: 0 2px 8px rgba(26,46,38,0.28);
+          transition: background 0.15s ease, transform 0.15s ease;
+        }
+        .seos-rail-arrow:hover {
+          background: #245a42;
+          transform: translateY(-50%) scale(1.06);
+        }
+        .seos-rail-arrow--prev { left: 4px; }
+        .seos-rail-arrow--next { right: 4px; }
         .seos-testchat-choice {
           appearance: none;
           font: inherit;
@@ -1608,18 +1750,7 @@ export default function Home() {
           transform: translateY(-1px);
         }
         .seos-testchat-choice:disabled { opacity: 0.5; cursor: default; }
-        /* Product rail — same horizontal scroll treatment. */
-        .seos-testchat-prods {
-          display: flex;
-          flex-wrap: nowrap;
-          gap: 8px;
-          margin: 10px -14px 0;
-          padding: 2px 14px 4px;
-          overflow-x: auto;
-          scroll-snap-type: x proximity;
-          scrollbar-width: none;
-        }
-        .seos-testchat-prods::-webkit-scrollbar { display: none; }
+
         .seos-testchat-prod {
           display: inline-flex;
           align-items: center;
