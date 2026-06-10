@@ -160,20 +160,7 @@ const STYLES = `
     position: relative;
     color: var(--accent);
     font-weight: 700;
-    cursor: pointer;
   }
-  .seos::after {
-    content: "";
-    position: absolute;
-    left: 0; right: 0; bottom: 2px;
-    height: 1px;
-    background: currentColor;
-    opacity: 0;
-    transform: scaleX(0.4);
-    transform-origin: left;
-    transition: opacity 0.2s ease, transform 0.3s ease;
-  }
-  .seos:hover::after { opacity: 0.5; transform: scaleX(1); }
   [data-theme="dark"] .seos {
     text-shadow:
       0 0 14px rgba(74, 222, 128, 0.45),
@@ -192,28 +179,6 @@ const STYLES = `
     0%   { text-shadow: 0 0 0 rgba(74, 222, 128, 0); }
     25%  { text-shadow: 0 0 24px rgba(74, 222, 128, 1), 0 0 48px rgba(74, 222, 128, 0.7), 0 0 96px rgba(74, 222, 128, 0.4); }
     100% { text-shadow: 0 0 14px rgba(74, 222, 128, 0.45), 0 0 28px rgba(74, 222, 128, 0.22), 0 0 56px rgba(74, 222, 128, 0.10); }
-  }
-  .seos-tip {
-    position: absolute;
-    left: 50%;
-    top: calc(100% + 6px);
-    transform: translateX(-50%) translateY(-4px);
-    background: var(--bg-cmd);
-    color: var(--bg-cmd-text);
-    font-size: 11px;
-    font-weight: 500;
-    letter-spacing: 0.04em;
-    padding: 5px 10px;
-    border-radius: 4px;
-    white-space: nowrap;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.15s ease, transform 0.15s ease;
-    text-shadow: none;
-  }
-  .seos:hover .seos-tip {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
   }
 
   /* ── Theme toggle (fixed top-right) ───────────────────────── */
@@ -648,13 +613,12 @@ const THEME_INIT_SCRIPT = `
 
 // ---------------------------------------------------------------------------
 // Globe — the slow-spinning dotted sphere, pinned to the viewport's
-// top-right corner behind the content. Single-colour dots (white on light,
-// green glow on dark) plus a "setup mode" network layer: a few dozen
-// short links between neighbouring dots fade in and out on independent
-// rhythms, so the sphere looks like nodes connecting and disconnecting
-// while the system wires itself up. `boostRef` lets the page trigger a
-// brief hyper-spin (easter egg). Respects prefers-reduced-motion with a
-// single static frame.
+// top-right corner behind the content. Quiet grey-sage dots, plus a
+// "setup mode" layer: individual nodes keep coming online — a random dot
+// lights up brand green, emits a soft expanding ping ring, then settles
+// back down — like systems booting one by one. `boostRef` lets the page
+// trigger a brief hyper-spin (easter egg). Respects prefers-reduced-motion
+// with a single static frame.
 // ---------------------------------------------------------------------------
 function Globe({ size = 820, points = 1700, theme = "light", boostRef = null }) {
   const ref = useRef(null);
@@ -678,28 +642,6 @@ function Globe({ size = 820, points = 1700, theme = "light", boostRef = null }) 
       pts.push([Math.cos(th) * r, y, Math.sin(th) * r]);
     }
 
-    // Connection pairs for the setup-mode link effect: sample points
-    // across the sphere, pair each with its nearest neighbour in a
-    // local window, and give every pair its own blink phase + speed so
-    // links connect and disconnect out of sync.
-    const pairs = [];
-    const stride = Math.max(7, Math.floor(N / 110));
-    for (let i = 0; i < N - 1; i += stride) {
-      let best = -1;
-      let bestD = 0.34; // max chord length on the unit sphere
-      const end = Math.min(N, i + stride * 3);
-      for (let j = i + 1; j < end; j++) {
-        const dx = pts[i][0] - pts[j][0];
-        const dy = pts[i][1] - pts[j][1];
-        const dz = pts[i][2] - pts[j][2];
-        const d = Math.sqrt(dx * dx + dy * dy + dz * dz);
-        if (d < bestD) { bestD = d; best = j; }
-      }
-      if (best >= 0) {
-        pairs.push([i, best, Math.random() * Math.PI * 2, 0.35 + Math.random() * 0.7]);
-      }
-    }
-
     const R = size / 2 - 10;
     const cx = size / 2;
     const cy = size / 2;
@@ -707,12 +649,15 @@ function Globe({ size = 820, points = 1700, theme = "light", boostRef = null }) 
     const cosT = Math.cos(tilt);
     const sinT = Math.sin(tilt);
     const dark = theme === "dark";
-    // Per-frame projected coordinates, reused by the link pass.
+    // Per-frame projected coordinates, reused by the blip pass.
     const px = new Float32Array(N);
     const py = new Float32Array(N);
     const pd = new Float32Array(N);
+    // Nodes currently "coming online".
+    const blips = [];
+    let lastSpawn = 0;
 
-    const drawFrame = (rot, tSec) => {
+    const drawFrame = (rot, tMs) => {
       ctx.clearRect(0, 0, size, size);
       const grad = ctx.createRadialGradient(cx - R * 0.35, cy - R * 0.35, R * 0.1, cx, cy, R);
       if (dark) {
@@ -720,8 +665,8 @@ function Globe({ size = 820, points = 1700, theme = "light", boostRef = null }) 
         grad.addColorStop(0.7, "rgba(74,222,128,0.03)");
         grad.addColorStop(1, "rgba(74,222,128,0)");
       } else {
-        grad.addColorStop(0, "rgba(255,255,255,0.70)");
-        grad.addColorStop(0.75, "rgba(255,255,255,0.28)");
+        grad.addColorStop(0, "rgba(255,255,255,0.85)");
+        grad.addColorStop(0.75, "rgba(255,255,255,0.35)");
         grad.addColorStop(1, "rgba(255,255,255,0)");
       }
       ctx.fillStyle = grad;
@@ -742,38 +687,47 @@ function Globe({ size = 820, points = 1700, theme = "light", boostRef = null }) 
         const sx = cx + xr * R;
         const sy = cy + yr * R;
         px[i] = sx; py[i] = sy; pd[i] = depth;
-        // Single colour per theme — green glow on dark, pure white on light.
+        // Grey-sage on light (visible on the grey page background),
+        // soft green on dark.
         ctx.fillStyle = dark
           ? `rgba(74,222,128,${0.05 + depth * 0.24})`
-          : `rgba(255,255,255,${0.22 + depth * 0.66})`;
+          : `rgba(101,117,109,${0.07 + depth * 0.26})`;
         ctx.beginPath();
         ctx.arc(sx, sy, (0.6 + depth * 1.25) * dotScale, 0, Math.PI * 2);
         ctx.fill();
       }
 
-      // Setup-mode links — each pair blinks on its own rhythm; only
-      // front-facing links draw, and brightness follows depth so the
-      // network sits ON the sphere instead of floating over it.
-      ctx.lineWidth = 1;
-      for (const [i, j, phase, speed] of pairs) {
-        const blink = Math.sin(tSec * speed + phase);
-        if (blink < 0.2) continue; // disconnected right now
-        const vis = Math.min(pd[i], pd[j]);
-        if (vis < 0.5) continue; // back of the sphere
-        const a = (blink - 0.2) * 1.1 * (vis - 0.4);
-        ctx.strokeStyle = dark
-          ? `rgba(74,222,128,${a * 0.55})`
-          : `rgba(255,255,255,${a * 0.95})`;
+      // Setup-mode blips: spawn a node every ~300ms, let it flare brand
+      // green with an expanding ping ring, then fade. Front hemisphere
+      // only, so the effect reads as activity ON the visible sphere.
+      if (tMs - lastSpawn > 300 && blips.length < 9) {
+        lastSpawn = tMs;
+        blips.push({ idx: Math.floor(Math.random() * N), born: tMs, life: 1500 + Math.random() * 1300 });
+      }
+      const coreColor = dark ? "74,222,128" : "45,107,79";
+      for (let b = blips.length - 1; b >= 0; b--) {
+        const age = (tMs - blips[b].born) / blips[b].life;
+        if (age >= 1) { blips.splice(b, 1); continue; }
+        const i = blips[b].idx;
+        if (pd[i] < 0.45) continue; // node is on the far side right now
+        const env = age < 0.22 ? age / 0.22 : 1 - (age - 0.22) / 0.78;
+        // Lit core.
+        ctx.fillStyle = `rgba(${coreColor},${(0.85 * env).toFixed(3)})`;
         ctx.beginPath();
-        ctx.moveTo(px[i], py[i]);
-        ctx.lineTo(px[j], py[j]);
+        ctx.arc(px[i], py[i], (1.6 + pd[i] * 1.6) * dotScale, 0, Math.PI * 2);
+        ctx.fill();
+        // Expanding ping ring.
+        ctx.strokeStyle = `rgba(${coreColor},${(0.4 * (1 - age)).toFixed(3)})`;
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.arc(px[i], py[i], 4 + age * 22, 0, Math.PI * 2);
         ctx.stroke();
       }
     };
 
     const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
     if (reduced) {
-      drawFrame(0.6, 1.2);
+      drawFrame(0.6, 0);
       return undefined;
     }
     let raf;
@@ -788,7 +742,7 @@ function Globe({ size = 820, points = 1700, theme = "light", boostRef = null }) 
       const boostedAgo = boostRef ? t - (boostRef.current || -1e9) : Infinity;
       const speed = boostedAgo < 4000 ? 1 + 11 * (1 - boostedAgo / 4000) : 1;
       rot += dt * 0.00003 * speed;
-      drawFrame(rot, t / 1000);
+      drawFrame(rot, t);
       raf = requestAnimationFrame(loop);
     };
     raf = requestAnimationFrame(loop);
@@ -1240,7 +1194,6 @@ export default function Onboarding() {
                 onClick={() => setBoosted(true)}
               >
                 SEoS
-                <span className="seos-tip">SEoS Assistant — Search Engine on Steroids</span>
               </span>
               {" Assistant."}
             </h1>
