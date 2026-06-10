@@ -17,8 +17,13 @@ import { getConversionSummary } from "../models/ChatConversion.server";
 
 const MODEL_LABELS = {
   "claude-sonnet-4-20250514": "Standard",
+  "claude-sonnet-4-6": "Standard",
   "claude-haiku-4-5-20251001": "Fast",
+  "claude-haiku-4-5": "Fast",
   "claude-opus-4-20250514": "Advanced",
+  "claude-opus-4-6": "Advanced",
+  "claude-opus-4-7": "Advanced",
+  "claude-opus-4-8": "Advanced",
 };
 const modelLabel = (m) => MODEL_LABELS[m] || m;
 

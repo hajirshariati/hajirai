@@ -4625,6 +4625,95 @@ export const action = async ({ request }) => {
           // OFF), the new path runs in parallel into a discard buffer
           // and only its diff vs. the old answer is logged.
           // ──────────────────────────────────────────────────────────
+          // Follow-up suggestion generation — shared by the LLM-owns and
+          // legacy paths so the admin "Follow-up questions" toggle works
+          // identically on both. Returns the Haiku usage object (or null).
+          const emitFollowUpSuggestions = async ({ lastText, recommenderInvoked }) => {
+            const hasChoiceButtons = /<<[^<>]+>>/.test(lastText);
+            if (config.showFollowUps === false || hasChoiceButtons || recommenderInvoked) return null;
+            try {
+              const catalogLine = catalogProductTypes.length > 0
+                ? `\n\nCATALOG ALLOW-LIST: this store sells ONLY these product categories: ${catalogProductTypes.join(", ")}. Any follow-up that names or implies a category MUST use one of these exact categories — it is FORBIDDEN to reference a category not on this list.`
+                : "";
+              const fuRes = await anthropic.messages.create({
+                model: HAIKU_MODEL,
+                max_tokens: 150,
+                messages: [
+                  {
+                    role: "user",
+                    content: `You are generating follow-up suggestions for "${ctx.shop}", a Shopify store. The store's AI assistant is named "${config.assistantName || "AI Shopping Assistant"}".\n\nCustomer asked: "${String(body.message).slice(0, 200)}"\nAssistant replied: "${lastText.slice(0, 300)}"${catalogLine}\n\nSuggest 2-3 brief follow-up questions the CUSTOMER would naturally ask next.\n\nRULES:\n- Questions MUST be directly relevant to the assistant's response. If the assistant asked the customer a question, suggest answers the customer might give — not unrelated questions.\n- Only reference products, styles, or details the assistant ACTUALLY mentioned. Never ask about things not yet discussed.\n- NEVER invent product categories the store might not carry. Only reference categories or product types that appeared in the conversation above OR appear in the CATALOG ALLOW-LIST above.\n- NEVER mention "brands" — this is a single-brand store.\n- NEVER ask about shoe size, availability, or pricing if no specific product has been shown yet.\n- NEVER suggest "Tell me more about [TechnologyName]", "What is [TM]", "How does [feature] work", or "Explain [material]" — those questions trigger AI hallucination because the catalog has marketing-level descriptions, not engineering specs. The AI cannot answer them accurately.\n- NEVER reference a trademarked or branded technology name (anything with TM, ®, ™, or a TitleCase product-tech term like UltraSKY, OrthoLite, etc.) UNLESS that exact term appeared verbatim in the assistant's reply above. Even then, prefer pivot questions over tech deep-dives.\n- NEVER ask about specific specs or measurements (heel height, stack height, drop, weight, density, foam grade, dimensions, gradient) unless the assistant's reply quoted those exact numbers.\n- PREFER pivot questions: different gender ("Do you have these for women?"), different category ("Show me sneakers"), different price/feature filter ("Anything under $100?", "Do you have wider widths?"), or honest comparisons between products already mentioned.\n- Write from the customer's perspective.\n- Keep questions short and specific.\n\nReturn ONLY a JSON array of strings, nothing else.`,
+                  },
+                ],
+              });
+              const raw = fuRes.content?.[0]?.text || "";
+              const match = raw.match(/\[[\s\S]*\]/);
+              if (match) {
+                let questions = JSON.parse(match[0]).filter((q) => typeof q === "string").slice(0, 3);
+                // Server-side validator. Even with tightened prompt
+                // rules, Haiku occasionally generates questions the
+                // main AI can't answer (tech-name deep-dives, spec
+                // numbers, deeply branded terms). Strip those before
+                // emit. Customer is better off with 1-2 good
+                // suggestions than 3 with one that triggers a
+                // hallucinated reply on the next turn.
+                // Established gender from the conversation, used to drop
+                // suggestions that name the opposite gender (logic + unit
+                // tests live in chat-postprocessing.suggestionContradictsGender).
+                const conversationTextForGender = messages
+                  .map((m) => (typeof m.content === "string" ? m.content : ""))
+                  .join("\n");
+                const establishedGender = detectLatestGender(conversationTextForGender);
+                const filtered = [];
+                const dropped = [];
+                for (const q of questions) {
+                  if (suggestionContradictsGender(q, establishedGender)) {
+                    dropped.push({ q, reason: `gender contradicts established=${establishedGender}` });
+                    continue;
+                  }
+                  // Single code-owned answerability gate: never suggest a
+                  // follow-up the bot can't answer (spec deep-dives, branded
+                  // tech names, unverifiable discount mechanics).
+                  const verdict = isUnanswerableSuggestion(q, {
+                    lastText,
+                    latestUserMessage: String(body.message || ""),
+                    catalogCategories: allCatalogCategories,
+                    categoryAttributeCoverage,
+                  });
+                  if (verdict.unanswerable) {
+                    dropped.push({ q, reason: verdict.reason });
+                    continue;
+                  }
+                  const catalogVerdict = catalogGroundedSuggestionVerdict(q, ctx);
+                  if (!catalogVerdict.possible) {
+                    dropped.push({
+                      q,
+                      reason:
+                        `${catalogVerdict.reason}; ` +
+                        `scope=${JSON.stringify(catalogVerdict.effectiveConstraints)}`,
+                    });
+                    continue;
+                  }
+                  filtered.push(q);
+                }
+                if (dropped.length > 0) {
+                  console.log(
+                    `[chat] ${ctx.shop} follow-up validator: dropped ${dropped.length}/${questions.length} suggestion(s) — ` +
+                      dropped.map((d) => `"${d.q.slice(0, 50)}" (${d.reason})`).join("; "),
+                  );
+                }
+                questions = filtered;
+                if (questions.length > 0) {
+                  controller.enqueue(encoder.encode(sseChunk({ type: "suggestions", questions })));
+                }
+              }
+              return fuRes.usage || null;
+            } catch (fuErr) {
+              console.error("[chat] follow-up error:", fuErr?.message);
+              return null;
+            }
+            return null;
+          };
+
           const {
             isLlmOwnsTurnEnabled,
             isShadowModeEnabled,
@@ -4635,24 +4724,40 @@ export const action = async ({ request }) => {
               const stored = config.anthropicModel || DEFAULT_MODEL;
               return DEPRECATED_MODELS.has(stored) ? DEFAULT_MODEL : stored;
             })();
-            // Hybrid model routing (cost). Haiku 4.5 is 3× cheaper than
-            // Sonnet and handles the bread-and-butter turns (search,
-            // show, follow-up) well — the grounding validator polices
-            // facts identically on both. Sonnet handles the turns that
-            // need synthesis: compares, and any validator RETRY (a
-            // rejected attempt escalates to the stronger model for the
-            // correction). HYBRID_MODEL_ROUTING=false pins everything
-            // back to the configured Sonnet model.
+            // Hybrid model routing (cost), honoring the merchant's
+            // Model Strategy setting from the admin panel (app/api-keys):
+            //   smart (default)  — Haiku for standard turns; the
+            //                      configured Standard model for compare
+            //                      turns and ALL validator retries (a
+            //                      rejected attempt escalates to the
+            //                      stronger model for the correction).
+            //   cost-optimized   — Haiku for everything except validator
+            //                      retries. Lowest spend; the validator
+            //                      escalation keeps facts correct.
+            //   always-opus      — every turn on the Advanced model.
+            //   always-sonnet    — every turn on the Standard model
+            //                      (legacy stored value).
+            //   always-haiku     — every turn on the Fast model
+            //                      (legacy stored value).
+            // HYBRID_MODEL_ROUTING=false pins everything back to the
+            // configured Standard model regardless of strategy.
             const hybridRouting =
               String(process.env.HYBRID_MODEL_ROUTING || "").toLowerCase() !== "false";
-            const HAIKU_MODEL = "claude-haiku-4-5";
+            const turnStrategy = String(config.modelStrategy || "smart");
             const latestForRouting = String(body.message || "");
-            const needsSonnet =
+            const needsStrongModel =
               detectComparisonIntent(latestForRouting) ||
               /\b(?:vs\.?|versus|difference between|compare)\b/i.test(latestForRouting);
             const pickModel = (attempt) => {
               if (!hybridRouting) return sonnetModelForClean;
-              if (attempt > 0 || needsSonnet) return sonnetModelForClean;
+              if (turnStrategy === "always-opus") return OPUS_MODEL;
+              if (turnStrategy === "always-haiku") return HAIKU_MODEL;
+              if (turnStrategy === "always-sonnet") return sonnetModelForClean;
+              if (turnStrategy === "cost-optimized") {
+                return attempt > 0 ? sonnetModelForClean : HAIKU_MODEL;
+              }
+              // smart (default)
+              if (attempt > 0 || needsStrongModel) return sonnetModelForClean;
               return HAIKU_MODEL;
             };
             // Each attempt runs into its OWN buffer — only the accepted
@@ -4708,6 +4813,18 @@ export const action = async ({ request }) => {
             // then close the stream — runAgenticLoop does NOT emit
             // `done` itself (the legacy path emits it after follow-ups).
             for (const c of attemptBuf) controller.enqueue(c);
+            // Honor the admin "Follow-up questions" toggle on this path
+            // too — previously only the legacy path generated them, so
+            // the setting silently did nothing under LLM_OWNS_ALL_TURNS.
+            let llmOwnsFuUsage = null;
+            try {
+              llmOwnsFuUsage = await emitFollowUpSuggestions({
+                lastText: cleanResult.fullResponseText || "",
+                recommenderInvoked: cleanResult.recommenderInvokedThisTurn === true,
+              });
+            } catch (fuErr) {
+              console.error("[chat] follow-up error (llm-owns):", fuErr?.message);
+            }
             controller.enqueue(encoder.encode(sseChunk({ type: "done" })));
             const finalCards =
               cleanResult.turnResult?.products
@@ -4721,6 +4838,7 @@ export const action = async ({ request }) => {
             // tokens, dominating latency. Live trace 2026-06-10
             // showed 14.5s hops; this should cut them substantially.
             const usage = cleanResult.totalUsage || {};
+            if (llmOwnsFuUsage) addUsage(usage, llmOwnsFuUsage);
             console.log(
               `[llm-owns-turn] ${ctx.shop} final ok=${cleanResult.validation.ok} ` +
                 `attempts=${cleanResult.validation.attempts} ` +
@@ -4730,6 +4848,16 @@ export const action = async ({ request }) => {
                 `write:${usage.cache_creation_input_tokens || 0}/` +
                 `fresh:${usage.input_tokens || 0}`,
             );
+            // Record usage for the admin Analytics dashboard and the
+            // daily message cap. Previously only the legacy path
+            // recorded — under LLM_OWNS_ALL_TURNS the dashboard showed
+            // zero cost/messages and the daily cap could never trigger.
+            recordChatUsage({
+              shop: session.shop,
+              model: cleanResult.model || pickModel(0),
+              usage,
+              toolCalls: cleanResult.toolCallCount || 0,
+            }).catch((err) => console.error("[chat] usage log error:", err?.message));
             return;
           }
           let shadowResultForDiff = null;
@@ -4979,87 +5107,11 @@ export const action = async ({ request }) => {
           // the resolver may not have, leading to dead-ends. Customer
           // already got their definitive answer — don't dilute with
           // questions we can't reliably fulfill.
-          if (config.showFollowUps !== false && !hasChoiceButtons && !result.recommenderInvokedThisTurn) {
-            try {
-              const catalogLine = catalogProductTypes.length > 0
-                ? `\n\nCATALOG ALLOW-LIST: this store sells ONLY these product categories: ${catalogProductTypes.join(", ")}. Any follow-up that names or implies a category MUST use one of these exact categories — it is FORBIDDEN to reference a category not on this list.`
-                : "";
-              const fuRes = await anthropic.messages.create({
-                model: HAIKU_MODEL,
-                max_tokens: 150,
-                messages: [
-                  {
-                    role: "user",
-                    content: `You are generating follow-up suggestions for "${ctx.shop}", a Shopify store. The store's AI assistant is named "${config.assistantName || "AI Shopping Assistant"}".\n\nCustomer asked: "${String(body.message).slice(0, 200)}"\nAssistant replied: "${lastText.slice(0, 300)}"${catalogLine}\n\nSuggest 2-3 brief follow-up questions the CUSTOMER would naturally ask next.\n\nRULES:\n- Questions MUST be directly relevant to the assistant's response. If the assistant asked the customer a question, suggest answers the customer might give — not unrelated questions.\n- Only reference products, styles, or details the assistant ACTUALLY mentioned. Never ask about things not yet discussed.\n- NEVER invent product categories the store might not carry. Only reference categories or product types that appeared in the conversation above OR appear in the CATALOG ALLOW-LIST above.\n- NEVER mention "brands" — this is a single-brand store.\n- NEVER ask about shoe size, availability, or pricing if no specific product has been shown yet.\n- NEVER suggest "Tell me more about [TechnologyName]", "What is [TM]", "How does [feature] work", or "Explain [material]" — those questions trigger AI hallucination because the catalog has marketing-level descriptions, not engineering specs. The AI cannot answer them accurately.\n- NEVER reference a trademarked or branded technology name (anything with TM, ®, ™, or a TitleCase product-tech term like UltraSKY, OrthoLite, etc.) UNLESS that exact term appeared verbatim in the assistant's reply above. Even then, prefer pivot questions over tech deep-dives.\n- NEVER ask about specific specs or measurements (heel height, stack height, drop, weight, density, foam grade, dimensions, gradient) unless the assistant's reply quoted those exact numbers.\n- PREFER pivot questions: different gender ("Do you have these for women?"), different category ("Show me sneakers"), different price/feature filter ("Anything under $100?", "Do you have wider widths?"), or honest comparisons between products already mentioned.\n- Write from the customer's perspective.\n- Keep questions short and specific.\n\nReturn ONLY a JSON array of strings, nothing else.`,
-                  },
-                ],
-              });
-              const raw = fuRes.content?.[0]?.text || "";
-              const match = raw.match(/\[[\s\S]*\]/);
-              if (match) {
-                let questions = JSON.parse(match[0]).filter((q) => typeof q === "string").slice(0, 3);
-                // Server-side validator. Even with tightened prompt
-                // rules, Haiku occasionally generates questions the
-                // main AI can't answer (tech-name deep-dives, spec
-                // numbers, deeply branded terms). Strip those before
-                // emit. Customer is better off with 1-2 good
-                // suggestions than 3 with one that triggers a
-                // hallucinated reply on the next turn.
-                // Established gender from the conversation, used to drop
-                // suggestions that name the opposite gender (logic + unit
-                // tests live in chat-postprocessing.suggestionContradictsGender).
-                const conversationTextForGender = messages
-                  .map((m) => (typeof m.content === "string" ? m.content : ""))
-                  .join("\n");
-                const establishedGender = detectLatestGender(conversationTextForGender);
-                const filtered = [];
-                const dropped = [];
-                for (const q of questions) {
-                  if (suggestionContradictsGender(q, establishedGender)) {
-                    dropped.push({ q, reason: `gender contradicts established=${establishedGender}` });
-                    continue;
-                  }
-                  // Single code-owned answerability gate: never suggest a
-                  // follow-up the bot can't answer (spec deep-dives, branded
-                  // tech names, unverifiable discount mechanics).
-                  const verdict = isUnanswerableSuggestion(q, {
-                    lastText,
-                    latestUserMessage: String(body.message || ""),
-                    catalogCategories: allCatalogCategories,
-                    categoryAttributeCoverage,
-                  });
-                  if (verdict.unanswerable) {
-                    dropped.push({ q, reason: verdict.reason });
-                    continue;
-                  }
-                  const catalogVerdict = catalogGroundedSuggestionVerdict(q, ctx);
-                  if (!catalogVerdict.possible) {
-                    dropped.push({
-                      q,
-                      reason:
-                        `${catalogVerdict.reason}; ` +
-                        `scope=${JSON.stringify(catalogVerdict.effectiveConstraints)}`,
-                    });
-                    continue;
-                  }
-                  filtered.push(q);
-                }
-                if (dropped.length > 0) {
-                  console.log(
-                    `[chat] ${ctx.shop} follow-up validator: dropped ${dropped.length}/${questions.length} suggestion(s) — ` +
-                      dropped.map((d) => `"${d.q.slice(0, 50)}" (${d.reason})`).join("; "),
-                  );
-                }
-                questions = filtered;
-                if (questions.length > 0) {
-                  controller.enqueue(encoder.encode(sseChunk({ type: "suggestions", questions })));
-                }
-              }
-              addUsage(result.totalUsage, fuRes.usage || {});
-            } catch (fuErr) {
-              console.error("[chat] follow-up error:", fuErr?.message);
-            }
-          }
+          const fuUsage = await emitFollowUpSuggestions({
+            lastText,
+            recommenderInvoked: result.recommenderInvokedThisTurn === true,
+          });
+          if (fuUsage) addUsage(result.totalUsage, fuUsage);
 
           controller.enqueue(encoder.encode(sseChunk({ type: "done" })));
 

@@ -499,11 +499,11 @@ const MODEL_OPTIONS = [
 // older 5-value vocabulary (smart, cost-optimized, always-sonnet,
 // always-haiku, always-opus) so stored configs keep working — but the
 // admin only exposes three so the choice stays clear.
-//   • Smart (recommended): best balance — Fast model for trivial
-//     follow-ups, Standard for everything that matters.
-//   • Cost optimized: Fast model for safe product turns, Standard
-//     for medical / comparison / sizing / policy. Lower spend, same
-//     correctness on the hard turns.
+//   • Smart (recommended): best balance — Fast model for standard
+//     turns, Standard for comparisons + automatic escalation when a
+//     reply fails the grounding fact-check.
+//   • Cost optimized: Fast model for every turn (comparisons too);
+//     Standard only on grounding-check escalations. Lowest spend.
 //   • Premium quality: every turn on the Advanced model. Maximum
 //     capability, highest cost. Enterprise plan only.
 // "Always use Standard" and "Always use Fast" were removed: Standard
@@ -516,8 +516,8 @@ const STRATEGY_OPTIONS = [
 ];
 
 const STRATEGY_HELP = {
-  smart: "Uses the Fast model for simple follow-ups like \"thanks\" or \"ok\", and the Standard model for product questions and complex queries. Best balance of cost and quality.",
-  "cost-optimized": "Uses the Fast model for simple product-listing and refinement turns where product truth is code-owned, while keeping the Standard model for medical, comparison, policy, sizing, and complex reasoning turns.",
+  smart: "Uses the Fast model for standard shopping turns and the Standard model for product comparisons and complex queries. Every reply is fact-checked against live catalog data; if a check fails, the turn automatically re-runs on the Standard model. Best balance of cost and quality.",
+  "cost-optimized": "Uses the Fast model for every turn, including comparisons. Every reply is still fact-checked against live catalog data, and a failed check automatically re-runs the turn on the Standard model — so product facts stay correct at the lowest cost.",
   "always-opus": "Every message uses the Advanced model. Maximum capability for complex catalogs and nuanced shopper questions. Highest cost.",
   // Legacy values still mapped so existing configs render a sensible
   // helper line; the dropdown auto-normalizes them to 'smart' below.
@@ -796,8 +796,8 @@ export default function ApiKeys() {
                     onChange={setModel}
                     helpText={
                       plan.features?.advancedModel
-                        ? "Used for product questions, first messages, and complex queries."
-                        : "Used for product questions, first messages, and complex queries. The Advanced model is available on the Enterprise plan."
+                        ? "Your Standard model. With Smart routing it handles product comparisons, complex queries, and automatic escalations when a reply fails the grounding fact-check; routine turns use the Fast model."
+                        : "Your Standard model. With Smart routing it handles product comparisons, complex queries, and automatic escalations when a reply fails the grounding fact-check; routine turns use the Fast model. The Advanced model is available on the Enterprise plan."
                     }
                   />
 
@@ -822,19 +822,20 @@ export default function ApiKeys() {
                       {strategy === "smart" && (
                         <Banner tone="info">
                           <Text as="p" variant="bodySm">
-                            <strong>How smart routing works:</strong> When a customer sends a simple follow-up
-                            like "thanks", "ok", or "bye", SEoS Assistant uses the Fast model.
-                            Product questions, first messages, and detailed queries always use your primary model.
+                            <strong>How smart routing works:</strong> Standard shopping turns run on the
+                            Fast model. Product comparisons and complex queries run on your primary model.
+                            Every reply is fact-checked against your live catalog before it reaches the
+                            customer — if a check fails, the turn automatically re-runs on your primary model.
                           </Text>
                         </Banner>
                       )}
                       {strategy === "cost-optimized" && (
                         <Banner tone="info">
                           <Text as="p" variant="bodySm">
-                            <strong>How cost optimized smart routing works:</strong> Simple product-listing
-                            requests and refinements use the Fast model because the app code owns product cards
-                            and listing facts. Medical, comparison, policy, sizing, variant-detail, and complex
-                            turns still use your primary model.
+                            <strong>How cost optimized routing works:</strong> Every turn — including
+                            comparisons — runs on the Fast model for the lowest cost. Every reply is still
+                            fact-checked against your live catalog, and any reply that fails the check
+                            automatically re-runs on your primary model, so product facts stay correct.
                           </Text>
                         </Banner>
                       )}
@@ -1035,13 +1036,13 @@ export default function ApiKeys() {
                   <PlanGate
                     plan={plan}
                     feature="promptCaching"
-                    summary="Prompt caching lowers input token cost on repeat messages by reusing the cached system prompt. Recommended for stores with 1,000+ monthly conversations."
+                    summary="Prompt caching lowers input token cost by reusing the cached system prompt across turns. The current chat engine always caches the stable part of the prompt; this toggle only affects the legacy engine."
                   >
                     <Checkbox
                       label="Prompt caching"
                       checked={caching}
                       onChange={setCaching}
-                      helpText="Caches the system prompt across requests so repeat messages reuse it instead of re-sending it each turn. Recommended for stores with 1,000+ monthly conversations."
+                      helpText="The current chat engine always caches the stable part of the system prompt (this is what keeps responses fast and costs low). This toggle is kept for the legacy engine only — leaving it on or off does not change the current engine's behavior."
                     />
                   </PlanGate>
                 </BlockStack>

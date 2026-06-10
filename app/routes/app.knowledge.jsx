@@ -285,8 +285,9 @@ export const action = async ({ request }) => {
     const value = formData.get("knowledgeRagEnabled") === "true";
     if (value) {
       // Block opt-in if no embedding provider — flag would be on but
-      // retrieval would always return [] and silently fall back to
-      // legacy. Better to nudge the merchant to Settings first.
+      // retrieval would report "unavailable" (null) every turn and
+      // silently fall back to the full knowledge dump. Better to
+      // nudge the merchant to Settings first.
       const cfg = await getShopConfig(session.shop);
       const resolved = resolveShopEmbedding(cfg);
       if (!resolved) {
@@ -1024,7 +1025,7 @@ function KnowledgeFilesCard({ files, ragEnabled, embeddingProvider, campaignByte
               label="Use RAG retrieval (only inject the most relevant knowledge per chat turn)"
               helpText={
                 ragHasProvider
-                  ? "Instead of dumping every knowledge file into every chat, the AI receives only the top sections most relevant to the customer's current message. Recommended once your corpus is heavy. Requires running the backfill once after enabling."
+                  ? "Instead of dumping every knowledge file into every chat, the AI receives only the top sections most relevant to the customer's current message — and nothing at all when no section is relevant (e.g. pure product questions). Recommended once your corpus is heavy. Requires running the backfill once after enabling."
                   : "Configure an embedding provider (OpenAI or Voyage) and key in Settings before enabling. Without one, RAG can't embed your knowledge files."
               }
               checked={ragEnabled}
@@ -2201,10 +2202,10 @@ function SearchRulesCard({ initial }) {
         <BlockStack gap="100">
           <InlineStack gap="200" blockAlign="center">
             <Text as="h2" variant="headingMd">Search rules</Text>
-            <Badge tone="critical">Hard filter — highest priority</Badge>
+            <Badge tone="critical">Hard filter</Badge>
           </InlineStack>
           <Text as="p" tone="subdued">
-            When a trigger keyword appears in the conversation, matching products are hidden from search results before the AI sees them. Rules are evaluated top-to-bottom — first match wins.
+            When a trigger keyword appears in the conversation, matching products are hidden from search results before the AI sees them. Rules are evaluated top-to-bottom — first match wins. Skipped when the customer’s search already targets a specific category (a focused category search overrides broad exclusions) or when an override trigger matches.
           </Text>
           <Text as="p" tone="subdued" variant="bodySm">
             Example: trigger <code>foot pain, plantar</code> → exclude <code>sneaker, sandal, boot</code>. The customer sees only relief products like orthotics. Add an <em>override</em> like <code>new footwear, new shoes</code> to let the rule be skipped when the customer explicitly asks for shoes.
