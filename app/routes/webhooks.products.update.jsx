@@ -1,28 +1,49 @@
 import { authenticate } from "../shopify.server";
-import { upsertProductFromWebhook } from "../models/Product.server";
+import { upsertProductFromWebhook, syncCatalog } from "../models/Product.server";
 import { getShopConfig } from "../models/ShopConfig.server";
-import { embedSingleProductInBackground } from "../lib/embeddings.server";
+import { resolveShopEmbedding, embedAndStoreProducts } from "../lib/embeddings.server";
 import prisma from "../db.server";
 
-// In-memory dedup window. Shopify fires PRODUCTS_UPDATE for many small
-// changes (inventory adjustments, metafield tweaks, variant edits) that
-// don't change anything we care about for chat. With 800+ products this
-// becomes a webhook storm — every burst opens a Postgres connection and
-// has caused FATAL "too many clients already" errors during deploys.
+// ── Webhook storm handling ─────────────────────────────────────────
 //
-// Coalesce repeat webhooks for the same product within 30s to a single
-// processing pass. The ack still happens immediately so Shopify sees a
-// 200 and doesn't retry. Acceptable trade-off: a real change might be
-// up to 30s stale until the next non-deduped webhook comes through —
-// fine for chat (RAG / search) which doesn't need second-by-second
-// freshness.
+// Shopify fires PRODUCTS_UPDATE per product. A bulk operation on the
+// store (re-tagging, an inventory app, a feed sync) touches the whole
+// catalog and produces hundreds of webhooks in seconds, then a trickle
+// for many minutes. Live trace 2026-06-10 16:50: ~150 distinct
+// products in 25s. Each webhook used to cost a DB query + a Shopify
+// GraphQL fetch + a multi-row upsert + an embedding API call — run
+// concurrently that has caused Postgres "too many clients" FATALs and
+// embedding-provider failures ("[embeddings] batch failed").
 //
-// In-memory only — survives a single container restart loses dedup
-// state (first 30s after restart processes everything). Multi-instance
-// deployments would each have their own map. Both fine for this app.
+// Three layers of defense, all in-memory (single-instance app):
+//
+//  1. DEDUP — repeats of the SAME product within 30s are dropped
+//     outright (covers Shopify's at-least-once redelivery and rapid
+//     consecutive edits to one product).
+//
+//  2. COALESCE — the request handler only enqueues the product id and
+//     acks 200 immediately. A drain runs DEBOUNCE_MS later and
+//     processes the batch with limited concurrency, batching the
+//     embedding calls instead of one API call per product.
+//
+//  3. CIRCUIT BREAKER — when one drain batch holds ≥ FULL_SYNC_THRESHOLD
+//     distinct products, that's a bulk catalog operation: one paginated
+//     full sync is far cheaper than N single-product GraphQL fetches.
+//     syncCatalog sets catalogSyncState.status="running", which makes
+//     the drains for the rest of the storm no-ops until it finishes.
+//
+// Trade-off: a product change can be up to ~DEBOUNCE_MS + drain time
+// stale in chat. Search/RAG doesn't need second-by-second freshness.
+
 const RECENT_WEBHOOKS = new Map(); // key=`${shop}:${productId}` → ms
 const DEDUP_WINDOW_MS = 30_000;
 const MAX_ENTRIES = 5000;
+
+const DEBOUNCE_MS = 8_000;
+const DRAIN_CONCURRENCY = 3;
+const FULL_SYNC_THRESHOLD = 40;
+
+const QUEUES = new Map(); // shop → { ids:Set<number|string>, timer, admin, draining }
 
 function shouldDedupe(shop, productId) {
   const key = `${shop}:${productId}`;
@@ -30,9 +51,6 @@ function shouldDedupe(shop, productId) {
   const last = RECENT_WEBHOOKS.get(key);
   if (last && now - last < DEDUP_WINDOW_MS) return true;
   RECENT_WEBHOOKS.set(key, now);
-  // Opportunistic cleanup so the map doesn't grow forever in a long-
-  // running process. Triggered only when we cross the soft cap, so
-  // hot path stays cheap.
   if (RECENT_WEBHOOKS.size > MAX_ENTRIES) {
     const cutoff = now - DEDUP_WINDOW_MS;
     for (const [k, t] of RECENT_WEBHOOKS) {
@@ -42,29 +60,126 @@ function shouldDedupe(shop, productId) {
   return false;
 }
 
+async function drainQueue(shop) {
+  const q = QUEUES.get(shop);
+  if (!q) return;
+  q.timer = null;
+  if (q.draining) return;
+  q.draining = true;
+
+  try {
+    // A full sync (manual or breaker-triggered) is already rebuilding
+    // the catalog — these queued updates will be covered by it.
+    const syncState = await prisma.catalogSyncState
+      .findUnique({ where: { shop } })
+      .catch(() => null);
+    if (syncState?.status === "running") {
+      q.ids.clear();
+      return;
+    }
+
+    const ids = Array.from(q.ids);
+    q.ids.clear();
+    const admin = q.admin;
+    if (!admin || ids.length === 0) return;
+
+    if (ids.length >= FULL_SYNC_THRESHOLD) {
+      console.log(
+        `[webhook PRODUCTS_UPDATE] ${shop}: ${ids.length} distinct products in one burst — ` +
+          `bulk operation detected, running ONE full catalog sync instead of ${ids.length} single fetches`,
+      );
+      try {
+        await syncCatalog(admin, shop);
+      } catch (err) {
+        console.error(`[webhook PRODUCTS_UPDATE] full sync failed:`, err?.message || err);
+      }
+      // Fall through to re-embed the touched products below (the full
+      // sync refreshes rows but does not recompute embeddings).
+    } else {
+      console.log(
+        `[webhook PRODUCTS_UPDATE] ${shop}: draining ${ids.length} coalesced update(s)`,
+      );
+      let next = 0;
+      const worker = async () => {
+        while (next < ids.length) {
+          const id = ids[next++];
+          try {
+            await upsertProductFromWebhook(shop, { id }, admin);
+          } catch (err) {
+            console.error(`[webhook PRODUCTS_UPDATE] upsert ${id} failed:`, err?.message || err);
+          }
+        }
+      };
+      await Promise.all(
+        Array.from({ length: Math.min(DRAIN_CONCURRENCY, ids.length) }, worker),
+      );
+    }
+
+    // One batched embedding pass for the whole drain instead of one
+    // background API call per product.
+    try {
+      const config = await getShopConfig(shop).catch(() => null);
+      const resolved = config ? resolveShopEmbedding(config) : null;
+      if (resolved) {
+        const gids = ids.map((id) =>
+          typeof id === "string" && id.startsWith("gid://")
+            ? id
+            : `gid://shopify/Product/${id}`,
+        );
+        const rows = await prisma.product.findMany({
+          where: { shop, shopifyId: { in: gids } },
+          select: {
+            id: true,
+            title: true,
+            vendor: true,
+            productType: true,
+            tags: true,
+            description: true,
+            attributesJson: true,
+          },
+        });
+        if (rows.length > 0) {
+          // Provider-safe chunks (same 50 limit the backfill uses).
+          for (let i = 0; i < rows.length; i += 50) {
+            await embedAndStoreProducts(
+              prisma,
+              resolved.provider,
+              resolved.apiKey,
+              rows.slice(i, i + 50),
+            );
+          }
+        }
+      }
+    } catch (err) {
+      console.error(`[webhook PRODUCTS_UPDATE] batch embed failed:`, err?.message || err);
+    }
+  } finally {
+    q.draining = false;
+    // Webhooks that arrived mid-drain are waiting — schedule the next pass.
+    if (q.ids.size > 0 && !q.timer) {
+      q.timer = setTimeout(() => drainQueue(shop), DEBOUNCE_MS);
+    }
+  }
+}
+
 export const action = async ({ request }) => {
   const { shop, payload, topic, admin } = await authenticate.webhook(request);
 
-  const syncState = await prisma.catalogSyncState.findUnique({ where: { shop } });
-  if (syncState?.status === "running") {
-    return new Response();
-  }
-
-  const productId = payload?.id;
-  if (productId && shouldDedupe(shop, productId)) {
-    return new Response();
-  }
+  const productId = payload?.id || payload?.admin_graphql_api_id;
+  if (!productId || !admin) return new Response();
+  if (shouldDedupe(shop, productId)) return new Response();
 
   console.log(`Received ${topic} webhook for ${shop}`);
-  try {
-    const product = await upsertProductFromWebhook(shop, payload, admin);
-    // Re-embed in background if semantic search is configured for this shop.
-    if (product?.id) {
-      const config = await getShopConfig(shop).catch(() => null);
-      if (config) embedSingleProductInBackground(prisma, shop, product.id, config);
-    }
-  } catch (err) {
-    console.error(`[webhook ${topic}] upsert failed:`, err?.message || err);
+
+  let q = QUEUES.get(shop);
+  if (!q) {
+    q = { ids: new Set(), timer: null, admin: null, draining: false };
+    QUEUES.set(shop, q);
+  }
+  q.ids.add(productId);
+  q.admin = admin; // keep the freshest client for the drain
+  if (!q.timer && !q.draining) {
+    q.timer = setTimeout(() => drainQueue(shop), DEBOUNCE_MS);
   }
   return new Response();
 };
