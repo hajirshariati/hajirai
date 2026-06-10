@@ -921,7 +921,18 @@ export function repairProductTurnAssembly({ text, pool = [], ctx = {}, relaxedFi
   // feature claims, unverifiable concepts (waterproof / roomy toe box
   // / hiking when the merchant didn't tag for it), and sale claims
   // that don't hold across the displayed pool.
-  const claimRepair = verifyClaimsAgainstCards({ text: nextText, cards: pool });
+  // SKIPPED when LLM_OWNS_ALL_TURNS is active: the grounding validator
+  // (app/lib/grounding-validator.server.js) is now the authority on
+  // claim verification and it checks description/tags/attributes/
+  // claim-facts (broader evidence base) before flagging. The legacy
+  // verifier checks tag-only and ZEROES the text on failure — live
+  // trace 2026-06-10: customer asked "which boots have memory foam?",
+  // LLM wrote 172 chars from descriptions, verifier zeroed because
+  // catalog `footbed` attribute is warehouse codes ("ll", "cc") not
+  // "memory foam".
+  const claimRepair = isLlmOwnsTurnActive()
+    ? { changed: false, text: nextText, logs: [] }
+    : verifyClaimsAgainstCards({ text: nextText, cards: pool });
   if (claimRepair.changed) {
     nextText = claimRepair.text;
     changed = true;
@@ -2280,6 +2291,26 @@ export function repairProductResponseText({ text, pool = [], ctx = {}, relaxedFi
   if (!text || !contract.exactScopeSatisfied || !detectAiNoMatchPhrasing(text)) {
     return { text, changed: false, contract };
   }
+  // RELAXED-FILTER HONESTY EXEMPTION.
+  // exactScopeSatisfied means the broader scope (e.g. women's sandals)
+  // was satisfied — but if the search had to RELAX a specific attribute
+  // (e.g. customer asked for color=lapis lazuli, search dropped the
+  // color filter to return any women's sandals), then the AI saying
+  // "we don't have lapis lazuli sandals" is HONEST, not contradictory.
+  // Stripping it leaves the customer with random sandals and no
+  // explanation. Live trace 2026-06-10: customer asked for lapis lazuli
+  // sandals, AI wrote 231 chars including honest denial + alternatives,
+  // this stripper cut to 51 chars of "here are some top sandals to
+  // browse" with no mention of color absence.
+  // We also honor isLlmOwnsTurnEnabled: when the new grounding-validator
+  // path is in charge, denial honesty is the explicit prompt rule and
+  // this code-side stripper must not override it.
+  if (relaxedFilters && Object.keys(relaxedFilters).length > 0) {
+    return { text, changed: false, contract };
+  }
+  if (isLlmOwnsTurnActive()) {
+    return { text, changed: false, contract };
+  }
 
   const stripped = stripAvailabilityDenialSentences(text);
   return {
@@ -2289,6 +2320,17 @@ export function repairProductResponseText({ text, pool = [], ctx = {}, relaxedFi
     changed: true,
     contract,
   };
+}
+
+// Lightweight check — same env-flag rule as
+// app/lib/llm-owns-turn.server.js's isLlmOwnsTurnEnabled(), inlined
+// here to avoid importing the orchestrator into the response-contract
+// (would create a circular reference: chat.jsx → response-contract →
+// llm-owns-turn → chat.jsx).
+function isLlmOwnsTurnActive() {
+  const raw = String(process.env.LLM_OWNS_ALL_TURNS || "").toLowerCase();
+  if (raw === "false") return false;
+  return true;
 }
 
 export function extractTurnChips(text) {
