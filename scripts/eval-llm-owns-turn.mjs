@@ -9,6 +9,7 @@ import {
   isLlmOwnsTurnEnabled,
   isShadowModeEnabled,
   gatherPoolFromMessages,
+  gatherPoolFromResult,
   runWithGroundingRetry,
   shadowDiffRecord,
 } from "../app/lib/llm-owns-turn.server.js";
@@ -93,6 +94,35 @@ test("gatherPoolFromMessages dedupes by handle across multiple tool calls", () =
   ];
   const pool = gatherPoolFromMessages(messages);
   assert.equal(pool.length, 2);
+});
+
+test("gatherPoolFromResult reads turnResult.products first (live agent loop shape)", () => {
+  // Live trace 2026-06-10: validator was reporting pool=0 even when
+  // the reply had 5 cards because runAgenticLoop returns
+  // result.turnResult.products, not a messages array. The pool
+  // gatherer must check that path first.
+  const result = {
+    turnResult: { products: [
+      { handle: "reagan-black", title: "Reagan Boot - Black" },
+      { handle: "scarlett-honey", title: "Scarlett Boot - Honey" },
+    ] },
+  };
+  const pool = gatherPoolFromResult(result, []);
+  assert.equal(pool.length, 2);
+  assert.equal(pool[0].handle, "reagan-black");
+});
+
+test("gatherPoolFromResult falls back to finalProductCards then messages", () => {
+  const result1 = { finalProductCards: [{ handle: "a", title: "A" }] };
+  assert.equal(gatherPoolFromResult(result1).length, 1);
+  const result2 = { messages: [
+    { role: "user", content: [{
+      type: "tool_result", tool_use_id: "t",
+      content: [{ type: "text", text: JSON.stringify({ products: [{ handle: "b", title: "B" }] }) }],
+    }] },
+  ]};
+  assert.equal(gatherPoolFromResult(result2).length, 1);
+  assert.equal(gatherPoolFromResult(null).length, 0);
 });
 
 test("gatherPoolFromMessages tolerates malformed tool_result content (no throw)", () => {

@@ -12,7 +12,7 @@ export const TOOLS = [
   {
     name: "search_products",
     description:
-      "Search the merchant's product catalog by keyword. Returns products matching the query across title, vendor, product type, tags, and description. Use filters to narrow by attributes the merchant has configured (e.g. gender, color, material). Each product also includes a compact variantFacts summary of all available colors, sizes, and widths for that product; use those facts for variant-range questions instead of assuming the filtered search pool is the full color/size range.",
+      "Search the merchant's product catalog by keyword. Returns products matching the query across title, vendor, product type, tags, and description. Use filters to narrow by attributes the merchant has configured (e.g. gender, color, material). Each product also includes a compact variantFacts summary of all available colors, sizes, and widths for that product; use those facts for variant-range questions instead of assuming the filtered search pool is the full color/size range. CLAIM-FACT CONTRACT: every returned product includes `_claimFacts` — a merchant-verified, source-tagged map of feature claims (e.g. `archSupport: {value: true, source: 'tag'}`, `memoryFoam: {value: false, source: 'none'}`). Quote claims ONLY when the corresponding `_claimFacts.<feature>.value === true`. When `.value === false` or the key is absent, do NOT claim that feature for that product — say 'I'm not certain it has X' or pick a different product whose facts confirm it. This is the single source of truth for feature claims; never override it with guesses from the title or description alone.",
     input_schema: {
       type: "object",
       properties: {
