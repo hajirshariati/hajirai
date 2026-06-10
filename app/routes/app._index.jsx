@@ -151,7 +151,7 @@ function formatRevenue(n, currency) {
 // 3-D globe without any 3-D library. Respects prefers-reduced-motion by
 // rendering one static frame.
 // ---------------------------------------------------------------------------
-function Globe({ size = 280, points = 800, dim = 1 }) {
+function Globe({ size = 280, points = 800, dim = 1, variant = "brand" }) {
   const ref = useRef(null);
   useEffect(() => {
     const canvas = ref.current;
@@ -170,7 +170,10 @@ function Globe({ size = 280, points = 800, dim = 1 }) {
       const y = 1 - (i / (N - 1)) * 2;
       const r = Math.sqrt(Math.max(0, 1 - y * y));
       const th = golden * i;
-      pts.push([Math.cos(th) * r, y, Math.sin(th) * r]);
+      // Every third dot carries the brand-green accent in the subtle
+      // palette; the rest stay white so the globe reads as a quiet
+      // background texture, not a graphic competing with content.
+      pts.push([Math.cos(th) * r, y, Math.sin(th) * r, i % 3 === 0]);
     }
     const R = size / 2 - 10;
     const cx = size / 2;
@@ -179,13 +182,23 @@ function Globe({ size = 280, points = 800, dim = 1 }) {
     const cosT = Math.cos(tilt);
     const sinT = Math.sin(tilt);
 
+    const subtle = variant === "subtle";
     const drawFrame = (rot) => {
       ctx.clearRect(0, 0, size, size);
-      // Soft inner sphere shading so the dot field sits on a body.
+      // Soft inner sphere shading so the dot field sits on a body. The
+      // subtle palette uses a white sheen (a quiet lighter orb on the
+      // grey admin background, like Shopify's); the brand palette uses
+      // the green tint.
       const grad = ctx.createRadialGradient(cx - R * 0.35, cy - R * 0.35, R * 0.1, cx, cy, R);
-      grad.addColorStop(0, `rgba(58,138,102,${0.16 * dim})`);
-      grad.addColorStop(0.7, `rgba(45,107,79,${0.08 * dim})`);
-      grad.addColorStop(1, `rgba(45,107,79,${0.02 * dim})`);
+      if (subtle) {
+        grad.addColorStop(0, `rgba(255,255,255,${0.70 * dim})`);
+        grad.addColorStop(0.75, `rgba(255,255,255,${0.28 * dim})`);
+        grad.addColorStop(1, "rgba(255,255,255,0)");
+      } else {
+        grad.addColorStop(0, `rgba(58,138,102,${0.16 * dim})`);
+        grad.addColorStop(0.7, `rgba(45,107,79,${0.08 * dim})`);
+        grad.addColorStop(1, `rgba(45,107,79,${0.02 * dim})`);
+      }
       ctx.fillStyle = grad;
       ctx.beginPath();
       ctx.arc(cx, cy, R, 0, Math.PI * 2);
@@ -196,7 +209,7 @@ function Globe({ size = 280, points = 800, dim = 1 }) {
       // Dot radius scales gently with globe size so a viewport-sized
       // globe doesn't render pin-prick dots.
       const dotScale = Math.max(1, size / 280) * 0.75;
-      for (const [x, y, z] of pts) {
+      for (const [x, y, z, accent] of pts) {
         // Spin around Y, then tilt around X.
         const xr = x * cosR + z * sinR;
         const zr = -x * sinR + z * cosR;
@@ -205,10 +218,17 @@ function Globe({ size = 280, points = 800, dim = 1 }) {
         const depth = (zt + 1) / 2; // 0 = back, 1 = front
         const sx = cx + xr * R;
         const sy = cy + yr * R;
-        const alpha = (0.06 + depth * 0.78) * dim;
-        ctx.fillStyle = depth > 0.72
-          ? `rgba(58,138,102,${alpha})`
-          : `rgba(45,107,79,${alpha})`;
+        if (subtle) {
+          // Mostly white dots with a sage-green sprinkle, all low-alpha.
+          ctx.fillStyle = accent
+            ? `rgba(45,107,79,${(0.05 + depth * 0.20) * dim})`
+            : `rgba(255,255,255,${(0.20 + depth * 0.62) * dim})`;
+        } else {
+          const alpha = (0.06 + depth * 0.78) * dim;
+          ctx.fillStyle = depth > 0.72
+            ? `rgba(58,138,102,${alpha})`
+            : `rgba(45,107,79,${alpha})`;
+        }
         ctx.beginPath();
         ctx.arc(sx, sy, (0.6 + depth * 1.25) * dotScale, 0, Math.PI * 2);
         ctx.fill();
@@ -222,12 +242,14 @@ function Globe({ size = 280, points = 800, dim = 1 }) {
     }
     let raf;
     const loop = (t) => {
-      drawFrame(t * 0.00013);
+      // Glacial spin — one full rotation every ~3.5 minutes. The globe
+      // is ambience; you should sense the motion, not watch it.
+      drawFrame(t * 0.00003);
       raf = requestAnimationFrame(loop);
     };
     raf = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(raf);
-  }, [size, points, dim]);
+  }, [size, points, dim, variant]);
 
   return (
     <canvas
@@ -483,6 +505,7 @@ function StatusCluster({ items }) {
               style={{ background: t.dot }}
             />
             <span className="seos-pip-label">{labelText}</span>
+            <span className="seos-pip-chev" aria-hidden="true">›</span>
           </>
         );
         if (!it.url) {
@@ -533,12 +556,14 @@ function ArtSetup() {
         <circle cx="93" cy="128" r="10" fill="#2D6B4F" />
         <path d="M88 128 l3.5 3.5 L98.5 124" stroke="#fff" strokeWidth="2.4" fill="none" strokeLinecap="round" strokeLinejoin="round" />
         <rect x="112" y="123" width="96" height="9" rx="4.5" fill="#E4ECE8" />
-        <circle cx="93" cy="161" r="10" fill="#fff" stroke="#BCCFC6" strokeWidth="2" />
-        <rect x="112" y="156" width="132" height="9" rx="4.5" fill="#EDF3F0" />
+        <circle cx="93" cy="161" r="10" fill="#2D6B4F" />
+        <path d="M88 161 l3.5 3.5 L98.5 157" stroke="#fff" strokeWidth="2.4" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+        <rect x="112" y="156" width="132" height="9" rx="4.5" fill="#E4ECE8" />
       </g>
       <g filter="url(#su-sh)">
-        <rect x="222" y="22" width="98" height="32" rx="16" fill="#2D6B4F" />
-        <text x="271" y="43" textAnchor="middle" fontSize="13" fontWeight="700" fill="#fff">4 of 5 done</text>
+        <rect x="240" y="22" width="80" height="32" rx="16" fill="#2D6B4F" />
+        <path d="M254 38 l4.5 4.5 L268 32.5" stroke="#fff" strokeWidth="2.8" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+        <text x="277" y="43" fontSize="13" fontWeight="700" fill="#fff">Live</text>
       </g>
     </svg>
   );
@@ -1130,8 +1155,8 @@ export default function Home() {
            the overhang never creates a horizontal scrollbar. */
         .seos-globe-bg {
           position: fixed;
-          top: -190px;
-          right: -210px;
+          top: -300px;
+          right: -200px;
           z-index: 0;
           pointer-events: none;
         }
@@ -1139,40 +1164,41 @@ export default function Home() {
           .seos-globe-bg { display: none; }
         }
 
-        /* Hero: transparent — the greeting floats on the page like the
-           Shopify admin home, with the globe showing behind it. */
+        /* Hero: transparent and fully centered — brand lockup, greeting,
+           and status pills all share one axis with the metric strip
+           above, like the Shopify admin home. */
         .seos-hero {
           position: relative;
-          padding: 18px 4px 8px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          text-align: center;
+          padding: 26px 4px 8px;
         }
         .seos-hero-brand {
           display: inline-flex;
           align-items: center;
-          gap: 10px;
-          margin-bottom: 14px;
+          justify-content: center;
+          gap: 9px;
+          margin-bottom: 16px;
+          opacity: 0;
+          animation: seos-rise 0.55s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
         }
-        .seos-hero-brand img { display: block; height: 30px; width: auto; }
+        .seos-hero-brand img { display: block; height: 26px; width: auto; }
         .seos-hero-brand-name {
-          font-size: 12px;
+          font-size: 11.5px;
           font-weight: 650;
-          letter-spacing: 1.4px;
+          letter-spacing: 1.6px;
           text-transform: uppercase;
           color: #2D6B4F;
         }
-        .seos-hero-brand-tag {
-          font-size: 12px;
-          color: rgba(26,46,38,0.55);
-          border-left: 1px solid rgba(45,107,79,0.25);
-          padding-left: 10px;
-        }
         .seos-greet {
           margin: 0;
-          font-size: 30px;
-          line-height: 1.18;
+          font-size: 34px;
+          line-height: 1.15;
           font-weight: 650;
-          letter-spacing: -0.4px;
+          letter-spacing: -0.5px;
           color: #1a2e26;
-          max-width: 560px;
         }
         .seos-greet .seos-word {
           display: inline-block;
@@ -1180,39 +1206,37 @@ export default function Home() {
           transform: translateY(10px);
           animation: seos-rise 0.55s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
         }
-        .seos-subgreet {
-          margin-top: 8px;
-          font-size: 14px;
-          color: rgba(26,46,38,0.62);
-          max-width: 520px;
-          opacity: 0;
-          animation: seos-rise 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) 0.28s forwards;
-        }
         @keyframes seos-rise {
           to { opacity: 1; transform: translateY(0); }
         }
         @media (max-width: 760px) {
-          .seos-greet { font-size: 24px; }
+          .seos-greet { font-size: 26px; }
         }
 
-        /* Status pips — light theme. */
+        /* Status pills — centered under the greeting. White, bordered,
+           softly shadowed with a trailing chevron so they unmistakably
+           read as buttons, not tags. */
         .seos-status-bar {
           display: flex;
           flex-wrap: wrap;
           align-items: center;
+          justify-content: center;
           gap: 8px;
-          padding-top: 18px;
+          padding-top: 20px;
           position: relative;
           z-index: 1;
+          opacity: 0;
+          animation: seos-rise 0.55s cubic-bezier(0.2, 0.7, 0.2, 1) 0.25s forwards;
         }
         .seos-pip {
           display: inline-flex;
           align-items: center;
           gap: 8px;
-          padding: 6px 12px;
+          padding: 8px 11px 8px 13px;
           border-radius: 999px;
-          background: rgba(45,107,79,0.06);
-          border: 1px solid rgba(45,107,79,0.16);
+          background: #fff;
+          border: 1px solid rgba(26,46,38,0.12);
+          box-shadow: 0 1px 2px rgba(26,46,38,0.06);
           text-decoration: none !important;
           color: #1a2e26 !important;
           line-height: 1;
@@ -1222,30 +1246,32 @@ export default function Home() {
           outline: none;
         }
         .seos-pip:hover {
-          background: rgba(45,107,79,0.12);
-          border-color: rgba(45,107,79,0.35);
+          border-color: rgba(45,107,79,0.45);
           transform: translateY(-1px);
-          box-shadow: 0 2px 8px rgba(45,107,79,0.12);
+          box-shadow: 0 4px 12px rgba(26,46,38,0.10);
         }
         .seos-pip:focus-visible {
           border-color: rgba(45,107,79,0.6);
           box-shadow: 0 0 0 2px rgba(45,107,79,0.3);
         }
+        .seos-pip-chev {
+          font-size: 12px;
+          font-weight: 600;
+          color: rgba(26,46,38,0.35);
+          transition: transform 0.15s ease, color 0.15s ease;
+        }
+        .seos-pip:hover .seos-pip-chev {
+          color: #2D6B4F;
+          transform: translateX(2px);
+        }
         .seos-pip-off {
-          background: rgba(0,0,0,0.025);
-          border-color: rgba(0,0,0,0.08);
+          background: rgba(255,255,255,0.6);
           color: rgba(26,46,38,0.55) !important;
         }
-        .seos-pip-warn {
-          background: rgba(255,196,83,0.16);
-          border-color: rgba(185,137,0,0.5);
-        }
-        .seos-pip-warn:hover { background: rgba(255,196,83,0.28); }
-        .seos-pip-crit {
-          background: rgba(215,44,13,0.08);
-          border-color: rgba(215,44,13,0.5);
-        }
-        .seos-pip-crit:hover { background: rgba(215,44,13,0.15); }
+        .seos-pip-warn { border-color: rgba(185,137,0,0.55); background: #FFFBF0; }
+        .seos-pip-warn:hover { border-color: rgba(185,137,0,0.8); }
+        .seos-pip-crit { border-color: rgba(215,44,13,0.55); background: #FFF6F4; }
+        .seos-pip-crit:hover { border-color: rgba(215,44,13,0.8); }
         .seos-pip-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
         .seos-pip-label {
           font-size: 10.5px;
@@ -1488,14 +1514,14 @@ export default function Home() {
         .seos-card:hover .seos-card-arrow { transform: translateX(4px); }
 
         @media (prefers-reduced-motion: reduce) {
-          .seos-greet .seos-word, .seos-subgreet { animation: none; opacity: 1; transform: none; }
+          .seos-greet .seos-word, .seos-hero-brand, .seos-status-bar { animation: none; opacity: 1; transform: none; }
           .seos-pip, .seos-card, .seos-card-arrow, .seos-metric, .seos-metric-detail { transition: none; }
           .seos-pip-pulse { animation: none; }
         }
       `}</style>
       <div className="seos-home">
         <div className="seos-globe-bg" aria-hidden="true">
-          <Globe size={780} points={1700} dim={0.5} />
+          <Globe size={820} points={1700} variant="subtle" />
         </div>
         <BlockStack gap="500">
           {hasApiKey ? <MetricStrip metrics={metrics} /> : null}
@@ -1504,7 +1530,6 @@ export default function Home() {
             <div className="seos-hero-brand">
               <img src={seosLogo} alt="SEoS" />
               <span className="seos-hero-brand-name">SEoS Assistant</span>
-              <span className="seos-hero-brand-tag">Search Engine on Steroids</span>
             </div>
             <h1 className="seos-greet">
               {greetWords.map((w, i) => (
@@ -1513,9 +1538,6 @@ export default function Home() {
                 </span>
               ))}
             </h1>
-            <div className="seos-subgreet">
-              Your AI shopping assistant is working the storefront. Here's how the last 30 days look.
-            </div>
             <StatusCluster items={statusItems} />
           </div>
 
