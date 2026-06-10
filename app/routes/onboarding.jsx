@@ -692,7 +692,7 @@ function Globe({ size = 820, points = 1700, theme = "light", boostRef = null }) 
         // a short curved trace that thins, fades, and shrinks as it
         // trails back, so every comet visibly follows the spin (and
         // dots near the poles/limb naturally get shorter tails).
-        if (trailing && depth > 0.5) {
+        if (trailing && depth > 0.55) {
           let prevX = sx;
           let prevY = sy;
           for (let seg = 1; seg <= TAIL_SEGMENTS; seg++) {
@@ -704,9 +704,20 @@ function Globe({ size = 820, points = 1700, theme = "light", boostRef = null }) 
             const yr2 = y * cosT - zr2 * sinT;
             const tx = cx + xr2 * R;
             const ty = cy + yr2 * R;
-            const fade = 1 - seg / (TAIL_SEGMENTS + 1);
-            ctx.strokeStyle = `rgba(${comet},${((0.05 + depth * 0.18) * glow * fade).toFixed(3)})`;
-            ctx.lineWidth = radius * (0.35 + 0.65 * fade);
+            // Steeper fade so the tail dies to nothing — no blunt end.
+            const fade = Math.pow(1 - seg / (TAIL_SEGMENTS + 1), 1.6);
+            const coreAlpha = (0.05 + depth * 0.18) * glow * fade;
+            const coreWidth = radius * (0.35 + 0.65 * fade);
+            // Soft halo under the core stroke — wide, very faint —
+            // gives the trail a glow instead of a hard-edged line.
+            ctx.strokeStyle = `rgba(${comet},${(coreAlpha * 0.3).toFixed(3)})`;
+            ctx.lineWidth = coreWidth * 2.8;
+            ctx.beginPath();
+            ctx.moveTo(prevX, prevY);
+            ctx.lineTo(tx, ty);
+            ctx.stroke();
+            ctx.strokeStyle = `rgba(${comet},${coreAlpha.toFixed(3)})`;
+            ctx.lineWidth = coreWidth;
             ctx.beginPath();
             ctx.moveTo(prevX, prevY);
             ctx.lineTo(tx, ty);
@@ -724,9 +735,14 @@ function Globe({ size = 820, points = 1700, theme = "light", boostRef = null }) 
         ctx.arc(sx, sy, radius, 0, Math.PI * 2);
         ctx.fill();
 
-        // Glowing comet head layered over the base while boosted.
-        if (trailing && depth > 0.5) {
-          ctx.fillStyle = `rgba(${comet},${((0.08 + depth * 0.30) * glow).toFixed(3)})`;
+        // Glowing comet head: a wide faint halo under a brighter core.
+        if (trailing && depth > 0.55) {
+          const headAlpha = (0.08 + depth * 0.30) * glow;
+          ctx.fillStyle = `rgba(${comet},${(headAlpha * 0.25).toFixed(3)})`;
+          ctx.beginPath();
+          ctx.arc(sx, sy, radius * 2.6, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillStyle = `rgba(${comet},${headAlpha.toFixed(3)})`;
           ctx.beginPath();
           ctx.arc(sx, sy, radius * 1.15, 0, Math.PI * 2);
           ctx.fill();
