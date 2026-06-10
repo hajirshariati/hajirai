@@ -43,6 +43,17 @@ import {
   matchCatalogRequirement,
 } from "../lib/catalog-query.server.js";
 import { withAnthropicRetry, classifyAnthropicError, customerFacingFailureMessage } from "../lib/anthropic-resilience.server";
+// Phase 1 of the architecture migration: LLM_OWNS_ALL_TURNS flag.
+// When true, the dispatcher cascade and ~50 post-processors are
+// skipped — one model call (with retry on grounding failures) owns
+// the turn. Default OFF. See app/lib/llm-owns-turn.server.js for
+// the orchestrator and grounding validator.
+import {
+  isLlmOwnsTurnEnabled,
+  isShadowModeEnabled,
+  runWithGroundingRetry,
+  shadowDiffRecord,
+} from "../lib/llm-owns-turn.server.js";
 import { fetchCustomerContext } from "../lib/customer-context.server";
 import { fetchKlaviyoEnrichment } from "../lib/klaviyo-enrichment.server";
 import { fetchYotpoLoyalty } from "../lib/yotpo-loyalty.server";
@@ -4487,6 +4498,103 @@ export const action = async ({ request }) => {
           // …) so we don't build a second search system.
           //
           // ──────────────────────────────────────────────────────────
+          // Phase 1 migration — LLM_OWNS_ALL_TURNS short-circuit.
+          //
+          // When the flag is on, skip the dispatcher cascade and all
+          // ~50 post-processors. One model invocation owns the turn,
+          // with the grounding validator catching ungrounded claims
+          // and asking the model to fix them (max 2 retries) before
+          // anything reaches the customer. The orthotic gate stays
+          // in front because it's a real business workflow that
+          // ALREADY ran above this point — we honor its result.
+          //
+          // Default OFF: requires LLM_OWNS_ALL_TURNS=true. When
+          // LLM_OWNS_ALL_TURNS_SHADOW=true (and the main flag is
+          // OFF), the new path runs in parallel into a discard buffer
+          // and only its diff vs. the old answer is logged.
+          // ──────────────────────────────────────────────────────────
+          if (isLlmOwnsTurnEnabled()) {
+            const sonnetModelForClean = (() => {
+              const stored = config.anthropicModel || DEFAULT_MODEL;
+              return DEPRECATED_MODELS.has(stored) ? DEFAULT_MODEL : stored;
+            })();
+            const runLoopOnce = async ({ messages: msgs }) => {
+              return await runAgenticLoop({
+                anthropic,
+                model: sonnetModelForClean,
+                systemPrompt,
+                messages: msgs.slice(),
+                ctx: { ...ctx },
+                controller,
+                encoder,
+                promptCaching: config.promptCaching === true,
+                tools: activeTools,
+              });
+            };
+            const cleanResult = await runWithGroundingRetry({
+              runLoop: runLoopOnce,
+              initialMessages: messages,
+              maxRetries: 2,
+              onAttempt: ({ attempt, validation, textLen, poolSize }) => {
+                console.log(
+                  `[llm-owns-turn] ${ctx.shop} attempt=${attempt + 1} ` +
+                    `ok=${validation.ok} errors=${validation.errors.length} ` +
+                    `textLen=${textLen} pool=${poolSize}`,
+                );
+              },
+            });
+            console.log(
+              `[llm-owns-turn] ${ctx.shop} final ok=${cleanResult.validation.ok} ` +
+                `attempts=${cleanResult.validation.attempts} ` +
+                `textLen=${(cleanResult.fullResponseText || "").length} ` +
+                `cards=${(cleanResult.finalProductCards || []).length}`,
+            );
+            return;
+          }
+          let shadowResultForDiff = null;
+          if (isShadowModeEnabled()) {
+            // Shadow run: don't stream to the customer. The old path
+            // owns the response; we just record what the new path
+            // would have produced and diff it.
+            try {
+              const sonnetModelForShadow = (() => {
+                const stored = config.anthropicModel || DEFAULT_MODEL;
+                return DEPRECATED_MODELS.has(stored) ? DEFAULT_MODEL : stored;
+              })();
+              const discardBuf = [];
+              const runLoopOnce = async ({ messages: msgs }) => {
+                return await runAgenticLoop({
+                  anthropic,
+                  model: sonnetModelForShadow,
+                  systemPrompt,
+                  messages: msgs.slice(),
+                  ctx: { ...ctx },
+                  controller: { enqueue: (c) => discardBuf.push(c) },
+                  encoder,
+                  promptCaching: config.promptCaching === true,
+                  tools: activeTools,
+                });
+              };
+              shadowResultForDiff = await runWithGroundingRetry({
+                runLoop: runLoopOnce,
+                initialMessages: messages,
+                maxRetries: 2,
+              });
+              console.log(
+                `[llm-owns-turn:shadow] ${ctx.shop} shadow-run complete ` +
+                  `ok=${shadowResultForDiff.validation.ok} ` +
+                  `attempts=${shadowResultForDiff.validation.attempts} ` +
+                  `textLen=${(shadowResultForDiff.fullResponseText || "").length} ` +
+                  `cards=${(shadowResultForDiff.finalProductCards || []).length}`,
+              );
+            } catch (shadowErr) {
+              console.warn(
+                `[llm-owns-turn:shadow] ${ctx.shop} shadow run failed (ignored): ` +
+                  `${shadowErr?.message || shadowErr}`,
+              );
+            }
+          }
+
           // ──────────────────────────────────────────────────────────
           // Phase 3 — Policy / Knowledge dispatcher.
           //
