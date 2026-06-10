@@ -30,7 +30,7 @@ const COUNTRY_ABBR = {
 // ---- The output columns, in exact order, with how each is produced -------
 // ctx = { cfg, row } where row is the trimmed source record.
 const COLUMNS = [
-  ["Order Name",                   c => c.cfg.orderPrefix + g(c.row,"Order ID")],
+  ["Order Name",                   c => c.cfg.orderPrefix + orderTail(g(c.row,"Order ID"), c.cfg)],
   ["Order Status",                 c => c.cfg.orderStatus],
   ["Order Date",                   c => c.cfg.orderDate || formatDate(g(c.row,"Created Time"))],
   ["Total tax",                    c => money(g(c.row,"Taxes"))],
@@ -143,6 +143,12 @@ function countryAbbr(name) {
   return COUNTRY_ABBR[key] || String(name).trim();
 }
 
+// "577417729630966484" -> "6484" when the last-4 option is on.
+function orderTail(id, cfg) {
+  const s = String(id);
+  return cfg.last4 ? s.slice(-4) : s;
+}
+
 function productName(c) {
   const base = g(c.row, "Product Name");
   const variation = g(c.row, "Variation");
@@ -198,12 +204,15 @@ function loadConfig() {
   }
   const av = document.getElementById("appendVariation");
   av.checked = saved.appendVariation !== undefined ? saved.appendVariation : true;
+  const l4 = document.getElementById("last4");
+  l4.checked = saved.last4 !== undefined ? saved.last4 : true;
 }
 
 function readConfig() {
   const cfg = {};
   for (const id of FIELD_IDS) cfg[id] = document.getElementById(id).value.trim();
   cfg.appendVariation = document.getElementById("appendVariation").checked;
+  cfg.last4 = document.getElementById("last4").checked;
   try { localStorage.setItem("ttCfg", JSON.stringify(cfg)); } catch (e) {}
   return cfg;
 }
@@ -317,6 +326,9 @@ FIELD_IDS.forEach(id => document.getElementById(id).addEventListener("input", ()
   if (parsedRows) renderPreview();
 }));
 document.getElementById("appendVariation").addEventListener("change", () => {
+  if (parsedRows) renderPreview();
+});
+document.getElementById("last4").addEventListener("change", () => {
   if (parsedRows) renderPreview();
 });
 document.getElementById("orderFilter").addEventListener("input", () => {
