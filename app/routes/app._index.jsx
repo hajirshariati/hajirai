@@ -475,22 +475,292 @@ function StatusCluster({ items }) {
 }
 
 // ---------------------------------------------------------------------------
-// ActionCard — the card-grid blocks below the metrics. Apple-clean: soft
-// border, gentle hover lift, arrow that slides on hover.
+// Card illustrations — hand-built vector scenes in the Shopify-home style:
+// a soft green gradient backdrop, floating white panels with drop shadows,
+// slight rotations for depth, brand-green accents. Vector keeps them crisp
+// at any DPI and on-brand without an asset pipeline. Each uses a unique
+// ID prefix so the six <defs> blocks don't collide on one page.
 // ---------------------------------------------------------------------------
-function ActionCard({ emoji, title, description, cta, url, external, stat }) {
+function ArtSetup() {
+  return (
+    <svg viewBox="0 0 340 210" role="presentation" focusable="false">
+      <defs>
+        <linearGradient id="su-bg" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#DCEEE5" />
+          <stop offset="1" stopColor="#F4FAF7" />
+        </linearGradient>
+        <filter id="su-sh" x="-40%" y="-40%" width="180%" height="180%">
+          <feDropShadow dx="0" dy="6" stdDeviation="9" floodColor="#1a2e26" floodOpacity="0.13" />
+        </filter>
+      </defs>
+      <rect width="340" height="210" rx="20" fill="url(#su-bg)" />
+      <circle cx="306" cy="26" r="48" fill="rgba(58,138,102,0.10)" />
+      <g filter="url(#su-sh)" transform="rotate(-3 170 115)">
+        <rect x="62" y="42" width="204" height="150" rx="14" fill="#fff" />
+        <rect x="82" y="60" width="92" height="9" rx="4.5" fill="#C9DCD3" />
+        <circle cx="93" cy="95" r="10" fill="#2D6B4F" />
+        <path d="M88 95 l3.5 3.5 L98.5 91" stroke="#fff" strokeWidth="2.4" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+        <rect x="112" y="90" width="118" height="9" rx="4.5" fill="#E4ECE8" />
+        <circle cx="93" cy="128" r="10" fill="#2D6B4F" />
+        <path d="M88 128 l3.5 3.5 L98.5 124" stroke="#fff" strokeWidth="2.4" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+        <rect x="112" y="123" width="96" height="9" rx="4.5" fill="#E4ECE8" />
+        <circle cx="93" cy="161" r="10" fill="#fff" stroke="#BCCFC6" strokeWidth="2" />
+        <rect x="112" y="156" width="132" height="9" rx="4.5" fill="#EDF3F0" />
+      </g>
+      <g filter="url(#su-sh)">
+        <rect x="222" y="22" width="98" height="32" rx="16" fill="#2D6B4F" />
+        <text x="271" y="43" textAnchor="middle" fontSize="13" fontWeight="700" fill="#fff">4 of 5 done</text>
+      </g>
+    </svg>
+  );
+}
+
+function ArtAnalytics() {
+  return (
+    <svg viewBox="0 0 340 210" role="presentation" focusable="false">
+      <defs>
+        <linearGradient id="an-bg" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#E2F0E9" />
+          <stop offset="1" stopColor="#F5FBF8" />
+        </linearGradient>
+        <linearGradient id="an-panel" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#2D6B4F" />
+          <stop offset="1" stopColor="#235843" />
+        </linearGradient>
+        <linearGradient id="an-area" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#ffffff" stopOpacity="0.22" />
+          <stop offset="1" stopColor="#ffffff" stopOpacity="0.02" />
+        </linearGradient>
+        <filter id="an-sh" x="-40%" y="-40%" width="180%" height="180%">
+          <feDropShadow dx="0" dy="6" stdDeviation="9" floodColor="#1a2e26" floodOpacity="0.14" />
+        </filter>
+      </defs>
+      <rect width="340" height="210" rx="20" fill="url(#an-bg)" />
+      <g filter="url(#an-sh)">
+        <rect x="86" y="36" width="254" height="174" rx="18" fill="url(#an-panel)" />
+        <line x1="104" y1="84" x2="322" y2="84" stroke="rgba(255,255,255,0.12)" strokeWidth="1" />
+        <line x1="104" y1="124" x2="322" y2="124" stroke="rgba(255,255,255,0.12)" strokeWidth="1" />
+        <line x1="104" y1="164" x2="322" y2="164" stroke="rgba(255,255,255,0.12)" strokeWidth="1" />
+        <path d="M104 170 C136 122 158 178 192 140 C220 110 252 130 318 88 L318 196 L104 196 Z" fill="url(#an-area)" />
+        <path d="M104 170 C136 122 158 178 192 140 C220 110 252 130 318 88" stroke="#fff" strokeWidth="3.6" fill="none" strokeLinecap="round" />
+        <circle cx="192" cy="140" r="5.5" fill="#fff" />
+        <circle cx="318" cy="88" r="5.5" fill="#fff" />
+      </g>
+      <g filter="url(#an-sh)">
+        <rect x="34" y="58" width="106" height="38" rx="11" fill="#fff" />
+        <circle cx="52" cy="77" r="6" fill="#3a8a66" />
+        <rect x="64" y="68" width="62" height="7" rx="3.5" fill="#D8E2DD" />
+        <rect x="64" y="81" width="44" height="7" rx="3.5" fill="#E7EEEA" />
+      </g>
+      <g filter="url(#an-sh)">
+        <rect x="232" y="16" width="80" height="32" rx="16" fill="#fff" />
+        <text x="272" y="37" textAnchor="middle" fontSize="13" fontWeight="700" fill="#2D6B4F">+24%</text>
+      </g>
+    </svg>
+  );
+}
+
+function ArtKnowledge() {
+  return (
+    <svg viewBox="0 0 340 210" role="presentation" focusable="false">
+      <defs>
+        <linearGradient id="kn-bg" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#DFEFE7" />
+          <stop offset="1" stopColor="#F4FAF7" />
+        </linearGradient>
+        <filter id="kn-sh" x="-40%" y="-40%" width="180%" height="180%">
+          <feDropShadow dx="0" dy="6" stdDeviation="9" floodColor="#1a2e26" floodOpacity="0.13" />
+        </filter>
+      </defs>
+      <rect width="340" height="210" rx="20" fill="url(#kn-bg)" />
+      <circle cx="42" cy="180" r="52" fill="rgba(58,138,102,0.08)" />
+      <g transform="rotate(6 230 120)">
+        <rect x="172" y="56" width="112" height="142" rx="12" fill="#fff" opacity="0.75" />
+      </g>
+      <g filter="url(#kn-sh)">
+        <rect x="86" y="44" width="134" height="158" rx="12" fill="#fff" />
+        <rect x="102" y="64" width="70" height="9" rx="4.5" fill="#C9DCD3" />
+        <rect x="102" y="86" width="100" height="7" rx="3.5" fill="#E4ECE8" />
+        <rect x="102" y="100" width="88" height="7" rx="3.5" fill="#E4ECE8" />
+        <rect x="102" y="114" width="100" height="7" rx="3.5" fill="#E4ECE8" />
+        <rect x="102" y="128" width="64" height="7" rx="3.5" fill="#E4ECE8" />
+        <rect x="102" y="152" width="100" height="7" rx="3.5" fill="#EDF3F0" />
+        <rect x="102" y="166" width="76" height="7" rx="3.5" fill="#EDF3F0" />
+        <circle cx="200" cy="62" r="14" fill="#2D6B4F" />
+        <path d="M200 53.5 l2.3 5.9 5.9 2.3 -5.9 2.3 -2.3 5.9 -2.3 -5.9 -5.9 -2.3 5.9 -2.3 Z" fill="#fff" />
+      </g>
+      <g filter="url(#kn-sh)">
+        <rect x="206" y="148" width="112" height="36" rx="12" fill="#fff" />
+        <rect x="218" y="157" width="36" height="18" rx="5" fill="#2D6B4F" />
+        <text x="236" y="170" textAnchor="middle" fontSize="10" fontWeight="700" fill="#fff">CSV</text>
+        <path d="M264 166 l4 4 L276 161" stroke="#3a8a66" strokeWidth="2.6" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+        <rect x="284" y="162" width="22" height="7" rx="3.5" fill="#D8E2DD" />
+      </g>
+    </svg>
+  );
+}
+
+function ArtRecommenders() {
+  return (
+    <svg viewBox="0 0 340 210" role="presentation" focusable="false">
+      <defs>
+        <linearGradient id="re-bg" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#E0EFE8" />
+          <stop offset="1" stopColor="#F5FBF8" />
+        </linearGradient>
+        <linearGradient id="re-img" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#BFE0D1" />
+          <stop offset="1" stopColor="#8FC6AC" />
+        </linearGradient>
+        <filter id="re-sh" x="-40%" y="-40%" width="180%" height="180%">
+          <feDropShadow dx="0" dy="6" stdDeviation="9" floodColor="#1a2e26" floodOpacity="0.13" />
+        </filter>
+      </defs>
+      <rect width="340" height="210" rx="20" fill="url(#re-bg)" />
+      <path d="M158 64 C190 48 208 60 236 92" stroke="#3a8a66" strokeWidth="3" fill="none" strokeLinecap="round" strokeDasharray="0.1 9" />
+      <path d="M236 92 l-9 -1.5 4 -8.5 Z" fill="#3a8a66" />
+      <g filter="url(#re-sh)">
+        <rect x="34" y="44" width="122" height="38" rx="19" fill="#fff" />
+        <circle cx="54" cy="63" r="6" fill="#2D6B4F" />
+        <rect x="66" y="59" width="74" height="8" rx="4" fill="#D8E2DD" />
+      </g>
+      <g filter="url(#re-sh)">
+        <rect x="46" y="98" width="80" height="30" rx="15" fill="#fff" stroke="#BCD6C9" strokeWidth="1.5" />
+        <rect x="60" y="109" width="52" height="8" rx="4" fill="#E4ECE8" />
+      </g>
+      <g filter="url(#re-sh)">
+        <rect x="58" y="140" width="96" height="30" rx="15" fill="#E7F3ED" stroke="#2D6B4F" strokeWidth="1.5" />
+        <path d="M72 155 l4 4 L84 150" stroke="#2D6B4F" strokeWidth="2.6" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+        <rect x="92" y="151" width="48" height="8" rx="4" fill="#BFD8CC" />
+      </g>
+      <g filter="url(#re-sh)">
+        <rect x="214" y="78" width="106" height="126" rx="12" fill="#fff" />
+        <rect x="224" y="88" width="86" height="62" rx="8" fill="url(#re-img)" />
+        <circle cx="248" cy="108" r="9" fill="rgba(255,255,255,0.55)" />
+        <path d="M224 142 L252 118 L274 134 L292 122 L310 134 L310 150 L224 150 Z" fill="rgba(255,255,255,0.35)" />
+        <rect x="224" y="160" width="66" height="8" rx="4" fill="#D8E2DD" />
+        <rect x="224" y="176" width="38" height="9" rx="4.5" fill="#2D6B4F" opacity="0.85" />
+      </g>
+      <g filter="url(#re-sh)">
+        <circle cx="318" cy="84" r="13" fill="#2D6B4F" />
+        <path d="M312 84 l4 4 L324 79.5" stroke="#fff" strokeWidth="2.6" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+      </g>
+    </svg>
+  );
+}
+
+function ArtCatalog() {
+  const card = (x, y, highlight) => (
+    <g key={`${x}-${y}`}>
+      <rect x={x} y={y} width="88" height="82" rx="10" fill="#fff" stroke={highlight ? "#2D6B4F" : "rgba(0,0,0,0)"} strokeWidth="2" />
+      <rect x={x + 10} y={y + 10} width="68" height="38" rx="6" fill={highlight ? "url(#ca-img)" : "#DFEDE6"} />
+      <rect x={x + 10} y={y + 56} width="52" height="7" rx="3.5" fill="#D8E2DD" />
+      <rect x={x + 10} y={y + 68} width="30" height="7" rx="3.5" fill="#9EC4B2" />
+    </g>
+  );
+  return (
+    <svg viewBox="0 0 340 210" role="presentation" focusable="false">
+      <defs>
+        <linearGradient id="ca-bg" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#DEEFE6" />
+          <stop offset="1" stopColor="#F4FAF7" />
+        </linearGradient>
+        <linearGradient id="ca-img" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#BFE0D1" />
+          <stop offset="1" stopColor="#8FC6AC" />
+        </linearGradient>
+        <filter id="ca-sh" x="-40%" y="-40%" width="180%" height="180%">
+          <feDropShadow dx="0" dy="6" stdDeviation="9" floodColor="#1a2e26" floodOpacity="0.13" />
+        </filter>
+      </defs>
+      <rect width="340" height="210" rx="20" fill="url(#ca-bg)" />
+      <circle cx="32" cy="36" r="44" fill="rgba(58,138,102,0.09)" />
+      <g filter="url(#ca-sh)">
+        {card(96, 36, false)}
+        {card(194, 36, true)}
+        {card(96, 126, false)}
+        {card(194, 126, false)}
+      </g>
+      <g filter="url(#ca-sh)">
+        <circle cx="288" cy="38" r="13" fill="#2D6B4F" />
+        <path d="M282 38 l4 4 L294 33.5" stroke="#fff" strokeWidth="2.6" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+      </g>
+      <g filter="url(#ca-sh)">
+        <rect x="24" y="92" width="92" height="32" rx="16" fill="#fff" />
+        <circle cx="42" cy="108" r="5" fill="#3a8a66" />
+        <text x="54" y="113" fontSize="12" fontWeight="650" fill="#2D6B4F">Synced</text>
+      </g>
+    </svg>
+  );
+}
+
+function ArtSettings() {
+  return (
+    <svg viewBox="0 0 340 210" role="presentation" focusable="false">
+      <defs>
+        <linearGradient id="se-bg" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#DFEFE7" />
+          <stop offset="1" stopColor="#F5FBF8" />
+        </linearGradient>
+        <linearGradient id="se-fill" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stopColor="#2D6B4F" />
+          <stop offset="1" stopColor="#3a8a66" />
+        </linearGradient>
+        <filter id="se-sh" x="-40%" y="-40%" width="180%" height="180%">
+          <feDropShadow dx="0" dy="6" stdDeviation="9" floodColor="#1a2e26" floodOpacity="0.13" />
+        </filter>
+      </defs>
+      <rect width="340" height="210" rx="20" fill="url(#se-bg)" />
+      <circle cx="312" cy="186" r="50" fill="rgba(58,138,102,0.09)" />
+      <g filter="url(#se-sh)">
+        <rect x="68" y="40" width="214" height="154" rx="14" fill="#fff" />
+        {/* slider rows */}
+        <rect x="90" y="68" width="146" height="7" rx="3.5" fill="#E4ECE8" />
+        <rect x="90" y="68" width="92" height="7" rx="3.5" fill="url(#se-fill)" />
+        <circle cx="182" cy="71.5" r="9" fill="#fff" stroke="#2D6B4F" strokeWidth="2.4" />
+        <rect x="90" y="104" width="146" height="7" rx="3.5" fill="#E4ECE8" />
+        <rect x="90" y="104" width="46" height="7" rx="3.5" fill="url(#se-fill)" />
+        <circle cx="136" cy="107.5" r="9" fill="#fff" stroke="#2D6B4F" strokeWidth="2.4" />
+        <rect x="90" y="140" width="146" height="7" rx="3.5" fill="#E4ECE8" />
+        <rect x="90" y="140" width="118" height="7" rx="3.5" fill="url(#se-fill)" />
+        <circle cx="208" cy="143.5" r="9" fill="#fff" stroke="#2D6B4F" strokeWidth="2.4" />
+        {/* toggle row */}
+        <rect x="90" y="164" width="42" height="22" rx="11" fill="#2D6B4F" />
+        <circle cx="122" cy="175" r="8" fill="#fff" />
+        <rect x="144" y="171" width="74" height="8" rx="4" fill="#E4ECE8" />
+      </g>
+      <g filter="url(#se-sh)">
+        <rect x="236" y="16" width="84" height="34" rx="17" fill="#fff" />
+        <circle cx="256" cy="33" r="6.5" fill="none" stroke="#2D6B4F" strokeWidth="2.6" />
+        <rect x="262" y="31" width="22" height="4" rx="2" fill="#2D6B4F" />
+        <rect x="276" y="35" width="4" height="6" rx="1.5" fill="#2D6B4F" />
+        <rect x="284" y="35" width="4" height="6" rx="1.5" fill="#2D6B4F" />
+        <rect x="294" y="29" width="16" height="8" rx="4" fill="#E4ECE8" />
+      </g>
+    </svg>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// ActionCard — Shopify-home-style illustrated card: title + description up
+// top, the illustration filling the lower area and bleeding to the card's
+// bottom-right edge, and a white pill CTA floating over it bottom-left.
+// ---------------------------------------------------------------------------
+function ActionCard({ art, title, description, cta, url, external, stat }) {
   const inner = (
     <>
-      <div className="seos-card-top">
-        <div className="seos-card-icon" aria-hidden="true">{emoji}</div>
-        {stat ? <span className="seos-card-stat">{stat}</span> : null}
+      <div className="seos-card-body">
+        <div className="seos-card-titlerow">
+          <div className="seos-card-title">{title}</div>
+          {stat ? <span className="seos-card-stat">{stat}</span> : null}
+        </div>
+        <div className="seos-card-desc">{description}</div>
       </div>
-      <div className="seos-card-title">{title}</div>
-      <div className="seos-card-desc">{description}</div>
-      <div className="seos-card-cta">
+      <div className="seos-card-art" aria-hidden="true">{art}</div>
+      <span className="seos-card-btn">
         {cta}
         <span className="seos-card-arrow" aria-hidden="true">→</span>
-      </div>
+      </span>
     </>
   );
   if (external) {
@@ -1091,46 +1361,41 @@ export default function Home() {
           gap: 12px;
         }
 
-        /* Card grid. */
+        /* Card grid — Shopify-home-style illustrated cards. */
         .seos-card-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-          gap: 14px;
+          grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+          gap: 16px;
         }
         .seos-card {
+          position: relative;
           display: flex;
           flex-direction: column;
-          gap: 8px;
-          padding: 18px;
-          border-radius: 14px;
+          min-height: 320px;
+          border-radius: 16px;
           background: #fff;
-          border: 1px solid rgba(0,0,0,0.08);
+          border: 1px solid rgba(0,0,0,0.07);
+          overflow: hidden;
           text-decoration: none !important;
           color: inherit !important;
           box-shadow: 0 1px 2px rgba(0,0,0,0.04);
-          transition: transform 0.18s cubic-bezier(0.2, 0.7, 0.2, 1), box-shadow 0.18s ease, border-color 0.18s ease;
+          transition: transform 0.2s cubic-bezier(0.2, 0.7, 0.2, 1), box-shadow 0.2s ease, border-color 0.2s ease;
         }
         .seos-card:hover {
           transform: translateY(-3px);
-          border-color: rgba(45,107,79,0.35);
-          box-shadow: 0 10px 26px rgba(26,46,38,0.10), 0 2px 6px rgba(26,46,38,0.06);
+          border-color: rgba(45,107,79,0.30);
+          box-shadow: 0 12px 28px rgba(26,46,38,0.12), 0 2px 6px rgba(26,46,38,0.06);
         }
         .seos-card:focus-visible {
           outline: 2px solid rgba(45,107,79,0.5);
           outline-offset: 2px;
         }
-        .seos-card-top {
+        .seos-card-body { padding: 18px 18px 6px; }
+        .seos-card-titlerow {
           display: flex;
           align-items: center;
           justify-content: space-between;
           gap: 8px;
-        }
-        .seos-card-icon {
-          width: 38px; height: 38px;
-          display: flex; align-items: center; justify-content: center;
-          border-radius: 10px;
-          background: linear-gradient(135deg, rgba(45,107,79,0.12), rgba(58,138,102,0.07));
-          font-size: 19px;
         }
         .seos-card-stat {
           font-size: 11px;
@@ -1142,19 +1407,52 @@ export default function Home() {
           padding: 3px 9px;
           white-space: nowrap;
         }
-        .seos-card-title { font-size: 14.5px; font-weight: 650; color: #1a2e26; }
-        .seos-card-desc { font-size: 12.5px; line-height: 1.45; color: rgba(26,46,38,0.6); flex: 1; }
-        .seos-card-cta {
+        .seos-card-title { font-size: 15px; font-weight: 650; color: #1a2e26; letter-spacing: -0.1px; }
+        .seos-card-desc { font-size: 12.5px; line-height: 1.5; color: rgba(26,46,38,0.62); margin-top: 6px; }
+        .seos-card-art {
+          flex: 1;
+          display: flex;
+          align-items: flex-end;
+          justify-content: flex-end;
+          padding: 14px 0 0 30px;
+          min-height: 160px;
+          pointer-events: none;
+        }
+        .seos-card-art svg {
+          display: block;
+          width: 94%;
+          max-width: 330px;
+          height: auto;
+          /* Bleed past the card's bottom-right edge so the illustration's
+             own rounded corners are cropped — same trick as Shopify home. */
+          margin-right: -12px;
+          margin-bottom: -12px;
+        }
+        .seos-card-btn {
+          position: absolute;
+          left: 16px;
+          bottom: 16px;
           display: inline-flex;
           align-items: center;
-          gap: 6px;
+          gap: 7px;
+          background: #fff;
+          border: 1px solid rgba(0,0,0,0.05);
+          border-radius: 999px;
+          padding: 9px 15px;
           font-size: 12.5px;
           font-weight: 600;
-          color: #2D6B4F;
-          margin-top: 2px;
+          color: #1a2e26;
+          box-shadow: 0 2px 10px rgba(26,46,38,0.16), 0 1px 2px rgba(26,46,38,0.10);
+          transition: transform 0.18s cubic-bezier(0.2, 0.7, 0.2, 1), box-shadow 0.18s ease;
+          white-space: nowrap;
+        }
+        .seos-card:hover .seos-card-btn {
+          transform: translateY(-1px);
+          box-shadow: 0 4px 14px rgba(26,46,38,0.22), 0 1px 3px rgba(26,46,38,0.12);
         }
         .seos-card-arrow {
           display: inline-block;
+          color: #2D6B4F;
           transition: transform 0.18s cubic-bezier(0.2, 0.7, 0.2, 1);
         }
         .seos-card:hover .seos-card-arrow { transform: translateX(4px); }
@@ -1230,7 +1528,7 @@ export default function Home() {
             <Text as="h2" variant="headingMd">Explore</Text>
             <div className="seos-card-grid">
               <ActionCard
-                emoji="📘"
+                art={<ArtSetup />}
                 title="Setup guide"
                 description="Full walkthrough for installing, configuring, and going live with the assistant."
                 cta="Open setup guide"
@@ -1238,14 +1536,14 @@ export default function Home() {
                 external
               />
               <ActionCard
-                emoji="📊"
+                art={<ArtAnalytics />}
                 title="Analytics"
                 description="Requests, costs, satisfaction trends, and the questions customers actually ask."
                 cta="View analytics"
                 url="/app/analytics"
               />
               <ActionCard
-                emoji="🧠"
+                art={<ArtKnowledge />}
                 title="Knowledge"
                 description="Upload FAQs, sizing guides, and brand voice so the AI answers in your words."
                 cta="Manage knowledge"
@@ -1253,7 +1551,7 @@ export default function Home() {
                 stat={fileCount > 0 ? `${fileCount} file${fileCount > 1 ? "s" : ""}` : null}
               />
               <ActionCard
-                emoji="🎯"
+                art={<ArtRecommenders />}
                 title="Smart Recommenders"
                 description="Guided product finders that walk customers to the right product, step by step."
                 cta="Configure flows"
@@ -1261,7 +1559,7 @@ export default function Home() {
                 stat={recommenderActive ? `${enabledRecommenderCount} active` : null}
               />
               <ActionCard
-                emoji="🗂️"
+                art={<ArtCatalog />}
                 title="Catalog"
                 description="Synced products, enrichment, and category groups that keep answers on-topic."
                 cta="Open catalog"
@@ -1269,7 +1567,7 @@ export default function Home() {
                 stat={productsCount > 0 ? `${productsCount} products` : null}
               />
               <ActionCard
-                emoji="⚙️"
+                art={<ArtSettings />}
                 title="Settings"
                 description="API keys, model strategy, semantic search, and safety limits — all in one place."
                 cta="Open settings"
