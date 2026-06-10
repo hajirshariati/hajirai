@@ -67,6 +67,22 @@ test("bolded tech names (BioRocker™ Technology) are not treated as products", 
   assert.equal(families.length, 0, `tech bolds must not count as products; got ${JSON.stringify(families)}`);
 });
 
+test("compare-turn section labels (Heel Height, Removable Insole) are NOT products", () => {
+  // Live trace 2026-06-10: Reagan/Jillian compare emitted "**Heel
+  // Height**" and "**Removable Insole**" as alternating section
+  // labels between Reagan: x / Jillian: y rows. The validator flagged
+  // each as an ungrounded product family and burned 3 retries (~30s)
+  // on the same turn.
+  const text =
+    "Here's how the two compare:\n\n**Heel Height**\nReagan: 2\"\nJillian: 1.1\"\n\n**Removable Insole**\nReagan: Yes\nJillian: No\n\n**Closure**\nReagan: Side zip\nJillian: Hook & loop.";
+  const families = extractBoldedProductFamilies(text);
+  assert.equal(
+    families.length,
+    0,
+    `compare-turn section labels must not count as products; got ${JSON.stringify(families)}`,
+  );
+});
+
 test("bolded actual product names ARE captured", () => {
   const text = "The **Noelle Arch Support Wedge** is a great pick for foot pain.";
   const families = extractBoldedProductFamilies(text);

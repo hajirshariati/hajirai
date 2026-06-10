@@ -64,7 +64,7 @@ function extractBoldedProductFamilies(text) {
     // spec answers — Style, Comfort, Fit, Sizing, Details, Specs,
     // Design, Construction, Overview, Summary, Verdict — are now
     // recognized.
-    if (/\b(?:Technolog(?:y|ies)|System|Method|Approach|Feature|Series|Collection|Platform|Footbed|Midsole|Outsole|Insole|Foam|Material|Lining|Upper|Mission|HQ|Headquarters|Bottom\s+line|Style|Comfort|Fit|Sizing|Detail|Spec(?:ification)?|Design|Construction|Overview|Summar(?:y|ies)|Verdict|Pro|Con|Difference|Highlight|Takeaway)s?\b/i.test(inner)) continue;
+    if (/\b(?:Technolog(?:y|ies)|System|Method|Approach|Feature|Series|Collection|Platform|Footbed|Midsole|Outsole|Insole|Foam|Material|Lining|Upper|Mission|HQ|Headquarters|Bottom\s+line|Style|Comfort|Fit|Sizing|Detail|Spec(?:ification)?|Design|Construction|Overview|Summar(?:y|ies)|Verdict|Pro|Con|Difference|Highlight|Takeaway|Heel\s+Height|Removable\s+Insole|Closure|Best\s+for|Vibe|Category|Price\s+Range|Weight|Cushioning)s?\b/i.test(inner)) continue;
     // Ampersand bolds are section headings ("Style & Materials",
     // "Fit & Sizing") — no product title in this catalog contains "&".
     if (inner.includes("&")) continue;
@@ -144,14 +144,37 @@ function extractFeatureClaims(text) {
 // we just consult the same evidence.
 function cardSupportsFeature(card, feature) {
   if (!card) return false;
+  // Scan everything the search/lookup tools attach to a card. Live trace
+  // 2026-06-10: "the Jillian has memory foam" was rejected because
+  // `_description` was empty on the card (the product's spec lives in
+  // a metafield/variant-attribute JSON, not in shopify's description
+  // field). The model had seen the value through variantFacts and
+  // attributes; the validator was looking at fewer fields than the
+  // model did. Now we scan the same surfaces the tool result exposes.
+  const variantFactsStr =
+    typeof card._variantFacts === "object" && card._variantFacts
+      ? JSON.stringify(card._variantFacts)
+      : "";
+  const variantsStr =
+    Array.isArray(card._variants)
+      ? card._variants.map((v) => JSON.stringify(v?.attributesJson || {})).join(" ")
+      : "";
   const haystack = [
     card._description,
     card._descriptionSnippet,
     Array.isArray(card._tags) ? card._tags.join(" ") : "",
     typeof card._attributes === "object" ? JSON.stringify(card._attributes) : "",
     card.title,
+    card._productType,
+    variantFactsStr,
+    variantsStr,
   ].join(" ").toLowerCase();
   if (haystack.includes(feature)) return true;
+  // Also match common spelling variants without requiring per-feature
+  // patching ("memory foam" ↔ "memory-foam", "memoryfoam").
+  const collapsed = haystack.replace(/[-\s]+/g, "");
+  const featureCollapsed = feature.replace(/[-\s]+/g, "");
+  if (featureCollapsed && collapsed.includes(featureCollapsed)) return true;
   // Claim facts (provenance-tagged) — preferred evidence.
   const claimFacts = card._claimFacts || {};
   // Map feature words to fact keys the claim builder maintains.
