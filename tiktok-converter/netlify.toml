@@ -1,0 +1,5 @@
+# Netlify deploy config for the TikTok -> ERP converter.
+# The app is a static site, so there is no build step.
+[build]
+  publish = "."
+  command = ""

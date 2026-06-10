@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TikTok → ERP CSV Converter</title>
+  <link rel="stylesheet" href="styles.css" />
+  <!-- Robust CSV parser (handles quoted fields, embedded newlines/commas) -->
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>TikTok → ERP CSV Converter</h1>
+      <p class="sub">Upload your TikTok Seller order export, set the static values, and download the pipe-delimited file for your ERP.</p>
+    </header>
+
+    <!-- STEP 1: UPLOAD -->
+    <section class="card">
+      <h2><span class="step">1</span> Upload TikTok source CSV</h2>
+      <div id="drop" class="drop">
+        <input type="file" id="file" accept=".csv,text/csv" hidden />
+        <p><strong>Click to choose</strong> or drag your <code>Source.csv</code> here</p>
+        <p id="fileinfo" class="muted"></p>
+      </div>
+    </section>
+
+    <!-- STEP 2: STATIC VALUES -->
+    <section class="card">
+      <h2><span class="step">2</span> Static values for this export</h2>
+      <p class="muted">These fields don't exist in the TikTok file, so set them here. They're remembered for next time.</p>
+      <div class="grid">
+        <label>Order Name Prefix
+          <input id="orderPrefix" type="text" placeholder="ATXSECRET#" />
+          <small>Put before the TikTok Order ID. e.g. <code>ATXSECRET#</code></small>
+        </label>
+        <label>Order Status
+          <input id="orderStatus" type="text" placeholder="unfulfilled" />
+        </label>
+        <label>Ship Method
+          <input id="shipMethod" type="text" placeholder="US1" />
+        </label>
+        <label>Payment Method
+          <input id="paymentMethod" type="text" placeholder="PayPal Payflow Pro" />
+        </label>
+        <label>Customer / Shipping Email
+          <input id="email" type="text" placeholder="(TikTok hides emails — leave blank or set a default)" />
+          <small>TikTok does not export customer emails.</small>
+        </label>
+        <label>Account Number
+          <input id="accountNumber" type="text" placeholder="99999280" />
+        </label>
+        <label>Product Group Type
+          <input id="productGroupType" type="text" placeholder="MULTI" />
+        </label>
+        <label>Order Date Override <span class="opt">(optional)</span>
+          <input id="orderDate" type="text" placeholder="MM-DD-YYYY (blank = use TikTok created date)" />
+          <small>Leave blank to use each order's created date.</small>
+        </label>
+      </div>
+      <label class="checkrow">
+        <input id="appendVariation" type="checkbox" checked />
+        Append the variation (color / size) to the Product Name
+      </label>
+    </section>
+
+    <!-- STEP 3: EXPORT -->
+    <section class="card">
+      <h2><span class="step">3</span> Export</h2>
+      <div class="actions">
+        <button id="export" disabled>Convert &amp; Download</button>
+        <span id="status" class="muted"></span>
+      </div>
+      <div id="previewWrap" class="preview" hidden>
+        <h3>Preview <span id="rowcount" class="muted"></span></h3>
+        <div class="tablescroll"><table id="preview"></table></div>
+      </div>
+    </section>
+
+    <footer>
+      <p class="muted">Everything runs in your browser — no data leaves your computer.</p>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
