@@ -209,7 +209,7 @@ function Globe({ size = 280, points = 800, dim = 1, variant = "brand" }) {
       // Dot radius scales gently with globe size so a viewport-sized
       // globe doesn't render pin-prick dots.
       const dotScale = Math.max(1, size / 280) * 0.75;
-      for (const [x, y, z, accent] of pts) {
+      for (const [x, y, z] of pts) {
         // Spin around Y, then tilt around X.
         const xr = x * cosR + z * sinR;
         const zr = -x * sinR + z * cosR;
@@ -219,10 +219,9 @@ function Globe({ size = 280, points = 800, dim = 1, variant = "brand" }) {
         const sx = cx + xr * R;
         const sy = cy + yr * R;
         if (subtle) {
-          // Mostly white dots with a sage-green sprinkle, all low-alpha.
-          ctx.fillStyle = accent
-            ? `rgba(45,107,79,${(0.05 + depth * 0.20) * dim})`
-            : `rgba(255,255,255,${(0.20 + depth * 0.62) * dim})`;
+          // Single colour — pure white dots, low-alpha. Quiet texture
+          // on the grey admin canvas; never competes with content.
+          ctx.fillStyle = `rgba(255,255,255,${(0.22 + depth * 0.66) * dim})`;
         } else {
           const alpha = (0.06 + depth * 0.78) * dim;
           ctx.fillStyle = depth > 0.72
@@ -478,50 +477,68 @@ function MetricStrip({ metrics }) {
 }
 
 // ---------------------------------------------------------------------------
-// StatusCluster — the pip row carried over from the previous design,
-// restyled for the new light header. Healthy pips read calm (green dot),
-// off pips read quiet, warning / critical pips glow.
+// StatusCluster — the engine's gauge cluster. One segmented instrument bar
+// (not six separate buttons, which read as repeated navigation) plus a
+// one-line verdict above it: "All systems running" when healthy, or
+// "N systems need attention" in amber/red when not. Each segment still
+// links to the page that manages it; the tooltip carries the detail.
 // ---------------------------------------------------------------------------
 function StatusCluster({ items }) {
   const TONE = {
     success:  { dot: "#2D6B4F", cls: "" },
-    subdued:  { dot: "#B5BCC4", cls: " seos-pip-off" },
+    subdued:  { dot: "#C2C9C5", cls: " seos-pip-off" },
     warning:  { dot: "#B98900", cls: " seos-pip-warn" },
     critical: { dot: "#D72C0D", cls: " seos-pip-crit" },
   };
+  const attention = items.filter((it) => it.tone === "warning" || it.tone === "critical");
+  const hasCritical = items.some((it) => it.tone === "critical");
+  const summary = attention.length === 0
+    ? "All systems running"
+    : `${attention.length} system${attention.length > 1 ? "s" : ""} need${attention.length > 1 ? "" : "s"} attention`;
   return (
-    <div role="group" aria-label="System status" className="seos-status-bar">
-      {items.map((it) => {
-        const t = TONE[it.tone] || TONE.subdued;
-        const isAttention = it.tone === "warning" || it.tone === "critical";
-        const labelText = `${it.label}${isAttention ? ` · ${it.value}` : ""}`;
-        const tooltip = `${it.label}: ${it.value}${it.tooltip ? " — " + it.tooltip : ""}`;
-        const className = "seos-pip" + t.cls;
-        const inner = (
-          <>
-            <span
-              aria-hidden="true"
-              className={it.tone === "critical" ? "seos-pip-dot seos-pip-pulse" : "seos-pip-dot"}
-              style={{ background: t.dot }}
-            />
-            <span className="seos-pip-label">{labelText}</span>
-            <span className="seos-pip-chev" aria-hidden="true">›</span>
-          </>
-        );
-        if (!it.url) {
-          return <span key={it.label} className={className} title={tooltip}>{inner}</span>;
-        }
-        if (it.external) {
-          return (
-            <a key={it.label} className={className} href={it.url} target="_blank" rel="noopener noreferrer" title={tooltip}>
-              {inner}
-            </a>
+    <div className="seos-status-wrap">
+      <div className="seos-status-summary">
+        <span
+          aria-hidden="true"
+          className={
+            "seos-status-summary-dot" +
+            (attention.length > 0 ? (hasCritical ? " is-crit" : " is-warn") : "")
+          }
+        />
+        <span>{summary}</span>
+      </div>
+      <div role="group" aria-label="System status" className="seos-status-bar">
+        {items.map((it) => {
+          const t = TONE[it.tone] || TONE.subdued;
+          const isAttention = it.tone === "warning" || it.tone === "critical";
+          const labelText = `${it.label}${isAttention ? ` · ${it.value}` : ""}`;
+          const tooltip = `${it.label}: ${it.value}${it.tooltip ? " — " + it.tooltip : ""}`;
+          const className = "seos-pip" + t.cls;
+          const inner = (
+            <>
+              <span
+                aria-hidden="true"
+                className={it.tone === "critical" ? "seos-pip-dot seos-pip-pulse" : "seos-pip-dot"}
+                style={{ background: t.dot }}
+              />
+              <span className="seos-pip-label">{labelText}</span>
+            </>
           );
-        }
-        return (
-          <Link key={it.label} className={className} to={it.url} title={tooltip}>{inner}</Link>
-        );
-      })}
+          if (!it.url) {
+            return <span key={it.label} className={className} title={tooltip}>{inner}</span>;
+          }
+          if (it.external) {
+            return (
+              <a key={it.label} className={className} href={it.url} target="_blank" rel="noopener noreferrer" title={tooltip}>
+                {inner}
+              </a>
+            );
+          }
+          return (
+            <Link key={it.label} className={className} to={it.url} title={tooltip}>{inner}</Link>
+          );
+        })}
+      </div>
     </div>
   );
 }
@@ -1213,65 +1230,97 @@ export default function Home() {
           .seos-greet { font-size: 26px; }
         }
 
-        /* Status pills — centered under the greeting. White, bordered,
-           softly shadowed with a trailing chevron so they unmistakably
-           read as buttons, not tags. */
-        .seos-status-bar {
+        /* Status — the engine's gauge cluster. A one-line verdict
+           ("All systems running") above a single segmented instrument
+           bar. One container, hairline dividers between segments — it
+           reads as status, not as a second row of navigation. */
+        .seos-status-wrap {
           display: flex;
-          flex-wrap: wrap;
+          flex-direction: column;
           align-items: center;
-          justify-content: center;
-          gap: 8px;
-          padding-top: 20px;
+          gap: 12px;
+          padding-top: 18px;
           position: relative;
           z-index: 1;
           opacity: 0;
           animation: seos-rise 0.55s cubic-bezier(0.2, 0.7, 0.2, 1) 0.25s forwards;
         }
+        .seos-status-summary {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          font-size: 13px;
+          font-weight: 500;
+          color: rgba(26,46,38,0.65);
+        }
+        .seos-status-summary-dot {
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          background: #2D6B4F;
+          animation: seos-breathe 2.8s ease-in-out infinite;
+        }
+        .seos-status-summary-dot.is-warn {
+          background: #B98900;
+          animation: none;
+          box-shadow: 0 0 0 3px rgba(185,137,0,0.18);
+        }
+        .seos-status-summary-dot.is-crit {
+          background: #D72C0D;
+          animation: seos-pulse 1.6s ease-in-out infinite;
+        }
+        @keyframes seos-breathe {
+          0%, 100% { box-shadow: 0 0 0 3px rgba(45,107,79,0.16); }
+          50%      { box-shadow: 0 0 0 6px rgba(45,107,79,0.05); }
+        }
+        .seos-status-bar {
+          display: inline-flex;
+          flex-wrap: wrap;
+          justify-content: center;
+          align-items: stretch;
+          background: #fff;
+          border: 1px solid rgba(26,46,38,0.10);
+          border-radius: 999px;
+          box-shadow: 0 1px 2px rgba(26,46,38,0.05);
+          padding: 4px;
+        }
         .seos-pip {
           display: inline-flex;
           align-items: center;
           gap: 8px;
-          padding: 8px 11px 8px 13px;
+          padding: 8px 14px;
           border-radius: 999px;
-          background: #fff;
-          border: 1px solid rgba(26,46,38,0.12);
-          box-shadow: 0 1px 2px rgba(26,46,38,0.06);
+          background: transparent;
+          border: none;
           text-decoration: none !important;
           color: #1a2e26 !important;
           line-height: 1;
           user-select: none;
           cursor: pointer;
-          transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+          position: relative;
+          transition: background 0.15s ease;
           outline: none;
         }
-        .seos-pip:hover {
-          border-color: rgba(45,107,79,0.45);
-          transform: translateY(-1px);
-          box-shadow: 0 4px 12px rgba(26,46,38,0.10);
+        /* Hairline divider between segments. */
+        .seos-pip + .seos-pip::before {
+          content: "";
+          position: absolute;
+          left: -0.5px;
+          top: 26%;
+          bottom: 26%;
+          width: 1px;
+          background: rgba(26,46,38,0.09);
         }
+        .seos-pip:hover { background: rgba(45,107,79,0.07); }
+        .seos-pip:hover::before, .seos-pip:hover + .seos-pip::before { background: transparent; }
         .seos-pip:focus-visible {
-          border-color: rgba(45,107,79,0.6);
-          box-shadow: 0 0 0 2px rgba(45,107,79,0.3);
+          box-shadow: inset 0 0 0 2px rgba(45,107,79,0.4);
         }
-        .seos-pip-chev {
-          font-size: 12px;
-          font-weight: 600;
-          color: rgba(26,46,38,0.35);
-          transition: transform 0.15s ease, color 0.15s ease;
-        }
-        .seos-pip:hover .seos-pip-chev {
-          color: #2D6B4F;
-          transform: translateX(2px);
-        }
-        .seos-pip-off {
-          background: rgba(255,255,255,0.6);
-          color: rgba(26,46,38,0.55) !important;
-        }
-        .seos-pip-warn { border-color: rgba(185,137,0,0.55); background: #FFFBF0; }
-        .seos-pip-warn:hover { border-color: rgba(185,137,0,0.8); }
-        .seos-pip-crit { border-color: rgba(215,44,13,0.55); background: #FFF6F4; }
-        .seos-pip-crit:hover { border-color: rgba(215,44,13,0.8); }
+        .seos-pip-off .seos-pip-label { color: rgba(26,46,38,0.45); }
+        .seos-pip-warn { background: rgba(255,196,83,0.16); }
+        .seos-pip-warn:hover { background: rgba(255,196,83,0.28); }
+        .seos-pip-crit { background: rgba(215,44,13,0.08); }
+        .seos-pip-crit:hover { background: rgba(215,44,13,0.15); }
         .seos-pip-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
         .seos-pip-label {
           font-size: 10.5px;
@@ -1284,6 +1333,9 @@ export default function Home() {
         @keyframes seos-pulse {
           0%, 100% { box-shadow: 0 0 0 3px rgba(215,44,13,0.25), 0 0 10px rgba(215,44,13,0.45); }
           50%      { box-shadow: 0 0 0 5px rgba(215,44,13,0.12), 0 0 16px rgba(215,44,13,0.6); }
+        }
+        @media (max-width: 640px) {
+          .seos-status-bar { border-radius: 22px; }
         }
 
         /* Metric strip — compact, no card chrome, centered at the very
@@ -1514,7 +1566,8 @@ export default function Home() {
         .seos-card:hover .seos-card-arrow { transform: translateX(4px); }
 
         @media (prefers-reduced-motion: reduce) {
-          .seos-greet .seos-word, .seos-hero-brand, .seos-status-bar { animation: none; opacity: 1; transform: none; }
+          .seos-greet .seos-word, .seos-hero-brand, .seos-status-wrap { animation: none; opacity: 1; transform: none; }
+          .seos-status-summary-dot { animation: none; }
           .seos-pip, .seos-card, .seos-card-arrow, .seos-metric, .seos-metric-detail { transition: none; }
           .seos-pip-pulse { animation: none; }
         }

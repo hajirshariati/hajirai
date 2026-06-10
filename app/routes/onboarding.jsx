@@ -655,7 +655,7 @@ function Globe({ size = 820, points = 1700, theme = "light" }) {
       const cosR = Math.cos(rot);
       const sinR = Math.sin(rot);
       const dotScale = Math.max(1, size / 280) * 0.75;
-      for (const [x, y, z, accent] of pts) {
+      for (const [x, y, z] of pts) {
         const xr = x * cosR + z * sinR;
         const zr = -x * sinR + z * cosR;
         const yr = y * cosT - zr * sinT;
@@ -663,15 +663,10 @@ function Globe({ size = 820, points = 1700, theme = "light" }) {
         const depth = (zt + 1) / 2;
         const sx = cx + xr * R;
         const sy = cy + yr * R;
-        if (dark) {
-          ctx.fillStyle = accent
-            ? `rgba(74,222,128,${0.06 + depth * 0.30})`
-            : `rgba(163,200,180,${0.04 + depth * 0.16})`;
-        } else {
-          ctx.fillStyle = accent
-            ? `rgba(45,107,79,${0.05 + depth * 0.20})`
-            : `rgba(255,255,255,${0.20 + depth * 0.62})`;
-        }
+        // Single colour per theme — green glow on dark, pure white on light.
+        ctx.fillStyle = dark
+          ? `rgba(74,222,128,${0.05 + depth * 0.24})`
+          : `rgba(255,255,255,${0.22 + depth * 0.66})`;
         ctx.beginPath();
         ctx.arc(sx, sy, (0.6 + depth * 1.25) * dotScale, 0, Math.PI * 2);
         ctx.fill();
