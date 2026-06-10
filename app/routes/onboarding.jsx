@@ -672,11 +672,9 @@ function Globe({ size = 820, points = 1700, theme = "light", boostRef = null }) 
 
       const cosR = Math.cos(rot);
       const sinR = Math.sin(rot);
-      // Trail anchor: where each dot was `tailAngle` of rotation ago.
-      const cosP = Math.cos(rot - tailAngle);
-      const sinP = Math.sin(rot - tailAngle);
       const dotScale = Math.max(1, size / 280) * 0.75;
       const trailing = glow > 0.02 && tailAngle > 0.001;
+      const TAIL_SEGMENTS = 4;
       ctx.lineCap = "round";
       for (let i = 0; i < N; i++) {
         const [x, y, z] = pts[i];
@@ -690,18 +688,32 @@ function Globe({ size = 820, points = 1700, theme = "light", boostRef = null }) 
         const radius = (0.6 + depth * 1.25) * dotScale;
 
         // Comet trail first, so the head draws on top of its own tail.
-        if (trailing && depth > 0.35) {
-          const xr2 = x * cosP + z * sinP;
-          const zr2 = -x * sinP + z * cosP;
-          const yr2 = y * cosT - zr2 * sinT;
-          const tx = cx + xr2 * R;
-          const ty = cy + yr2 * R;
-          ctx.strokeStyle = `rgba(${comet},${((0.04 + depth * 0.16) * glow).toFixed(3)})`;
-          ctx.lineWidth = radius;
-          ctx.beginPath();
-          ctx.moveTo(tx, ty);
-          ctx.lineTo(sx, sy);
-          ctx.stroke();
+        // The tail is sampled along the dot's ACTUAL rotation path —
+        // a short curved trace that thins, fades, and shrinks as it
+        // trails back, so every comet visibly follows the spin (and
+        // dots near the poles/limb naturally get shorter tails).
+        if (trailing && depth > 0.5) {
+          let prevX = sx;
+          let prevY = sy;
+          for (let seg = 1; seg <= TAIL_SEGMENTS; seg++) {
+            const a = rot - (tailAngle * seg) / TAIL_SEGMENTS;
+            const ca = Math.cos(a);
+            const sa = Math.sin(a);
+            const xr2 = x * ca + z * sa;
+            const zr2 = -x * sa + z * ca;
+            const yr2 = y * cosT - zr2 * sinT;
+            const tx = cx + xr2 * R;
+            const ty = cy + yr2 * R;
+            const fade = 1 - seg / (TAIL_SEGMENTS + 1);
+            ctx.strokeStyle = `rgba(${comet},${((0.05 + depth * 0.18) * glow * fade).toFixed(3)})`;
+            ctx.lineWidth = radius * (0.35 + 0.65 * fade);
+            ctx.beginPath();
+            ctx.moveTo(prevX, prevY);
+            ctx.lineTo(tx, ty);
+            ctx.stroke();
+            prevX = tx;
+            prevY = ty;
+          }
         }
 
         // Base dot — grey-sage on light, soft green on dark.
@@ -713,7 +725,7 @@ function Globe({ size = 820, points = 1700, theme = "light", boostRef = null }) 
         ctx.fill();
 
         // Glowing comet head layered over the base while boosted.
-        if (trailing && depth > 0.35) {
+        if (trailing && depth > 0.5) {
           ctx.fillStyle = `rgba(${comet},${((0.08 + depth * 0.30) * glow).toFixed(3)})`;
           ctx.beginPath();
           ctx.arc(sx, sy, radius * 1.15, 0, Math.PI * 2);
@@ -746,7 +758,7 @@ function Globe({ size = 820, points = 1700, theme = "light", boostRef = null }) 
         if (p >= 0 && p < 1) {
           glow = 1 - p;
           speed = 1 + 11 * glow;
-          tailAngle = 0.15 * glow;
+          tailAngle = 0.09 * glow;
         }
       }
       // Glacial cruise — one rotation every ~3.5 minutes.
