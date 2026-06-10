@@ -768,20 +768,42 @@ function Globe({ size = 820, points = 1700, theme = "light", boostRef = null }) 
     // decaying back to 1x over four seconds. The comet treatment rides
     // the same curve: subtle light-green heads and trails fade in with
     // the kick and die away as the spin settles. Deliberately understated.
+    // On top of the sprint, the whole globe dives toward the viewer:
+    // it scales up smoothly while blurring and fading (so the zoomed
+    // sphere reads as soft background atmosphere, never sitting on top
+    // of the text), then glides back to normal. The zoom runs on a
+    // cosine bell — zero slope at start, peak, and end — so every
+    // phase of the move is butter.
     const BOOST_MS = 4000;
+    let zoomStyled = false;
+    canvas.style.willChange = "transform, filter, opacity";
     const loop = (t) => {
       const dt = last ? Math.min(t - last, 100) : 16;
       last = t;
       let glow = 0;
       let tailAngle = 0;
       let speed = 1;
+      let boosting = false;
       if (boostRef) {
         const p = (t - (boostRef.current || -1e9)) / BOOST_MS;
         if (p >= 0 && p < 1) {
+          boosting = true;
           glow = 1 - p;
           speed = 1 + 11 * glow;
           tailAngle = 0.075 * glow;
+          // Zoom bell: 0 → 1 → 0, zero slope at both ends and the peak.
+          const bell = (1 - Math.cos(2 * Math.PI * p)) / 2;
+          canvas.style.transform = `scale(${(1 + 1.4 * bell).toFixed(3)})`;
+          canvas.style.filter = `blur(${(6 * bell).toFixed(2)}px)`;
+          canvas.style.opacity = (1 - 0.55 * bell).toFixed(3);
+          zoomStyled = true;
         }
+      }
+      if (!boosting && zoomStyled) {
+        canvas.style.transform = "";
+        canvas.style.filter = "";
+        canvas.style.opacity = "";
+        zoomStyled = false;
       }
       // Glacial cruise — one rotation every ~3.5 minutes.
       rot += dt * 0.00003 * speed;
