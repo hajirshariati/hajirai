@@ -792,10 +792,23 @@ function Globe({ size = 820, points = 1700, theme = "light", boostRef = null }) 
           speed = 1 + 11 * glow;
           tailAngle = 0.075 * glow;
           // Zoom bell: 0 → 1 → 0, zero slope at both ends and the peak.
+          // At the peak the globe covers the ENTIRE viewport: it scales
+          // until its diameter clears the widest screen edge and drifts
+          // from its corner perch to the viewport centre, all heavily
+          // blurred and faded so it washes the background without ever
+          // burying the content.
           const bell = (1 - Math.cos(2 * Math.PI * p)) / 2;
-          canvas.style.transform = `scale(${(1 + 1.4 * bell).toFixed(3)})`;
-          canvas.style.filter = `blur(${(6 * bell).toFixed(2)}px)`;
-          canvas.style.opacity = (1 - 0.55 * bell).toFixed(3);
+          const vw = window.innerWidth || 1280;
+          const vh = window.innerHeight || 800;
+          // Canvas centre sits at (vw - 210, 110) given the fixed
+          // top:-300/right:-200 slot and the 820px canvas.
+          const dx = (vw / 2 - (vw - 210)) * bell;
+          const dy = (vh / 2 - 110) * bell;
+          const fullScale = Math.max(1.8, (Math.max(vw, vh) * 1.7) / size);
+          const scale = 1 + (fullScale - 1) * bell;
+          canvas.style.transform = `translate(${dx.toFixed(1)}px, ${dy.toFixed(1)}px) scale(${scale.toFixed(3)})`;
+          canvas.style.filter = `blur(${(10 * bell).toFixed(2)}px)`;
+          canvas.style.opacity = (1 - 0.6 * bell).toFixed(3);
           zoomStyled = true;
         }
       }
