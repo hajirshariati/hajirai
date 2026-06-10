@@ -30,7 +30,13 @@ import {
 } from "./grounding-validator.server.js";
 
 export function isLlmOwnsTurnEnabled() {
-  return String(process.env.LLM_OWNS_ALL_TURNS || "").toLowerCase() === "true";
+  // Default ON since 2026-06-10 (pre-launch, no live customers — the
+  // owner asked for the new path in production directly). Set
+  // LLM_OWNS_ALL_TURNS=false in Railway as the kill switch to fall
+  // back to the legacy dispatcher cascade.
+  const raw = String(process.env.LLM_OWNS_ALL_TURNS || "").toLowerCase();
+  if (raw === "false") return false;
+  return true;
 }
 
 export function isShadowModeEnabled() {

@@ -43,17 +43,13 @@ import {
   matchCatalogRequirement,
 } from "../lib/catalog-query.server.js";
 import { withAnthropicRetry, classifyAnthropicError, customerFacingFailureMessage } from "../lib/anthropic-resilience.server";
-// Phase 1 of the architecture migration: LLM_OWNS_ALL_TURNS flag.
-// When true, the dispatcher cascade and ~50 post-processors are
-// skipped — one model call (with retry on grounding failures) owns
-// the turn. Default OFF. See app/lib/llm-owns-turn.server.js for
-// the orchestrator and grounding validator.
-import {
-  isLlmOwnsTurnEnabled,
-  isShadowModeEnabled,
-  runWithGroundingRetry,
-  shadowDiffRecord,
-} from "../lib/llm-owns-turn.server.js";
+// Phase 1 of the architecture migration: LLM_OWNS_ALL_TURNS flag
+// (defaults ON; LLM_OWNS_ALL_TURNS=false is the kill switch). When
+// active, the dispatcher cascade and ~50 post-processors are skipped —
+// one model call (with retry on grounding failures) owns the turn.
+// Imported DYNAMICALLY inside the action (same pattern as
+// product-turn-engine.server) because Vite flags static server-module
+// imports referenced by route files as client-leakage.
 import { fetchCustomerContext } from "../lib/customer-context.server";
 import { fetchKlaviyoEnrichment } from "../lib/klaviyo-enrichment.server";
 import { fetchYotpoLoyalty } from "../lib/yotpo-loyalty.server";
@@ -4513,19 +4509,30 @@ export const action = async ({ request }) => {
           // OFF), the new path runs in parallel into a discard buffer
           // and only its diff vs. the old answer is logged.
           // ──────────────────────────────────────────────────────────
+          const {
+            isLlmOwnsTurnEnabled,
+            isShadowModeEnabled,
+            runWithGroundingRetry,
+          } = await import("../lib/llm-owns-turn.server.js");
           if (isLlmOwnsTurnEnabled()) {
             const sonnetModelForClean = (() => {
               const stored = config.anthropicModel || DEFAULT_MODEL;
               return DEPRECATED_MODELS.has(stored) ? DEFAULT_MODEL : stored;
             })();
+            // Each attempt runs into its OWN buffer — only the accepted
+            // attempt's chunks flush to the live controller. Without
+            // this, a failed attempt's text would stream to the widget
+            // and the retry's text would stream again (duplicate reply).
+            let attemptBuf = [];
             const runLoopOnce = async ({ messages: msgs }) => {
+              attemptBuf = [];
               return await runAgenticLoop({
                 anthropic,
                 model: sonnetModelForClean,
                 systemPrompt,
                 messages: msgs.slice(),
                 ctx: { ...ctx },
-                controller,
+                controller: { enqueue: (c) => attemptBuf.push(c) },
                 encoder,
                 promptCaching: config.promptCaching === true,
                 tools: activeTools,
@@ -4539,10 +4546,18 @@ export const action = async ({ request }) => {
                 console.log(
                   `[llm-owns-turn] ${ctx.shop} attempt=${attempt + 1} ` +
                     `ok=${validation.ok} errors=${validation.errors.length} ` +
-                    `textLen=${textLen} pool=${poolSize}`,
+                    `textLen=${textLen} pool=${poolSize}` +
+                    (validation.errors.length > 0
+                      ? ` first_error=${JSON.stringify(validation.errors[0]?.claim || "")}`
+                      : ""),
                 );
               },
             });
+            // Flush ONLY the final (accepted or last-attempt) buffer,
+            // then close the stream — runAgenticLoop does NOT emit
+            // `done` itself (the legacy path emits it after follow-ups).
+            for (const c of attemptBuf) controller.enqueue(c);
+            controller.enqueue(encoder.encode(sseChunk({ type: "done" })));
             console.log(
               `[llm-owns-turn] ${ctx.shop} final ok=${cleanResult.validation.ok} ` +
                 `attempts=${cleanResult.validation.attempts} ` +

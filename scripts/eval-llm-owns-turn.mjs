@@ -15,12 +15,18 @@ import {
 
 // ─── Feature flags ─────────────────────────────────────────────
 
-test("LLM_OWNS_ALL_TURNS flag defaults to false", () => {
+test("LLM_OWNS_ALL_TURNS defaults to ON (pre-launch, no live customers)", () => {
   delete process.env.LLM_OWNS_ALL_TURNS;
-  assert.equal(isLlmOwnsTurnEnabled(), false);
+  assert.equal(isLlmOwnsTurnEnabled(), true);
 });
 
-test("LLM_OWNS_ALL_TURNS=true opts in", () => {
+test("LLM_OWNS_ALL_TURNS=false is the kill switch back to legacy", () => {
+  process.env.LLM_OWNS_ALL_TURNS = "false";
+  assert.equal(isLlmOwnsTurnEnabled(), false);
+  delete process.env.LLM_OWNS_ALL_TURNS;
+});
+
+test("LLM_OWNS_ALL_TURNS=true also enables (explicit)", () => {
   process.env.LLM_OWNS_ALL_TURNS = "true";
   assert.equal(isLlmOwnsTurnEnabled(), true);
   delete process.env.LLM_OWNS_ALL_TURNS;
