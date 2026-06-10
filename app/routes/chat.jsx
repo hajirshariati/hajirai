@@ -199,6 +199,29 @@ function sanitizeHistory(history) {
     if (turn.role !== "user" && turn.role !== "assistant") continue;
     let content = String(turn.content).replace(/^\s*(?:Human|Assistant)\s*:\s*/i, "");
     content = content.replace(/\n\s*(?:Human|Assistant)\s*:\s*/gi, "\n");
+    // Surface the product cards that were DISPLAYED under this
+    // assistant turn. The widget sends them back as turn.products but
+    // the model previously only saw the reply text — which is usually
+    // one sentence that names nothing. Live trace 2026-06-10: "What
+    // sizes does the first one come in?" was unanswerable because
+    // "the first one" pointed at a card the model couldn't see; it
+    // asked a from-scratch clarifying question instead. The bracketed
+    // note gives the model ordinal/reference resolution; facts still
+    // come from fresh tool calls per the grounding rules.
+    if (turn.role === "assistant" && llmOwnsTurnActive() && Array.isArray(turn.products) && turn.products.length > 0) {
+      const shown = turn.products
+        .slice(0, 10)
+        .map((p, i) => {
+          const title = String(p?.title || "").trim();
+          if (!title) return null;
+          const price = String(p?.price_formatted || p?.price || "").trim();
+          return `${i + 1}. ${title}${price ? ` (${price})` : ""}`;
+        })
+        .filter(Boolean);
+      if (shown.length > 0) {
+        content += `\n\n[Product cards displayed with this reply: ${shown.join("; ")}]`;
+      }
+    }
     out.push({ role: turn.role, content });
   }
   return out;
@@ -1483,7 +1506,12 @@ function shouldAttachProductCardsForTurn({ text, ctx, recommenderAskedForMoreInf
   const compound = isCompoundPolicyProductQuestion(latest);
   const latestIsPolicyOnly = isPolicyOrServiceQuestion(latest) && !compound;
   if (latestIsPolicyOnly || recommenderAskedForMoreInfo) return false;
-  if (resolverPromisedRecommendation(ctx?.resolverState)) return true;
+  // Under llm-owns, the resolver's stale "recommend" verdict must not
+  // force cards onto a turn the model answered as text. Live trace
+  // 2026-06-10: "Do you price match Amazon?" got 5 orthotic cards
+  // attached because memory still said category=orthotics from three
+  // turns earlier. The model's own text decides (pitch → attach below).
+  if (!llmOwnsTurnActive() && resolverPromisedRecommendation(ctx?.resolverState)) return true;
   if (compound) return true;
   if (!text) return false;
   if (looksLikeClarifyingQuestion(text)) return false;
@@ -2486,7 +2514,13 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     }
   }
 
+  // Legacy-only: under llm-owns the model's text stands — live trace
+  // 2026-06-10: a RAG-grounded return-policy answer (444 chars) matched
+  // the pitch regex, got wiped to "", and the fallback chain replaced
+  // it with a canned support line. The grounding validator polices
+  // product claims; policy/info prose is the model's to write.
   if (
+    !llmOwnsTurnActive() &&
     pool.length === 0 &&
     looksLikeProductPitch(fullResponseText) &&
     !looksLikeClarifyingQuestion(fullResponseText) &&
@@ -2558,6 +2592,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   }
 
   if (
+    !llmOwnsTurnActive() &&
     isPolicyOrServiceQuestion(ctx.latestUserMessage) &&
     !isCompoundPolicyProductQuestion(ctx.latestUserMessage) &&
     !PRODUCT_SHOPPING_NOUN_RE.test(String(ctx.latestUserMessage || ""))
