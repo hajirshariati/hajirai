@@ -4496,13 +4496,18 @@ export const action = async ({ request }) => {
           // ──────────────────────────────────────────────────────────
           // Phase 1 migration — LLM_OWNS_ALL_TURNS short-circuit.
           //
-          // When the flag is on, skip the dispatcher cascade and all
-          // ~50 post-processors. One model invocation owns the turn,
-          // with the grounding validator catching ungrounded claims
-          // and asking the model to fix them (max 2 retries) before
-          // anything reaches the customer. The orthotic gate stays
-          // in front because it's a real business workflow that
-          // ALREADY ran above this point — we honor its result.
+          // When the flag is on, skip the dispatcher cascade (variant-
+          // fact / policy / resolver-no-match / product-engine). One
+          // model invocation owns the turn, with the grounding
+          // validator catching ungrounded claims and asking the model
+          // to fix them (max 2 retries) before anything reaches the
+          // customer. NOTE: the in-loop post-processors inside
+          // runAgenticLoop (cleanup pipeline, card guards, response
+          // contract) STILL RUN on this path — only the cascade is
+          // skipped. Phase 4 removes the in-loop mutators that fight
+          // the model. The orthotic gate stays in front because it's
+          // a real business workflow that ALREADY ran above this
+          // point — we honor its result.
           //
           // Default OFF: requires LLM_OWNS_ALL_TURNS=true. When
           // LLM_OWNS_ALL_TURNS_SHADOW=true (and the main flag is
