@@ -1481,6 +1481,31 @@ const isExcludedByRule = (p) => {
           reason: "no_kids_products",
         },
       };
+    } else if (
+      afterGender.length === 0 &&
+      beforeGenderFilter > 0 &&
+      (wantedCatalogTerms.length > 0 || !effectiveCategory)
+    ) {
+      // Fail-open for term/informational queries. Live trace 2026-06-10:
+      // "Tell me about BioRocker" carried a stale gender=men from the
+      // prior turn; 15 products had literal "bio rocker" evidence in
+      // their descriptions — ALL women's — and the gender filter wiped
+      // them to zero, so the bot denied a technology the catalog
+      // documents. When the customer asked about a TERM (catalog
+      // requirement evidence) or gave no category at all, wrong-gender
+      // evidence beats no evidence. relaxedFilters tells the model to
+      // frame it honestly ("BioRocker appears in our women's styles").
+      // Category-constrained product requests (e.g. "men's boots") keep
+      // the hard wipe — showing the opposite gender's boots is worse.
+      console.log(
+        `[search]   gender filter ${eg}: WIPED ALL ${beforeGenderFilter} → fail-open ` +
+          `(${wantedCatalogTerms.length > 0 ? "catalog-term evidence" : "no category constraint"}); flagging relaxedFilters.gender`,
+      );
+      relaxedFilters = {
+        ...(relaxedFilters || {}),
+        gender: effectiveGender,
+        _reason: `no matches in ${effectiveGender}'s — showing matches from other genders`,
+      };
     } else {
       filtered = afterGender;
     }

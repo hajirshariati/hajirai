@@ -181,19 +181,26 @@ export async function rebuildChunksForFile(prisma, { shop, sourceFileId, fileTyp
 // Returns [] when the shop has no embedding provider, no chunks
 // embedded yet, or the query is empty — the caller's prompt-builder
 // should fall back to the legacy full-dump path in that case.
+//
+// Return contract: `null` means retrieval COULD NOT run (no provider,
+// embed failure, db error, no chunks embedded) — caller falls back to
+// the full knowledge dump. An ARRAY (possibly empty) means retrieval
+// ran against real embeddings; an empty array is an authoritative
+// "nothing in the knowledge corpus is relevant to this message" and
+// the caller should inject NOTHING, not the 10-30K full dump.
 export async function retrieveRelevantChunks(prisma, { shop, query, config, limit = DEFAULT_RETRIEVAL_LIMIT, threshold = DEFAULT_SIMILARITY_THRESHOLD }) {
-  if (!shop || !query || !String(query).trim()) return [];
+  if (!shop || !query || !String(query).trim()) return null;
   const resolved = resolveShopEmbedding(config);
-  if (!resolved) return [];
+  if (!resolved) return null;
 
   let queryVec;
   try {
     queryVec = await embedText(resolved.provider, resolved.apiKey, String(query), { inputType: "query" });
   } catch (err) {
     console.error(`[knowledge-chunks] query embed failed for shop=${shop}:`, err?.message || err);
-    return [];
+    return null;
   }
-  if (!Array.isArray(queryVec) || queryVec.length !== EMBEDDING_DIMENSIONS) return [];
+  if (!Array.isArray(queryVec) || queryVec.length !== EMBEDDING_DIMENSIONS) return null;
 
   let rows;
   try {
@@ -209,8 +216,13 @@ export async function retrieveRelevantChunks(prisma, { shop, query, config, limi
     );
   } catch (err) {
     console.error(`[knowledge-chunks] retrieval query failed for shop=${shop}:`, err?.message || err);
-    return [];
+    return null;
   }
+
+  // No embedded chunks at all for this shop → retrieval is not really
+  // operational (RAG enabled before the backfill ran). Treat as
+  // unavailable so the caller still injects the full knowledge dump.
+  if (!Array.isArray(rows) || rows.length === 0) return null;
 
   return (rows || [])
     .map((r) => ({
