@@ -162,8 +162,14 @@ function productName(c) {
 // (matches the sample ERP file: anything with a space, pipe, quote or newline
 //  gets wrapped in double-quotes; internal quotes are doubled.)
 function pipeField(value) {
-  const s = value === undefined || value === null ? "" : String(value);
-  if (/[\s"|]/.test(s)) {
+  let s = value === undefined || value === null ? "" : String(value);
+  // The pipe is our column delimiter, so it must never appear inside a value
+  // (e.g. TikTok product titles like "...Wedge | Summer | Ultra Comfort").
+  // Strip it out and collapse the leftover spacing.
+  if (s.indexOf("|") !== -1) {
+    s = s.replace(/\|/g, " ").replace(/ {2,}/g, " ").trim();
+  }
+  if (/[\s"]/.test(s)) {
     return '"' + s.replace(/"/g, '""') + '"';
   }
   return s;
