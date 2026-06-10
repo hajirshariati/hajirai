@@ -24,6 +24,14 @@ import {
   recommenderProductToCanonical,
 } from "../app/lib/product-claim-facts.server.js";
 
+// This file tests the LEGACY response-contract mutators. Phase 2 added
+// LLM_OWNS_ALL_TURNS as the production default (ON), which makes the
+// new grounding validator the authority and turns the legacy
+// stripper/verifier into NO-OPs. Pin the flag OFF here so the legacy
+// behavior is exercised. Tests that specifically verify the new path
+// re-set the flag inside their own try/finally (R89/R90/R91).
+process.env.LLM_OWNS_ALL_TURNS = "false";
+
 let passed = 0;
 let failed = 0;
 const failures = [];
@@ -1134,6 +1142,7 @@ test("R57 — ensureCompleteCustomerText rescues whitespace-only input via fallb
 test("R58 — repairProductTurnAssembly + verifier can zero text under pool>0 (matches live failure)", () => {
   // Live trace: "Both have arch support and run wide." → 149→0 chars
   // under unverified_universal:arch support against a mixed pool.
+  // Legacy path, exercised under the file-level LLM_OWNS_ALL_TURNS=false.
   const cards = [
     card({ title: "A", archSupport: true }),
     card({ title: "B", archSupport: false }),
@@ -1878,6 +1887,87 @@ test("R88 — exact no-match text cannot inherit an unrelated LLM product group"
   assert.match(out.text, /pink men's footwear/i);
   assert.match(out.text, /current catalog/i);
   assert.doesNotMatch(out.text, /orthotic/i);
+});
+
+// ─── R89..R91 — LLM_OWNS_ALL_TURNS bypasses legacy mutators ──
+// Live trace 2026-06-10: customer asked for lapis lazuli sandals,
+// LLM wrote an honest "we don't carry that, here are alternatives"
+// reply (231 chars), the legacy `stripped_contradictory_denial`
+// stripper cut it to 51 chars of generic "here are some sandals to
+// browse." The Phase 2 prompt rule explicitly allows that honesty,
+// so the code-side stripper must defer when the new path is active.
+// Same idea for the claim verifier on "boots with memory foam" — the
+// verifier zeroed 172 chars because catalog `footbed` attribute is
+// warehouse codes, not material names.
+
+test("R89 — stripped_contradictory_denial DEFERS when LLM_OWNS_ALL_TURNS is active", () => {
+  process.env.LLM_OWNS_ALL_TURNS = "true";
+  try {
+    const text = "We don't carry lapis lazuli sandals specifically — here are our closest options.";
+    const pool = [
+      { title: "Jillian Sandal - Black", handle: "jillian-black", _attributes: { category: "Sandals", gender: "Women" } },
+      { title: "Vicki Sandal - Tan", handle: "vicki-tan", _attributes: { category: "Sandals", gender: "Women" } },
+    ];
+    const ctx = {
+      latestUserMessage: "do you have lapis lazuli sandals?",
+      sessionMemory: { explicit: { category: "sandals", gender: "women" } },
+    };
+    const out = repairProductTurnAssembly({ text, pool, ctx });
+    assert.equal(out.changed, false, `stripper must not fire when LLM_OWNS_ALL_TURNS is active; logs=${JSON.stringify(out.logs)}`);
+    assert.equal(out.text, text, "honest denial must pass through unmodified");
+  } finally {
+    process.env.LLM_OWNS_ALL_TURNS = "false";
+  }
+});
+
+test("R90 — relaxedFilters exempts the denial stripper even with flag OFF", () => {
+  // When the search RELAXED a filter (color=lapis lazuli was dropped
+  // to get any sandals), the AI's "we don't carry lapis lazuli" is
+  // honest about the relaxation, not contradictory to the catalog.
+  process.env.LLM_OWNS_ALL_TURNS = "false";
+  try {
+    const text = "We don't carry lapis lazuli sandals — here are alternatives.";
+    const pool = [
+      { title: "Jillian Sandal - Black", handle: "jillian-black", _attributes: { category: "Sandals", gender: "Women" } },
+    ];
+    const ctx = {
+      latestUserMessage: "lapis lazuli sandals",
+      sessionMemory: { explicit: { category: "sandals", gender: "women", color: "lapis lazuli" } },
+    };
+    const out = repairProductTurnAssembly({ text, pool, ctx, relaxedFilters: { color: "lapis lazuli" } });
+    assert.ok(!out.logs.includes("stripped_contradictory_denial"),
+      `relaxedFilters must exempt the denial stripper; logs=${JSON.stringify(out.logs)}`);
+  } finally {
+    process.env.LLM_OWNS_ALL_TURNS = "false";
+  }
+});
+
+test("R91 — claim verifier DEFERS when LLM_OWNS_ALL_TURNS is active", () => {
+  // Live trace 2026-06-10: "which of your boots has memory foam?" →
+  // LLM wrote 172 chars of correct description quotes → legacy
+  // verifier zeroed it because catalog `footbed` attr is "ll"/"cc"
+  // warehouse codes, not "memory foam". The new path's grounding
+  // validator checks broader evidence (description/tags/attributes/
+  // claim-facts) and is the authority now.
+  process.env.LLM_OWNS_ALL_TURNS = "true";
+  try {
+    const text = "Based on the product descriptions, the **Hannah Boot**, **Margot Boot**, and **Scarlett Boot** all feature memory foam footbed for cushioning.";
+    const pool = [
+      { title: "Hannah Arch Support Boot - Tan", handle: "hannah-tan-ll302w", _attributes: { footbed: "ll", category: "Boots" }, _description: "Boot with memory foam footbed and arch support" },
+      { title: "Margot Lace-Up Boot - Dark Green", handle: "margot-dark-green-ll504w", _attributes: { footbed: "ll", category: "Boots" }, _description: "Lace-up boot with memory foam cushioning" },
+      { title: "Scarlett Boot - Honey", handle: "scarlett-honey-cc602w", _attributes: { footbed: "cc", category: "Boots" }, _description: "Boot with memory foam footbed" },
+    ];
+    const ctx = {
+      latestUserMessage: "which of your boots has memory foam?",
+      sessionMemory: { explicit: { category: "boots", gender: "women" } },
+    };
+    const out = repairProductTurnAssembly({ text, pool, ctx });
+    assert.ok(!out.logs.includes("verified_claims"),
+      `verifier must defer when LLM_OWNS_ALL_TURNS is active; logs=${JSON.stringify(out.logs)}`);
+    assert.ok(out.text.length > 100, `text must not be zeroed; got len=${out.text.length}`);
+  } finally {
+    process.env.LLM_OWNS_ALL_TURNS = "false";
+  }
 });
 
 if (failed > 0) {
