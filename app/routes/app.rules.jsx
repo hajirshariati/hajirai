@@ -78,6 +78,7 @@ import {
 import { validateDecisionTree } from "../lib/decision-tree-schema.server";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
+import BrandHeader from "../components/BrandHeader";
 
 function isCsv(fileName) {
   return typeof fileName === "string" && fileName.toLowerCase().endsWith(".csv");
@@ -3048,7 +3049,7 @@ export default function RulesKnowledge() {
   return (
     <Page>
       <TitleBar title="Rules" />
-      <div style={{ height: "4px", borderRadius: "2px", background: "linear-gradient(90deg, #2D6B4F, #3a8a66, transparent)", marginBottom: "20px" }} />
+      <BrandHeader title="Rules" />
       <BlockStack gap="800">
         <BlockStack gap="400">
           <SectionHeading

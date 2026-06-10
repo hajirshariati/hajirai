@@ -19,6 +19,7 @@ import { authenticate } from "../shopify.server";
 import { getShopConfig, updateShopConfig } from "../models/ShopConfig.server";
 import { getShopPlan } from "../lib/billing.server";
 import { PlanGate } from "../components/PlanGate";
+import BrandHeader from "../components/BrandHeader";
 
 // Focused loader — only the fields the fit-predictor card needs.
 // Keeping this independent from app.rules.jsx so the bigger admin
@@ -234,7 +235,7 @@ export default function FitPredictor() {
   return (
     <Page>
       <TitleBar title="Fit predictor" />
-      <div style={{ height: "4px", borderRadius: "2px", background: "linear-gradient(90deg, #2D6B4F, #3a8a66, transparent)", marginBottom: "20px" }} />
+      <BrandHeader title="Fit predictor (Beta)" />
       <BlockStack gap="400">
         <Card>
           <BlockStack gap="200">

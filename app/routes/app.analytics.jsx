@@ -14,6 +14,7 @@ import {
   getTopProducts, getProductsByTool, getInterestBreakdown, cleanupOldMentions,
 } from "../models/ChatProductMention.server";
 import { getConversionSummary } from "../models/ChatConversion.server";
+import BrandHeader from "../components/BrandHeader";
 
 const MODEL_LABELS = {
   "claude-sonnet-4-20250514": "Standard",
@@ -530,7 +531,7 @@ export default function Analytics() {
     <Page>
       <TitleBar title="Analytics" />
       <BlockStack gap="500">
-        <div style={{ height: "4px", borderRadius: "2px", background: "linear-gradient(90deg, #2D6B4F, #3a8a66, transparent)" }} />
+        <BrandHeader title="Analytics" gutter={false} />
 
         <Card>
           <InlineStack align="space-between" blockAlign="center" wrap>
