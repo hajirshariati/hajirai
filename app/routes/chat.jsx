@@ -4539,7 +4539,17 @@ export const action = async ({ request }) => {
                 ctx: { ...ctx },
                 controller: { enqueue: (c) => attemptBuf.push(c) },
                 encoder,
-                promptCaching: config.promptCaching === true,
+                // Force prompt caching ON for the LLM-owns path. The
+                // system prompt is ~80KB and goes to Sonnet on EVERY
+                // hop; without caching, Anthropic re-reads it from
+                // scratch each call, costing 5-10 extra seconds per
+                // turn. ShopConfig.promptCaching defaults to false
+                // (legacy field), but for the new architecture it
+                // should always be on — the cache TTL is plenty for
+                // a multi-hop turn and the cost is essentially free.
+                // Live trace 2026-06-10: hiking-poles single-hop turn
+                // took 14.5s; chartreuse two-hop turn took 13s.
+                promptCaching: true,
                 tools: activeTools,
               });
             };
@@ -4567,11 +4577,22 @@ export const action = async ({ request }) => {
               cleanResult.turnResult?.products
               || cleanResult.finalProductCards
               || [];
+            // Cache instrumentation. After enabling promptCaching=true,
+            // cache_read_input_tokens should be ~78K on every turn
+            // after the first one in a session — Anthropic re-reads
+            // the cached system prompt at ~10× the rate. Without
+            // caching every turn re-billed and re-processed those
+            // tokens, dominating latency. Live trace 2026-06-10
+            // showed 14.5s hops; this should cut them substantially.
+            const usage = cleanResult.totalUsage || {};
             console.log(
               `[llm-owns-turn] ${ctx.shop} final ok=${cleanResult.validation.ok} ` +
                 `attempts=${cleanResult.validation.attempts} ` +
                 `textLen=${(cleanResult.fullResponseText || "").length} ` +
-                `cards=${finalCards.length}`,
+                `cards=${finalCards.length} ` +
+                `cache=read:${usage.cache_read_input_tokens || 0}/` +
+                `write:${usage.cache_creation_input_tokens || 0}/` +
+                `fresh:${usage.input_tokens || 0}`,
             );
             return;
           }
@@ -4595,7 +4616,8 @@ export const action = async ({ request }) => {
                   ctx: { ...ctx },
                   controller: { enqueue: (c) => discardBuf.push(c) },
                   encoder,
-                  promptCaching: config.promptCaching === true,
+                  // Match the live path: force prompt caching ON.
+                  promptCaching: true,
                   tools: activeTools,
                 });
               };
