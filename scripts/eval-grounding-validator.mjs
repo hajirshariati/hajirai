@@ -218,6 +218,22 @@ test("brand-prefixed tech bolds ('Aetrex Signature Arch Support') are NOT produc
     `brand-tech bolds must not be flagged; got ${JSON.stringify(out.errors)}`);
 });
 
+test("spec-section headings (Style & Materials, Comfort Features, Fit & Sizing) are NOT products", () => {
+  // Live trace 2026-06-10 evening: the Reagan spec answer used
+  // "**Style & Materials**" as a section heading and burned TWO
+  // retries (~25s) — "Materials" didn't match the singular \bMaterial\b
+  // and "Style" wasn't in the vocabulary. Plural-tolerant suffixes +
+  // ampersand-heading rule fix the class.
+  const text =
+    "**Style & Materials**\nGenuine leather upper.\n\n" +
+    "**Comfort Features**\nBuilt-in arch support.\n\n" +
+    "**Fit & Sizing**\nRuns true to size.\n\n" +
+    "**Key Details**\n2-inch stacked heel.";
+  const out = validateGrounding({ text, pool: [] });
+  assert.equal(out.ok, true,
+    `section headings must not be flagged as products; got ${JSON.stringify(out.errors)}`);
+});
+
 test("real product name (no trailing punctuation in bold) still extracted", () => {
   // Belt-and-suspenders — make sure the heading-end guard doesn't
   // accidentally swallow legitimate product names.

@@ -884,6 +884,13 @@ export function repairProductTurnAssembly({ text, pool = [], ctx = {}, relaxedFi
   let nextText = String(text || "").trim();
   let changed = false;
   const logs = [];
+  // Phase 4 completion: on the LLM-owns path, ALL silent text
+  // rewriters in this assembly defer to the grounding validator's
+  // reject-and-retry. Live trace 2026-06-10 evening: "is the Jamie
+  // wedge in stock?" → color repairs + enumeration collapse cut the
+  // model's 334-char answer to 181 chars behind its back. The
+  // legacy (kill-switch) path keeps every repair.
+  const llmOwns = isLlmOwnsTurnActive();
 
   const denialRepair = repairProductResponseText({ text: nextText, pool, ctx, relaxedFilters });
   if (denialRepair.changed) {
@@ -892,21 +899,25 @@ export function repairProductTurnAssembly({ text, pool = [], ctx = {}, relaxedFi
     logs.push("stripped_contradictory_denial");
   }
 
-  const colorRepair = repairColorAvailabilityClaims(nextText, pool, ctx);
+  const colorRepair = llmOwns
+    ? { changed: false }
+    : repairColorAvailabilityClaims(nextText, pool, ctx);
   if (colorRepair.changed) {
     nextText = colorRepair.text;
     changed = true;
     logs.push("verified_color_availability");
   }
 
-  const positiveColorRepair = repairPositiveColorClaims(nextText, pool);
+  const positiveColorRepair = llmOwns
+    ? { changed: false }
+    : repairPositiveColorClaims(nextText, pool);
   if (positiveColorRepair.changed) {
     nextText = positiveColorRepair.text;
     changed = true;
     logs.push("corrected_color_overclaim");
   }
 
-  if (isDirectProductFactQuestion(ctx?.latestUserMessage)) {
+  if (!llmOwns && isDirectProductFactQuestion(ctx?.latestUserMessage)) {
     const colorRangeRepair = repairColorRangePromises(nextText, pool, ctx);
     if (colorRangeRepair.changed) {
       nextText = colorRangeRepair.text;
@@ -949,7 +960,9 @@ export function repairProductTurnAssembly({ text, pool = [], ctx = {}, relaxedFi
   // AFTER repairColorRangePromises because that step can ITSELF
   // introduce a partial enumeration (only cards with multi-color
   // variants get a "comes in…" sentence), which this cleanup catches.
-  const partialEnum = collapsePartialPerProductEnumeration(nextText, pool);
+  const partialEnum = llmOwns
+    ? { changed: false }
+    : collapsePartialPerProductEnumeration(nextText, pool);
   if (partialEnum.changed) {
     nextText = partialEnum.text;
     changed = true;

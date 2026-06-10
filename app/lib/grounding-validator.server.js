@@ -56,7 +56,18 @@ function extractBoldedProductFamilies(text) {
     // Generic emphasis bolds, headings, or tech/feature labels.
     if (/^(?:yes|no|note|important|warning|tip|here|now|today|great)\b/i.test(inner)) continue;
     if (/[™®©]/.test(inner)) continue;
-    if (/\b(?:Technology|System|Method|Approach|Feature|Series|Collection|Platform|Footbed|Midsole|Outsole|Insole|Foam|Material|Lining|Upper|Mission|HQ|Headquarters|Bottom\s+line)\b/i.test(inner)) continue;
+    // Tech/feature/section vocabulary — plural-tolerant ((?:s)?\b).
+    // Live trace 2026-06-10 evening: "**Style & Materials**" burned
+    // TWO retries (~25s) because "Materials" didn't match \bMaterial\b
+    // (no word boundary before the plural 's') and "Style" wasn't in
+    // the list at all. Section headings the model naturally writes in
+    // spec answers — Style, Comfort, Fit, Sizing, Details, Specs,
+    // Design, Construction, Overview, Summary, Verdict — are now
+    // recognized.
+    if (/\b(?:Technolog(?:y|ies)|System|Method|Approach|Feature|Series|Collection|Platform|Footbed|Midsole|Outsole|Insole|Foam|Material|Lining|Upper|Mission|HQ|Headquarters|Bottom\s+line|Style|Comfort|Fit|Sizing|Detail|Spec(?:ification)?|Design|Construction|Overview|Summar(?:y|ies)|Verdict|Pro|Con|Difference|Highlight|Takeaway)s?\b/i.test(inner)) continue;
+    // Ampersand bolds are section headings ("Style & Materials",
+    // "Fit & Sizing") — no product title in this catalog contains "&".
+    if (inner.includes("&")) continue;
     // Brand-prefixed tech phrases ("Aetrex Signature Arch Support",
     // "Aetrex Orthotic System") are brand/technology references —
     // product titles never start with the brand name. Live trace
