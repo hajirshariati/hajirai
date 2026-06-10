@@ -788,22 +788,29 @@ function Globe({ size = 820, points = 1700, theme = "light", boostRef = null }) 
         const p = (t - (boostRef.current || -1e9)) / BOOST_MS;
         if (p >= 0 && p < 1) {
           boosting = true;
-          // Everything rides one cosine bell — spin, comets, and zoom
-          // peak together mid-dive and ease out together. The spin
-          // multiplier is high enough for well over a full rotation
-          // across the zoom out-and-back, so the sphere is visibly
-          // churning the whole way.
-          const spinBell = (1 - Math.cos(2 * Math.PI * p)) / 2;
-          glow = spinBell;
-          speed = 1 + 140 * spinBell;
-          tailAngle = 0.09 * spinBell;
+          // Spin envelope: a PLATEAU, not a bell. Smooth ramp to full
+          // speed over the first 12%, hold flat through the entire
+          // zoom out-and-back, then ease down over the final 20%. The
+          // rotation never dips mid-flight, so the motion reads as one
+          // continuous spin from take-off to landing. Comets ride the
+          // same envelope. (The earlier bell-shaped speed decayed all
+          // through the return leg — dots looked stalled on the way
+          // home.)
+          const smooth = (a, b, v) => {
+            const t = Math.min(1, Math.max(0, (v - a) / (b - a)));
+            return t * t * (3 - 2 * t);
+          };
+          const env = smooth(0, 0.12, p) * (1 - smooth(0.8, 1, p));
+          glow = env;
+          speed = 1 + 90 * env;
+          tailAngle = 0.09 * env;
           // Zoom bell: 0 → 1 → 0, zero slope at both ends and the peak.
           // At the peak the globe covers the ENTIRE viewport: it scales
           // until its diameter clears the widest screen edge and drifts
           // from its corner perch to the viewport centre, all heavily
           // blurred and faded so it washes the background without ever
           // burying the content.
-          const bell = spinBell;
+          const bell = (1 - Math.cos(2 * Math.PI * p)) / 2;
           const vw = window.innerWidth || 1280;
           const vh = window.innerHeight || 800;
           // Canvas centre sits at (vw - 210, 110) given the fixed
