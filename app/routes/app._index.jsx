@@ -151,7 +151,7 @@ function formatRevenue(n, currency) {
 // 3-D globe without any 3-D library. Respects prefers-reduced-motion by
 // rendering one static frame.
 // ---------------------------------------------------------------------------
-function Globe({ size = 280 }) {
+function Globe({ size = 280, points = 800, dim = 1 }) {
   const ref = useRef(null);
   useEffect(() => {
     const canvas = ref.current;
@@ -163,7 +163,7 @@ function Globe({ size = 280 }) {
     if (!ctx) return;
     ctx.scale(dpr, dpr);
 
-    const N = 800;
+    const N = points;
     const pts = [];
     const golden = Math.PI * (3 - Math.sqrt(5));
     for (let i = 0; i < N; i++) {
@@ -183,9 +183,9 @@ function Globe({ size = 280 }) {
       ctx.clearRect(0, 0, size, size);
       // Soft inner sphere shading so the dot field sits on a body.
       const grad = ctx.createRadialGradient(cx - R * 0.35, cy - R * 0.35, R * 0.1, cx, cy, R);
-      grad.addColorStop(0, "rgba(58,138,102,0.16)");
-      grad.addColorStop(0.7, "rgba(45,107,79,0.08)");
-      grad.addColorStop(1, "rgba(45,107,79,0.02)");
+      grad.addColorStop(0, `rgba(58,138,102,${0.16 * dim})`);
+      grad.addColorStop(0.7, `rgba(45,107,79,${0.08 * dim})`);
+      grad.addColorStop(1, `rgba(45,107,79,${0.02 * dim})`);
       ctx.fillStyle = grad;
       ctx.beginPath();
       ctx.arc(cx, cy, R, 0, Math.PI * 2);
@@ -193,6 +193,9 @@ function Globe({ size = 280 }) {
 
       const cosR = Math.cos(rot);
       const sinR = Math.sin(rot);
+      // Dot radius scales gently with globe size so a viewport-sized
+      // globe doesn't render pin-prick dots.
+      const dotScale = Math.max(1, size / 280) * 0.75;
       for (const [x, y, z] of pts) {
         // Spin around Y, then tilt around X.
         const xr = x * cosR + z * sinR;
@@ -202,12 +205,12 @@ function Globe({ size = 280 }) {
         const depth = (zt + 1) / 2; // 0 = back, 1 = front
         const sx = cx + xr * R;
         const sy = cy + yr * R;
-        const alpha = 0.06 + depth * 0.78;
+        const alpha = (0.06 + depth * 0.78) * dim;
         ctx.fillStyle = depth > 0.72
           ? `rgba(58,138,102,${alpha})`
           : `rgba(45,107,79,${alpha})`;
         ctx.beginPath();
-        ctx.arc(sx, sy, 0.6 + depth * 1.25, 0, Math.PI * 2);
+        ctx.arc(sx, sy, (0.6 + depth * 1.25) * dotScale, 0, Math.PI * 2);
         ctx.fill();
       }
     };
@@ -224,7 +227,7 @@ function Globe({ size = 280 }) {
     };
     raf = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(raf);
-  }, [size]);
+  }, [size, points, dim]);
 
   return (
     <canvas
@@ -1118,18 +1121,29 @@ export default function Home() {
            Brand green #2D6B4F with #3a8a66 as the light end.
         ------------------------------------------------------------------ */
         .seos-home { position: relative; }
+        /* Page content layers above the fixed globe backdrop. */
+        .seos-home > div:not(.seos-globe-bg), .seos-home > .Polaris-BlockStack { position: relative; z-index: 1; }
 
-        /* Hero: greeting left, globe top-right, soft green aura. */
+        /* Globe backdrop — pinned to the viewport's top-right corner,
+           behind all content, bleeding off the edge like the Shopify
+           admin home. position:fixed keeps it outside layout flow, so
+           the overhang never creates a horizontal scrollbar. */
+        .seos-globe-bg {
+          position: fixed;
+          top: -190px;
+          right: -210px;
+          z-index: 0;
+          pointer-events: none;
+        }
+        @media (max-width: 1000px) {
+          .seos-globe-bg { display: none; }
+        }
+
+        /* Hero: transparent — the greeting floats on the page like the
+           Shopify admin home, with the globe showing behind it. */
         .seos-hero {
           position: relative;
-          border-radius: 16px;
-          padding: 28px 32px 22px;
-          overflow: hidden;
-          background:
-            radial-gradient(1100px 420px at 85% -60%, rgba(58,138,102,0.16), rgba(58,138,102,0) 60%),
-            radial-gradient(700px 320px at -10% 120%, rgba(45,107,79,0.07), rgba(45,107,79,0) 60%),
-            linear-gradient(180deg, #ffffff 0%, #fafcfb 100%);
-          border: 1px solid rgba(45,107,79,0.14);
+          padding: 18px 4px 8px;
         }
         .seos-hero-brand {
           display: inline-flex;
@@ -1177,16 +1191,7 @@ export default function Home() {
         @keyframes seos-rise {
           to { opacity: 1; transform: translateY(0); }
         }
-        .seos-globe-slot {
-          position: absolute;
-          top: 0;
-          right: 0;
-          transform: translate(26%, -24%);
-          pointer-events: none;
-          filter: drop-shadow(0 0 28px rgba(58,138,102,0.25));
-        }
         @media (max-width: 760px) {
-          .seos-globe-slot { display: none; }
           .seos-greet { font-size: 24px; }
         }
 
@@ -1489,13 +1494,13 @@ export default function Home() {
         }
       `}</style>
       <div className="seos-home">
+        <div className="seos-globe-bg" aria-hidden="true">
+          <Globe size={780} points={1700} dim={0.5} />
+        </div>
         <BlockStack gap="500">
           {hasApiKey ? <MetricStrip metrics={metrics} /> : null}
 
           <div className="seos-hero">
-            <div className="seos-globe-slot">
-              <Globe size={300} />
-            </div>
             <div className="seos-hero-brand">
               <img src={seosLogo} alt="SEoS" />
               <span className="seos-hero-brand-name">SEoS Assistant</span>
@@ -1531,9 +1536,7 @@ export default function Home() {
             </Banner>
           )}
 
-          <BlockStack gap="300">
-            <Text as="h2" variant="headingMd">Explore</Text>
-            <div className="seos-card-grid">
+          <div className="seos-card-grid">
               <ActionCard
                 art={<ArtSetup />}
                 title="Setup guide"
@@ -1580,8 +1583,7 @@ export default function Home() {
                 cta="Open settings"
                 url="/app/api-keys"
               />
-            </div>
-          </BlockStack>
+          </div>
 
           <SetupChecklist
             hasApiKey={hasApiKey}
