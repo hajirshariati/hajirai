@@ -207,6 +207,17 @@ test("'**Quick take —**' style bold is treated as heading, not product", () =>
   assert.equal(out.ok, true);
 });
 
+test("brand-prefixed tech bolds ('Aetrex Signature Arch Support') are NOT products", () => {
+  // Live trace 2026-06-10: the model bolded the brand technology
+  // "**Aetrex Signature Arch Support**" in a grounded BioRocker
+  // answer; the validator extracted "aetrex" as a product family and
+  // burned a retry. Product titles never start with the brand name.
+  const text = "Both styles feature **Aetrex Signature Arch Support** and the **Aetrex Orthotic System**.";
+  const out = validateGrounding({ text, pool: [] });
+  assert.equal(out.ok, true,
+    `brand-tech bolds must not be flagged; got ${JSON.stringify(out.errors)}`);
+});
+
 test("real product name (no trailing punctuation in bold) still extracted", () => {
   // Belt-and-suspenders — make sure the heading-end guard doesn't
   // accidentally swallow legitimate product names.

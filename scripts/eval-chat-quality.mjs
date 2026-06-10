@@ -31,6 +31,14 @@ import {
   validateTurnResult,
 } from "../app/lib/response-contract.server.js";
 
+// This file tests LEGACY pipeline behaviors (category-lock injection,
+// rewrite pipeline, etc). LLM_OWNS_ALL_TURNS now defaults ON in
+// production, which disables the stale-memory category-lock injector
+// (live trace 2026-06-10: it stuffed category=boots into a clean
+// "BioRocker" search). Pin the flag OFF so the legacy contracts stay
+// covered for the kill-switch path.
+process.env.LLM_OWNS_ALL_TURNS = "false";
+
 const u = (content) => ({ role: "user", content });
 const a = (content) => ({ role: "assistant", content });
 

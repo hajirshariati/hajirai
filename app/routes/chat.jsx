@@ -2408,14 +2408,17 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       { fn: stripBannedNarration,          name: "banned-narration" },
       { fn: stripMetaNarration,            name: "meta-narration" },
       { fn: dedupeConsecutiveSentences,    name: "dedupe" },
-      // Cosmetic markdown rewriters run on the LEGACY path only.
-      // On the LLM-owns path the prompt's formatting rules govern,
-      // and live trace 2026-06-10 showed these half-splitting the
-      // Reagan spec list into orphan "-" lines. Safety/leak scrubs
-      // above stay on for both paths.
+      // header-breaks runs on BOTH paths: its sole job is putting
+      // bold product/section headers on their own paragraph, and the
+      // very first LLM-owns compare without it glued "**Jillian
+      // Braided Quarter Strap Sandal — $139.95**" onto the tail of
+      // the Vicki section (screenshot 2026-06-10). It's the best-
+      // tested mutator here (bullet/heading/tech-name guards) and is
+      // shape-preserving. reflow-list and tighten-facts stay
+      // legacy-only — they were implicated in the orphan "-" lines.
+      { fn: ensureHeaderLineBreaks,        name: "header-breaks" },
       ...(llmOwnsTurnActive() ? [] : [
         { fn: reflowInlineList,              name: "reflow-list" },
-        { fn: ensureHeaderLineBreaks,        name: "header-breaks" },
         { fn: tightenSequentialFactLines,    name: "tighten-facts" },
       ]),
     ];

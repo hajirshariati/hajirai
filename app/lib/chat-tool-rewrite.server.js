@@ -419,6 +419,21 @@ function getLockedCategory(ctx) {
 export function injectLockedCategory(toolCall, ctx) {
   if (toolCall.name !== "search_products") return toolCall;
 
+  // LLM-owns path: the model's tool args ARE the intent — never
+  // inject a stale memory category behind its back. Live trace
+  // 2026-06-10: customer asked "what's BioRocker?" right after a
+  // Reagan boot question; this injector stuffed category="boots"
+  // into the model's clean search("BioRocker") call → 0 results →
+  // the model honestly-but-wrongly told the customer "BioRocker
+  // doesn't appear in any of our descriptions". BioRocker lives in
+  // sandals/sneakers — excluded by the injected boots filter.
+  // When the model WANTS a category lock it passes filters.category
+  // itself (the prompt's CATEGORY LOCK rule instructs exactly that).
+  {
+    const raw = String(process.env.LLM_OWNS_ALL_TURNS || "").toLowerCase();
+    if (raw !== "false") return toolCall;
+  }
+
   const existingFilters = toolCall.input?.filters || {};
   if (existingFilters.category || existingFilters.Category) return toolCall;
 
