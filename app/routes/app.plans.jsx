@@ -1,18 +1,14 @@
 import { useState, useEffect } from "react";
 import { data } from "react-router";
 import { useLoaderData, useActionData, Form, useNavigation } from "react-router";
-import {
-  Page, Layout, Card, Text, Button, Badge, BlockStack, InlineStack, Banner,
-  ProgressBar, Box, Icon, InlineGrid,
-} from "@shopify/polaris";
-import { CheckCircleIcon, EmailIcon, MinusIcon, ClipboardIcon } from "@shopify/polaris-icons";
+import { Page } from "@shopify/polaris";
 import { TitleBar } from "@shopify/app-bridge-react";
 import { authenticate } from "../shopify.server";
 import {
   getShopPlan, getConversationsThisMonth, createSubscription, setShopPlan,
   cancelSubscription, getActiveSubscription,
 } from "../lib/billing.server";
-import { PLANS, PLAN_ORDER, planAllows, formatLimit } from "../lib/plans";
+import { PLANS, PLAN_ORDER, formatLimit } from "../lib/plans";
 import BrandHeader from "../components/BrandHeader";
 
 const SUPPORT_EMAIL = "hajiraiapp@gmail.com";
@@ -48,326 +44,66 @@ export const action = async ({ request }) => {
   return data({ ok: false, message: "Unknown action" }, { status: 400 });
 };
 
-const FEATURE_ROWS = [
-  { label: "Conversations / month", get: (p) => formatLimit(p.conversationsPerMonth) },
-  { label: "Knowledge files", get: (p) => formatLimit(p.knowledgeFiles) },
-  { label: "Analytics history", get: (p) => `${p.analyticsRetentionDays} days` },
-  { label: "Smart routing + prompt caching", get: (p) => planAllows(p, "smartRouting") && planAllows(p, "promptCaching") },
-  { label: "Advanced AI model", get: (p) => planAllows(p, "advancedModel") },
-  { label: "Search rules, synonyms, product enrichment", get: (p) => planAllows(p, "searchRules") && planAllows(p, "productEnrichment") },
-  { label: "Fit predictor + VIP mode", get: (p) => planAllows(p, "fitPredictor") && planAllows(p, "vipMode") },
-  { label: "Integrations · Remove branding", get: (p) => {
-    const ints = [
-      planAllows(p, "klaviyoIntegration") && "Klaviyo",
-      planAllows(p, "yotpoIntegration") && "Yotpo",
-      planAllows(p, "aftershipIntegration") && "Aftership",
-    ].filter(Boolean);
-    if (ints.length === 0) return false;
-    const branding = planAllows(p, "removeBranding") ? " · Unbranded" : "";
-    return ints.join(" · ") + branding;
-  } },
+// Apple-style tier cards: each plan shows only what it ADDS over the tier
+// below it, so the columns stay short and the differences pop.
+const PLAN_HIGHLIGHTS = {
+  free: {
+    tagline: "Try it on real customers.",
+    inherits: null,
+    points: [
+      "50 conversations / month",
+      "1 knowledge file",
+      "7-day analytics",
+      "Standard AI model",
+    ],
+  },
+  growth: {
+    tagline: "For the typical Shopify store.",
+    inherits: "Everything in Free, plus",
+    points: [
+      "3,000 conversations / month",
+      "Unlimited knowledge files",
+      "Smart routing + prompt caching",
+      "Search rules + product enrichment",
+      "Klaviyo + Aftership integrations",
+      "Remove SEoS branding",
+      "90-day analytics",
+    ],
+  },
+  enterprise: {
+    tagline: "High volume, deep data.",
+    inherits: "Everything in Growth, plus",
+    points: [
+      "Unlimited conversations",
+      "Advanced AI model",
+      "Fit predictor + VIP mode",
+      "Yotpo reviews + loyalty",
+      "180-day analytics",
+    ],
+  },
+};
+
+const FLOW_STEPS = [
+  { title: "Customer asks", text: "The widget sends the message with full conversation context." },
+  { title: "AI understands intent", text: "Gender, size, color carry forward — nothing gets re-asked." },
+  { title: "Catalog search", text: "Keyword matching, plus search-by-meaning when enabled." },
+  { title: "Smart filtering", text: "Wrong-gender or off-category products never show." },
+  { title: "Guided recommenders", text: "Step-by-step finders and size prediction for bigger decisions." },
+  { title: "Honest answer", text: "Grounded in your catalog and knowledge — nothing invented." },
+  { title: "Personal touches", text: "Logged-in shoppers can get history-aware picks (VIP mode)." },
+  { title: "Customer sees it", text: "Short reply, product cards, follow-up chips." },
 ];
 
-// Sort rows so the features supported by the most plans float to the top and
-// tier-exclusive features sink to the bottom. Visual effect: in any one plan's
-// column, all the green checks stack first, then the row of dashes/X marks
-// stacks at the bottom — easy to scan what a tier is missing.
-const SORTED_FEATURE_ROWS = [...FEATURE_ROWS].sort((a, b) => {
-  const score = (row) =>
-    PLAN_ORDER.reduce(
-      (acc, id) => acc + (row.get(PLANS[id]) !== false ? 1 : 0),
-      0,
-    );
-  return score(b) - score(a);
-});
-
-function Cell({ value }) {
-  if (value === true) {
-    return (
-      <div style={{ display: "flex", justifyContent: "center", color: "#2D6B4F" }}>
-        <div style={{ width: 18, height: 18 }}><Icon source={CheckCircleIcon} tone="success" /></div>
-      </div>
-    );
-  }
-  if (value === false) {
-    return (
-      <div style={{ display: "flex", justifyContent: "center", color: "var(--p-color-text-disabled)" }}>
-        <div style={{ width: 18, height: 18, opacity: 0.5 }}><Icon source={MinusIcon} /></div>
-      </div>
-    );
-  }
-  return <Text as="span" variant="bodyMd" alignment="center">{value}</Text>;
-}
-
-function ComparisonTable({ currentPlanId, submitting, pendingPlan, onSubmit }) {
-  return (
-    <>
-      <div className="hj-cmp-scroll">
-        <table className="hj-cmp">
-          <thead>
-            <tr>
-              <th className="hj-cmp-rowlabel"></th>
-              {PLAN_ORDER.map((id) => {
-                const plan = PLANS[id];
-                const isCurrent = id === currentPlanId;
-                const isPopular = id === "growth";
-                return (
-                  <th key={id} className={`hj-cmp-colhead ${isCurrent ? "hj-cmp-popular" : ""}`}>
-                    <div className="hj-cmp-ribbons">
-                      {isPopular ? <span className="hj-cmp-ribbon hj-cmp-ribbon-popular">Most popular</span> : null}
-                      {isCurrent ? <span className="hj-cmp-ribbon hj-cmp-ribbon-current">Current plan</span> : null}
-                    </div>
-                    <div className="hj-cmp-header">
-                      <div className="hj-cmp-plan-name">{plan.name}</div>
-                      <div className="hj-cmp-plan-price">
-                        <span className="hj-cmp-plan-price-amount">
-                          {plan.price === 0 ? "Free" : `$${plan.price}`}
-                        </span>
-                        {plan.price > 0 ? <span className="hj-cmp-plan-price-unit"> / mo</span> : null}
-                      </div>
-                    </div>
-                  </th>
-                );
-              })}
-            </tr>
-          </thead>
-          <tbody>
-            {SORTED_FEATURE_ROWS.map((row) => (
-              <tr key={row.label}>
-                <td className="hj-cmp-rowlabel">{row.label}</td>
-                {PLAN_ORDER.map((id) => (
-                  <td key={id} className={id === currentPlanId ? "hj-cmp-popular" : ""}>
-                    <Cell value={row.get(PLANS[id])} />
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-          <tfoot>
-            <tr>
-              <td className="hj-cmp-rowlabel"></td>
-              {PLAN_ORDER.map((id) => {
-                const plan = PLANS[id];
-                const isCurrent = id === currentPlanId;
-                const isDowngrade = PLAN_ORDER.indexOf(id) < PLAN_ORDER.indexOf(currentPlanId);
-                return (
-                  <td key={id} className={id === currentPlanId ? "hj-cmp-popular" : ""}>
-                    <Form method="post" onSubmit={() => onSubmit(id)}>
-                      <input type="hidden" name="intent" value="select" />
-                      <input type="hidden" name="planId" value={id} />
-                      <Button
-                        submit fullWidth
-                        variant={isCurrent ? "secondary" : id === "growth" ? "primary" : "secondary"}
-                        disabled={isCurrent || submitting}
-                        loading={submitting && pendingPlan === id}
-                      >
-                        {isCurrent ? "Current plan" : isDowngrade ? "Downgrade" : plan.price === 0 ? "Switch to Free" : `Upgrade`}
-                      </Button>
-                    </Form>
-                  </td>
-                );
-              })}
-            </tr>
-          </tfoot>
-        </table>
-      </div>
-      <style>{`
-        .hj-cmp-scroll { overflow-x: auto; margin: 0 -4px; padding: 0 4px 4px; }
-        .hj-cmp { border-collapse: separate; border-spacing: 0; width: 100%; min-width: 720px; }
-        .hj-cmp th, .hj-cmp td {
-          padding: 14px 12px;
-          border-bottom: 1px solid var(--p-color-border-subdued);
-          vertical-align: middle;
-          text-align: center;
-        }
-        .hj-cmp thead th {
-          position: sticky; top: 0; background: var(--p-color-bg-surface);
-          padding-top: 52px; padding-bottom: 20px;
-          border-bottom: 1px solid var(--p-color-border);
-        }
-        .hj-cmp-header {
-          display: flex; flex-direction: column; align-items: center;
-          gap: 6px;
-        }
-        .hj-cmp-plan-name {
-          font-size: 22px; font-weight: 600; line-height: 1.2;
-          letter-spacing: -0.01em;
-          color: var(--p-color-text);
-        }
-        .hj-cmp-plan-price {
-          display: inline-flex; align-items: baseline; gap: 2px;
-          color: var(--p-color-text);
-        }
-        .hj-cmp-plan-price-amount {
-          font-size: 18px; font-weight: 500;
-        }
-        .hj-cmp-plan-price-unit {
-          font-size: 12px; color: var(--p-color-text-secondary);
-        }
-        .hj-cmp-rowlabel {
-          text-align: left !important;
-          font-size: 13px;
-          color: var(--p-color-text);
-          font-weight: 500;
-          white-space: nowrap;
-          width: 1%;
-        }
-        .hj-cmp tbody tr:hover { background: var(--p-color-bg-surface-hover); }
-        .hj-cmp-popular {
-          background: rgba(45, 107, 79, 0.04);
-        }
-        .hj-cmp thead .hj-cmp-popular {
-          background: rgba(45, 107, 79, 0.08);
-          border-top: 2px solid #2D6B4F;
-          border-left: 2px solid #2D6B4F;
-          border-right: 2px solid #2D6B4F;
-          border-top-left-radius: 10px;
-          border-top-right-radius: 10px;
-        }
-        .hj-cmp tfoot .hj-cmp-popular {
-          border-left: 2px solid #2D6B4F;
-          border-right: 2px solid #2D6B4F;
-          border-bottom: 2px solid #2D6B4F;
-          border-bottom-left-radius: 10px;
-          border-bottom-right-radius: 10px;
-        }
-        .hj-cmp tbody .hj-cmp-popular:not(:last-child) {
-          border-left: 2px solid #2D6B4F;
-          border-right: 2px solid #2D6B4F;
-        }
-        .hj-cmp tbody tr td.hj-cmp-popular {
-          border-left: 2px solid #2D6B4F;
-          border-right: 2px solid #2D6B4F;
-        }
-        .hj-cmp-ribbons {
-          position: absolute; top: 14px; left: 0; right: 0;
-          display: flex; justify-content: center; gap: 6px;
-          pointer-events: none;
-        }
-        .hj-cmp-colhead { position: relative; }
-        .hj-cmp-ribbon {
-          display: inline-block; font-size: 10px; font-weight: 700;
-          padding: 3px 12px; border-radius: 999px;
-          letter-spacing: 0.06em; text-transform: uppercase;
-          white-space: nowrap;
-          box-shadow: 0 1px 2px rgba(0,0,0,0.06);
-        }
-        .hj-cmp-ribbon-popular { background: #2D6B4F; color: #fff; }
-        .hj-cmp-ribbon-current { background: #e3f5eb; color: #0f5132; }
-      `}</style>
-    </>
-  );
-}
-
-function SupportBox({ shop }) {
-  const [copied, setCopied] = useState(false);
-
-  // mailto with a sensible default subject and the shop domain pre-filled in
-  // the body — when the merchant clicks "Send email" their default mail
-  // client (Outlook, Apple Mail, Gmail, etc.) opens with everything ready.
-  const mailtoHref =
-    `mailto:${SUPPORT_EMAIL}` +
-    `?subject=${encodeURIComponent("[SEoS Assistant] Support request")}` +
-    `&body=${encodeURIComponent(`Shop: ${shop}\n\n`)}`;
-
-  const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(SUPPORT_EMAIL);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1800);
-    } catch {
-      /* clipboard blocked — silently ignore; the address is still on screen */
-    }
-  };
-
-  return (
-    <Card>
-      <BlockStack gap="400">
-        <InlineStack gap="400" blockAlign="start" wrap={false}>
-          <div
-            style={{
-              flexShrink: 0,
-              width: 48,
-              height: 48,
-              borderRadius: 12,
-              background: "rgba(45,107,79,0.10)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              color: "#2D6B4F",
-            }}
-          >
-            <div style={{ width: 24, height: 24 }}>
-              <Icon source={EmailIcon} />
-            </div>
-          </div>
-          <BlockStack gap="100">
-            <InlineStack gap="200" blockAlign="center" wrap>
-              <Text as="h2" variant="headingMd">
-                Need a hand?
-              </Text>
-              <Badge tone="info">Replies within 1 business day</Badge>
-            </InlineStack>
-            <Text as="p" tone="subdued" variant="bodyMd">
-              Email us with any questions, bugs, or feature requests. A real person reads every message.
-            </Text>
-          </BlockStack>
-        </InlineStack>
-
-        <Box
-          padding="400"
-          background="bg-surface-secondary"
-          borderRadius="200"
-          borderWidth="025"
-          borderColor="border"
-        >
-          <InlineStack align="space-between" blockAlign="center" gap="300" wrap>
-            <BlockStack gap="050">
-              <Text as="span" tone="subdued" variant="bodySm">
-                Support email
-              </Text>
-              <Text as="p" variant="headingMd" fontWeight="semibold">
-                {SUPPORT_EMAIL}
-              </Text>
-            </BlockStack>
-            <InlineStack gap="200" wrap={false}>
-              <Button icon={ClipboardIcon} onClick={handleCopy} accessibilityLabel="Copy support email">
-                {copied ? "Copied" : "Copy"}
-              </Button>
-              <Button
-                variant="primary"
-                icon={EmailIcon}
-                url={mailtoHref}
-                external
-              >
-                Send email
-              </Button>
-            </InlineStack>
-          </InlineStack>
-        </Box>
-
-        <Text as="p" tone="subdued" variant="bodySm">
-          Send email opens your default mail app with the shop domain pre-filled.
-        </Text>
-
-        <Box paddingBlockStart="200" borderBlockStartWidth="025" borderColor="border-subdued">
-          <Text as="p" tone="subdued" variant="bodySm">
-            Read our{" "}
-            <a
-              href="/privacy"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{ color: "inherit", textDecoration: "underline", textUnderlineOffset: "2px" }}
-            >
-              privacy policy
-            </a>{" "}
-            for details on what data SEoS Assistant collects and how it&apos;s handled.
-          </Text>
-        </Box>
-      </BlockStack>
-    </Card>
-  );
-}
+const FAQ = [
+  { q: "How am I billed?", a: "Through Shopify — charges appear on your Shopify invoice. Change plans any time; changes take effect immediately." },
+  { q: "Do unused conversations roll over?", a: "No — the allowance resets at the start of each billing cycle." },
+  { q: "What happens if I hit my limit?", a: "The AI pauses for new conversations until the next cycle or an upgrade. The widget still loads but won't reply." },
+  { q: "Where do AI costs go?", a: "AI usage is billed by Anthropic directly from your own API key — we add zero markup. Smart routing automatically uses a cheaper model for simple follow-ups." },
+  { q: "How much will the AI cost at my traffic?", a: "Use the cost estimator at the bottom of the Analytics page — it projects monthly spend from your sessions, anchored on your store's real per-request average." },
+  { q: "Does semantic search cost extra?", a: "Not from us — bring your own Voyage AI or OpenAI key and pay them directly. Typically under $1/month for catalogs under 5,000 products." },
+  { q: "What if the AI can't answer?", a: "It offers to connect the customer with your support team via a Contact button (URL set in Settings)." },
+  { q: "Can I see what customers are asking?", a: "Yes — Analytics shows every recent conversation, satisfaction votes, costs, and what customers search for." },
+];
 
 export default function PlansPage() {
   const { currentPlanId, used, shop } = useLoaderData();
@@ -375,6 +111,7 @@ export default function PlansPage() {
   const navigation = useNavigation();
   const submitting = navigation.state === "submitting";
   const [pendingPlan, setPendingPlan] = useState(null);
+  const [copied, setCopied] = useState(false);
   const current = PLANS[currentPlanId] || PLANS.free;
 
   // After the action returns a confirmationUrl, escape the iframe and
@@ -388,237 +125,440 @@ export default function PlansPage() {
       window.top.location.href = url;
     }
   }, [actionData?.confirmationUrl]);
+
   const limit = current.conversationsPerMonth;
   const usagePct = limit === Infinity ? 0 : Math.min(100, Math.round((used / limit) * 100));
-  const usageTone = usagePct >= 90 ? "critical" : usagePct >= 75 ? "caution" : "primary";
+
+  const mailtoHref =
+    `mailto:${SUPPORT_EMAIL}` +
+    `?subject=${encodeURIComponent("[SEoS Assistant] Support request")}` +
+    `&body=${encodeURIComponent(`Shop: ${shop}\n\n`)}`;
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(SUPPORT_EMAIL);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1800);
+    } catch {
+      /* clipboard blocked — the address is still on screen */
+    }
+  };
 
   return (
     <Page>
       <TitleBar title="Plan & Support" />
-      <BrandHeader title="Plan & Support" />
-      <Layout>
+      <style>{`
+        .seos-pl { display: flex; flex-direction: column; gap: 16px; }
+        .seos-pl, .seos-pl * { box-sizing: border-box; }
+        .seos-pl-card {
+          background: #fff;
+          border: 1px solid rgba(0,0,0,0.07);
+          border-radius: 16px;
+          box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+          padding: 20px;
+        }
+        .seos-pl-title { font-size: 15px; font-weight: 650; color: #1a2e26; letter-spacing: -0.1px; }
+        .seos-pl-desc { font-size: 12.5px; line-height: 1.5; color: rgba(26,46,38,0.62); margin-top: 4px; }
+        .seos-pl-note {
+          background: rgba(45,107,79,0.05);
+          border: 1px solid rgba(45,107,79,0.16);
+          border-radius: 16px;
+          padding: 13px 18px;
+          font-size: 13px;
+          color: rgba(26,46,38,0.8);
+        }
+        .seos-pl-note.is-bad { background: rgba(185,90,90,0.05); border-color: rgba(185,90,90,0.2); }
+
+        /* Your plan. */
+        .seos-pl-current { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+        .seos-pl-current-name { font-size: 21px; font-weight: 700; letter-spacing: -0.4px; color: #1a2e26; }
+        .seos-pl-pricepill {
+          font-size: 12px;
+          font-weight: 650;
+          color: #2D6B4F;
+          background: rgba(45,107,79,0.08);
+          border: 1px solid rgba(45,107,79,0.18);
+          border-radius: 999px;
+          padding: 3px 11px;
+          vertical-align: 3px;
+          margin-left: 10px;
+        }
+        .seos-pl-usage { text-align: right; }
+        .seos-pl-usage-num { font-size: 19px; font-weight: 700; color: #1a2e26; font-variant-numeric: tabular-nums; letter-spacing: -0.3px; }
+        .seos-pl-usage-sub { font-size: 11.5px; color: rgba(26,46,38,0.5); margin-top: 1px; }
+        .seos-pl-meter { margin-top: 14px; height: 6px; border-radius: 999px; background: rgba(26,46,38,0.07); overflow: hidden; }
+        .seos-pl-meter span {
+          display: block; height: 100%; border-radius: 999px;
+          background: linear-gradient(90deg, #2D6B4F, #3a8a66);
+          transition: width 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        .seos-pl-meter.is-warn span { background: linear-gradient(90deg, #b98a5a, #c9995f); }
+        .seos-pl-meter.is-crit span { background: linear-gradient(90deg, #a33d3d, #b85454); }
+        .seos-pl-usage-warn { margin-top: 8px; font-size: 12px; color: rgba(26,46,38,0.6); }
+
+        /* Pricing tiers. */
+        .seos-pl-tiers {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+          gap: 16px;
+          align-items: stretch;
+        }
+        .seos-pl-tier {
+          position: relative;
+          display: flex;
+          flex-direction: column;
+          background: #fff;
+          border: 1px solid rgba(0,0,0,0.07);
+          border-radius: 16px;
+          box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+          padding: 22px 22px 20px;
+          transition: transform 0.2s cubic-bezier(0.2, 0.7, 0.2, 1), box-shadow 0.2s ease;
+        }
+        .seos-pl-tier:hover { transform: translateY(-3px); box-shadow: 0 12px 28px rgba(26,46,38,0.1), 0 2px 6px rgba(26,46,38,0.05); }
+        .seos-pl-tier.is-popular { border-color: rgba(45,107,79,0.45); box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 0 0 1px rgba(45,107,79,0.25); }
+        .seos-pl-ribbon {
+          position: absolute;
+          top: -10px;
+          left: 50%;
+          transform: translateX(-50%);
+          font-size: 10px;
+          font-weight: 700;
+          letter-spacing: 0.8px;
+          text-transform: uppercase;
+          padding: 3px 12px;
+          border-radius: 999px;
+          white-space: nowrap;
+        }
+        .seos-pl-ribbon.is-popular { background: #2D6B4F; color: #fff; }
+        .seos-pl-ribbon.is-current { background: rgba(45,107,79,0.12); color: #2D6B4F; border: 1px solid rgba(45,107,79,0.25); }
+        .seos-pl-tier-name { font-size: 16px; font-weight: 650; color: #1a2e26; }
+        .seos-pl-tier-tagline { font-size: 12px; color: rgba(26,46,38,0.55); margin-top: 2px; }
+        .seos-pl-tier-price { margin-top: 14px; display: flex; align-items: baseline; gap: 4px; }
+        .seos-pl-tier-amount { font-size: 34px; font-weight: 700; letter-spacing: -1.2px; color: #1a2e26; font-variant-numeric: tabular-nums; }
+        .seos-pl-tier-unit { font-size: 13px; color: rgba(26,46,38,0.5); }
+        .seos-pl-tier-inherits {
+          margin-top: 16px;
+          font-size: 11px;
+          font-weight: 650;
+          letter-spacing: 0.6px;
+          text-transform: uppercase;
+          color: rgba(45,107,79,0.8);
+        }
+        .seos-pl-tier-points { margin: 10px 0 0; padding: 0; list-style: none; flex: 1; }
+        .seos-pl-tier-points li {
+          display: flex;
+          gap: 9px;
+          font-size: 12.5px;
+          line-height: 1.45;
+          color: rgba(26,46,38,0.78);
+          padding: 4px 0;
+        }
+        .seos-pl-tier-points li::before {
+          content: "";
+          flex-shrink: 0;
+          width: 14px;
+          height: 14px;
+          margin-top: 2px;
+          border-radius: 50%;
+          background: rgba(45,107,79,0.1) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14'%3E%3Cpath d='M4 7.2l2 2 4-4.5' fill='none' stroke='%232D6B4F' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat;
+        }
+        .seos-pl-tier-cta {
+          appearance: none;
+          font: inherit;
+          width: 100%;
+          margin-top: 18px;
+          padding: 10px 16px;
+          border-radius: 999px;
+          font-size: 13px;
+          font-weight: 650;
+          cursor: pointer;
+          border: 1px solid rgba(0,0,0,0.1);
+          background: #fff;
+          color: #1a2e26;
+          transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+        }
+        .seos-pl-tier-cta:hover:not(:disabled) { border-color: rgba(45,107,79,0.45); box-shadow: 0 1px 4px rgba(26,46,38,0.1); }
+        .seos-pl-tier-cta.is-primary {
+          background: linear-gradient(180deg, #34795b, #2D6B4F);
+          border-color: transparent;
+          color: #fff;
+          box-shadow: 0 1px 2px rgba(26,46,38,0.28), inset 0 1px 0 rgba(255,255,255,0.12);
+        }
+        .seos-pl-tier-cta.is-primary:hover:not(:disabled) { background: linear-gradient(180deg, #3a8a66, #2f7053); }
+        .seos-pl-tier-cta:disabled { opacity: 0.55; cursor: default; }
+
+        /* Support. */
+        .seos-pl-support { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+        .seos-pl-support-email { font-size: 16px; font-weight: 650; color: #1a2e26; margin-top: 2px; }
+        .seos-pl-support-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+        .seos-pl-btn {
+          appearance: none;
+          font: inherit;
+          display: inline-flex;
+          align-items: center;
+          gap: 7px;
+          padding: 8px 16px;
+          border-radius: 999px;
+          font-size: 12.5px;
+          font-weight: 650;
+          cursor: pointer;
+          border: 1px solid rgba(0,0,0,0.1);
+          background: #fff;
+          color: #1a2e26;
+          text-decoration: none !important;
+          transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+        }
+        .seos-pl-btn:hover { border-color: rgba(45,107,79,0.45); box-shadow: 0 1px 4px rgba(26,46,38,0.1); }
+        .seos-pl-btn.is-primary {
+          background: linear-gradient(180deg, #34795b, #2D6B4F);
+          border-color: transparent;
+          color: #fff !important;
+        }
+        .seos-pl-btn.is-primary:hover { background: linear-gradient(180deg, #3a8a66, #2f7053); }
+
+        /* How it works — quiet numbered grid. */
+        .seos-pl-steps {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+          gap: 14px;
+          margin-top: 16px;
+        }
+        .seos-pl-step { display: flex; gap: 12px; align-items: flex-start; }
+        .seos-pl-step-num {
+          flex-shrink: 0;
+          width: 26px;
+          height: 26px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 50%;
+          background: rgba(45,107,79,0.1);
+          color: #2D6B4F;
+          font-size: 12px;
+          font-weight: 700;
+          font-variant-numeric: tabular-nums;
+        }
+        .seos-pl-step-title { font-size: 13px; font-weight: 650; color: #1a2e26; }
+        .seos-pl-step-text { font-size: 12px; line-height: 1.5; color: rgba(26,46,38,0.58); margin-top: 2px; }
+        .seos-pl-specs {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 12px 36px;
+          margin-top: 20px;
+          padding-top: 16px;
+          border-top: 1px solid rgba(0,0,0,0.06);
+        }
+        .seos-pl-spec { display: flex; flex-direction: column; gap: 2px; }
+        .seos-pl-spec-label {
+          font-size: 10px;
+          font-weight: 650;
+          letter-spacing: 1px;
+          text-transform: uppercase;
+          color: rgba(26,46,38,0.4);
+        }
+        .seos-pl-spec-value { font-size: 12px; color: rgba(26,46,38,0.65); }
+
+        /* FAQ accordion. */
+        .seos-pl-faq { margin-top: 4px; }
+        .seos-pl-faq details { border-bottom: 1px solid rgba(0,0,0,0.06); }
+        .seos-pl-faq details:last-child { border-bottom: none; }
+        .seos-pl-faq summary {
+          list-style: none;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 12px;
+          padding: 13px 2px;
+          font-size: 13.5px;
+          font-weight: 600;
+          color: #1a2e26;
+          cursor: pointer;
+        }
+        .seos-pl-faq summary::-webkit-details-marker { display: none; }
+        .seos-pl-faq summary::after {
+          content: "+";
+          flex-shrink: 0;
+          width: 22px;
+          height: 22px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 50%;
+          background: rgba(45,107,79,0.08);
+          color: #2D6B4F;
+          font-size: 15px;
+          font-weight: 600;
+          transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        .seos-pl-faq details[open] summary::after { transform: rotate(45deg); }
+        .seos-pl-faq-a { padding: 0 36px 14px 2px; font-size: 12.5px; line-height: 1.55; color: rgba(26,46,38,0.62); }
+
+        .seos-pl-foot { text-align: center; font-size: 11.5px; color: rgba(26,46,38,0.45); padding: 4px 8px; }
+        .seos-pl-foot a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+
+        @media (prefers-reduced-motion: reduce) {
+          .seos-pl * { transition: none !important; }
+        }
+      `}</style>
+      <BrandHeader title="Plan & Support" gutter={false} />
+      <div className="seos-pl">
+
         {actionData?.message ? (
-          <Layout.Section>
-            <Banner tone={actionData.ok ? "success" : "critical"}>{actionData.message}</Banner>
-          </Layout.Section>
+          <div className={`seos-pl-note ${actionData.ok ? "" : "is-bad"}`}>{actionData.message}</div>
         ) : null}
 
-        <Layout.Section>
-          <Card>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: "24px", alignItems: "center" }}>
-              <BlockStack gap="100">
-                <InlineStack gap="200" blockAlign="center" wrap>
-                  <Text as="h2" variant="headingLg">Your plan</Text>
-                  <Badge tone={currentPlanId === "free" ? "attention" : "success"}>
-                    {current.price === 0 ? "Free" : `$${current.price}/mo`}
-                  </Badge>
-                </InlineStack>
-                <Text as="p" tone="subdued">
-                  {current.name} · {limit === Infinity ? "unlimited" : formatLimit(limit)} conversations / month
-                </Text>
-              </BlockStack>
-              <div style={{ textAlign: "right" }}>
-                <Text as="p" variant="headingMd">
-                  {limit === Infinity
-                    ? `${used.toLocaleString()} this month`
-                    : `${used.toLocaleString()} / ${limit.toLocaleString()}`}
-                </Text>
-                <Text as="p" tone="subdued" variant="bodySm">conversations used</Text>
+        <div className="seos-pl-card">
+          <div className="seos-pl-current">
+            <div>
+              <div className="seos-pl-title">Your plan</div>
+              <div className="seos-pl-current-name">
+                {current.name}
+                <span className="seos-pl-pricepill">{current.price === 0 ? "Free" : `$${current.price}/mo`}</span>
               </div>
             </div>
-            {limit !== Infinity ? (
-              <Box paddingBlockStart="400">
-                <BlockStack gap="100">
-                  <ProgressBar progress={usagePct} tone={usageTone} />
-                  {usagePct >= 90 ? (
-                    <Text as="p" tone="critical" variant="bodySm">
-                      You're at {usagePct}% — upgrade now to avoid hitting the limit.
-                    </Text>
-                  ) : usagePct >= 75 ? (
-                    <Text as="p" variant="bodySm" tone="subdued">
-                      {usagePct}% used — consider upgrading before the end of the month.
-                    </Text>
+            <div className="seos-pl-usage">
+              <div className="seos-pl-usage-num">
+                {limit === Infinity
+                  ? used.toLocaleString()
+                  : `${used.toLocaleString()} / ${limit.toLocaleString()}`}
+              </div>
+              <div className="seos-pl-usage-sub">conversations this month</div>
+            </div>
+          </div>
+          {limit !== Infinity && (
+            <>
+              <div className={`seos-pl-meter ${usagePct >= 90 ? "is-crit" : usagePct >= 75 ? "is-warn" : ""}`}>
+                <span style={{ width: `${usagePct}%` }} />
+              </div>
+              {usagePct >= 75 && (
+                <div className="seos-pl-usage-warn">
+                  {usagePct}% used — upgrade to keep the assistant answering all month.
+                </div>
+              )}
+            </>
+          )}
+        </div>
+
+        <div className="seos-pl-card">
+          <div className="seos-pl-title">Compare plans</div>
+          <div className="seos-pl-desc">Change any time. Billed through Shopify, on your Shopify invoice.</div>
+          <div className="seos-pl-tiers" style={{ marginTop: 22 }}>
+            {PLAN_ORDER.map((id) => {
+              const plan = PLANS[id];
+              const hl = PLAN_HIGHLIGHTS[id];
+              const isCurrent = id === currentPlanId;
+              const isPopular = id === "growth";
+              const isDowngrade = PLAN_ORDER.indexOf(id) < PLAN_ORDER.indexOf(currentPlanId);
+              return (
+                <div key={id} className={`seos-pl-tier ${isPopular ? "is-popular" : ""}`}>
+                  {isCurrent ? (
+                    <span className="seos-pl-ribbon is-current">Current plan</span>
+                  ) : isPopular ? (
+                    <span className="seos-pl-ribbon is-popular">Most popular</span>
                   ) : null}
-                </BlockStack>
-              </Box>
-            ) : null}
-          </Card>
-        </Layout.Section>
+                  <div className="seos-pl-tier-name">{plan.name}</div>
+                  <div className="seos-pl-tier-tagline">{hl.tagline}</div>
+                  <div className="seos-pl-tier-price">
+                    <span className="seos-pl-tier-amount">{plan.price === 0 ? "Free" : `$${plan.price}`}</span>
+                    {plan.price > 0 && <span className="seos-pl-tier-unit">/ month</span>}
+                  </div>
+                  {hl.inherits && <div className="seos-pl-tier-inherits">{hl.inherits}</div>}
+                  <ul className="seos-pl-tier-points">
+                    {hl.points.map((p) => <li key={p}>{p}</li>)}
+                  </ul>
+                  <Form method="post" onSubmit={() => setPendingPlan(id)}>
+                    <input type="hidden" name="intent" value="select" />
+                    <input type="hidden" name="planId" value={id} />
+                    <button
+                      type="submit"
+                      className={`seos-pl-tier-cta ${!isCurrent && isPopular ? "is-primary" : ""}`}
+                      disabled={isCurrent || submitting}
+                    >
+                      {isCurrent
+                        ? "Current plan"
+                        : submitting && pendingPlan === id
+                          ? "One moment…"
+                          : isDowngrade
+                            ? plan.price === 0 ? "Switch to Free" : "Downgrade"
+                            : "Upgrade"}
+                    </button>
+                  </Form>
+                </div>
+              );
+            })}
+          </div>
+        </div>
 
-        <Layout.Section>
-          <Card>
-            <BlockStack gap="400">
-              <BlockStack gap="100">
-                <Text as="h2" variant="headingLg">Compare plans</Text>
-                <Text as="p" tone="subdued" variant="bodySm">
-                  Change plans any time. Charges are handled by Shopify and appear on your Shopify invoice.
-                </Text>
-              </BlockStack>
-              <ComparisonTable
-                currentPlanId={currentPlanId}
-                submitting={submitting}
-                pendingPlan={pendingPlan}
-                onSubmit={setPendingPlan}
-              />
-            </BlockStack>
-          </Card>
-        </Layout.Section>
+        <div className="seos-pl-card">
+          <div className="seos-pl-support">
+            <div>
+              <div className="seos-pl-title">Need a hand?</div>
+              <div className="seos-pl-support-email">{SUPPORT_EMAIL}</div>
+              <div className="seos-pl-desc">A real person replies within 1 business day.</div>
+            </div>
+            <div className="seos-pl-support-actions">
+              <button type="button" className="seos-pl-btn" onClick={handleCopy}>
+                {copied ? "Copied ✓" : "Copy address"}
+              </button>
+              <a className="seos-pl-btn is-primary" href={mailtoHref} target="_blank" rel="noopener noreferrer">
+                Send email
+              </a>
+            </div>
+          </div>
+        </div>
 
-        <Layout.Section>
-          <SupportBox shop={shop} />
-        </Layout.Section>
+        <div className="seos-pl-card">
+          <div className="seos-pl-title">How SEoS Assistant works</div>
+          <div className="seos-pl-desc">Every customer message, in eight quick steps.</div>
+          <div className="seos-pl-steps">
+            {FLOW_STEPS.map((s, i) => (
+              <div className="seos-pl-step" key={s.title}>
+                <span className="seos-pl-step-num">{i + 1}</span>
+                <div>
+                  <div className="seos-pl-step-title">{s.title}</div>
+                  <div className="seos-pl-step-text">{s.text}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="seos-pl-specs">
+            <div className="seos-pl-spec">
+              <span className="seos-pl-spec-label">Catalog sync</span>
+              <span className="seos-pl-spec-value">Real-time webhooks + nightly reconciliation</span>
+            </div>
+            <div className="seos-pl-spec">
+              <span className="seos-pl-spec-label">Embeddings</span>
+              <span className="seos-pl-spec-value">Automatic when semantic search is on</span>
+            </div>
+            <div className="seos-pl-spec">
+              <span className="seos-pl-spec-label">Cost control</span>
+              <span className="seos-pl-spec-value">Prompt caching + smart routing</span>
+            </div>
+            <div className="seos-pl-spec">
+              <span className="seos-pl-spec-label">Privacy</span>
+              <span className="seos-pl-spec-value">Feedback hashed · purged after 90 days</span>
+            </div>
+          </div>
+        </div>
 
-        <Layout.Section>
-          <Card>
-            <BlockStack gap="400">
-              <BlockStack gap="100">
-                <Text as="h3" variant="headingMd">How SEoS Assistant works</Text>
-                <Text as="p" tone="subdued" variant="bodySm">
-                  Every customer message flows through these steps. Feature badges show which plan unlocks each capability — items without a badge work on every plan.
-                </Text>
-              </BlockStack>
+        <div className="seos-pl-card">
+          <div className="seos-pl-title">FAQ</div>
+          <div className="seos-pl-faq">
+            {FAQ.map((item) => (
+              <details key={item.q}>
+                <summary>{item.q}</summary>
+                <div className="seos-pl-faq-a">{item.a}</div>
+              </details>
+            ))}
+          </div>
+        </div>
 
-              <InlineGrid columns={{ xs: 1, md: 2 }} gap="300">
-                <FlowStep number="1" emoji="💬" title="Customer sends a message">
-                  The chat widget on your storefront sends the message to SEoS Assistant along with the recent conversation history.
-                </FlowStep>
-
-                <FlowStep number="2" emoji="🧠" title="AI reads context, understands intent">
-                  Gender, category, color, size, condition — anything mentioned earlier in the chat becomes context. The AI never re-asks what the customer already told it.
-                </FlowStep>
-
-                <FlowStep
-                  number="3"
-                  emoji="🔍"
-                  title="Catalog search — keyword + meaning"
-                  badges={[{ tone: "info", text: "Semantic search optional (BYO API key)" }]}
-                >
-                  Keyword search matches title, tags, attributes, and description. With semantic search enabled, products are also matched by meaning — "shoes for standing all day" finds arch-support styles even when descriptions don't say "standing".
-                </FlowStep>
-
-                <FlowStep
-                  number="4"
-                  emoji="🎯"
-                  title="Smart filtering — only the right products"
-                  badges={[
-                    { tone: "success", text: "Category groups (all plans)" },
-                    { tone: "attention", text: "Search rules — Growth+" },
-                  ]}
-                >
-                  Gender and category are locked from the conversation so wrong-gender products never show. Category groups keep choice buttons sharp ("shoes" only offers Footwear chips, not Orthotics or Accessories). Merchant-defined search rules can block products that shouldn't appear for specific queries.
-                </FlowStep>
-
-                <FlowStep
-                  number="5"
-                  emoji="🧭"
-                  title="Guided recommenders for the big decisions"
-                  badges={[{ tone: "attention", text: "Configured on the Smart Recommenders page" }]}
-                >
-                  For decisions that need more than a search — like finding the right orthotic or the right size — the assistant can switch to a guided flow: a short Q&amp;A that lands on exactly one product, or a fit-predictor card that recommends a size with a confidence score.
-                </FlowStep>
-
-                <FlowStep number="6" emoji="✍️" title="AI composes a clean, honest answer">
-                  One sentence, no rambling, no echo headlines. Uses your knowledge files, brand voice, and tone settings. A grounding check runs on every reply — the AI never invents product names, SKUs, prices, or health claims; every product mentioned is backed by real catalog data.
-                </FlowStep>
-
-                <FlowStep
-                  number="7"
-                  emoji="👤"
-                  title="Personalization for logged-in customers"
-                  badges={[{ tone: "magic", text: "VIP mode — Enterprise" }]}
-                >
-                  For shoppers signed into your storefront, the assistant can use past order history, loyalty status, and prior fit feedback to personalize recommendations. None of their data is stored — every lookup is per-conversation, in-memory only.
-                </FlowStep>
-
-                <FlowStep number="8" emoji="📦" title="Customer sees the response">
-                  Clean text reply, real product cards (image + title + price, clickable), and a few follow-up question chips. Optional collection CTA, support button, fit-confidence badge, or Klaviyo signup form depending on context.
-                </FlowStep>
-              </InlineGrid>
-
-              <Box padding="400" background="bg-surface-secondary" borderRadius="200">
-                <BlockStack gap="200">
-                  <InlineStack gap="200" blockAlign="center">
-                    <Text as="span" variant="headingSm">⚙️ Always running in the background</Text>
-                  </InlineStack>
-                  <Text as="p" tone="subdued" variant="bodySm">
-                    <strong>Catalog sync:</strong> Real-time webhooks update the assistant's product index the moment you edit a Shopify product, and a full reconciliation sync runs automatically every night — no manual syncing needed.
-                  </Text>
-                  <Text as="p" tone="subdued" variant="bodySm">
-                    <strong>Auto-embedding:</strong> When semantic search is on, new and updated products are embedded automatically — no manual work after the initial backfill.
-                  </Text>
-                  <Text as="p" tone="subdued" variant="bodySm">
-                    <strong>Cost control:</strong> Prompt caching and smart model routing trim AI spend automatically on every conversation. Use the cost estimator at the bottom of the Analytics page to project spend at your traffic.
-                  </Text>
-                  <Text as="p" tone="subdued" variant="bodySm">
-                    <strong>Privacy:</strong> Customer feedback is hashed; no personal data is stored beyond what's needed to answer the conversation. GDPR-compliant deletion handlers run on uninstall.
-                  </Text>
-                </BlockStack>
-              </Box>
-            </BlockStack>
-          </Card>
-        </Layout.Section>
-
-        <Layout.Section>
-          <Card>
-            <BlockStack gap="200">
-              <Text as="h3" variant="headingSm">FAQ</Text>
-              <Text as="p" tone="subdued" variant="bodySm">
-                <strong>How am I billed?</strong> Charges are handled by Shopify and appear on your Shopify invoice.
-              </Text>
-              <Text as="p" tone="subdued" variant="bodySm">
-                <strong>Can I change plans later?</strong> Yes — upgrade or downgrade any time. Changes take effect immediately.
-              </Text>
-              <Text as="p" tone="subdued" variant="bodySm">
-                <strong>Do unused conversations roll over?</strong> No — each month's allowance resets at the start of the billing cycle.
-              </Text>
-              <Text as="p" tone="subdued" variant="bodySm">
-                <strong>What happens if I hit my limit?</strong> The AI pauses for new conversations until next cycle or an upgrade — your widget still loads but won't reply.
-              </Text>
-              <Text as="p" tone="subdued" variant="bodySm">
-                <strong>Where do AI costs go?</strong> Pay-as-you-go AI usage is billed by Anthropic directly from the API key you provide. We add zero markup. Smart routing automatically uses a faster, cheaper model for trivial follow-ups like "thanks" or "ok".
-              </Text>
-              <Text as="p" tone="subdued" variant="bodySm">
-                <strong>How much will the AI cost at my traffic?</strong> Use the cost estimator at the bottom of the Analytics page — type your store sessions and it projects monthly spend, anchored on your store's real per-request average and adjusted for the volume discounts caching brings at scale.
-              </Text>
-              <Text as="p" tone="subdued" variant="bodySm">
-                <strong>Does semantic search cost extra?</strong> It's free from us — you bring your own Voyage AI or OpenAI key and pay them directly. Typical cost: under $1/month for catalogs under 5,000 products.
-              </Text>
-              <Text as="p" tone="subdued" variant="bodySm">
-                <strong>What if a customer asks something the AI can't answer?</strong> The assistant offers to connect them with your support team and shows a Contact Customer Service button (URL configurable in Settings).
-              </Text>
-              <Text as="p" tone="subdued" variant="bodySm">
-                <strong>Can I see what customers are asking?</strong> Yes — the Analytics page shows conversation volume, satisfaction rate, AI cost, and per-message feedback so you can find friction and tune your knowledge files.
-              </Text>
-            </BlockStack>
-          </Card>
-        </Layout.Section>
-      </Layout>
+        <div className="seos-pl-foot">
+          See the{" "}
+          <a href="/privacy" target="_blank" rel="noopener noreferrer">privacy policy</a>{" "}
+          for what data SEoS Assistant collects and how it&apos;s handled.
+        </div>
+      </div>
     </Page>
   );
 }
-
-function FlowStep({ number, emoji, title, badges, children }) {
-  return (
-    <Box padding="400" background="bg-surface-secondary" borderRadius="200">
-      <BlockStack gap="200">
-        <InlineStack gap="300" blockAlign="center" wrap>
-          <Box
-            background="bg-fill-brand"
-            borderRadius="full"
-            paddingInline="300"
-            paddingBlock="100"
-            minWidth="32px"
-          >
-            <Text as="span" variant="bodySm" fontWeight="bold" tone="text-inverse">{number}</Text>
-          </Box>
-          <Text as="span" variant="headingSm">{emoji} {title}</Text>
-          {Array.isArray(badges) && badges.map((b, i) => (
-            <Badge key={i} tone={b.tone}>{b.text}</Badge>
-          ))}
-        </InlineStack>
-        <Text as="p" tone="subdued" variant="bodySm">{children}</Text>
-      </BlockStack>
-    </Box>
-  );
-}
-
