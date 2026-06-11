@@ -79,6 +79,7 @@ import { validateDecisionTree } from "../lib/decision-tree-schema.server";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import BrandHeader from "../components/BrandHeader";
+import { nextScheduledSyncAt } from "../lib/catalog-sync-scheduler.server";
 
 function isCsv(fileName) {
   return typeof fileName === "string" && fileName.toLowerCase().endsWith(".csv");
@@ -125,6 +126,7 @@ export const loader = async ({ request }) => {
     shop: session.shop,
     status: state.status,
     lastSyncedAt: state.lastSyncedAt,
+    nextScheduledSyncAt: nextScheduledSyncAt().toISOString(),
     lastError: state.lastError,
     productsCount: count,
     syncedSoFar: state.syncedSoFar || 0,
@@ -2428,6 +2430,13 @@ function CatalogSyncCard({ data }) {
           <Box>
             <Text as="p" tone="subdued" variant="bodySm">Last sync</Text>
             <Text as="p" variant="bodyMd">{formatTime(data.lastSyncedAt)}</Text>
+          </Box>
+          <Box>
+            <Text as="p" tone="subdued" variant="bodySm">Next full sync</Text>
+            <Text as="p" variant="bodyMd">{formatTime(data.nextScheduledSyncAt)}</Text>
+            <Text as="p" tone="subdued" variant="bodySm">
+              Nightly reconciliation — product edits sync in real time via webhooks in between.
+            </Text>
           </Box>
         </InlineStack>
         {(data.status === "running" || data.status === "stopping") && syncedSoFar > 0 && (
