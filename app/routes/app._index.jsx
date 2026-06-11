@@ -1510,7 +1510,7 @@ export default function Home() {
         : { label: "Widget", value: "Not enabled", tone: "warning", url: themeEditorUrl, external: true, tooltip: "Enable the SEoS Assistant block in your active theme." }
     );
     if (catalogSyncStatus === "running") {
-      items.push({ label: "Catalog", value: "Syncing…", tone: "warning", url: "/app/catalog", tooltip: "Catalog sync currently in progress." });
+      items.push({ label: "Catalog", value: "Syncing…", tone: "subdued", url: "/app/catalog", tooltip: "Catalog sync in progress — products are being indexed in the background." });
     } else if (productsCount === 0) {
       items.push({ label: "Catalog", value: "Not synced", tone: "critical", url: "/app/catalog", tooltip: "No products synced yet. Run a manual sync." });
     } else if (hoursSinceSync !== null && hoursSinceSync > 168) {
