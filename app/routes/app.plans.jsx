@@ -508,12 +508,21 @@ export default function PlansPage() {
                   Gender and category are locked from the conversation so wrong-gender products never show. Category groups keep choice buttons sharp ("shoes" only offers Footwear chips, not Orthotics or Accessories). Merchant-defined search rules can block products that shouldn't appear for specific queries.
                 </FlowStep>
 
-                <FlowStep number="5" emoji="✍️" title="AI composes a clean, honest answer">
-                  One sentence, no rambling, no echo headlines. Uses your knowledge files, brand voice, and tone settings. Never invents product names, SKUs, prices, or health claims — every product mentioned is backed by real catalog data.
+                <FlowStep
+                  number="5"
+                  emoji="🧭"
+                  title="Guided recommenders for the big decisions"
+                  badges={[{ tone: "attention", text: "Configured on the Smart Recommenders page" }]}
+                >
+                  For decisions that need more than a search — like finding the right orthotic or the right size — the assistant can switch to a guided flow: a short Q&amp;A that lands on exactly one product, or a fit-predictor card that recommends a size with a confidence score.
+                </FlowStep>
+
+                <FlowStep number="6" emoji="✍️" title="AI composes a clean, honest answer">
+                  One sentence, no rambling, no echo headlines. Uses your knowledge files, brand voice, and tone settings. A grounding check runs on every reply — the AI never invents product names, SKUs, prices, or health claims; every product mentioned is backed by real catalog data.
                 </FlowStep>
 
                 <FlowStep
-                  number="6"
+                  number="7"
                   emoji="👤"
                   title="Personalization for logged-in customers"
                   badges={[{ tone: "magic", text: "VIP mode — Enterprise" }]}
@@ -521,7 +530,7 @@ export default function PlansPage() {
                   For shoppers signed into your storefront, the assistant can use past order history, loyalty status, and prior fit feedback to personalize recommendations. None of their data is stored — every lookup is per-conversation, in-memory only.
                 </FlowStep>
 
-                <FlowStep number="7" emoji="📦" title="Customer sees the response">
+                <FlowStep number="8" emoji="📦" title="Customer sees the response">
                   Clean text reply, real product cards (image + title + price, clickable), and a few follow-up question chips. Optional collection CTA, support button, fit-confidence badge, or Klaviyo signup form depending on context.
                 </FlowStep>
               </InlineGrid>
@@ -532,10 +541,13 @@ export default function PlansPage() {
                     <Text as="span" variant="headingSm">⚙️ Always running in the background</Text>
                   </InlineStack>
                   <Text as="p" tone="subdued" variant="bodySm">
-                    <strong>Catalog sync:</strong> Real-time webhooks keep the assistant's product index up to date the moment you edit a Shopify product.
+                    <strong>Catalog sync:</strong> Real-time webhooks update the assistant's product index the moment you edit a Shopify product, and a full reconciliation sync runs automatically every night — no manual syncing needed.
                   </Text>
                   <Text as="p" tone="subdued" variant="bodySm">
                     <strong>Auto-embedding:</strong> When semantic search is on, new and updated products are embedded automatically — no manual work after the initial backfill.
+                  </Text>
+                  <Text as="p" tone="subdued" variant="bodySm">
+                    <strong>Cost control:</strong> Prompt caching and smart model routing trim AI spend automatically on every conversation. Use the cost estimator at the bottom of the Analytics page to project spend at your traffic.
                   </Text>
                   <Text as="p" tone="subdued" variant="bodySm">
                     <strong>Privacy:</strong> Customer feedback is hashed; no personal data is stored beyond what's needed to answer the conversation. GDPR-compliant deletion handlers run on uninstall.
@@ -564,6 +576,9 @@ export default function PlansPage() {
               </Text>
               <Text as="p" tone="subdued" variant="bodySm">
                 <strong>Where do AI costs go?</strong> Pay-as-you-go AI usage is billed by Anthropic directly from the API key you provide. We add zero markup. Smart routing automatically uses a faster, cheaper model for trivial follow-ups like "thanks" or "ok".
+              </Text>
+              <Text as="p" tone="subdued" variant="bodySm">
+                <strong>How much will the AI cost at my traffic?</strong> Use the cost estimator at the bottom of the Analytics page — type your store sessions and it projects monthly spend, anchored on your store's real per-request average and adjusted for the volume discounts caching brings at scale.
               </Text>
               <Text as="p" tone="subdued" variant="bodySm">
                 <strong>Does semantic search cost extra?</strong> It's free from us — you bring your own Voyage AI or OpenAI key and pay them directly. Typical cost: under $1/month for catalogs under 5,000 products.

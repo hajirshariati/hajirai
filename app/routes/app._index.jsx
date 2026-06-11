@@ -2560,7 +2560,7 @@ export default function Home() {
               <ActionCard
                 art={<ArtRecommenders />}
                 title="Smart Recommenders"
-                description="Guided product finders that walk customers to the right product, step by step."
+                description="Guided product finders and the fit predictor — step-by-step flows to the right product and size."
                 cta="Configure flows"
                 url="/app/recommenders"
                 stat={recommenderActive ? `${enabledRecommenderCount} active` : null}
