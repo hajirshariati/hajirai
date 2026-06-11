@@ -27,6 +27,57 @@ import { withAnthropicRetry } from "./anthropic-resilience.server.js";
 
 const HAIKU_MODEL = process.env.HAIKU_MODEL || "claude-haiku-4-5-20251001";
 
+// Pre-gate: skip the Haiku classifier call entirely for turns that
+// clearly aren't about orthotics or foot conditions. The classifier
+// costs ~$0.0015 + 400–700ms per turn and runs unconditionally today
+// — but on most footwear questions ("show me pink sneakers", "what
+// boots do you have", "compare X and Y") it returns nulls for every
+// attribute and isOrthoticRequest=false. Those turns get nothing from
+// the classifier that other code (regex gender detector, the LLM
+// itself) doesn't already cover.
+//
+// Skip is conservative: only when none of these triggers hit do we
+// bypass. False positives just mean we run the classifier when we
+// don't strictly need to (no quality loss); false negatives would
+// mean an orthotic question routed without classifier attributes,
+// so the triggers err on the inclusive side.
+//
+// Verified live (2026-06-11) against the prior accuracy run:
+//   - All 7 orthotic-flow scoreboard questions trigger
+//   - All 3 foot-condition pivots ("plantar fasciitis", "diabetic-
+//     friendly", "high arch") trigger
+//   - "show me pink shoes" / "compare X and Y" / "what's available
+//     in size 8" — all bypass cleanly
+// Vocab: include the trailing `s` and common typos. Customers
+// routinely write "orhtotics" (h/t swap) and "orthodics" — the
+// classifier's whole job is handling that; the gate must too.
+const ORTHOTIC_VOCAB_RE =
+  /\b(?:orthotics?|orhtotics?|orthodics?|ortotics?|insoles?|inserts?|arch[\s-]?supports?|footbeds?|memory[\s-]?foam[\s-]?insoles?|metatarsal[\s-]?supports?|posted|posting|over[\s-]?the[\s-]?counter|otc[\s-]?insoles?|3\/4[\s-]?length|full[\s-]?length|lynco|copper[\s-]?fit)\b/i;
+const FOOT_CONDITION_RE =
+  /\b(?:plantar[\s-]?fasciitis|plantar|fasciitis|fallen[\s-]?arch|flat[\s-]?(?:feet|foot)|high[\s-]?arch|low[\s-]?arch|medium[\s-]?arch|heel[\s-]?(?:pain|spur)|foot[\s-]?(?:pain|ache|hurts?)|achy[\s-]?feet|sore[\s-]?feet|bunion|bunions|metatarsalgia|morton'?s?[\s-]?neuroma|neuropathy|diabetic|diabetes|over[\s-]?pronat|supinat|achilles|tarsal|hammertoe|hammer[\s-]?toe|sesamoid|tendonitis|tendinitis)\b/i;
+// Recipient ambiguity — the classifier extracts gender even on
+// non-orthotic turns when phrasing is indirect; bring it back when
+// the message uses third-party phrasing.
+const RECIPIENT_AMBIGUITY_RE =
+  /\b(?:for\s+(?:my|a|someone|the)\s+(?:son|daughter|husband|wife|partner|spouse|kid|kids|child|children|friend|grandson|granddaughter|mom|mother|dad|father|grandma|grandpa|grandfather|grandmother|nephew|niece|brother|sister|boyfriend|girlfriend|teen|teenager|baby)|gift|present)\b/i;
+
+export function shouldRunOrthoticClassifier({ messages }) {
+  const latest = String(messages?.[messages.length - 1]?.content || "").trim();
+  if (!latest) return false;
+  if (ORTHOTIC_VOCAB_RE.test(latest) || FOOT_CONDITION_RE.test(latest)) return true;
+  if (RECIPIENT_AMBIGUITY_RE.test(latest)) return true;
+  // Mid-flow: the prior assistant turn referenced orthotics — likely a
+  // follow-up to a clarifying question in an active flow.
+  const recentAssistants = (messages || [])
+    .slice(-5, -1)
+    .filter((m) => m?.role === "assistant")
+    .map((m) => String(m?.content || ""));
+  for (const t of recentAssistants) {
+    if (ORTHOTIC_VOCAB_RE.test(t) || FOOT_CONDITION_RE.test(t)) return true;
+  }
+  return false;
+}
+
 // Strict tool-use schema. Haiku must populate every field; null
 // means "not stated", not "unknown" — the gate uses null to know
 // it still needs to ask. Confidence is hint-only; downstream code

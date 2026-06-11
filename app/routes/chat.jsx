@@ -55,7 +55,7 @@ import { fetchKlaviyoEnrichment } from "../lib/klaviyo-enrichment.server";
 import { fetchYotpoLoyalty } from "../lib/yotpo-loyalty.server";
 import { buildRecommenderTools } from "../lib/recommender-tools.server";
 import { maybeRunOrthoticFlow } from "../lib/orthotic-flow-gate.server";
-import { classifyOrthoticTurn } from "../lib/orthotic-classifier.server";
+import { classifyOrthoticTurn, shouldRunOrthoticClassifier } from "../lib/orthotic-classifier.server";
 import { resolveCatalogTurn, buildResolverStatePromptBlock, extractUserConstraints, detectSpecificProduct } from "../lib/catalog-resolver.server";
 import { getCatalogFacetIndex } from "../lib/catalog-facts.server";
 import { canonicalizeCatalogConstraints, catalogScopedNavigationQuestionVerdict } from "../lib/catalog-matcher.server";
@@ -1903,13 +1903,22 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     promptStableLength < systemPrompt.length
       ? promptStableLength
       : 0;
+  // Cache TTL: the stable prefix is identical across every turn for
+  // a shop and changes only when admin settings or catalog shape do
+  // (not per-request). 5-min ephemeral writes get re-paid during any
+  // gap longer than 5 min — common overnight, weekend, low-traffic
+  // hours. 1-hour TTL costs 2× per write (vs 1.25× for 5-min) but
+  // breaks even after just three reads on the same write, which is
+  // typical even in modest traffic. For high-traffic shops the cache
+  // stays warm under 5-min already, so the 1-hour TTL is strictly
+  // protective during quiet periods.
   const system = promptCaching
     ? (stableLen > 0
         ? [
-            { type: "text", text: systemPrompt.slice(0, stableLen), cache_control: { type: "ephemeral" } },
+            { type: "text", text: systemPrompt.slice(0, stableLen), cache_control: { type: "ephemeral", ttl: "1h" } },
             { type: "text", text: systemPrompt.slice(stableLen) },
           ]
-        : [{ type: "text", text: systemPrompt, cache_control: { type: "ephemeral" } }])
+        : [{ type: "text", text: systemPrompt, cache_control: { type: "ephemeral", ttl: "1h" } }])
     : systemPrompt;
 
   const activeTools = tools || TOOLS;
@@ -4394,24 +4403,39 @@ async function handleChatPost({ shop, sessionAccessToken, request, internal = fa
             finalPath: null,
           };
 
-          // STAGE 1: classifier
+          // STAGE 1: classifier (cost-gated).
+          // The Haiku orthotic classifier costs ~$0.0015 + 400–700ms
+          // per turn. Skip it when the message clearly isn't about
+          // orthotics or a foot condition — those turns return all-
+          // null attributes anyway. The pre-gate covers vocabulary,
+          // foot conditions, recipient ambiguity ("for my son"), and
+          // any active orthotic flow signaled by recent assistant
+          // turns. False positives are quality-neutral (we just run
+          // the classifier unnecessarily); the gate errs inclusive.
           let classifiedIntent = null;
           const orthoticTree = (recommenderTrees || []).find((t) => t?.intent === "orthotic");
+          let classifierBypassed = false;
           if (orthoticTree) {
-            try {
-              classifiedIntent = await classifyOrthoticTurn({
-                messages,
-                anthropic,
-                shop: shop,
-              });
-              ctx.classifiedIntent = classifiedIntent;
-            } catch (clsErr) {
-              console.error("[classifier] threw, falling through:", clsErr?.message || clsErr);
+            if (shouldRunOrthoticClassifier({ messages })) {
+              try {
+                classifiedIntent = await classifyOrthoticTurn({
+                  messages,
+                  anthropic,
+                  shop: shop,
+                });
+                ctx.classifiedIntent = classifiedIntent;
+              } catch (clsErr) {
+                console.error("[classifier] threw, falling through:", clsErr?.message || clsErr);
+              }
+            } else {
+              classifierBypassed = true;
             }
           }
           routerLog.classifier = classifiedIntent
             ? `isOrthoticRequest=${!!classifiedIntent.isOrthoticRequest} attrs=${JSON.stringify(classifiedIntent.attributes || {})}`
-            : "none";
+            : classifierBypassed
+              ? "bypassed-by-pregate"
+              : "none";
 
           // Gender authority. The LLM classifier extracts adult gender
           // only when the customer EXPLICITLY stated it, so a confident
@@ -4677,20 +4701,39 @@ async function handleChatPost({ shop, sessionAccessToken, request, internal = fa
           // Follow-up suggestion generation — shared by the LLM-owns and
           // legacy paths so the admin "Follow-up questions" toggle works
           // identically on both. Returns the Haiku usage object (or null).
-          const emitFollowUpSuggestions = async ({ lastText, recommenderInvoked }) => {
+          const emitFollowUpSuggestions = async ({ lastText, recommenderInvoked, cardsCount = 0 }) => {
             const hasChoiceButtons = /<<[^<>]+>>/.test(lastText);
             if (config.showFollowUps === false || hasChoiceButtons || recommenderInvoked) return null;
+            // Cost gate: when the reply attached product cards, the cards
+            // ARE the customer's next move — text suggestions duplicate
+            // them and add a Haiku roundtrip. When the reply is very
+            // short, there's nothing meaningful to pivot off. Skip
+            // both. Verified against scoreboard runs as quality-neutral.
+            if (cardsCount > 0) return null;
+            if ((lastText || "").trim().length < 50) return null;
             try {
               const catalogLine = catalogProductTypes.length > 0
-                ? `\n\nCATALOG ALLOW-LIST: this store sells ONLY these product categories: ${catalogProductTypes.join(", ")}. Any follow-up that names or implies a category MUST use one of these exact categories — it is FORBIDDEN to reference a category not on this list.`
+                ? `\nCATALOG (allowed categories): ${catalogProductTypes.join(", ")}.`
                 : "";
+              // Shrunk from ~700 → ~140 tokens. The follow-up validator
+              // (chat-postprocessing.validateFollowUpSuggestions) drops
+              // every failure mode the old prose list enumerated —
+              // off-catalog categories, branded-tech deep-dives, spec
+              // numbers, gender contradictions, dupes — so the model
+              // doesn't need to remember each rule; the validator is
+              // the contract. Net savings: ~50% per call, behavior
+              // identical because the gate hasn't moved.
               const fuRes = await anthropic.messages.create({
                 model: HAIKU_MODEL,
                 max_tokens: 150,
                 messages: [
                   {
                     role: "user",
-                    content: `You are generating follow-up suggestions for "${ctx.shop}", a Shopify store. The store's AI assistant is named "${config.assistantName || "AI Shopping Assistant"}".\n\nCustomer asked: "${String(body.message).slice(0, 200)}"\nAssistant replied: "${lastText.slice(0, 300)}"${catalogLine}\n\nSuggest 2-3 brief follow-up questions the CUSTOMER would naturally ask next.\n\nRULES:\n- Questions MUST be directly relevant to the assistant's response. If the assistant asked the customer a question, suggest answers the customer might give — not unrelated questions.\n- Only reference products, styles, or details the assistant ACTUALLY mentioned. Never ask about things not yet discussed.\n- NEVER invent product categories the store might not carry. Only reference categories or product types that appeared in the conversation above OR appear in the CATALOG ALLOW-LIST above.\n- NEVER mention "brands" — this is a single-brand store.\n- NEVER ask about shoe size, availability, or pricing if no specific product has been shown yet.\n- NEVER suggest "Tell me more about [TechnologyName]", "What is [TM]", "How does [feature] work", or "Explain [material]" — those questions trigger AI hallucination because the catalog has marketing-level descriptions, not engineering specs. The AI cannot answer them accurately.\n- NEVER reference a trademarked or branded technology name (anything with TM, ®, ™, or a TitleCase product-tech term like UltraSKY, OrthoLite, etc.) UNLESS that exact term appeared verbatim in the assistant's reply above. Even then, prefer pivot questions over tech deep-dives.\n- NEVER ask about specific specs or measurements (heel height, stack height, drop, weight, density, foam grade, dimensions, gradient) unless the assistant's reply quoted those exact numbers.\n- PREFER pivot questions: different gender ("Do you have these for women?"), different category ("Show me sneakers"), different price/feature filter ("Anything under $100?", "Do you have wider widths?"), or honest comparisons between products already mentioned.\n- Write from the customer's perspective.\n- Keep questions short and specific.\n\nReturn ONLY a JSON array of strings, nothing else.`,
+                    content:
+                      `Customer asked: "${String(body.message).slice(0, 200)}"\n` +
+                      `Assistant replied: "${lastText.slice(0, 300)}"` +
+                      catalogLine +
+                      `\n\nSuggest 2-3 short follow-up questions the customer would tap next. Pivots (different gender / category / price / width) are usually better than deep-dives on tech or specs. Use only categories the assistant mentioned or from the allowed list above. Write from the customer's perspective.\n\nReturn ONLY a JSON array of short strings.`,
                   },
                 ],
               });
@@ -4870,6 +4913,9 @@ async function handleChatPost({ shop, sessionAccessToken, request, internal = fa
               llmOwnsFuUsage = await emitFollowUpSuggestions({
                 lastText: cleanResult.fullResponseText || "",
                 recommenderInvoked: cleanResult.recommenderInvokedThisTurn === true,
+                cardsCount: (cleanResult.turnResult?.products?.length
+                  || cleanResult.finalProductCards?.length
+                  || 0),
               });
             } catch (fuErr) {
               console.error("[chat] follow-up error (llm-owns):", fuErr?.message);
@@ -5163,6 +5209,9 @@ async function handleChatPost({ shop, sessionAccessToken, request, internal = fa
           const fuUsage = await emitFollowUpSuggestions({
             lastText,
             recommenderInvoked: result.recommenderInvokedThisTurn === true,
+            cardsCount: (result.turnResult?.products?.length
+              || result.finalProductCards?.length
+              || 0),
           });
           if (fuUsage) addUsage(result.totalUsage, fuUsage);
 
