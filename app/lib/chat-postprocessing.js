@@ -1046,7 +1046,7 @@ export function sonnetEscalationSignal({ alreadyTopTier = false, signals = {} } 
 
 const INLINE_CHIP_RE = /<<\s*([^<>]+?)\s*>>/g;
 const SAFE_INLINE_CHIP_QUESTION_RE =
-  /\b(?:who\s+are|what\s+(?:kind|type)|which\s+(?:style|styles|category)|what'?s\s+your\s+arch|any\s+specific|are\s+you\s+looking\s+for|would\s+you\s+like|do\s+you\s+want|choose|select|men'?s\s+or\s+women'?s|women'?s\s+or\s+men'?s)\b/i;
+  /\b(?:who\s+are|what\s+(?:kind|type|style|category)|which\s+(?:one|style|styles|category|kind|type)|what'?s\s+your\s+arch|any\s+specific|are\s+you\s+looking\s+for|would\s+you\s+like|do\s+you\s+want|choose|select|pick(?:\s+(?:from|one))?|narrow\s+(?:down|it\s+down)|let\s+me\s+know|tell\s+me|men'?s\s+or\s+women'?s|women'?s\s+or\s+men'?s)\b/i;
 const ANSWER_WITH_MENU_RE =
   /\b(?:we\s+don'?t\s+(?:carry|have)|only\s+available|alternatives?|instead|closest|not\s+available)\b/i;
 const DOMAIN_DISAMBIG_RE =
@@ -1071,10 +1071,18 @@ export function stripUnsafeInlineChips(text, { hasProducts = false } = {}) {
 
   const firstChip = value.indexOf("<<");
   const before = firstChip >= 0 ? value.slice(0, firstChip).trim() : value.trim();
-  const lastQuestion = before.match(/(?:^|[.!]\s+)([^.!?]{0,240}\?)\s*$/)?.[1] || before.match(/([^.!?]{0,240}\?)\s*$/)?.[1] || "";
 
   if (DOMAIN_DISAMBIG_RE.test(before)) return { text: value, changed: false, reason: "" };
-  if (lastQuestion && SAFE_INLINE_CHIP_QUESTION_RE.test(lastQuestion) && !ANSWER_WITH_MENU_RE.test(before)) {
+  // A clarifying *statement* can also legitimately introduce chips
+  // ('I need to narrow down which style you'd like to explore.'). The
+  // earlier version required the prior sentence to end with a '?',
+  // which threw out perfectly safe chips for any model that phrased
+  // its prompt as a period-ending invitation. The safety belt is the
+  // ANSWER_WITH_MENU_RE check below: a clarifier-shaped phrase plus
+  // 'we don't carry' / 'alternatives' / etc. is still treated as
+  // unsafe, so the failure mode that motivated this guard (the model
+  // dressing up a denial as a chip menu) remains caught.
+  if (SAFE_INLINE_CHIP_QUESTION_RE.test(before) && !ANSWER_WITH_MENU_RE.test(before)) {
     return { text: value, changed: false, reason: "" };
   }
 

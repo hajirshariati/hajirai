@@ -1249,6 +1249,27 @@ test("inline-chip gate — keeps real clarifier chips", () => {
   assert.equal(r.changed, false, `must keep chips; got: ${r.text}`);
 });
 
+test("inline-chip gate — keeps chips after a clarifier STATEMENT (period, not '?')", () => {
+  // Live leak 2026-06-11: model wrote a statement that ended in '.'
+  // instead of '?', so the old guard never saw the safe pattern and
+  // stripped 'Sneakers / Sandals' chips. The customer was left with
+  // no way to answer the clarifying question.
+  const r = stripUnsafeInlineChips(
+    "Since pink only comes in our women's line, I need to narrow down which style you'd like to explore. <<Sneakers>> <<Sandals>>",
+    { hasProducts: false },
+  );
+  assert.equal(r.changed, false, `must keep chips after clarifier statement; got: ${r.text}`);
+  assert.match(r.text, /<<Sneakers>>/);
+});
+
+test("inline-chip gate — 'pick from / let me know' clarifier keeps chips", () => {
+  const r = stripUnsafeInlineChips(
+    "Let me know which one fits best. <<Sneakers>> <<Sandals>>",
+    { hasProducts: false },
+  );
+  assert.equal(r.changed, false, `must keep chips; got: ${r.text}`);
+});
+
 test("inline-chip gate — keeps foot-pain domain disambiguation", () => {
   const r = stripUnsafeInlineChips(
     "Are you looking for footwear with built-in arch support, or an orthotic insole that goes inside your existing shoes? <<Footwear with arch support>> <<Orthotic insole>>",
