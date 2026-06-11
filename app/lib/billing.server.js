@@ -1,5 +1,5 @@
 import prisma from "../db.server";
-import { PLANS, getPlan } from "./plans";
+import { PLANS, getPlan, DEFAULT_PLAN_ID } from "./plans";
 
 // Production-safe default: real charges. Set SHOPIFY_BILLING_TEST=true on
 // dev / staging to opt into Shopify's test-mode subscriptions (no real money
@@ -21,10 +21,13 @@ export function isCompedShop(shop) {
 }
 
 export async function getShopPlan(shop) {
-  if (isCompedShop(shop)) return getPlan("enterprise");
+  // Complimentary Pro: launch partners and stores listed in COMP_PRO_SHOPS
+  // always read as Pro, regardless of any plan recorded in the database.
+  if (isCompedShop(shop)) return getPlan("pro");
   const config = await prisma.shopConfig.findUnique({ where: { shop } });
-  const planId = config?.plan || "free";
-  return getPlan(planId);
+  // getPlan() handles legacy ids — old "free" / "enterprise" rows resolve
+  // to Growth and Pro respectively, no DB migration needed.
+  return getPlan(config?.plan || DEFAULT_PLAN_ID);
 }
 
 function monthStart(date = new Date()) {
@@ -59,7 +62,7 @@ export async function canSendMessage(shop) {
 export async function createSubscription({ admin, shop, planId, host }) {
   const plan = getPlan(planId);
   if (!plan || plan.price === 0) {
-    throw new Error("Cannot create subscription for free plan");
+    throw new Error(`Cannot create subscription for plan: ${planId}`);
   }
 
   const returnUrl = buildReturnUrl({ shop, planId, host });
@@ -169,12 +172,12 @@ export async function setShopPlan({ shop, planId, subscriptionId }) {
       shop,
       plan: planId,
       subscriptionId: subscriptionId || null,
-      subscriptionActivatedAt: planId === "free" ? null : new Date(),
+      subscriptionActivatedAt: new Date(),
     },
     update: {
       plan: planId,
       subscriptionId: subscriptionId || null,
-      subscriptionActivatedAt: planId === "free" ? null : new Date(),
+      subscriptionActivatedAt: new Date(),
     },
   });
 }
