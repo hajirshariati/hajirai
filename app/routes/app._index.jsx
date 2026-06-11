@@ -1633,23 +1633,6 @@ export default function Home() {
           text-align: center;
           padding: 26px 4px 8px;
         }
-        .seos-hero-brand {
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          gap: 9px;
-          margin-bottom: 16px;
-          opacity: 0;
-          animation: seos-rise 0.55s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
-        }
-        .seos-hero-brand img { display: block; height: 26px; width: auto; }
-        .seos-hero-brand-name {
-          font-size: 11.5px;
-          font-weight: 650;
-          letter-spacing: 1.6px;
-          text-transform: uppercase;
-          color: #2D6B4F;
-        }
         .seos-greet {
           margin: 0;
           font-size: 34px;
@@ -2497,7 +2480,7 @@ export default function Home() {
         .seos-card-setupguide:hover { text-decoration: underline !important; }
 
         @media (prefers-reduced-motion: reduce) {
-          .seos-greet .seos-word, .seos-hero-brand, .seos-status-wrap, .seos-subline, .seos-testchat { animation: none; opacity: 1; transform: none; }
+          .seos-greet .seos-word, .seos-status-wrap, .seos-subline, .seos-testchat { animation: none; opacity: 1; transform: none; }
           .seos-testchat-typing span { animation: none; }
           .seos-status-summary-dot { animation: none; }
           .seos-pip, .seos-card, .seos-card-arrow, .seos-metric, .seos-metric-detail, .seos-setup-body, .seos-setup-chev { transition: none; }
@@ -2512,10 +2495,6 @@ export default function Home() {
           {hasApiKey ? <MetricStrip metrics={metrics} /> : null}
 
           <div className="seos-hero">
-            <div className="seos-hero-brand">
-              <img src={seosLogo} alt="SEoS" />
-              <span className="seos-hero-brand-name">SEoS Assistant</span>
-            </div>
             <h1 className="seos-greet">
               {greetWords.map((w, i) => (
                 <span key={`${w}-${i}`} className="seos-word" style={{ animationDelay: `${i * 90}ms` }}>
