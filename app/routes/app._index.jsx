@@ -1432,7 +1432,12 @@ function SetupCard(props) {
         <div className="seos-card-art" aria-hidden="true"><ArtSetup /></div>
         <span className="seos-card-btn">
           {open ? "Hide checklist" : "View checklist"}
-          <span className={"seos-card-arrow" + (open ? " is-open" : "")} aria-hidden="true">›</span>
+          <span className={"seos-card-plusminus" + (open ? " is-open" : "")} aria-hidden="true">
+            <svg viewBox="0 0 12 12" width="11" height="11">
+              <path d="M1 6 h10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+              <path className="pm-v" d="M6 1 v10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+            </svg>
+          </span>
         </span>
       </button>
       <div className={"seos-card-setupbody" + (open ? " is-open" : "")} aria-hidden={!open}>
@@ -2436,7 +2441,19 @@ export default function Home() {
           color: #fff;
           border-color: #2D6B4F;
         }
-        .seos-card-arrow.is-open { transform: rotate(90deg); }
+        .seos-card-plusminus {
+          display: inline-flex;
+          color: #2D6B4F;
+        }
+        .seos-card-plusminus svg {
+          display: block;
+          transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        .seos-card-plusminus .pm-v {
+          transition: opacity 0.25s ease;
+        }
+        .seos-card-plusminus.is-open svg { transform: rotate(180deg); }
+        .seos-card-plusminus.is-open .pm-v { opacity: 0; }
         .seos-card-setupbody {
           display: grid;
           grid-template-rows: 0fr;
@@ -2447,7 +2464,7 @@ export default function Home() {
         .seos-card-setupclip {
           overflow: hidden;
           min-height: 0;
-          padding: 0 20px 20px;
+          padding: 0 20px;
         }
         .seos-setup-items--inline {
           padding: 4px 0 0 !important;
@@ -2457,7 +2474,7 @@ export default function Home() {
           display: inline-flex;
           align-items: center;
           gap: 6px;
-          margin-top: 14px;
+          margin: 14px 0 20px;
           font-size: 13px;
           font-weight: 600;
           color: #2D6B4F !important;
