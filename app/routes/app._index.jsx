@@ -921,7 +921,8 @@ function ArtSetup() {
       </g>
       <g filter="url(#su-sh)">
         <rect x="272" y="22" width="48" height="32" rx="16" fill="#2D6B4F" />
-        <path d="M289 38 l4.5 4.5 L303 32.5" stroke="#fff" strokeWidth="2.8" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M290.5 34 a8 8 0 1 0 11 0" stroke="#fff" strokeWidth="2.4" fill="none" strokeLinecap="round" />
+        <path d="M296 27.5 v9" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" />
       </g>
     </svg>
   );
@@ -2398,9 +2399,17 @@ export default function Home() {
           text-align: left;
           cursor: pointer;
           position: relative;
-          display: block;
+          /* Flex column overrides the browser's default vertical
+             centring of button contents, so the body/art stack lays
+             out exactly like every other Explore card. */
+          display: flex;
+          flex-direction: column;
+          align-items: stretch;
+          justify-content: flex-start;
           min-height: 320px;
         }
+        .seos-card-setuphead .seos-card-body { width: 100%; }
+        .seos-card-setuphead .seos-card-art { width: 100%; }
         .seos-card-setuphead:focus-visible {
           outline: 2px solid rgba(45,107,79,0.5);
           outline-offset: 2px;
