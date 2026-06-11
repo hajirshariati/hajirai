@@ -2039,16 +2039,22 @@ export default function Home() {
           z-index: 40;
         }
         .seos-metrics-caption {
+          position: absolute;
+          right: 10px;
+          top: 50%;
+          transform: translateY(-50%);
           display: flex;
           align-items: center;
-          justify-content: center;
           gap: 6px;
           font-size: 10px;
           font-weight: 650;
           letter-spacing: 1.2px;
           text-transform: uppercase;
           color: rgba(26,46,38,0.45);
-          padding-bottom: 4px;
+          pointer-events: none;
+        }
+        @media (max-width: 980px) {
+          .seos-metrics-caption { display: none; }
         }
         .seos-metrics-live {
           width: 6px;
@@ -2193,7 +2199,6 @@ export default function Home() {
           position: relative;
           display: flex;
           flex-direction: column;
-          min-height: 320px;
           border-radius: 16px;
           background: #fff;
           border: 1px solid rgba(0,0,0,0.07);
@@ -2236,8 +2241,8 @@ export default function Home() {
           display: flex;
           align-items: flex-end;
           justify-content: flex-end;
-          padding: 14px 0 0 30px;
-          min-height: 160px;
+          padding: 12px 0 0 30px;
+          min-height: 0;
           pointer-events: none;
         }
         .seos-card-art svg {
@@ -2418,7 +2423,6 @@ export default function Home() {
           flex-direction: column;
           align-items: stretch;
           justify-content: flex-start;
-          min-height: 320px;
         }
         .seos-card-setuphead .seos-card-body { width: 100%; }
         .seos-card-setuphead .seos-card-art { width: 100%; }
