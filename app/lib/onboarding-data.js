@@ -156,6 +156,19 @@ export const STEPS = [
   },
   {
     phase: "launch",
+    icon: "💬",
+    title: "Smoke-test the assistant from the admin home",
+    short: "Use the built-in test chat — it talks to the real engine and never touches your analytics.",
+    body: "The admin home page has an 'Ask anything…' box right under the greeting. It posts to the same chat handler the storefront widget uses — same system prompt, same tools, same grounding fact-checker, same model routing — so what you see in the test reply is exactly what a customer would get on the storefront. The one difference: test chats are flagged as internal, so they do NOT count toward your Analytics dashboard, AI cost totals, satisfaction rate, or your plan's monthly message quota. Run a few representative questions before pointing customers at the widget.",
+    list: [
+      "Ask one open-ended question (e.g. 'I need shoes for plantar fasciitis') and check the assistant clarifies + recommends real catalog products.",
+      "Ask a comparison question ('what's the difference between X and Y') and confirm both names match real products and prices.",
+      "Try a tricky edge case — a product line you don't carry, or a vague color request — and confirm the assistant is honest instead of inventing options.",
+    ],
+    tip: "If the test chat surfaces something off, fix it once and it's fixed for every customer — same engine. The 'You don't count toward analytics' guarantee means you can stress-test freely without skewing your dashboards.",
+  },
+  {
+    phase: "launch",
     icon: "✅",
     title: "QA with a real shopper account",
     short: "Verify VIP greeting, fit cards, loyalty, tracking, and the discovery flow.",

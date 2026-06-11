@@ -3753,17 +3753,22 @@ export const action = async ({ request }) => {
     const authHeader = request.headers.get("authorization") || "";
     let shop;
     let sessionAccessToken;
+    // `internal` flags admin-driven test chats so the shared handler
+    // skips analytics recording and plan/daily-cap counting — merchant
+    // testing must never pollute their own usage numbers or burn quota.
+    let internal = false;
     if (authHeader.startsWith("Bearer ")) {
       const { session } = await authenticate.admin(request);
       shop = session.shop;
       sessionAccessToken = session.accessToken;
+      internal = true;
     } else {
       const { session } = await authenticate.public.appProxy(request);
       if (!session) return Response.json({ error: "Unauthorized" }, { status: 401 });
       shop = session.shop;
       sessionAccessToken = session.accessToken;
     }
-    return await handleChatPost({ shop, sessionAccessToken, request });
+    return await handleChatPost({ shop, sessionAccessToken, request, internal });
   } catch (e) {
     // authenticate.admin signals auth failures by throwing Responses —
     // pass those through to the framework untouched.
@@ -3786,7 +3791,7 @@ export const action = async ({ request }) => {
 // on purpose: exporting it would put a non-route export on this route
 // file and drag server modules into the client bundle. Both front doors
 // in the action above funnel here.
-async function handleChatPost({ shop, sessionAccessToken, request }) {
+async function handleChatPost({ shop, sessionAccessToken, request, internal = false }) {
     const rate = checkIpShopRate(shop, clientIp(request));
     if (!rate.ok) {
       return Response.json(
@@ -3803,7 +3808,7 @@ async function handleChatPost({ shop, sessionAccessToken, request }) {
       );
     }
 
-    const quota = await canSendMessage(shop);
+    const quota = internal ? { ok: true } : await canSendMessage(shop);
     if (!quota.ok) {
       return Response.json(
         {
@@ -3821,7 +3826,7 @@ async function handleChatPost({ shop, sessionAccessToken, request }) {
     // chat endpoint stops accepting new conversations once the configured
     // count is reached for the UTC day. Counts come from ChatUsage so the
     // limit is enforced consistently across multiple server instances.
-    if (config.dailyCapEnabled && config.dailyCapMessages > 0) {
+    if (!internal && config.dailyCapEnabled && config.dailyCapMessages > 0) {
       const todayCount = await getTodayMessageCount(shop);
       if (todayCount >= config.dailyCapMessages) {
         return Response.json(
@@ -4896,12 +4901,16 @@ async function handleChatPost({ shop, sessionAccessToken, request }) {
             // daily message cap. Previously only the legacy path
             // recorded — under LLM_OWNS_ALL_TURNS the dashboard showed
             // zero cost/messages and the daily cap could never trigger.
-            recordChatUsage({
-              shop: shop,
-              model: cleanResult.model || pickModel(0),
-              usage,
-              toolCalls: cleanResult.toolCallCount || 0,
-            }).catch((err) => console.error("[chat] usage log error:", err?.message));
+            // Skipped for `internal` (admin test-chat) requests so the
+            // merchant's own testing never pollutes their analytics.
+            if (!internal) {
+              recordChatUsage({
+                shop: shop,
+                model: cleanResult.model || pickModel(0),
+                usage,
+                toolCalls: cleanResult.toolCallCount || 0,
+              }).catch((err) => console.error("[chat] usage log error:", err?.message));
+            }
             return;
           }
           let shadowResultForDiff = null;
@@ -5164,7 +5173,7 @@ async function handleChatPost({ shop, sessionAccessToken, request }) {
             console.log(`[cache] created=${u.cache_creation_input_tokens} read=${u.cache_read_input_tokens} input=${u.input_tokens}`);
           }
 
-          recordChatUsage({
+          if (!internal) recordChatUsage({
             shop: shop,
             model: result.model,
             usage: result.totalUsage,

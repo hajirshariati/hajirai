@@ -874,7 +874,7 @@ function TestChat({ shop }) {
       </form>
       {msgs.length > 0 ? (
         <div className="seos-testchat-note">
-          Live engine — same answers your customers get on the storefront.
+          Live engine, private session — your test chats don&rsquo;t count toward analytics or plan usage.
         </div>
       ) : null}
     </div>
@@ -1222,7 +1222,7 @@ function SetupCheckCircle() {
 
 function SetupChecklist({
   hasApiKey, widgetEnabled, fileCount, categoryGroupsCount, semanticEnabled,
-  semanticProvider, themeEditorUrl,
+  semanticProvider, themeEditorUrl, inline = false,
 }) {
   const items = [
     {
@@ -1273,6 +1273,46 @@ function SetupChecklist({
     ? `All ${items.length} steps done. Your assistant is fully configured.`
     : `${doneCount} of ${items.length} done${requiredDone ? "" : " — action needed"}`;
 
+  if (inline) {
+    return (
+      <div className="seos-setup-items seos-setup-items--inline">
+        {items.map((item) => {
+          const action = item.external ? (
+            <a className={"seos-setup-action" + (item.done ? " is-done" : "")} href={item.actionUrl} target="_blank" rel="noopener noreferrer">
+              {item.actionLabel}
+              <span aria-hidden="true">→</span>
+            </a>
+          ) : (
+            <Link className={"seos-setup-action" + (item.done ? " is-done" : "")} to={item.actionUrl}>
+              {item.actionLabel}
+              <span aria-hidden="true">→</span>
+            </Link>
+          );
+          return (
+            <div key={item.title} className={"seos-setup-item" + (item.done ? " is-done" : "")}>
+              <span className="seos-setup-item-dot" aria-hidden="true">
+                {item.done ? (
+                  <svg width="20" height="20" viewBox="0 0 20 20">
+                    <circle cx="10" cy="10" r="9" fill="#2D6B4F" />
+                    <path d="M6 10.5 l2.6 2.6 L14 7.5" stroke="#fff" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                ) : (
+                  <svg width="20" height="20" viewBox="0 0 20 20">
+                    <circle cx="10" cy="10" r="8.5" fill="none" stroke="rgba(26,46,38,0.25)" strokeWidth="1.6" strokeDasharray="2.5 3.5" />
+                  </svg>
+                )}
+              </span>
+              <span className="seos-setup-item-text">
+                <span className="seos-setup-item-title">{item.title}</span>
+                <span className="seos-setup-item-desc">{item.description}</span>
+              </span>
+              {action}
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
   return (
     <div className="seos-setup">
       <button
@@ -1333,6 +1373,70 @@ function SetupChecklist({
               );
             })}
           </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// SetupCard — the first Explore card, doubling as the setup-status block.
+// Closed state: looks and feels like the other Explore cards (illustration,
+// title, progress sub-line, CTA pill). Open state: grid-column 1/-1 so it
+// spans the whole row and reveals the live checklist inside, plus a
+// secondary "Open full setup guide →" link to /onboarding. One block, not
+// two — the old standalone checklist section is gone.
+// ---------------------------------------------------------------------------
+function SetupCard(props) {
+  const [open, setOpen] = useState(false);
+  const { hasApiKey, widgetEnabled, fileCount, categoryGroupsCount, semanticEnabled } = props;
+  const itemsDone = [
+    hasApiKey,
+    widgetEnabled,
+    fileCount > 0,
+    categoryGroupsCount > 0,
+    semanticEnabled,
+  ];
+  const doneCount = itemsDone.filter(Boolean).length;
+  const total = itemsDone.length;
+  const allDone = doneCount === total;
+  const requiredDone = hasApiKey && widgetEnabled;
+  const headline = allDone ? "Setup complete" : "Setup";
+  const sub = allDone
+    ? "Your assistant is fully configured."
+    : requiredDone
+      ? `${doneCount} of ${total} done · optional steps remain`
+      : `${doneCount} of ${total} done · action needed`;
+  return (
+    <div className={"seos-card seos-card-setup" + (open ? " is-open" : "")}>
+      <button
+        type="button"
+        className="seos-card-setuphead"
+        onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
+      >
+        <div className="seos-card-body">
+          <div className="seos-card-titlerow">
+            <div className="seos-card-title">{headline}</div>
+            <span className={"seos-card-stat" + (allDone ? " is-done" : "")}>
+              {allDone ? "✓ Done" : `${doneCount}/${total}`}
+            </span>
+          </div>
+          <div className="seos-card-desc">{sub}</div>
+        </div>
+        <div className="seos-card-art" aria-hidden="true"><ArtSetup /></div>
+        <span className="seos-card-btn">
+          {open ? "Hide checklist" : "View checklist"}
+          <span className={"seos-card-arrow" + (open ? " is-open" : "")} aria-hidden="true">›</span>
+        </span>
+      </button>
+      <div className={"seos-card-setupbody" + (open ? " is-open" : "")} aria-hidden={!open}>
+        <div className="seos-card-setupclip">
+          <SetupChecklist {...props} inline />
+          <a className="seos-card-setupguide" href="/onboarding" target="_blank" rel="noopener noreferrer">
+            <span>Open the full setup guide</span>
+            <span aria-hidden="true">→</span>
+          </a>
         </div>
       </div>
     </div>
@@ -2047,6 +2151,7 @@ export default function Home() {
           display: grid;
           grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
           gap: 16px;
+          align-items: stretch;
         }
         .seos-card {
           position: relative;
@@ -2223,45 +2328,82 @@ export default function Home() {
           .seos-setup-action { margin-left: 34px; }
         }
 
-        /* About — spec-sheet rows. */
-        .seos-about {
-          background: #fff;
-          border: 1px solid rgba(0,0,0,0.07);
-          border-radius: 16px;
-          box-shadow: 0 1px 2px rgba(0,0,0,0.04);
-          padding: 18px 20px 6px;
-        }
-        .seos-about-head {
-          font-size: 14.5px;
-          font-weight: 650;
-          color: #1a2e26;
-          padding-bottom: 10px;
-        }
-        .seos-about-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-          column-gap: 44px;
-        }
-        .seos-about-row {
+        /* Page-foot meta strip — borderless, centered, reads like a
+           footer caption rather than a content card. */
+        .seos-pagefoot {
           display: flex;
-          justify-content: space-between;
+          flex-wrap: wrap;
+          justify-content: center;
           align-items: baseline;
-          gap: 18px;
-          padding: 11px 0;
-          border-top: 1px solid rgba(26,46,38,0.06);
-        }
-        .seos-about-label {
-          flex-shrink: 0;
-          font-size: 12.5px;
-          font-weight: 600;
+          gap: 6px 14px;
+          padding: 16px 8px 0;
+          font-size: 12px;
           color: rgba(26,46,38,0.5);
+          text-align: center;
         }
-        .seos-about-value {
-          font-size: 12.5px;
-          line-height: 1.5;
-          color: #1a2e26;
-          text-align: right;
+        .seos-pagefoot strong {
+          font-weight: 650;
+          color: rgba(26,46,38,0.72);
+          margin-right: 4px;
         }
+        .seos-pagefoot > span[aria-hidden="true"] { color: rgba(26,46,38,0.25); }
+
+        /* SetupCard — when open, spans the whole grid row and reveals
+           the checklist inside. Closed it behaves like every other
+           Explore card. */
+        .seos-card-setup { padding: 0; }
+        .seos-card-setup.is-open { grid-column: 1 / -1; }
+        .seos-card-setuphead {
+          appearance: none;
+          font: inherit;
+          width: 100%;
+          padding: 0;
+          background: transparent;
+          border: none;
+          text-align: left;
+          cursor: pointer;
+          position: relative;
+          display: block;
+          min-height: 320px;
+        }
+        .seos-card-setuphead:focus-visible {
+          outline: 2px solid rgba(45,107,79,0.5);
+          outline-offset: 2px;
+          border-radius: 16px;
+        }
+        .seos-card-stat.is-done {
+          background: #2D6B4F;
+          color: #fff;
+          border-color: #2D6B4F;
+        }
+        .seos-card-arrow.is-open { transform: rotate(90deg); }
+        .seos-card-setupbody {
+          display: grid;
+          grid-template-rows: 0fr;
+          opacity: 0;
+          transition: grid-template-rows 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.3s ease;
+        }
+        .seos-card-setupbody.is-open { grid-template-rows: 1fr; opacity: 1; }
+        .seos-card-setupclip {
+          overflow: hidden;
+          min-height: 0;
+          padding: 0 20px 20px;
+        }
+        .seos-setup-items--inline {
+          padding: 4px 0 0 !important;
+          margin: 0;
+        }
+        .seos-card-setupguide {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          margin-top: 14px;
+          font-size: 13px;
+          font-weight: 600;
+          color: #2D6B4F !important;
+          text-decoration: none !important;
+        }
+        .seos-card-setupguide:hover { text-decoration: underline !important; }
 
         @media (prefers-reduced-motion: reduce) {
           .seos-greet .seos-word, .seos-hero-brand, .seos-status-wrap, .seos-subline, .seos-testchat { animation: none; opacity: 1; transform: none; }
@@ -2313,13 +2455,14 @@ export default function Home() {
           )}
 
           <div className="seos-card-grid">
-              <ActionCard
-                art={<ArtSetup />}
-                title="Setup guide"
-                description="Full walkthrough for installing, configuring, and going live with the assistant."
-                cta="Open setup guide"
-                url="/onboarding"
-                external
+              <SetupCard
+                hasApiKey={hasApiKey}
+                widgetEnabled={widgetEnabled}
+                fileCount={fileCount}
+                categoryGroupsCount={categoryGroupsCount}
+                semanticEnabled={semanticEnabled}
+                semanticProvider={semanticProvider}
+                themeEditorUrl={themeEditorUrl}
               />
               <ActionCard
                 art={<ArtAnalytics />}
@@ -2361,31 +2504,17 @@ export default function Home() {
               />
           </div>
 
-          <SetupChecklist
-            hasApiKey={hasApiKey}
-            widgetEnabled={widgetEnabled}
-            fileCount={fileCount}
-            categoryGroupsCount={categoryGroupsCount}
-            semanticEnabled={semanticEnabled}
-            semanticProvider={semanticProvider}
-            themeEditorUrl={themeEditorUrl}
-          />
-
-          {/* About — Apple-style spec sheet: subdued labels, hairline rows. */}
-          <div className="seos-about">
-            <div className="seos-about-head">About SEoS Assistant</div>
-            <div className="seos-about-grid">
-              <div className="seos-about-col">
-                <div className="seos-about-row"><span className="seos-about-label">Version</span><span className="seos-about-value">1.0.0</span></div>
-                <div className="seos-about-row"><span className="seos-about-label">AI Engine</span><span className="seos-about-value">Anthropic Claude</span></div>
-                <div className="seos-about-row"><span className="seos-about-label">Semantic Search</span><span className="seos-about-value">{semanticEnabled ? `${semanticProvider === "voyage" ? "Voyage AI" : "OpenAI"} · active` : "Optional — bring your own key"}</span></div>
-              </div>
-              <div className="seos-about-col">
-                <div className="seos-about-row"><span className="seos-about-label">Attribution</span><span className="seos-about-value">Orders tagged &ldquo;SEoS&rdquo; · links carry utm_content=SEoS, other channel UTMs stay intact</span></div>
-                <div className="seos-about-row"><span className="seos-about-label">Privacy</span><span className="seos-about-value">Feedback hashed · auto-deleted after 90 days</span></div>
-                <div className="seos-about-row"><span className="seos-about-label">Billing</span><span className="seos-about-value">Pay-as-you-go AI usage · no markup</span></div>
-              </div>
-            </div>
+          {/* Page foot — borderless meta strip, no card chrome. */}
+          <div className="seos-pagefoot">
+            <span><strong>AI Engine</strong> · Anthropic Claude</span>
+            <span aria-hidden="true">·</span>
+            <span><strong>Semantic Search</strong> · {semanticEnabled ? `${semanticProvider === "voyage" ? "Voyage AI" : "OpenAI"} active` : "Optional"}</span>
+            <span aria-hidden="true">·</span>
+            <span><strong>Attribution</strong> · Orders tagged &ldquo;SEoS&rdquo;</span>
+            <span aria-hidden="true">·</span>
+            <span><strong>Privacy</strong> · Feedback auto-deleted after 90 days</span>
+            <span aria-hidden="true">·</span>
+            <span><strong>Billing</strong> · Pay-as-you-go AI usage, no markup</span>
           </div>
         </BlockStack>
       </div>
