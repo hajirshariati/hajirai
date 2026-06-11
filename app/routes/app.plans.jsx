@@ -409,12 +409,6 @@ export default function PlansPage() {
           <div className={`seos-pl-note ${actionData.ok ? "" : "is-bad"}`}>{actionData.message}</div>
         ) : null}
 
-        {comped ? (
-          <div className="seos-pl-note">
-            <strong>Complimentary Pro plan.</strong> This store has the Pro plan permanently unlocked — no billing, no usage limits.
-          </div>
-        ) : null}
-
         <div className="seos-pl-card">
           <div className="seos-pl-current">
             <div>
@@ -460,7 +454,7 @@ export default function PlansPage() {
           <div className="seos-pl-title">Compare plans</div>
           <div className="seos-pl-desc">
             {comped
-              ? "Your store is on a complimentary Pro plan, so you have access to every feature in both tiers."
+              ? "Pro is permanently unlocked for this store — every feature in both tiers, no billing, no usage limits."
               : "Change any time. Billed through Shopify, on your Shopify invoice."}
           </div>
           <div className="seos-pl-tiers" style={{ marginTop: 22 }}>
