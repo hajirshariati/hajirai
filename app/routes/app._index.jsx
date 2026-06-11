@@ -606,33 +606,40 @@ function ScrollRail({ railClassName = "", wrapClassName = "", deps = [], childre
 
   return (
     <div className={wrapCls}>
-      {state.overflow && !state.atStart ? (
-        <button
-          type="button"
-          className="seos-rail-arrow seos-rail-arrow--prev"
-          aria-label="Scroll left"
-          onClick={() => step(-1)}
-        >
-          <svg viewBox="0 0 16 16" width="12" height="12" fill="none" aria-hidden="true">
-            <path d="M10 3 5 8l5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </button>
-      ) : null}
-      <div className={"seos-rail " + railClassName} ref={railRef} onScroll={update}>
+      <button
+        type="button"
+        className="seos-rail-arrow seos-rail-arrow--prev"
+        aria-label="Scroll left"
+        onClick={() => step(-1)}
+        hidden={!state.overflow || state.atStart}
+      >
+        <svg viewBox="0 0 16 16" width="12" height="12" fill="none" aria-hidden="true">
+          <path d="M10 3 5 8l5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </button>
+      <div
+        className={
+          "seos-rail " + railClassName +
+          (state.overflow ? " has-overflow" : "") +
+          (state.atStart ? " at-start" : "") +
+          (state.atEnd ? " at-end" : "")
+        }
+        ref={railRef}
+        onScroll={update}
+      >
         {children}
       </div>
-      {state.overflow && !state.atEnd ? (
-        <button
-          type="button"
-          className="seos-rail-arrow seos-rail-arrow--next"
-          aria-label="Scroll right"
-          onClick={() => step(1)}
-        >
-          <svg viewBox="0 0 16 16" width="12" height="12" fill="none" aria-hidden="true">
-            <path d="M6 3l5 5-5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </button>
-      ) : null}
+      <button
+        type="button"
+        className="seos-rail-arrow seos-rail-arrow--next"
+        aria-label="Scroll right"
+        onClick={() => step(1)}
+        hidden={!state.overflow || state.atEnd}
+      >
+        <svg viewBox="0 0 16 16" width="12" height="12" fill="none" aria-hidden="true">
+          <path d="M6 3l5 5-5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </button>
     </div>
   );
 }
@@ -1740,10 +1747,18 @@ export default function Home() {
           0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
           30% { transform: translateY(-4px); opacity: 1; }
         }
-        /* Scroll rails — horizontal chip/card rows with arrow + fade
-           overflow affordances, mirroring the storefront widget. The
-           wrap bleeds to the bubble's edges; the rail inside scrolls
-           with a hidden scrollbar. */
+        /* Scroll rails — ported 1:1 from the storefront widget so chip
+           and product rows behave identically in the admin test chat.
+           Key rules from extensions/hajirai-chat-widget/assets/
+           hajirai-chat-widget.css §choices-wrap:
+           - Edge fades are CSS mask-image on the rail itself (real
+             clip, not an overlay), with three variants for at-start /
+             at-end / neither.
+           - Arrows only on min-width 768px AND hover-capable pointers
+             (no arrows on touch — swipe handles it).
+           - When arrows are showing, the wrap reserves padding-right
+             36px (and padding-left 36px once scrolled away from start),
+             so chips never hide under the buttons. */
         .seos-rail-wrap {
           position: relative;
           margin: 10px -14px 0;
@@ -1764,55 +1779,48 @@ export default function Home() {
           scrollbar-width: none;
         }
         .seos-rail::-webkit-scrollbar { display: none; }
-        /* Edge fades — only while there's more content in that
-           direction. Gradient matches the bot-bubble background. */
-        .seos-rail-wrap::before,
-        .seos-rail-wrap::after {
-          content: "";
-          position: absolute;
-          top: 0;
-          bottom: 0;
-          width: 30px;
-          pointer-events: none;
-          z-index: 1;
-          opacity: 0;
-          transition: opacity 0.15s ease;
+        .seos-rail.has-overflow:not(.at-start):not(.at-end) {
+          -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 16px, #000 calc(100% - 20px), transparent 100%);
+                  mask-image: linear-gradient(90deg, transparent 0, #000 16px, #000 calc(100% - 20px), transparent 100%);
         }
-        .seos-rail-wrap::before {
-          left: 0;
-          background: linear-gradient(90deg, #f2f5f3, rgba(242,245,243,0));
+        .seos-rail.has-overflow.at-start:not(.at-end) {
+          -webkit-mask-image: linear-gradient(90deg, #000 0, #000 calc(100% - 20px), transparent 100%);
+                  mask-image: linear-gradient(90deg, #000 0, #000 calc(100% - 20px), transparent 100%);
         }
-        .seos-rail-wrap::after {
-          right: 0;
-          background: linear-gradient(270deg, #f2f5f3, rgba(242,245,243,0));
+        .seos-rail.has-overflow.at-end:not(.at-start) {
+          -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 16px, #000 100%);
+                  mask-image: linear-gradient(90deg, transparent 0, #000 16px, #000 100%);
         }
-        .seos-rail-wrap.has-overflow:not(.at-start)::before { opacity: 1; }
-        .seos-rail-wrap.has-overflow:not(.at-end)::after { opacity: 1; }
-        /* Arrow buttons — circular, vertically centred, above the fades. */
+        /* Arrow buttons — circular, vertically centred. Off by default
+           (no display) and only revealed on hover-capable desktop. */
         .seos-rail-arrow {
           position: absolute;
           top: 50%;
           transform: translateY(-50%);
-          width: 30px;
-          height: 30px;
+          width: 32px;
+          height: 32px;
           border-radius: 50%;
           border: none;
           background: #2D6B4F;
           color: #fff;
-          display: inline-flex;
           align-items: center;
           justify-content: center;
           cursor: pointer;
           z-index: 2;
           box-shadow: 0 2px 8px rgba(26,46,38,0.28);
-          transition: background 0.15s ease, transform 0.15s ease;
+          transition: background 0.15s ease, transform 0.1s ease;
+          display: none;
         }
-        .seos-rail-arrow:hover {
-          background: #245a42;
-          transform: translateY(-50%) scale(1.06);
+        .seos-rail-arrow svg { display: block; }
+        .seos-rail-arrow--prev { left: 0; }
+        .seos-rail-arrow--next { right: 0; }
+        @media (min-width: 768px) and (hover: hover) {
+          .seos-rail-wrap.has-overflow { padding-right: 36px; }
+          .seos-rail-wrap.has-overflow:not(.at-start) { padding-left: 36px; }
+          .seos-rail-arrow { display: inline-flex; }
+          .seos-rail-arrow:hover { background: #245a42; }
+          .seos-rail-arrow:active { transform: translateY(-50%) scale(0.92); }
         }
-        .seos-rail-arrow--prev { left: 4px; }
-        .seos-rail-arrow--next { right: 4px; }
         .seos-testchat-choice {
           appearance: none;
           font: inherit;
