@@ -5,8 +5,8 @@ import { Page } from "@shopify/polaris";
 import { TitleBar } from "@shopify/app-bridge-react";
 import { authenticate } from "../shopify.server";
 import {
-  getShopPlan, getConversationsThisMonth, createSubscription, setShopPlan,
-  cancelSubscription, getActiveSubscription,
+  getShopPlan, getConversationsThisMonth, createSubscription,
+  isCompedShop,
 } from "../lib/billing.server";
 import { PLANS, PLAN_ORDER, formatLimit } from "../lib/plans";
 import BrandHeader from "../components/BrandHeader";
@@ -17,7 +17,12 @@ export const loader = async ({ request }) => {
   const { session } = await authenticate.admin(request);
   const plan = await getShopPlan(session.shop);
   const used = await getConversationsThisMonth(session.shop);
-  return { currentPlanId: plan.id, used, shop: session.shop };
+  return {
+    currentPlanId: plan.id,
+    used,
+    shop: session.shop,
+    comped: isCompedShop(session.shop),
+  };
 };
 
 export const action = async ({ request }) => {
@@ -28,12 +33,6 @@ export const action = async ({ request }) => {
   const url = new URL(request.url);
   const host = url.searchParams.get("host") || "";
   if (intent === "select" && PLANS[planId]) {
-    if (planId === "free") {
-      const active = await getActiveSubscription({ admin });
-      if (active?.id) await cancelSubscription({ admin, subscriptionId: active.id });
-      await setShopPlan({ shop: session.shop, planId: "free", subscriptionId: null });
-      return data({ ok: true, message: "Switched to Free plan." });
-    }
     const { confirmationUrl } = await createSubscription({ admin, shop: session.shop, planId, host });
     // Don't redirect server-side — Shopify's billing approval page sends
     // X-Frame-Options: DENY, so loading it inside the embedded admin iframe
@@ -47,30 +46,20 @@ export const action = async ({ request }) => {
 // Apple-style tier cards: each plan shows only what it ADDS over the tier
 // below it, so the columns stay short and the differences pop.
 const PLAN_HIGHLIGHTS = {
-  free: {
-    tagline: "Try it on real customers.",
-    inherits: null,
-    points: [
-      "50 conversations / month",
-      "1 knowledge file",
-      "7-day analytics",
-      "Standard AI model",
-    ],
-  },
   growth: {
     tagline: "For the typical Shopify store.",
-    inherits: "Everything in Free, plus",
+    inherits: null,
     points: [
       "3,000 conversations / month",
       "Unlimited knowledge files",
       "Smart routing + prompt caching",
       "Search rules + product enrichment",
       "Klaviyo + Aftership integrations",
-      "Remove SEoS branding",
-      "90-day analytics",
+      "90-day analytics history",
+      "Standard AI model",
     ],
   },
-  enterprise: {
+  pro: {
     tagline: "High volume, deep data.",
     inherits: "Everything in Growth, plus",
     points: [
@@ -78,7 +67,8 @@ const PLAN_HIGHLIGHTS = {
       "Advanced AI model",
       "Fit predictor + VIP mode",
       "Yotpo reviews + loyalty",
-      "180-day analytics",
+      "180-day analytics history",
+      "Priority email support",
     ],
   },
 };
@@ -106,7 +96,7 @@ const FAQ = [
 ];
 
 export default function PlansPage() {
-  const { currentPlanId, used, shop } = useLoaderData();
+  const { currentPlanId, used, shop, comped } = useLoaderData();
   const actionData = useActionData();
   const navigation = useNavigation();
   const submitting = navigation.state === "submitting";
@@ -419,13 +409,19 @@ export default function PlansPage() {
           <div className={`seos-pl-note ${actionData.ok ? "" : "is-bad"}`}>{actionData.message}</div>
         ) : null}
 
+        {comped ? (
+          <div className="seos-pl-note">
+            <strong>Complimentary Pro plan.</strong> This store has the Pro plan permanently unlocked — no billing, no usage limits.
+          </div>
+        ) : null}
+
         <div className="seos-pl-card">
           <div className="seos-pl-current">
             <div>
               <div className="seos-pl-title">Your plan</div>
               <div className="seos-pl-current-name">
                 {current.name}
-                <span className="seos-pl-pricepill">{current.price === 0 ? "Free" : `$${current.price}/mo`}</span>
+                <span className="seos-pl-pricepill">{comped ? "Complimentary" : `$${current.price}/mo`}</span>
               </div>
               <div className="seos-pl-current-perks">
                 <span className="seos-pl-perk">
@@ -462,14 +458,18 @@ export default function PlansPage() {
 
         <div className="seos-pl-card">
           <div className="seos-pl-title">Compare plans</div>
-          <div className="seos-pl-desc">Change any time. Billed through Shopify, on your Shopify invoice.</div>
+          <div className="seos-pl-desc">
+            {comped
+              ? "Your store is on a complimentary Pro plan, so you have access to every feature in both tiers."
+              : "Change any time. Billed through Shopify, on your Shopify invoice."}
+          </div>
           <div className="seos-pl-tiers" style={{ marginTop: 22 }}>
             {PLAN_ORDER.map((id) => {
               const plan = PLANS[id];
               const hl = PLAN_HIGHLIGHTS[id];
               const isCurrent = id === currentPlanId;
-              const isPopular = id === "growth";
-              const isDowngrade = PLAN_ORDER.indexOf(id) < PLAN_ORDER.indexOf(currentPlanId);
+              const isPopular = id === "pro";
+              const isUpgrade = PLAN_ORDER.indexOf(id) > PLAN_ORDER.indexOf(currentPlanId);
               return (
                 <div key={id} className={`seos-pl-tier ${isPopular ? "is-popular" : ""}`}>
                   <span
@@ -482,8 +482,8 @@ export default function PlansPage() {
                   <div className="seos-pl-tier-name">{plan.name}</div>
                   <div className="seos-pl-tier-tagline">{hl.tagline}</div>
                   <div className="seos-pl-tier-price">
-                    <span className="seos-pl-tier-amount">{plan.price === 0 ? "Free" : `$${plan.price}`}</span>
-                    {plan.price > 0 && <span className="seos-pl-tier-unit">/ month</span>}
+                    <span className="seos-pl-tier-amount">${plan.price}</span>
+                    <span className="seos-pl-tier-unit">/ month</span>
                   </div>
                   {hl.inherits && <div className="seos-pl-tier-inherits">{hl.inherits}</div>}
                   <ul className="seos-pl-tier-points">
@@ -494,16 +494,18 @@ export default function PlansPage() {
                     <input type="hidden" name="planId" value={id} />
                     <button
                       type="submit"
-                      className={`seos-pl-tier-cta ${!isCurrent && isPopular ? "is-primary" : ""}`}
-                      disabled={isCurrent || submitting}
+                      className={`seos-pl-tier-cta ${isUpgrade && !comped ? "is-primary" : ""}`}
+                      disabled={isCurrent || submitting || comped || !isUpgrade}
                     >
-                      {isCurrent
-                        ? "Current plan"
-                        : submitting && pendingPlan === id
-                          ? "One moment…"
-                          : isDowngrade
-                            ? plan.price === 0 ? "Switch to Free" : "Downgrade"
-                            : "Upgrade"}
+                      {comped
+                        ? "Included"
+                        : isCurrent
+                          ? "Current plan"
+                          : submitting && pendingPlan === id
+                            ? "One moment…"
+                            : isUpgrade
+                              ? "Upgrade"
+                              : "Contact support to switch"}
                     </button>
                   </Form>
                 </div>
