@@ -8,6 +8,7 @@ import { PrismaSessionStorage } from "@shopify/shopify-app-session-storage-prism
 import prisma from "./db.server";
 import { getKey as assertEncryptionKey } from "./utils/encryption.server";
 import { startRetentionScheduler } from "./lib/retention.server";
+import { startCatalogSyncScheduler } from "./lib/catalog-sync-scheduler.server";
 
 // Fail fast at module load if encryption isn't configured. Without this the
 // app would happily accept writes (storing API keys plaintext) until the
@@ -17,6 +18,11 @@ assertEncryptionKey();
 // Sweeps ChatFeedback/ChatProductMention rows older than 90 days. Boot-time
 // scheduler so retention is enforced regardless of admin traffic.
 startRetentionScheduler();
+
+// Nightly full-catalog reconciliation (03:00 UTC) — safety net under the
+// real-time webhook sync. Imports shopify.server lazily at run time, so
+// starting it here creates no module cycle.
+startCatalogSyncScheduler();
 
 const shopify = shopifyApp({
   apiKey: process.env.SHOPIFY_API_KEY,
