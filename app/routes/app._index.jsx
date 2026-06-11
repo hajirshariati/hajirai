@@ -1186,34 +1186,40 @@ function ActionCard({ art, title, description, cta, url, external, stat }) {
   );
 }
 
-function StepCircle({ done, number }) {
-  if (done) {
-    return (
-      <div style={{ width: "28px", height: "28px", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", color: "#2D6B4F" }}>
-        <Icon source={CheckCircleIcon} tone="success" />
-      </div>
-    );
-  }
+// ---------------------------------------------------------------------------
+// SetupChecklist — one container that never swaps: a header row (status +
+// title + chevron) with the item list expanding underneath on a smooth
+// grid-rows animation. Collapsed by default once everything is done;
+// expanded while anything is pending. Apple-clean: hairline-divided rows,
+// a progress ring while in flight, a single green check when complete.
+// ---------------------------------------------------------------------------
+function SetupRing({ done, total }) {
+  const R = 12;
+  const C = 2 * Math.PI * R;
+  const frac = total > 0 ? done / total : 0;
   return (
-    <div style={{
-      width: "28px", height: "28px", flexShrink: 0,
-      display: "flex", alignItems: "center", justifyContent: "center",
-      borderRadius: "50%", background: "var(--p-color-bg-surface-secondary)",
-      border: "1px solid var(--p-color-border)",
-    }}>
-      <Text as="span" variant="bodySm" fontWeight="semibold" tone="subdued">
-        {number}
-      </Text>
-    </div>
+    <svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true">
+      <circle cx="16" cy="16" r={R} fill="none" stroke="rgba(45,107,79,0.15)" strokeWidth="3" />
+      <circle
+        cx="16" cy="16" r={R} fill="none"
+        stroke="#2D6B4F" strokeWidth="3" strokeLinecap="round"
+        strokeDasharray={`${(C * frac).toFixed(2)} ${C.toFixed(2)}`}
+        transform="rotate(-90 16 16)"
+        style={{ transition: "stroke-dasharray 0.5s cubic-bezier(0.2, 0.8, 0.2, 1)" }}
+      />
+    </svg>
   );
 }
 
-// Wraps the five-step setup list. When everything's done, render a
-// compact 'Setup complete' banner instead of stacking five 'Done'
-// rows — keeps the home page short for established merchants but
-// stays one click away if they want to revisit. Tracks expand
-// state in component state; defaults to collapsed when complete,
-// expanded when anything's still pending or in 'Action needed'.
+function SetupCheckCircle() {
+  return (
+    <svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true">
+      <circle cx="16" cy="16" r="14" fill="#2D6B4F" />
+      <path d="M10 16.5 l4 4 L22 12" stroke="#fff" strokeWidth="2.6" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 function SetupChecklist({
   hasApiKey, widgetEnabled, fileCount, categoryGroupsCount, semanticEnabled,
   semanticProvider, themeEditorUrl,
@@ -1221,7 +1227,6 @@ function SetupChecklist({
   const items = [
     {
       done: hasApiKey,
-      number: "1",
       title: "Connect the AI engine",
       description: "Paste your API key to power the AI assistant. Pay-as-you-go — you only pay for what you use.",
       actionLabel: hasApiKey ? "Manage" : "Add key",
@@ -1229,7 +1234,6 @@ function SetupChecklist({
     },
     {
       done: widgetEnabled,
-      number: "2",
       title: "Enable the chat widget",
       description: widgetEnabled
         ? "Your storefront is loading the chat widget. Use the theme editor to adjust appearance and content."
@@ -1240,7 +1244,6 @@ function SetupChecklist({
     },
     {
       done: fileCount > 0,
-      number: "3",
       title: "Upload extra knowledge (optional)",
       description: "FAQs, brand voice, sizing guides, product specs — CSV files with a SKU column are automatically linked to your catalog.",
       actionLabel: fileCount > 0 ? "Manage files" : "Upload",
@@ -1248,17 +1251,15 @@ function SetupChecklist({
     },
     {
       done: categoryGroupsCount > 0,
-      number: "4",
       title: "Define category groups (optional)",
-      description: "Group your catalog (e.g. Footwear / Orthotics / Accessories) so the AI never offers irrelevant categories when a customer asks about one of them. Keeps choice buttons sharp and on-topic.",
+      description: "Group your catalog (e.g. Footwear / Orthotics / Accessories) so the AI never offers irrelevant categories when a customer asks about one of them.",
       actionLabel: categoryGroupsCount > 0 ? `Manage (${categoryGroupsCount})` : "Set up groups",
       actionUrl: "/app/catalog",
     },
     {
       done: semanticEnabled,
-      number: "5",
       title: "Enable semantic search (optional)",
-      description: "Match products by meaning, not just keywords. Customers asking for \"shoes for standing all day\" find arch-support styles even when descriptions don't contain those words. Bring your own Voyage AI or OpenAI key — typically under $1/month.",
+      description: "Match products by meaning, not just keywords. Bring your own Voyage AI or OpenAI key — typically under $1/month.",
       actionLabel: semanticEnabled ? `Manage (${semanticProvider === "voyage" ? "Voyage AI" : "OpenAI"})` : "Add provider",
       actionUrl: "/app/api-keys",
     },
@@ -1266,100 +1267,75 @@ function SetupChecklist({
   const doneCount = items.filter((i) => i.done).length;
   const allDone = doneCount === items.length;
   const requiredDone = hasApiKey && widgetEnabled;
-  // Default collapsed once all done; expanded if anything's pending
-  // OR the required steps aren't met yet.
   const [expanded, setExpanded] = useState(!allDone);
 
-  if (allDone && !expanded) {
-    return (
-      <Card>
-        <InlineStack align="space-between" blockAlign="center" wrap>
-          <InlineStack gap="300" blockAlign="center" wrap={false}>
-            <div style={{ width: 28, height: 28, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", color: "#108043" }}>
-              <Icon source={CheckCircleIcon} tone="success" />
-            </div>
-            <BlockStack gap="050">
-              <Text as="h2" variant="headingMd">Setup complete</Text>
-              <Text as="span" tone="subdued" variant="bodySm">
-                All 5 steps done. Your assistant is fully configured.
-              </Text>
-            </BlockStack>
-          </InlineStack>
-          <Button variant="plain" onClick={() => setExpanded(true)}>
-            View checklist
-          </Button>
-        </InlineStack>
-      </Card>
-    );
-  }
+  const sub = allDone
+    ? `All ${items.length} steps done. Your assistant is fully configured.`
+    : `${doneCount} of ${items.length} done${requiredDone ? "" : " — action needed"}`;
 
   return (
-    <BlockStack gap="300">
-      <InlineStack gap="300" blockAlign="center" align="space-between" wrap>
-        <InlineStack gap="300" blockAlign="center">
-          <Text as="h2" variant="headingMd">Setup checklist</Text>
-          {allDone ? (
-            <Badge tone="success">Complete</Badge>
-          ) : requiredDone ? (
-            <Badge tone="success">Ready</Badge>
-          ) : (
-            <Badge tone="attention">Action needed</Badge>
-          )}
-          <Text as="span" tone="subdued" variant="bodySm">
-            {doneCount} of {items.length} done
-          </Text>
-        </InlineStack>
-        {allDone && (
-          <Button variant="plain" onClick={() => setExpanded(false)}>
-            Collapse
-          </Button>
-        )}
-      </InlineStack>
-      <BlockStack gap="300">
-        {items.map((item) => (
-          <ChecklistItem
-            key={item.number}
-            done={item.done}
-            number={item.number}
-            title={item.title}
-            description={item.description}
-            actionLabel={item.actionLabel}
-            actionUrl={item.actionUrl}
-            external={item.external}
-          />
-        ))}
-      </BlockStack>
-    </BlockStack>
-  );
-}
-
-function ChecklistItem({ done, number, title, description, actionLabel, actionUrl, external }) {
-  return (
-    <Box
-      background={done ? "bg-surface-success-subdued" : "bg-surface"}
-      borderRadius="300"
-      borderWidth="025"
-      borderColor={done ? "border-success-subdued" : "border"}
-      padding="400"
-    >
-      <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-        <StepCircle done={done} number={number} />
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <BlockStack gap="100">
-            <InlineStack gap="200" blockAlign="center">
-              <Text as="h3" variant="headingSm">{title}</Text>
-              {done && <Badge tone="success">Done</Badge>}
-            </InlineStack>
-            <Text as="p" tone="subdued" variant="bodySm">{description}</Text>
-          </BlockStack>
-        </div>
-        <div style={{ flexShrink: 0 }}>
-          <Button url={actionUrl} external={external} variant={done ? "plain" : "primary"}>
-            {actionLabel}
-          </Button>
+    <div className="seos-setup">
+      <button
+        type="button"
+        className="seos-setup-head"
+        onClick={() => setExpanded((e) => !e)}
+        aria-expanded={expanded}
+      >
+        <span className="seos-setup-status" aria-hidden="true">
+          {allDone ? <SetupCheckCircle /> : <SetupRing done={doneCount} total={items.length} />}
+        </span>
+        <span className="seos-setup-headtext">
+          <span className="seos-setup-title">{allDone ? "Setup complete" : "Setup checklist"}</span>
+          <span className="seos-setup-sub">{sub}</span>
+        </span>
+        <svg
+          className={"seos-setup-chev" + (expanded ? " is-open" : "")}
+          width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"
+        >
+          <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </button>
+      <div className={"seos-setup-body" + (expanded ? " is-open" : "")} aria-hidden={!expanded}>
+        <div className="seos-setup-clip">
+          <div className="seos-setup-items">
+            {items.map((item) => {
+              const action = item.external ? (
+                <a className={"seos-setup-action" + (item.done ? " is-done" : "")} href={item.actionUrl} target="_blank" rel="noopener noreferrer">
+                  {item.actionLabel}
+                  <span aria-hidden="true">→</span>
+                </a>
+              ) : (
+                <Link className={"seos-setup-action" + (item.done ? " is-done" : "")} to={item.actionUrl}>
+                  {item.actionLabel}
+                  <span aria-hidden="true">→</span>
+                </Link>
+              );
+              return (
+                <div key={item.title} className={"seos-setup-item" + (item.done ? " is-done" : "")}>
+                  <span className="seos-setup-item-dot" aria-hidden="true">
+                    {item.done ? (
+                      <svg width="20" height="20" viewBox="0 0 20 20">
+                        <circle cx="10" cy="10" r="9" fill="#2D6B4F" />
+                        <path d="M6 10.5 l2.6 2.6 L14 7.5" stroke="#fff" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    ) : (
+                      <svg width="20" height="20" viewBox="0 0 20 20">
+                        <circle cx="10" cy="10" r="8.5" fill="none" stroke="rgba(26,46,38,0.25)" strokeWidth="1.6" strokeDasharray="2.5 3.5" />
+                      </svg>
+                    )}
+                  </span>
+                  <span className="seos-setup-item-text">
+                    <span className="seos-setup-item-title">{item.title}</span>
+                    <span className="seos-setup-item-desc">{item.description}</span>
+                  </span>
+                  {action}
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
-    </Box>
+    </div>
   );
 }
 
@@ -2162,11 +2138,136 @@ export default function Home() {
         }
         .seos-card:hover .seos-card-arrow { transform: translateX(4px); }
 
+        /* Setup checklist — single animated container. */
+        .seos-setup {
+          background: #fff;
+          border: 1px solid rgba(0,0,0,0.07);
+          border-radius: 16px;
+          box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+          overflow: hidden;
+        }
+        .seos-setup-head {
+          appearance: none;
+          font: inherit;
+          width: 100%;
+          display: flex;
+          align-items: center;
+          gap: 14px;
+          padding: 16px 20px;
+          background: transparent;
+          border: none;
+          cursor: pointer;
+          text-align: left;
+          transition: background 0.15s ease;
+        }
+        .seos-setup-head:hover { background: rgba(45,107,79,0.03); }
+        .seos-setup-head:focus-visible {
+          outline: 2px solid rgba(45,107,79,0.5);
+          outline-offset: -2px;
+        }
+        .seos-setup-status { flex-shrink: 0; display: inline-flex; }
+        .seos-setup-headtext { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+        .seos-setup-title { font-size: 14.5px; font-weight: 650; color: #1a2e26; }
+        .seos-setup-sub { font-size: 12.5px; color: rgba(26,46,38,0.55); }
+        .seos-setup-chev {
+          flex-shrink: 0;
+          color: rgba(26,46,38,0.4);
+          transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        .seos-setup-chev.is-open { transform: rotate(180deg); }
+        .seos-setup-body {
+          display: grid;
+          grid-template-rows: 0fr;
+          opacity: 0;
+          transition: grid-template-rows 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.3s ease;
+        }
+        .seos-setup-body.is-open { grid-template-rows: 1fr; opacity: 1; }
+        .seos-setup-clip { overflow: hidden; min-height: 0; }
+        .seos-setup-items { padding: 0 20px 8px; }
+        .seos-setup-item {
+          display: flex;
+          align-items: center;
+          gap: 14px;
+          padding: 14px 0;
+          border-top: 1px solid rgba(26,46,38,0.06);
+        }
+        .seos-setup-item-dot { flex-shrink: 0; display: inline-flex; }
+        .seos-setup-item-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+        .seos-setup-item-title { font-size: 13.5px; font-weight: 600; color: #1a2e26; }
+        .seos-setup-item.is-done .seos-setup-item-title { color: rgba(26,46,38,0.6); }
+        .seos-setup-item-desc { font-size: 12.5px; line-height: 1.5; color: rgba(26,46,38,0.55); }
+        .seos-setup-action {
+          flex-shrink: 0;
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          font-size: 12.5px;
+          font-weight: 600;
+          text-decoration: none !important;
+          color: #fff !important;
+          background: #2D6B4F;
+          border-radius: 999px;
+          padding: 7px 14px;
+          transition: background 0.15s ease, transform 0.15s ease;
+          white-space: nowrap;
+        }
+        .seos-setup-action:hover { background: #245a42; transform: translateY(-1px); }
+        .seos-setup-action.is-done {
+          background: transparent;
+          color: #2D6B4F !important;
+          padding: 7px 8px;
+        }
+        .seos-setup-action.is-done:hover { background: rgba(45,107,79,0.07); }
+        @media (max-width: 560px) {
+          .seos-setup-item { flex-wrap: wrap; }
+          .seos-setup-action { margin-left: 34px; }
+        }
+
+        /* About — spec-sheet rows. */
+        .seos-about {
+          background: #fff;
+          border: 1px solid rgba(0,0,0,0.07);
+          border-radius: 16px;
+          box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+          padding: 18px 20px 6px;
+        }
+        .seos-about-head {
+          font-size: 14.5px;
+          font-weight: 650;
+          color: #1a2e26;
+          padding-bottom: 10px;
+        }
+        .seos-about-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+          column-gap: 44px;
+        }
+        .seos-about-row {
+          display: flex;
+          justify-content: space-between;
+          align-items: baseline;
+          gap: 18px;
+          padding: 11px 0;
+          border-top: 1px solid rgba(26,46,38,0.06);
+        }
+        .seos-about-label {
+          flex-shrink: 0;
+          font-size: 12.5px;
+          font-weight: 600;
+          color: rgba(26,46,38,0.5);
+        }
+        .seos-about-value {
+          font-size: 12.5px;
+          line-height: 1.5;
+          color: #1a2e26;
+          text-align: right;
+        }
+
         @media (prefers-reduced-motion: reduce) {
           .seos-greet .seos-word, .seos-hero-brand, .seos-status-wrap, .seos-subline, .seos-testchat { animation: none; opacity: 1; transform: none; }
           .seos-testchat-typing span { animation: none; }
           .seos-status-summary-dot { animation: none; }
-          .seos-pip, .seos-card, .seos-card-arrow, .seos-metric, .seos-metric-detail { transition: none; }
+          .seos-pip, .seos-card, .seos-card-arrow, .seos-metric, .seos-metric-detail, .seos-setup-body, .seos-setup-chev { transition: none; }
           .seos-pip-pulse { animation: none; }
         }
       `}</style>
@@ -2270,23 +2371,22 @@ export default function Home() {
             themeEditorUrl={themeEditorUrl}
           />
 
-          <Card>
-            <BlockStack gap="300">
-              <Text as="h2" variant="headingMd">About SEoS Assistant</Text>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "16px" }}>
-                <BlockStack gap="200">
-                  <Text as="p" variant="bodySm"><strong>Version:</strong> 1.0.0</Text>
-                  <Text as="p" variant="bodySm"><strong>AI Engine:</strong> Anthropic Claude</Text>
-                  <Text as="p" variant="bodySm"><strong>Semantic Search:</strong> {semanticEnabled ? `${semanticProvider === "voyage" ? "Voyage AI" : "OpenAI"} (active)` : "Optional — bring your own key"}</Text>
-                </BlockStack>
-                <BlockStack gap="200">
-                  <Text as="p" variant="bodySm"><strong>Attribution:</strong> Chat-driven sales tagged "SEoS" on the order; product links carry utm_content=SEoS so other channel UTMs stay intact.</Text>
-                  <Text as="p" variant="bodySm"><strong>Privacy:</strong> Feedback data hashed, auto-deleted after 90 days</Text>
-                  <Text as="p" variant="bodySm"><strong>Billing:</strong> Pay-as-you-go AI usage — no markup</Text>
-                </BlockStack>
+          {/* About — Apple-style spec sheet: subdued labels, hairline rows. */}
+          <div className="seos-about">
+            <div className="seos-about-head">About SEoS Assistant</div>
+            <div className="seos-about-grid">
+              <div className="seos-about-col">
+                <div className="seos-about-row"><span className="seos-about-label">Version</span><span className="seos-about-value">1.0.0</span></div>
+                <div className="seos-about-row"><span className="seos-about-label">AI Engine</span><span className="seos-about-value">Anthropic Claude</span></div>
+                <div className="seos-about-row"><span className="seos-about-label">Semantic Search</span><span className="seos-about-value">{semanticEnabled ? `${semanticProvider === "voyage" ? "Voyage AI" : "OpenAI"} · active` : "Optional — bring your own key"}</span></div>
               </div>
-            </BlockStack>
-          </Card>
+              <div className="seos-about-col">
+                <div className="seos-about-row"><span className="seos-about-label">Attribution</span><span className="seos-about-value">Orders tagged &ldquo;SEoS&rdquo; · links carry utm_content=SEoS, other channel UTMs stay intact</span></div>
+                <div className="seos-about-row"><span className="seos-about-label">Privacy</span><span className="seos-about-value">Feedback hashed · auto-deleted after 90 days</span></div>
+                <div className="seos-about-row"><span className="seos-about-label">Billing</span><span className="seos-about-value">Pay-as-you-go AI usage · no markup</span></div>
+              </div>
+            </div>
+          </div>
         </BlockStack>
       </div>
     </Page>
