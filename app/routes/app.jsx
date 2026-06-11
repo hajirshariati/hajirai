@@ -57,19 +57,82 @@ export default function App() {
   return (
     <ShopifyAppProvider isEmbeddedApp apiKey={apiKey}>
       <PolarisAppProvider i18n={enTranslations} linkComponent={PolarisLink}>
+        {/* SEoS design language over Polaris — one theme layer in the parent
+            layout so every subpage matches the home/analytics design without
+            rewriting each page: brand-green fills and focus rings, hairline
+            16px cards, pill buttons, softened inputs. Token overrides win
+            because this inline style renders after the Polaris stylesheet. */}
+        <style>{`
+          :root {
+            --p-color-bg-fill-brand: #2D6B4F;
+            --p-color-bg-fill-brand-hover: #34795b;
+            --p-color-bg-fill-brand-active: #275e45;
+            --p-color-bg-fill-brand-selected: #2D6B4F;
+            --p-color-bg-fill-brand-disabled: rgba(45,107,79,0.4);
+            --p-color-border-focus: rgba(45,107,79,0.8);
+            --p-color-text-link: #2D6B4F;
+            --p-color-text-link-hover: #245741;
+            --p-color-icon-emphasis: #2D6B4F;
+            --p-color-border-emphasis: #2D6B4F;
+            --p-color-bg-surface-selected: rgba(45,107,79,0.08);
+          }
+          /* Cards — white sheet, 16px radius, hairline + soft shadow,
+             matching .seos-card on the home page. */
+          .Polaris-ShadowBevel,
+          .Polaris-ShadowBevel::before {
+            border-radius: 16px !important;
+          }
+          .Polaris-ShadowBevel::before {
+            box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 0 0 1px rgba(0,0,0,0.07) !important;
+          }
+          /* Headings carry the brand ink color. */
+          .Polaris-Text--headingXs, .Polaris-Text--headingSm, .Polaris-Text--headingMd,
+          .Polaris-Text--headingLg, .Polaris-Text--headingXl, .Polaris-Text--heading2xl {
+            color: #1a2e26;
+          }
+          /* Buttons — pill silhouettes like the home CTAs. Segmented
+             groups keep their compact joined radius. */
+          .Polaris-Button {
+            border-radius: 999px !important;
+          }
+          .Polaris-ButtonGroup--variantSegmented .Polaris-Button {
+            border-radius: 8px !important;
+          }
+          .Polaris-Button--variantPrimary:not(.Polaris-Button--toneCritical) {
+            background: linear-gradient(180deg, #34795b, #2D6B4F);
+            box-shadow: 0 1px 2px rgba(26,46,38,0.28), inset 0 1px 0 rgba(255,255,255,0.12);
+          }
+          .Polaris-Button--variantPrimary:not(.Polaris-Button--toneCritical):hover {
+            background: linear-gradient(180deg, #3a8a66, #2f7053);
+          }
+          /* Inputs — softer 10px corners. */
+          .Polaris-TextField__Backdrop,
+          .Polaris-Select__Backdrop,
+          .Polaris-DropZone {
+            border-radius: 10px !important;
+          }
+          .Polaris-Badge { border-radius: 999px; }
+          .Polaris-Banner--withinPage { border-radius: 14px; }
+        `}</style>
         <NavMenu>
           <Link to="/app" rel="home">SEoS Assistant</Link>
           <Link to="/app/rules">Rules</Link>
           <Link to="/app/knowledge">Knowledge</Link>
           <Link to="/app/catalog">Catalog</Link>
           <Link to="/app/recommenders">Smart Recommenders</Link>
-          <Link to="/app/fit-predictor">Fit predictor (Beta)</Link>
           <Link to="/app/analytics">Analytics</Link>
           <Link to="/app/api-keys">Settings</Link>
           <Link to="/app/plans">Plans &amp; Support</Link>
         </NavMenu>
         <Outlet />
-        <div style={{ marginTop: "40px", padding: "16px", textAlign: "center", borderTop: "2px solid #2D6B4F" }}>
+        <div
+          style={{
+            marginTop: "40px",
+            padding: "18px 16px 22px",
+            textAlign: "center",
+            borderTop: "1px solid rgba(0,0,0,0.07)",
+          }}
+        >
           <Text as="p" tone="subdued" variant="bodySm" alignment="center">
             SEoS Assistant v1.0. All rights reserved. ·{" "}
             <a

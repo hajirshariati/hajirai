@@ -12,6 +12,28 @@ import { useState } from "react";
 const CALC_FALLBACK_RATE = 0.008; // typical blended $/AI request (Haiku-first routing)
 const CALC_MIN_SAMPLE = 25; // real requests needed before trusting the store's own average
 
+// Per-request cost falls as volume grows: at low traffic nearly every
+// conversation pays a fresh prompt-cache write with nothing amortizing it,
+// while at high traffic the cache stays hot (reads bill at ~1/10th the
+// input price) and the fast-model share of routing rises. Extrapolating a
+// low-volume average linearly to big traffic therefore overstates cost
+// badly — so the rate log-interpolates from the anchored low-volume rate
+// down to the at-scale blended rate between 2K and 100K requests/month.
+const CALC_AT_SCALE_RATE = 0.006;
+const CALC_AMORT_START = 2000;
+const CALC_AMORT_FULL = 100000;
+
+function effectiveRate(baseRate, monthlyRequests) {
+  if (baseRate <= CALC_AT_SCALE_RATE) return baseRate;
+  if (!Number.isFinite(monthlyRequests) || monthlyRequests <= CALC_AMORT_START) return baseRate;
+  const t = Math.min(
+    1,
+    (Math.log10(monthlyRequests) - Math.log10(CALC_AMORT_START)) /
+      (Math.log10(CALC_AMORT_FULL) - Math.log10(CALC_AMORT_START)),
+  );
+  return baseRate + (CALC_AT_SCALE_RATE - baseRate) * t;
+}
+
 const CALC_DEPTHS = [
   { key: "quick", label: "Quick", desc: "2 messages", turns: 2 },
   { key: "typical", label: "Typical", desc: "4 messages", turns: 4 },
@@ -25,10 +47,11 @@ function calcMoney(n) {
   return `$${Math.round(n).toLocaleString("en-US")}`;
 }
 
+const rateFmt = (r) => `$${r.toFixed(4).replace(/0+$/, "").replace(/\.$/, "")}`;
+
 export default function CostEstimator({ avgCostPerMessage, totalMessages }) {
   const anchored = totalMessages >= CALC_MIN_SAMPLE && avgCostPerMessage > 0;
-  const rate = anchored ? avgCostPerMessage : CALC_FALLBACK_RATE;
-  const rateLabel = `$${rate.toFixed(4).replace(/0+$/, "").replace(/\.$/, "")}`;
+  const baseRate = anchored ? avgCostPerMessage : CALC_FALLBACK_RATE;
 
   const [sessionsRaw, setSessionsRaw] = useState("25,000");
   const [period, setPeriod] = useState("month");
@@ -60,6 +83,8 @@ export default function CostEstimator({ avgCostPerMessage, totalMessages }) {
   const turns = CALC_DEPTHS.find((d) => d.key === depth).turns;
   const conversations = monthlySessions * (engagement / 100);
   const requests = conversations * turns;
+  const rate = effectiveRate(baseRate, requests);
+  const scaled = rate < baseRate - 1e-9;
   const monthlyCost = requests * rate;
   const fmtInt = (n) => Math.round(n).toLocaleString("en-US");
 
@@ -357,9 +382,13 @@ export default function CostEstimator({ avgCostPerMessage, totalMessages }) {
             </div>
           </div>
           <div className="seos-calc-anchor">
-            {anchored
-              ? `Anchored on your store's real average of ${rateLabel} per AI request over the last 30 days.`
-              : `Based on a typical blended rate of ${rateLabel} per AI request. Once your store has chat activity, this switches to your real average automatically.`}
+            {scaled
+              ? `${anchored
+                ? `Your store's current average is ${rateFmt(baseRate)} per AI request at today's low volume`
+                : `The typical low-volume rate is ${rateFmt(baseRate)} per AI request`}, but AI gets much cheaper at scale — prompt caching and fast-model routing bring it down to about ${rateFmt(rate)} per request at this traffic. The estimate uses the at-scale rate.`
+              : anchored
+                ? `Anchored on your store's real average of ${rateFmt(rate)} per AI request over the last 30 days.`
+                : `Based on a typical blended rate of ${rateFmt(rate)} per AI request. Once your store has chat activity, this switches to your real average automatically.`}
           </div>
         </div>
       </div>
