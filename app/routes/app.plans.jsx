@@ -169,19 +169,31 @@ export default function PlansPage() {
         }
         .seos-pl-note.is-bad { background: rgba(185,90,90,0.05); border-color: rgba(185,90,90,0.2); }
 
-        /* Your plan. */
+        /* Your plan — readable single row with usage on the right. */
         .seos-pl-current { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
-        .seos-pl-current-name { font-size: 21px; font-weight: 700; letter-spacing: -0.4px; color: #1a2e26; }
+        .seos-pl-current-name { font-size: 21px; font-weight: 700; letter-spacing: -0.4px; color: #1a2e26; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
         .seos-pl-pricepill {
-          font-size: 12px;
+          font-size: 11.5px;
           font-weight: 650;
           color: #2D6B4F;
           background: rgba(45,107,79,0.08);
           border: 1px solid rgba(45,107,79,0.18);
           border-radius: 999px;
-          padding: 3px 11px;
-          vertical-align: 3px;
-          margin-left: 10px;
+          padding: 2px 10px;
+        }
+        .seos-pl-current-perks {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 6px;
+          margin-top: 8px;
+        }
+        .seos-pl-perk {
+          font-size: 11px;
+          font-weight: 600;
+          color: rgba(26,46,38,0.6);
+          background: rgba(26,46,38,0.045);
+          border-radius: 999px;
+          padding: 3px 10px;
         }
         .seos-pl-usage { text-align: right; }
         .seos-pl-usage-num { font-size: 19px; font-weight: 700; color: #1a2e26; font-variant-numeric: tabular-nums; letter-spacing: -0.3px; }
@@ -211,26 +223,26 @@ export default function PlansPage() {
           border: 1px solid rgba(0,0,0,0.07);
           border-radius: 16px;
           box-shadow: 0 1px 2px rgba(0,0,0,0.04);
-          padding: 22px 22px 20px;
+          padding: 20px 22px;
           transition: transform 0.2s cubic-bezier(0.2, 0.7, 0.2, 1), box-shadow 0.2s ease;
         }
         .seos-pl-tier:hover { transform: translateY(-3px); box-shadow: 0 12px 28px rgba(26,46,38,0.1), 0 2px 6px rgba(26,46,38,0.05); }
         .seos-pl-tier.is-popular { border-color: rgba(45,107,79,0.45); box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 0 0 1px rgba(45,107,79,0.25); }
-        .seos-pl-ribbon {
-          position: absolute;
-          top: -10px;
-          left: 50%;
-          transform: translateX(-50%);
-          font-size: 10px;
+        .seos-pl-tier-flag {
+          align-self: flex-start;
+          display: inline-block;
+          font-size: 9.5px;
           font-weight: 700;
-          letter-spacing: 0.8px;
+          letter-spacing: 0.7px;
           text-transform: uppercase;
-          padding: 3px 12px;
+          padding: 2px 9px;
           border-radius: 999px;
+          margin-bottom: 10px;
           white-space: nowrap;
         }
-        .seos-pl-ribbon.is-popular { background: #2D6B4F; color: #fff; }
-        .seos-pl-ribbon.is-current { background: rgba(45,107,79,0.12); color: #2D6B4F; border: 1px solid rgba(45,107,79,0.25); }
+        .seos-pl-tier-flag.is-popular { background: #2D6B4F; color: #fff; }
+        .seos-pl-tier-flag.is-current { background: rgba(45,107,79,0.1); color: #2D6B4F; border: 1px solid rgba(45,107,79,0.22); }
+        .seos-pl-tier-flag.is-placeholder { visibility: hidden; }
         .seos-pl-tier-name { font-size: 16px; font-weight: 650; color: #1a2e26; }
         .seos-pl-tier-tagline { font-size: 12px; color: rgba(26,46,38,0.55); margin-top: 2px; }
         .seos-pl-tier-price { margin-top: 14px; display: flex; align-items: baseline; gap: 4px; }
@@ -415,6 +427,15 @@ export default function PlansPage() {
                 {current.name}
                 <span className="seos-pl-pricepill">{current.price === 0 ? "Free" : `$${current.price}/mo`}</span>
               </div>
+              <div className="seos-pl-current-perks">
+                <span className="seos-pl-perk">
+                  {limit === Infinity ? "Unlimited conversations" : `${formatLimit(limit)} conversations / mo`}
+                </span>
+                <span className="seos-pl-perk">
+                  {current.knowledgeFiles === Infinity ? "Unlimited knowledge files" : `${current.knowledgeFiles} knowledge file${current.knowledgeFiles === 1 ? "" : "s"}`}
+                </span>
+                <span className="seos-pl-perk">{current.analyticsRetentionDays}-day analytics</span>
+              </div>
             </div>
             <div className="seos-pl-usage">
               <div className="seos-pl-usage-num">
@@ -451,11 +472,13 @@ export default function PlansPage() {
               const isDowngrade = PLAN_ORDER.indexOf(id) < PLAN_ORDER.indexOf(currentPlanId);
               return (
                 <div key={id} className={`seos-pl-tier ${isPopular ? "is-popular" : ""}`}>
-                  {isCurrent ? (
-                    <span className="seos-pl-ribbon is-current">Current plan</span>
-                  ) : isPopular ? (
-                    <span className="seos-pl-ribbon is-popular">Most popular</span>
-                  ) : null}
+                  <span
+                    className={`seos-pl-tier-flag ${
+                      isCurrent ? "is-current" : isPopular ? "is-popular" : "is-placeholder"
+                    }`}
+                  >
+                    {isCurrent ? "Current plan" : isPopular ? "Most popular" : "·"}
+                  </span>
                   <div className="seos-pl-tier-name">{plan.name}</div>
                   <div className="seos-pl-tier-tagline">{hl.tagline}</div>
                   <div className="seos-pl-tier-price">
@@ -486,24 +509,6 @@ export default function PlansPage() {
                 </div>
               );
             })}
-          </div>
-        </div>
-
-        <div className="seos-pl-card">
-          <div className="seos-pl-support">
-            <div>
-              <div className="seos-pl-title">Need a hand?</div>
-              <div className="seos-pl-support-email">{SUPPORT_EMAIL}</div>
-              <div className="seos-pl-desc">A real person replies within 1 business day.</div>
-            </div>
-            <div className="seos-pl-support-actions">
-              <button type="button" className="seos-pl-btn" onClick={handleCopy}>
-                {copied ? "Copied ✓" : "Copy address"}
-              </button>
-              <a className="seos-pl-btn is-primary" href={mailtoHref} target="_blank" rel="noopener noreferrer">
-                Send email
-              </a>
-            </div>
           </div>
         </div>
 
@@ -553,10 +558,22 @@ export default function PlansPage() {
           </div>
         </div>
 
-        <div className="seos-pl-foot">
-          See the{" "}
-          <a href="/privacy" target="_blank" rel="noopener noreferrer">privacy policy</a>{" "}
-          for what data SEoS Assistant collects and how it&apos;s handled.
+        <div className="seos-pl-card">
+          <div className="seos-pl-support">
+            <div>
+              <div className="seos-pl-title">Need a hand?</div>
+              <div className="seos-pl-support-email">{SUPPORT_EMAIL}</div>
+              <div className="seos-pl-desc">A real person replies within 1 business day.</div>
+            </div>
+            <div className="seos-pl-support-actions">
+              <button type="button" className="seos-pl-btn" onClick={handleCopy}>
+                {copied ? "Copied ✓" : "Copy address"}
+              </button>
+              <a className="seos-pl-btn is-primary" href={mailtoHref} target="_blank" rel="noopener noreferrer">
+                Send email
+              </a>
+            </div>
+          </div>
         </div>
       </div>
     </Page>
