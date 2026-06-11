@@ -2364,25 +2364,37 @@ export default function Home() {
           .seos-setup-action { margin-left: 34px; }
         }
 
-        /* Page-foot meta strip — borderless, centered, reads like a
-           footer caption rather than a content card. */
+        /* Page-foot meta strip — five quiet spec columns, centered.
+           Each column stacks a tiny uppercase label over its value, so
+           wrapping just reflows whole columns instead of breaking a
+           sentence mid-line. */
         .seos-pagefoot {
           display: flex;
           flex-wrap: wrap;
           justify-content: center;
-          align-items: baseline;
-          gap: 6px 14px;
-          padding: 16px 8px 0;
-          font-size: 12px;
-          color: rgba(26,46,38,0.5);
+          align-items: flex-start;
+          gap: 14px 40px;
+          padding: 18px 8px 0;
+        }
+        .seos-pagefoot-item {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 3px;
           text-align: center;
         }
-        .seos-pagefoot strong {
+        .seos-pagefoot-label {
+          font-size: 10px;
           font-weight: 650;
-          color: rgba(26,46,38,0.72);
-          margin-right: 4px;
+          letter-spacing: 1.1px;
+          text-transform: uppercase;
+          color: rgba(26,46,38,0.4);
         }
-        .seos-pagefoot > span[aria-hidden="true"] { color: rgba(26,46,38,0.25); }
+        .seos-pagefoot-value {
+          font-size: 12.5px;
+          color: rgba(26,46,38,0.65);
+          white-space: nowrap;
+        }
 
         /* SetupCard — when open, spans the whole grid row and reveals
            the checklist inside. Closed it behaves like every other
@@ -2548,17 +2560,28 @@ export default function Home() {
               />
           </div>
 
-          {/* Page foot — borderless meta strip, no card chrome. */}
+          {/* Page foot — five quiet spec columns, no card chrome. */}
           <div className="seos-pagefoot">
-            <span><strong>AI Engine</strong> · Anthropic Claude</span>
-            <span aria-hidden="true">·</span>
-            <span><strong>Semantic Search</strong> · {semanticEnabled ? `${semanticProvider === "voyage" ? "Voyage AI" : "OpenAI"} active` : "Optional"}</span>
-            <span aria-hidden="true">·</span>
-            <span><strong>Attribution</strong> · Orders tagged &ldquo;SEoS&rdquo;</span>
-            <span aria-hidden="true">·</span>
-            <span><strong>Privacy</strong> · Feedback auto-deleted after 90 days</span>
-            <span aria-hidden="true">·</span>
-            <span><strong>Billing</strong> · Pay-as-you-go AI usage, no markup</span>
+            <div className="seos-pagefoot-item">
+              <span className="seos-pagefoot-label">AI Engine</span>
+              <span className="seos-pagefoot-value">Anthropic Claude</span>
+            </div>
+            <div className="seos-pagefoot-item">
+              <span className="seos-pagefoot-label">Semantic Search</span>
+              <span className="seos-pagefoot-value">{semanticEnabled ? `${semanticProvider === "voyage" ? "Voyage AI" : "OpenAI"} · active` : "Optional"}</span>
+            </div>
+            <div className="seos-pagefoot-item">
+              <span className="seos-pagefoot-label">Attribution</span>
+              <span className="seos-pagefoot-value">Orders tagged &ldquo;SEoS&rdquo;</span>
+            </div>
+            <div className="seos-pagefoot-item">
+              <span className="seos-pagefoot-label">Privacy</span>
+              <span className="seos-pagefoot-value">Feedback auto-deleted after 90 days</span>
+            </div>
+            <div className="seos-pagefoot-item">
+              <span className="seos-pagefoot-label">Billing</span>
+              <span className="seos-pagefoot-value">Pay-as-you-go · no markup</span>
+            </div>
           </div>
         </BlockStack>
       </div>
