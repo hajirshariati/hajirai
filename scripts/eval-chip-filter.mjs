@@ -365,6 +365,35 @@ await test("C17 — resolver impossibility does not suppress unrelated follow-up
   assert.equal(out.reason, "not_product_navigation");
 });
 
+await test("C18 — umbrella base scope from memory no longer strips gender chips (2026-06-12 trace)", () => {
+  // Production trace: scope carried category="footwear" — the
+  // merchant's umbrella CATEGORY-GROUP name, never a tuple category —
+  // and both <<Men's>>/<<Women's>> chips were stripped as
+  // catalog-impossible. The base value must be sanitized away; the
+  // group restriction already arrives via allowedCategories.
+  const facetIndex = {
+    categoryByGender: {
+      sneakers: ["men", "women"],
+      sandals: ["men", "women"],
+    },
+    colorByGenderCategory: {
+      "men:sneakers": ["black"],
+      "women:sneakers": ["white"],
+    },
+  };
+  const text = "Would you prefer men's or women's styles? <<Men's>><<Women's>>";
+  const out = filterCatalogScopedNavigationChips(text, {
+    constraints: { category: "footwear", condition: "plantar_fasciitis" },
+    facetIndex,
+    allowedCategories: ["Sneakers", "Sandals"],
+    catalogCategories: ["Sneakers", "Sandals"],
+    umbrellaCategoryTerms: ["footwear", "shoes", "shoe"],
+  });
+  assert.deepEqual(out.stripped, []);
+  assert.match(out.text, /<<Men's>>/);
+  assert.match(out.text, /<<Women's>>/);
+});
+
 // ──────────────────────────────────────────────────────────────
 console.log("");
 if (failed === 0) {

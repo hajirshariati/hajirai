@@ -1118,6 +1118,43 @@ test("suggestion-gate — keeps good pivots (gender / width / price)", () => {
   }
 });
 
+// ──────────────────────────────────────────────────────────────
+// Bot-voice rejector. Live 2026-06-12: Haiku generated "Do you
+// prefer sneakers or sandals for casual walking?" and "Do you
+// need wide width options?" as quick replies. Quick replies are
+// sent AS the customer's next message when tapped — assistant-
+// voice questions aimed at the customer must be dropped, while
+// customer-voice questions TO the bot keep passing.
+// ──────────────────────────────────────────────────────────────
+
+test("suggestion-gate — drops assistant-voice questions aimed at the customer (bot_voice)", () => {
+  for (const q of [
+    "Do you prefer sneakers or sandals for casual walking?",
+    "Do you need wide width options?",
+    "Would you like to see similar styles?",
+    "Are you looking for men's or women's styles?",
+    "Are you shopping for a specific occasion?",
+    "Do you want something for everyday wear?",
+  ]) {
+    const v = isUnanswerableSuggestion(q, { lastText: "Here are some walking shoes with great arch support." });
+    assert.equal(v.unanswerable, true, `must drop bot-voice "${q}"; got ${JSON.stringify(v)}`);
+    assert.equal(v.reason, "bot_voice");
+  }
+});
+
+test("suggestion-gate — keeps customer-voice questions TO the bot", () => {
+  for (const q of [
+    "Do you have wide widths?",
+    "Do you carry sandals?",
+    "Do you offer wide sizes?",
+    "Can you show me sandals instead?",
+    "Can you recommend something for all-day walking?",
+  ]) {
+    const v = isUnanswerableSuggestion(q, { lastText: "Here are some walking shoes with great arch support." });
+    assert.equal(v.unanswerable, false, `must keep customer-voice "${q}"; got ${JSON.stringify(v)}`);
+  }
+});
+
 // =====================================================================
 // haikuEscalationSignal (cost-mode observability)
 // =====================================================================

@@ -58,7 +58,7 @@ import { maybeRunOrthoticFlow } from "../lib/orthotic-flow-gate.server";
 import { classifyOrthoticTurn, shouldRunOrthoticClassifier } from "../lib/orthotic-classifier.server";
 import { resolveCatalogTurn, buildResolverStatePromptBlock, extractUserConstraints, detectSpecificProduct } from "../lib/catalog-resolver.server";
 import { getCatalogFacetIndex } from "../lib/catalog-facts.server";
-import { canonicalizeCatalogConstraints, catalogScopedNavigationQuestionVerdict } from "../lib/catalog-matcher.server";
+import { canonicalizeCatalogConstraints, catalogScopedNavigationQuestionVerdict, umbrellaCategoryTermsFromGroups } from "../lib/catalog-matcher.server";
 import { buildSessionMemory, detectClarifyingQuestionType, memorySummary, buildSessionMemoryPromptBlock } from "../lib/session-memory.server";
 import {
   SKU_PATTERN,
@@ -544,6 +544,10 @@ function catalogGroundedSuggestionVerdict(question, ctx = {}) {
     facetIndex: ctx.catalogFacetIndex,
     allowedCategories: allowedCatalogCategoriesFromContext(ctx),
     requireProof: resolverRequiresCatalogProof(ctx),
+    // Umbrella group words ("footwear", "shoes") parsed as a facet
+    // category must not prove impossibility — derived purely from the
+    // merchant's category-group config. 2026-06-12 trace.
+    umbrellaCategoryTerms: umbrellaCategoryTermsFromGroups(ctx.merchantGroups),
   });
 }
 
@@ -2805,6 +2809,11 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
         facetIndex: ctx.catalogFacetIndex,
         allowedCategories: allowedCatalogCategoriesFromContext(ctx),
         catalogCategories: ctx.fullCatalogCategories || ctx.catalogCategories || [],
+        // Merchant-group umbrella vocabulary (names + triggers): a
+        // carried-over scope value like category="footwear" is a GROUP
+        // name, not a tuple category, and must not strip every chip
+        // (2026-06-12 trace: <<Men's>>/<<Women's>> wrongly stripped).
+        umbrellaCategoryTerms: umbrellaCategoryTermsFromGroups(ctx.merchantGroups),
       });
       if (scoped.stripped.length > 0) {
         console.log(
@@ -4752,7 +4761,7 @@ async function handleChatPost({ shop, sessionAccessToken, request, internal = fa
                       `Customer asked: "${String(body.message).slice(0, 200)}"\n` +
                       `Assistant replied: "${lastText.slice(0, 300)}"` +
                       catalogLine +
-                      `\n\nSuggest 2-3 short follow-up questions the customer would tap next. Pivots (different gender / category / price / width) are usually better than deep-dives on tech or specs. Use only categories the assistant mentioned or from the allowed list above. Write from the customer's perspective.\n\nReturn ONLY a JSON array of short strings.`,
+                      `\n\nSuggest 2-3 short follow-up questions the customer would tap next. Pivots (different gender / category / price / width) are usually better than deep-dives on tech or specs. Use only categories the assistant mentioned or from the allowed list above. Each suggestion is sent AS the customer's next message — write it in first-person customer voice, e.g. "Show me women's sneakers", "Do you have wide widths?", "What's good for all-day walking?". Never write assistant-voice questions to the customer ("Do you prefer...", "Are you looking for...", "Do you need...", "Would you like...").\n\nReturn ONLY a JSON array of short strings.`,
                   },
                 ],
               });
