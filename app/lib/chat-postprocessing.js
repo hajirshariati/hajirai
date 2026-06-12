@@ -1090,6 +1090,19 @@ export function stripUnsafeInlineChips(text, { hasProducts = false } = {}) {
   const before = firstChip >= 0 ? value.slice(0, firstChip).trim() : value.trim();
 
   if (DOMAIN_DISAMBIG_RE.test(before)) return { text: value, changed: false, reason: "" };
+  // Gender navigation chip sets (bare or context-carrying: "Men's",
+  // "Women's shoes", "Kids' orthotics") are inherently safe — they're
+  // never the "denial dressed up as a chip menu" failure mode this
+  // guard exists for. Live 2026-06-12: an upstream narration strip ate
+  // the model's clarifying question, this guard then saw "greeting +
+  // chips", stripped the chips, and the customer got a dead-end
+  // greeting with no question and no chips. A pure gender set must
+  // survive even without a question sentence in front of it (unless
+  // the text is an answer-with-menu denial).
+  const GENDER_CHIP_LABEL_RE = /^(?:men|women|kids?)(?:['\u2019]s?)?(?:\s+[\w'-]+){0,2}$/i;
+  if (chips.every((c) => GENDER_CHIP_LABEL_RE.test(c)) && !ANSWER_WITH_MENU_RE.test(before)) {
+    return { text: value, changed: false, reason: "" };
+  }
   // A clarifying *statement* can also legitimately introduce chips
   // ('I need to narrow down which style you'd like to explore.'). The
   // earlier version required the prior sentence to end with a '?',
