@@ -357,9 +357,9 @@ function ConversationsCard({ rows, onExport, exporting }) {
     <SectionCard
       title="Customer conversations"
       count={rows.length}
-      description="Recent chats where the customer voted or that completed with a recommendation. Filter, then expand any row to read the full back-and-forth."
+      description="Recent chats where the customer voted or that completed with a recommendation. Filter, then expand any row to read the full back-and-forth. Export CSV downloads the active filter — select Not helpful to download just the flagged responses."
       exportSection="conversations"
-      onExport={onExport}
+      onExport={(section) => onExport(section, filter === "all" ? {} : { vote: filter })}
       exporting={exporting}
     >
       <div className="seos-an-chips">
@@ -470,13 +470,16 @@ export default function Analytics() {
   // and trigger a download client-side from the returned blob. The exports
   // route is loader-only (no default component) so React Router serves the
   // CSV Response directly without server-rendering a page underneath it.
-  const handleExport = useCallback(async (section) => {
+  const handleExport = useCallback(async (section, extraParams = {}) => {
     if (exporting) return;
     setExporting(section);
     try {
       const params = new URLSearchParams(searchParams);
       params.delete("export");
       params.set("section", section);
+      for (const [k, v] of Object.entries(extraParams)) {
+        if (v) params.set(k, v);
+      }
       const url = `/app/exports?${params.toString()}`;
       const token = await shopify.idToken();
       const res = await fetch(url, {
