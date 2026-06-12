@@ -14,6 +14,19 @@ const MODEL_PRICING = {
 
 const DEFAULT_PRICING = MODEL_PRICING["claude-sonnet-4-6"];
 
+// Embedding (semantic search) pricing — $ per 1M tokens.
+// voyage-3 and text-embedding-3-small respectively.
+const EMBEDDING_PRICING = { voyage: 0.06, openai: 0.02 };
+
+// Cost of an embedding API call. Returns 0 for unknown providers or
+// missing/zero token counts so callers can pass through unconditionally.
+export function computeEmbeddingCost(provider, tokens) {
+  const rate = EMBEDDING_PRICING[provider];
+  const n = Number(tokens);
+  if (!rate || !Number.isFinite(n) || n <= 0) return 0;
+  return (n * rate) / 1_000_000;
+}
+
 export function computeCost(model, usage) {
   const p = MODEL_PRICING[model] || DEFAULT_PRICING;
   const input = ((usage.input_tokens || 0) * p.input) / 1_000_000;
@@ -33,4 +46,4 @@ export function getModelLabel(model) {
   return "Sonnet 4";
 }
 
-export { MODEL_PRICING };
+export { MODEL_PRICING, EMBEDDING_PRICING };

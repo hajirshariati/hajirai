@@ -327,6 +327,11 @@ model ChatUsage {
   cacheReadInputTokens     Int      @default(0)
   costUsd                  Float    @default(0)
   toolCalls                Int      @default(0)
+  // Semantic-search (embedding) usage for this chat turn — query
+  // embeddings only (product search + RAG retrieval), priced separately
+  // from Anthropic tokens since the merchant pays Voyage/OpenAI directly.
+  embeddingTokens          Int      @default(0)
+  embeddingCostUsd         Float    @default(0)
   createdAt                DateTime @default(now())
 
   @@index([shop])

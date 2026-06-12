@@ -36,7 +36,12 @@ export function providerLabel(provider) {
 // (each is a number[] of length EMBEDDING_DIMENSIONS), aligned with the
 // input order. Throws on auth/network/rate-limit errors so callers can
 // retry or surface a useful message to the merchant.
-export async function embedTexts(provider, apiKey, texts, { inputType = "document" } = {}) {
+//
+// `onUsage` (optional): invoked after a successful call with
+// { totalTokens, provider, model } — both providers report
+// usage.total_tokens in their responses. Best-effort accounting hook
+// (per-chat cost tracking); callback errors never fail the embedding.
+export async function embedTexts(provider, apiKey, texts, { inputType = "document", onUsage } = {}) {
   if (!isProviderSupported(provider)) {
     throw new Error(`Unsupported embedding provider: ${provider}`);
   }
@@ -86,6 +91,17 @@ export async function embedTexts(provider, apiKey, texts, { inputType = "documen
   // Both providers return { data: [{ embedding: [...] }, ...] }
   if (!data || !Array.isArray(data.data) || data.data.length !== inputs.length) {
     throw new Error(`${cfg.label} returned malformed response`);
+  }
+  if (typeof onUsage === "function") {
+    try {
+      onUsage({
+        totalTokens: Number(data?.usage?.total_tokens) || 0,
+        provider,
+        model: cfg.model,
+      });
+    } catch {
+      // Usage accounting is best-effort — never fail the embedding.
+    }
   }
   return data.data.map((d) => d.embedding);
 }

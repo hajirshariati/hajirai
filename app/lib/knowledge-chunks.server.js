@@ -188,14 +188,14 @@ export async function rebuildChunksForFile(prisma, { shop, sourceFileId, fileTyp
 // ran against real embeddings; an empty array is an authoritative
 // "nothing in the knowledge corpus is relevant to this message" and
 // the caller should inject NOTHING, not the 10-30K full dump.
-export async function retrieveRelevantChunks(prisma, { shop, query, config, limit = DEFAULT_RETRIEVAL_LIMIT, threshold = DEFAULT_SIMILARITY_THRESHOLD }) {
+export async function retrieveRelevantChunks(prisma, { shop, query, config, limit = DEFAULT_RETRIEVAL_LIMIT, threshold = DEFAULT_SIMILARITY_THRESHOLD, onEmbeddingUsage }) {
   if (!shop || !query || !String(query).trim()) return null;
   const resolved = resolveShopEmbedding(config);
   if (!resolved) return null;
 
   let queryVec;
   try {
-    queryVec = await embedText(resolved.provider, resolved.apiKey, String(query), { inputType: "query" });
+    queryVec = await embedText(resolved.provider, resolved.apiKey, String(query), { inputType: "query", onUsage: onEmbeddingUsage });
   } catch (err) {
     console.error(`[knowledge-chunks] query embed failed for shop=${shop}:`, err?.message || err);
     return null;

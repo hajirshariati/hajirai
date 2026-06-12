@@ -851,10 +851,10 @@ export default function ApiKeys() {
               description={
                 <BlockStack gap="200">
                   <Text as="p" tone="subdued" variant="bodySm">
-                    Match products by meaning, not just keywords. Customers asking for "shoes for standing all day" will find arch-support styles even when the description doesn't say "standing". Handles typos, synonyms (red ≈ crimson), and use-case queries.
+                    Sharpen product matching by meaning, not just keywords. Customers asking for "shoes for standing all day" will find arch-support styles even when the description doesn't say "standing". Handles typos, synonyms (red ≈ crimson), and use-case queries.
                   </Text>
                   <Text as="p" tone="subdued" variant="bodySm">
-                    Bring your own API key from Voyage AI (recommended) or OpenAI. Cost is paid by you to the provider — typically under $1/month for catalogs under 5,000 products.
+                    Optional — the assistant already searches your catalog with AI and works fully without this. Bring your own API key from Voyage AI (recommended) or OpenAI. Cost is paid by you to the provider — typically under $1/month for catalogs under 5,000 products.
                   </Text>
                 </BlockStack>
               }

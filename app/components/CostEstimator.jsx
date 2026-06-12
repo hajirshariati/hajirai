@@ -390,6 +390,9 @@ export default function CostEstimator({ avgCostPerMessage, totalMessages }) {
                 ? `Anchored on your store's real average of ${rateFmt(rate)} per AI request over the last 30 days.`
                 : `Based on a typical blended rate of ${rateFmt(rate)} per AI request. Once your store has chat activity, this switches to your real average automatically.`}
           </div>
+          <div className="seos-calc-anchor" style={{ marginTop: 4 }}>
+            Includes semantic search embedding costs when enabled.
+          </div>
         </div>
       </div>
     </section>
