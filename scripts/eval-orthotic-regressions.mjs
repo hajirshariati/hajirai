@@ -1708,6 +1708,156 @@ await test("27 — explicit 'for my wife' STILL pivots subject (existing protect
 });
 
 // ──────────────────────────────────────────────────────────────
+// 28. Live 2026-06-12: footwear-commit hijack on a chip-answer
+//     turn. Customer asked for SHOES on turn 1 ("I have plantar
+//     fasciitis and going on a trip to Italy, what shoes do you
+//     recommend?") — gate correctly fell through, LLM asked
+//     men's/women's, customer clicked "Women's" — and the gate
+//     hijacked the turn with q_use_case ("What kind of shoes will
+//     the orthotics go in?"), because the bare chip answer carried
+//     no footwear noun and the engagement rule fired on the
+//     accumulated condition + gender. The conversation-level
+//     footwear-commit veto must keep the gate out: the customer
+//     committed to footwear on turn 1 and never pivoted.
+// ──────────────────────────────────────────────────────────────
+section("Footwear-commit history veto (live 2026-06-12)");
+
+const INCIDENT_TURN_1 =
+  "I have plantar fasciitis and going on a trip to Italy, what shoes do you recommend?";
+const INCIDENT_GENDER_ASK =
+  "Got it — let me help you find the right fit. Are you shopping for men's or women's?\n\n<<Men's>><<Women's>>";
+
+await test("28 — exact 2026-06-12 trace replay: 'Women's' chip after footwear ask does NOT re-enter orthotic flow", async () => {
+  const { events, encoder, controller } = makeMockSse();
+  const cap = captureLogs();
+  let out;
+  try {
+    out = await maybeRunOrthoticFlow({
+      messages: [
+        { role: "user", content: INCIDENT_TURN_1 },
+        { role: "assistant", content: INCIDENT_GENDER_ASK },
+        { role: "user", content: "Women's" },
+      ],
+      tree,
+      shop: "test.myshopify.com",
+      controller,
+      encoder,
+    });
+  } finally {
+    cap.restore();
+  }
+  assert.equal(out.handled, false, "gate must fall through to LLM on the chip-answer turn");
+  assert.equal(events.length, 0, "no SSE events — the orthotic flow must not emit q_use_case");
+  const sawVeto = cap.lines.some((l) =>
+    l.includes(
+      "[orthotic-flow] footwear-commit veto (history): customer committed to footwear " +
+        "on a prior turn and never pivoted; falling through to LLM",
+    ),
+  );
+  assert.equal(sawVeto, true,
+    `expected footwear-commit history veto log. Logs: ${cap.lines.filter((l) => l.includes("[orthotic-flow]")).join(" | ")}`);
+});
+
+await test("28b — same trace with production classifier (ortho=true on the chip turn) still vetoes", async () => {
+  // In production the classifier read the trimmed history, saw
+  // "plantar fasciitis", and tagged the chip turn isOrthoticRequest=
+  // true — which disabled hard veto #1's prior-commit scan. The
+  // history veto must be classifier-proof: the commit/pivot scan is
+  // message-text-only.
+  const { events, encoder, controller } = makeMockSse();
+  const cap = captureLogs();
+  let out;
+  try {
+    out = await maybeRunOrthoticFlow({
+      messages: [
+        { role: "user", content: INCIDENT_TURN_1 },
+        { role: "assistant", content: INCIDENT_GENDER_ASK },
+        { role: "user", content: "Women's" },
+      ],
+      tree,
+      shop: "test.myshopify.com",
+      controller,
+      encoder,
+      classifiedIntent: {
+        isOrthoticRequest: true,
+        isFootwearRequest: false,
+        isRejection: false,
+        attributes: { gender: "Women", useCase: null, condition: "plantar_fasciitis" },
+        confidence: "high",
+      },
+    });
+  } finally {
+    cap.restore();
+  }
+  assert.equal(out.handled, false, "classifier ortho-tag must not bypass the history veto");
+  assert.equal(events.length, 0);
+  const sawVeto = cap.lines.some((l) => /footwear-commit veto \(history\)/.test(l));
+  assert.equal(sawVeto, true,
+    `expected footwear-commit history veto log. Logs: ${cap.lines.filter((l) => l.includes("[orthotic-flow]")).join(" | ")}`);
+});
+
+await test("28c — counter-case: 'I need orthotics for plantar fasciitis' then 'Women's' STILL advances the flow", async () => {
+  // Same conversation shape, but turn 1 is an orthotic request — no
+  // footwear commit anywhere in history. The veto must stay silent
+  // and the gate must continue the flow on the chip answer.
+  const { events, encoder, controller } = makeMockSse();
+  const cap = captureLogs();
+  let out;
+  try {
+    out = await maybeRunOrthoticFlow({
+      messages: [
+        { role: "user", content: "I need orthotics for plantar fasciitis" },
+        { role: "assistant", content: "Who are these orthotics for?\n\n<<Men>><<Women>><<Kids>>" },
+        { role: "user", content: "Women's" },
+      ],
+      tree,
+      shop: "test.myshopify.com",
+      controller,
+      encoder,
+    });
+  } finally {
+    cap.restore();
+  }
+  assert.equal(out.handled, true, "orthotic flow must continue on the gender chip answer");
+  assert.match(events[0]?.text || "", /orthotics go in/i, "next question should be q_use_case");
+  const sawVeto = cap.lines.some((l) => /footwear-commit veto \(history\)/.test(l));
+  assert.equal(sawVeto, false, "history veto must NOT fire without a footwear commit");
+});
+
+await test("28d — disambig pivot: footwear commit turn 1, then 'Orthotic insole for these' re-enters the flow", async () => {
+  // The path-ambiguity disambig's orthotic-side chip is an explicit
+  // pivot AFTER the footwear commit — the veto must clear and the
+  // flow must engage.
+  const { events, encoder, controller } = makeMockSse();
+  const cap = captureLogs();
+  let out;
+  try {
+    out = await maybeRunOrthoticFlow({
+      messages: [
+        { role: "user", content: INCIDENT_TURN_1 },
+        {
+          role: "assistant",
+          content:
+            "Just to make sure I get this right — are you looking for shoes you can wear, " +
+            "or an orthotic insole to put in your shoes?\n\n<<The shoes themselves>><<Orthotic insole for these>>",
+        },
+        { role: "user", content: "Orthotic insole for these" },
+      ],
+      tree,
+      shop: "test.myshopify.com",
+      controller,
+      encoder,
+    });
+  } finally {
+    cap.restore();
+  }
+  const sawVeto = cap.lines.some((l) => /footwear-commit veto \(history\)/.test(l));
+  assert.equal(sawVeto, false, "explicit orthotic pivot after the commit must clear the veto");
+  assert.equal(out.handled, true, "gate must engage after the explicit orthotic pivot");
+  assert.match(events[0]?.text || "", /Who are these orthotics for/i, "flow should ask q_gender next");
+});
+
+// ──────────────────────────────────────────────────────────────
 // Run summary
 // ──────────────────────────────────────────────────────────────
 console.log("");

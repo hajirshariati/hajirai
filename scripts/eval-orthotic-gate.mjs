@@ -639,6 +639,31 @@ await test("regression: footwear-path commit (multi-turn) must NOT hijack on chi
   assert.equal(events.length, 0);
 });
 
+await test("regression (2026-06-12): condition + 'what shoes do you recommend?' commit must NOT hijack on the 'Women's' chip turn", async () => {
+  // Production trace 2026-06-12: turn 1 named plantar fasciitis AND
+  // asked for SHOES — gate correctly fell through, LLM asked gender,
+  // customer clicked "Women's", and the gate hijacked the turn with
+  // q_use_case off the accumulated condition+gender. The footwear-
+  // commit history veto must keep the gate out: the customer
+  // committed to footwear on a prior turn and never pivoted to
+  // orthotics.
+  const { events, encoder, controller } = makeMockSse();
+  const out = await maybeRunOrthoticFlow({
+    messages: [
+      { role: "user", content: "I have plantar fasciitis and going on a trip to Italy, what shoes do you recommend?" },
+      { role: "assistant", content: "Got it — let me help you find the right fit. Are you shopping for men's or women's?\n\n<<Men's>><<Women's>>" },
+      { role: "user", content: "Women's" },
+    ],
+    tree,
+    shop: "test.myshopify.com",
+    controller,
+    encoder,
+  });
+  assert.equal(out.handled, false, "gate must fall through; the customer asked for shoes, never orthotics");
+  assert.equal(out.case, "footwear_commit_history");
+  assert.equal(events.length, 0);
+});
+
 await test("regression: 'best summer sandal for my mom under $50' must NOT engage (post-19:27 prod trace)", async () => {
   // Production trace at 19:27 UTC. Earlier turns asked about
   // 'sneakers with lace-up styles' and 'wider widths' — Layer 2
