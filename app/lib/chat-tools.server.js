@@ -622,7 +622,7 @@ function genderFilterClause(gender) {
 
 async function searchProducts(
   { query, limit, filters, priceMax, priceMin, onSale, requiredTerms },
-  { shop, deduplicateColors, sessionGender, categoryExclusions, querySynonyms, conversationText, userText, latestUserMessage, shopConfig, activeCategoryGroup, merchantGroups, categoryGenderMap }
+  { shop, deduplicateColors, sessionGender, categoryExclusions, querySynonyms, conversationText, userText, latestUserMessage, shopConfig, activeCategoryGroup, merchantGroups, categoryGenderMap, embeddingUsage }
 ) {
   const q = String(query || "").trim();
   if (!q) return { products: [] };
@@ -1194,7 +1194,20 @@ const isExcludedByRule = (p) => {
   const shopEmbedding = resolveShopEmbedding(shopConfig);
   if (shopEmbedding && q) {
     try {
-      const queryVec = await embedText(shopEmbedding.provider, shopEmbedding.apiKey, q, { inputType: "query" });
+      const queryVec = await embedText(shopEmbedding.provider, shopEmbedding.apiKey, q, {
+        inputType: "query",
+        // Per-chat cost accounting: add this query embedding's tokens
+        // to the request-level accumulator (ctx.embeddingUsage, built
+        // in chat.jsx) so recordChatUsage captures the semantic-search
+        // spend alongside Anthropic tokens.
+        onUsage: embeddingUsage
+          ? (u) => {
+              embeddingUsage.tokens += Number(u?.totalTokens) || 0;
+              embeddingUsage.calls += 1;
+              if (u?.provider) embeddingUsage.provider = u.provider;
+            }
+          : undefined,
+      });
       const lit = vectorLiteral(queryVec);
       const semRows = await prisma.$queryRawUnsafe(
         `SELECT id, 1 - (embedding <=> $1::vector) AS sim

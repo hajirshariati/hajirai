@@ -118,6 +118,7 @@ import {
 } from "../lib/chat-postprocessing";
 import prisma from "../db.server";
 import { recordChatUsage, getTodayMessageCount } from "../models/ChatUsage.server";
+import { computeEmbeddingCost } from "../lib/pricing.server";
 import { canSendMessage } from "../lib/billing.server";
 import { normalizeVariantSize, normalizeVariantWidth } from "../lib/variant-matcher.server";
 
@@ -4216,6 +4217,20 @@ async function handleChatPost({ shop, sessionAccessToken, request, internal = fa
     // the full knowledge dump. Failures (no provider, no chunks
     // embedded yet, query empty) return [] and the prompt builder
     // falls back to the legacy full-dump path automatically.
+    // Per-request embedding usage accumulator. Query-time embedding
+    // calls (RAG retrieval below + semantic product search inside the
+    // search_products tool) add their token counts here so
+    // recordChatUsage can fold the semantic-search spend into the same
+    // ChatUsage row as the Anthropic tokens. Index-time embedding
+    // (product sync, chunk backfill) is intentionally NOT tracked here
+    // — that's a one-time indexing cost, not per-chat.
+    const embeddingUsage = { tokens: 0, calls: 0, provider: "" };
+    const addEmbeddingUsage = (u) => {
+      embeddingUsage.tokens += Number(u?.totalTokens) || 0;
+      embeddingUsage.calls += 1;
+      if (u?.provider) embeddingUsage.provider = u.provider;
+    };
+
     let retrievedChunks = null;
     if (config.knowledgeRagEnabled === true) {
       const ragQuery = String(body.message || "").trim();
@@ -4226,6 +4241,7 @@ async function handleChatPost({ shop, sessionAccessToken, request, internal = fa
             query: ragQuery,
             config,
             limit: 5,
+            onEmbeddingUsage: addEmbeddingUsage,
           });
           console.log(`[rag] retrieved ${retrievedChunks?.length || 0} chunk(s) for query="${ragQuery.slice(0, 60)}"`);
         } catch (err) {
@@ -4287,6 +4303,9 @@ async function handleChatPost({ shop, sessionAccessToken, request, internal = fa
     const anthropic = new Anthropic({ apiKey: config.anthropicApiKey });
     const ctx = {
       shop: shop,
+      // Per-request embedding (semantic search) usage accumulator —
+      // mutated by query-time embedText calls, read by recordChatUsage.
+      embeddingUsage,
       deduplicateColors: config.deduplicateColors,
       sessionGender,
       categoryExclusions,
@@ -4955,6 +4974,8 @@ async function handleChatPost({ shop, sessionAccessToken, request, internal = fa
                 model: cleanResult.model || pickModel(0),
                 usage,
                 toolCalls: cleanResult.toolCallCount || 0,
+                embeddingTokens: ctx.embeddingUsage.tokens,
+                embeddingCostUsd: computeEmbeddingCost(ctx.embeddingUsage.provider, ctx.embeddingUsage.tokens),
               }).catch((err) => console.error("[chat] usage log error:", err?.message));
             }
             return;
@@ -5227,6 +5248,8 @@ async function handleChatPost({ shop, sessionAccessToken, request, internal = fa
             model: result.model,
             usage: result.totalUsage,
             toolCalls: result.toolCallCount,
+            embeddingTokens: ctx.embeddingUsage.tokens,
+            embeddingCostUsd: computeEmbeddingCost(ctx.embeddingUsage.provider, ctx.embeddingUsage.tokens),
           }).catch((err) => console.error("[chat] usage log error:", err?.message));
         } catch (err) {
           console.error("[chat] stream error:", err?.message || err);

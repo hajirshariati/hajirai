@@ -90,7 +90,7 @@ export const STEPS = [
     icon: "🧠",
     title: "Turn on semantic search + RAG retrieval (optional)",
     short: "Match by meaning, not just keywords.",
-    body: "Settings → Semantic search. Paste an OpenAI or Voyage AI key. One key powers two features: semantic product matching (a customer asking 'shoes for standing all day' finds arch-support styles even when 'standing' isn't in the description), and RAG over your knowledge files (only the top relevant sections are sent to the AI per chat turn instead of the full corpus).",
+    body: "Optional — the assistant already searches your catalog with AI and works fully without this; an embedding key sharpens matching by meaning. Settings → Semantic search. Paste an OpenAI or Voyage AI key. One key powers two features: semantic product matching (a customer asking 'shoes for standing all day' finds arch-support styles even when 'standing' isn't in the description), and RAG over your knowledge files (only the top relevant sections are sent to the AI per chat turn instead of the full corpus).",
     list: [
       "Paste the embedding API key in Settings → Semantic search and save.",
       "Open Catalog → Semantic search and click Backfill embeddings — one-time, typically under $1.",

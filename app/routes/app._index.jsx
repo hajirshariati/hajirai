@@ -1272,7 +1272,7 @@ function SetupChecklist({
     {
       done: semanticEnabled,
       title: "Enable semantic search (optional)",
-      description: "Match products by meaning, not just keywords. Bring your own Voyage AI or OpenAI key — typically under $1/month.",
+      description: "The assistant already searches your catalog with AI — adding a Voyage AI or OpenAI key sharpens matching by meaning, not just keywords. Typically under $1/month, and everything works without it.",
       actionLabel: semanticEnabled ? `Manage (${semanticProvider === "voyage" ? "Voyage AI" : "OpenAI"})` : "Add provider",
       actionUrl: "/app/api-keys",
     },
@@ -1531,8 +1531,8 @@ export default function Home() {
     }
     items.push(
       semanticEnabled
-        ? { label: "Smart Search", value: semanticProvider === "voyage" ? "Voyage AI" : "OpenAI", tone: "success", url: "/app/api-keys", tooltip: "Semantic search active. Customers find products by meaning, not just keywords." }
-        : { label: "Smart Search", value: "Off", tone: "subdued", url: "/app/api-keys", tooltip: "Optional. Add a Voyage AI or OpenAI key to enable meaning-based product matching." }
+        ? { label: "Semantic Search", value: semanticProvider === "voyage" ? "Voyage AI" : "OpenAI", tone: "success", url: "/app/api-keys", tooltip: "Semantic search active. Customers find products by meaning, not just keywords." }
+        : { label: "Semantic Search", value: "Off", tone: "subdued", url: "/app/api-keys", tooltip: "Optional. The assistant already searches your catalog with AI — adding a Voyage AI or OpenAI key sharpens matching by meaning (e.g. 'shoes for standing all day'). Works fine without it." }
     );
     items.push(
       recommenderActive

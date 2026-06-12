@@ -503,12 +503,26 @@ export default function Analytics() {
     }
   }, [searchParams, shopify, exporting]);
 
-  const modelRows = useMemo(() => Object.entries(usage.byModel).map(([m, d]) => ({
-    model: modelLabel(m),
-    messages: d.messages,
-    cost: d.cost,
-    avg: d.messages > 0 ? d.cost / d.messages : null,
-  })), [usage]);
+  const modelRows = useMemo(() => {
+    const rows = Object.entries(usage.byModel).map(([m, d]) => ({
+      model: modelLabel(m),
+      messages: d.messages,
+      cost: d.cost,
+      avg: d.messages > 0 ? d.cost / d.messages : null,
+    }));
+    // Quiet breakout of the semantic-search (embedding) share — already
+    // included in the model totals above, surfaced so merchants can see
+    // what the optional embedding provider actually costs.
+    if (usage.embeddingCost > 0) {
+      rows.push({
+        model: "Semantic search",
+        messages: usage.totalMessages,
+        cost: usage.embeddingCost,
+        avg: usage.avgEmbeddingCostPerMessage,
+      });
+    }
+    return rows;
+  }, [usage]);
 
   const searchedRows = (productsByTool?.searched || []).slice(0, 10).map((p) => ({ title: p.title, count: p.count }));
   const viewedRows = (productsByTool?.viewed || []).slice(0, 10).map((p) => ({ title: p.title, count: p.count }));
@@ -977,7 +991,16 @@ export default function Analytics() {
               <Kpi label="AI Actions" value={String(usage.totalToolCalls)} sub="Searches & lookups" curr={usage.totalToolCalls} prev={previous.toolCalls} />
             </div>
             <div className="seos-an-kpitile">
-              <Kpi label="API Cost" value={formatCost(usage.totalCost)} sub={`Avg ${formatCost(usage.avgCostPerMessage)} / msg`} curr={usage.totalCost} prev={previous.cost} goodDirection="down" />
+              <Kpi
+                label="API Cost"
+                value={formatCost(usage.totalCost)}
+                sub={usage.embeddingCost > 0
+                  ? `Avg ${formatCost(usage.avgCostPerMessage)} / msg · incl. semantic search ${formatCost(usage.embeddingCost)}`
+                  : `Avg ${formatCost(usage.avgCostPerMessage)} / msg`}
+                curr={usage.totalCost}
+                prev={previous.cost}
+                goodDirection="down"
+              />
             </div>
           </div>
 

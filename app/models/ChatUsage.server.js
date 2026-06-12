@@ -14,7 +14,7 @@ export async function getTodayMessageCount(shop) {
   });
 }
 
-export async function recordChatUsage({ shop, model, usage, toolCalls }) {
+export async function recordChatUsage({ shop, model, usage, toolCalls, embeddingTokens = 0, embeddingCostUsd = 0 }) {
   const costUsd = computeCost(model, usage);
   return prisma.chatUsage.create({
     data: {
@@ -26,6 +26,11 @@ export async function recordChatUsage({ shop, model, usage, toolCalls }) {
       cacheReadInputTokens: usage.cache_read_input_tokens || 0,
       costUsd,
       toolCalls: toolCalls || 0,
+      // Semantic-search (embedding) spend for this turn — kept in its
+      // own columns so the Anthropic-only figure stays queryable, but
+      // folded into every summary total downstream.
+      embeddingTokens: embeddingTokens || 0,
+      embeddingCostUsd: embeddingCostUsd || 0,
     },
   });
 }
@@ -64,6 +69,7 @@ export async function getUsageSummary(shop, range = 30) {
   });
 
   let totalCost = 0;
+  let totalEmbeddingCost = 0;
   let totalInputTokens = 0;
   let totalOutputTokens = 0;
   let totalMessages = 0;
@@ -72,19 +78,28 @@ export async function getUsageSummary(shop, range = 30) {
   const dailyCosts = {};
 
   for (const r of records) {
-    totalCost += r.costUsd;
+    // Every cost total folds in the turn's semantic-search (embedding)
+    // spend so charts and totals reflect true cost, not just Anthropic
+    // tokens. Pre-migration rows have no embeddingCostUsd → 0.
+    const embCost = r.embeddingCostUsd || 0;
+    const turnCost = r.costUsd + embCost;
+    totalCost += turnCost;
+    totalEmbeddingCost += embCost;
     totalInputTokens += r.inputTokens;
     totalOutputTokens += r.outputTokens;
     totalMessages += 1;
     totalToolCalls += r.toolCalls;
 
+    // Per-model rows stay Anthropic-only: the analytics table shows a
+    // separate "Semantic search" breakout row, so folding embeddings in
+    // here would represent the same dollars twice in the breakdown.
     if (!byModel[r.model]) byModel[r.model] = { cost: 0, messages: 0 };
     byModel[r.model].cost += r.costUsd;
     byModel[r.model].messages += 1;
 
     const day = r.createdAt.toISOString().split("T")[0];
     if (!dailyCosts[day]) dailyCosts[day] = { cost: 0, messages: 0 };
-    dailyCosts[day].cost += r.costUsd;
+    dailyCosts[day].cost += turnCost;
     dailyCosts[day].messages += 1;
   }
 
@@ -95,6 +110,11 @@ export async function getUsageSummary(shop, range = 30) {
     totalMessages,
     totalToolCalls,
     avgCostPerMessage: totalMessages > 0 ? totalCost / totalMessages : 0,
+    // Semantic-search (embedding) share of totalCost — included in
+    // totalCost/dailyCosts above (true spend), broken out of byModel so
+    // the analytics table's model rows + this row sum to the total.
+    embeddingCost: totalEmbeddingCost,
+    avgEmbeddingCostPerMessage: totalMessages > 0 ? totalEmbeddingCost / totalMessages : 0,
     byModel,
     dailyCosts,
     startDate: start.toISOString(),
@@ -107,7 +127,7 @@ export async function getDailySeries(shop, range = 30) {
   const [usageRows, feedbackRows] = await Promise.all([
     prisma.chatUsage.findMany({
       where: { shop, createdAt: { gte: start, lte: end } },
-      select: { createdAt: true, costUsd: true, inputTokens: true, outputTokens: true, toolCalls: true },
+      select: { createdAt: true, costUsd: true, embeddingCostUsd: true, inputTokens: true, outputTokens: true, toolCalls: true },
     }),
     prisma.chatFeedback.findMany({
       where: { shop, createdAt: { gte: start, lte: end } },
@@ -125,7 +145,7 @@ export async function getDailySeries(shop, range = 30) {
     const row = map.get(key);
     if (!row) continue;
     row.messages += 1;
-    row.cost += r.costUsd || 0;
+    row.cost += (r.costUsd || 0) + (r.embeddingCostUsd || 0);
     row.tokens += (r.inputTokens || 0) + (r.outputTokens || 0);
     row.toolCalls += r.toolCalls || 0;
   }
