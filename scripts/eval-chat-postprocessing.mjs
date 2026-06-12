@@ -1278,6 +1278,44 @@ test("inline-chip gate — strips answer menus after no-match alternatives", () 
   assert.match(r.text, /kids' sneakers/i);
 });
 
+test("inline-chip gate — gender chip set survives WITHOUT a question sentence (live 2026-06-12)", () => {
+  // The model's clarifying question was eaten by an upstream narration
+  // strip, leaving "greeting + chips". The old guard stripped the
+  // chips and the customer got a dead-end greeting. A pure gender
+  // navigation set (bare or context-carrying) is inherently safe.
+  const r = stripUnsafeInlineChips(
+    "I'd love to help you find the perfect shoes for your Italy trip! <<Men's shoes>> <<Women's shoes>>",
+    { hasProducts: false },
+  );
+  assert.equal(r.changed, false, `decorated gender chips must survive; got: ${r.text}`);
+  assert.match(r.text, /<<Men's shoes>>/);
+});
+
+test("inline-chip gate — bare gender set also survives without a question", () => {
+  const r = stripUnsafeInlineChips(
+    "Happy to help with that! <<Men's>> <<Women's>>",
+    { hasProducts: false },
+  );
+  assert.equal(r.changed, false, `bare gender chips must survive; got: ${r.text}`);
+});
+
+test("inline-chip gate — Kids' orthotics decorated set survives", () => {
+  const r = stripUnsafeInlineChips(
+    "Great, let's get started. <<Men's orthotics>> <<Women's orthotics>> <<Kids' orthotics>>",
+    { hasProducts: false },
+  );
+  assert.equal(r.changed, false, `decorated flow gender chips must survive; got: ${r.text}`);
+});
+
+test("inline-chip gate — gender chips after a DENIAL are still stripped (failure mode preserved)", () => {
+  const r = stripUnsafeInlineChips(
+    "We don't carry that style. <<Men's shoes>> <<Women's shoes>>",
+    { hasProducts: false },
+  );
+  assert.equal(r.changed, true, `denial-with-gender-menu must still strip; got: ${r.text}`);
+  assert.equal(/<</.test(r.text), false);
+});
+
 test("inline-chip gate — keeps real clarifier chips", () => {
   const r = stripUnsafeInlineChips(
     "Which styles would you like to browse? <<Sneakers>> <<Sandals>> <<Boots>>",

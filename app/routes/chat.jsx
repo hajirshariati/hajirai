@@ -543,14 +543,18 @@ function genderChipCategoryNounFromContext(ctx = {}) {
     (g) => String(g?.name || "").trim().toLowerCase() === category.toLowerCase(),
   );
   if (group) {
-    const trigger = String(
-      (Array.isArray(group.triggers) ? group.triggers : []).find(
-        (t) => String(t || "").trim(),
-      ) || "",
-    ).trim().toLowerCase();
-    if (trigger) return trigger;
+    const triggers = (Array.isArray(group.triggers) ? group.triggers : [])
+      .map((t) => String(t || "").trim().toLowerCase())
+      .filter(Boolean);
+    // Prefer a plural trigger — the chip reads "Men's shoes", never
+    // "Men's shoe". Live 2026-06-12: the first trigger was the
+    // singular "shoe" and the chips rendered "Men's shoe".
+    const plural = triggers.find((t) => t.endsWith("s"));
+    if (plural) return plural;
+    if (triggers[0]) return `${triggers[0]}s`;
   }
-  return category.toLowerCase().replace(/-+/g, " ");
+  const noun = category.toLowerCase().replace(/-+/g, " ");
+  return noun.endsWith("s") ? noun : `${noun}s`;
 }
 
 function resolverRequiresCatalogProof(ctx = {}) {
