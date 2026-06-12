@@ -1,7 +1,7 @@
 import { normalizeCategory, normalizeColor } from "./catalog-facts.server.js";
 import {
   canonicalizeCatalogConstraints,
-  catalogScopeHasMatches,
+  catalogScopedNavigationQuestionVerdict,
 } from "./catalog-matcher.server.js";
 
 function normalize(s) {
@@ -289,23 +289,30 @@ export function filterCatalogScopedNavigationChips(
     facetIndex = null,
     allowedCategories = [],
     catalogCategories = [],
+    umbrellaCategoryTerms = [],
   } = {},
 ) {
   if (!text || typeof text !== "string" || !facetIndex) {
     return { text: text || "", stripped: [] };
   }
 
-  const base = canonicalizeCatalogConstraints(constraints || {});
   const stripped = [];
   const out = text.replace(/<<([^<>|]+)>>/g, (match, inner) => {
     const choice = navigationConstraintsFromChip(inner, catalogCategories);
     if (Object.keys(choice).length === 0) return match;
-    const possible = catalogScopeHasMatches(
+    // Single shared verdict (catalog-matcher) so base-scope
+    // sanitization — out-of-vocabulary carried-over values like the
+    // umbrella "footwear" group name (2026-06-12 trace) — applies
+    // identically to chips and follow-up suggestions.
+    const verdict = catalogScopedNavigationQuestionVerdict({
+      question: inner,
+      choice,
+      constraints,
       facetIndex,
-      { ...base, ...choice },
-      { allowedCategories },
-    );
-    if (possible !== false) return match;
+      allowedCategories,
+      umbrellaCategoryTerms,
+    });
+    if (verdict.possible) return match;
     stripped.push(inner.trim());
     return "";
   });

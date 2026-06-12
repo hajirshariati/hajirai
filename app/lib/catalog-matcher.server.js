@@ -124,6 +124,60 @@ export function catalogScopeHasMatches(facetIndex, constraints = {}, { allowedCa
   return tuples.some((tuple) => catalogTupleMatches(tuple, constraints));
 }
 
+// Per-field value domains of the facet tuple space — the catalog's
+// actual vocabulary for gender/category/color. Used by the navigation
+// verdict to decide whether a constraint value is even part of this
+// catalog before letting it prove impossibility.
+function catalogTupleFieldDomains(tuples) {
+  const domains = { gender: new Set(), category: new Set(), color: new Set() };
+  for (const t of tuples || []) {
+    if (t?.gender) domains.gender.add(t.gender);
+    if (t?.category) domains.category.add(t.category);
+    if (t?.color != null) domains.color.add(t.color);
+  }
+  return domains;
+}
+
+function fieldValueInDomain(field, value, domains) {
+  if (value == null || value === "") return true;
+  const domain = domains?.[field];
+  if (!domain) return true;
+  if (domain.has(value)) return true;
+  // Unisex tuples genuinely satisfy men's/women's constraints (see
+  // catalogTupleMatches), so those values are provable in this catalog
+  // even when no explicitly gendered tuple exists. "kids" stays out:
+  // unisex is never proof of kids availability.
+  if (field === "gender" && domain.has("unisex") && (value === "men" || value === "women")) {
+    return true;
+  }
+  return false;
+}
+
+// Umbrella CATEGORY-GROUP vocabulary: each merchant group's name plus
+// its triggers, lowercased, with light singular/plural variants
+// ("footwear", "shoes" → "shoe"). Purely merchant-config-driven — no
+// hardcoded store vocabulary. Threaded into
+// catalogScopedNavigationQuestionVerdict so an umbrella group word
+// parsed as a facet category ("travel shoes" → category "shoes") is
+// dropped instead of proving a false catalog impossibility.
+export function umbrellaCategoryTermsFromGroups(merchantGroups = []) {
+  const out = new Set();
+  const add = (raw) => {
+    const term = String(raw || "").toLowerCase().trim();
+    if (!term) return;
+    out.add(term);
+    if (term.endsWith("s")) out.add(term.replace(/s$/, ""));
+    else out.add(`${term}s`);
+  };
+  for (const group of Array.isArray(merchantGroups) ? merchantGroups : []) {
+    add(group?.name);
+    for (const trigger of Array.isArray(group?.triggers) ? group.triggers : []) {
+      add(trigger);
+    }
+  }
+  return Array.from(out);
+}
+
 // Shared final boundary for quick-reply questions that navigate product
 // facets. After an exact no-match, missing catalog proof must fail closed.
 export function catalogScopedNavigationQuestionVerdict({
@@ -134,14 +188,58 @@ export function catalogScopedNavigationQuestionVerdict({
   facetIndex = null,
   allowedCategories = [],
   requireProof = false,
+  umbrellaCategoryTerms = [],
 } = {}) {
+  // The catalog's per-field vocabulary, computed once from the FULL
+  // tuple space. The active merchant-group restriction is applied
+  // separately (allowedCategories → restrictCatalogTuples) inside
+  // catalogScopeHasMatches; vocabulary membership must not depend on it.
+  const domains = facetIndex
+    ? catalogTupleFieldDomains(buildCatalogTupleSpace(facetIndex))
+    : null;
+
   const parsed = canonicalizeCatalogConstraints(choice || {});
   const facetChoice = {};
   for (const field of ["gender", "category", "color"]) {
     if (parsed[field]) facetChoice[field] = parsed[field];
   }
 
+  // The chip's own gender and color stay STRICT — a missing color fact
+  // never makes "pink" look available (fail closed). For
+  // facetChoice.category ONLY: when the value is an umbrella
+  // CATEGORY-GROUP term (group name/trigger from merchant config) that
+  // isn't a real tuple category, drop it instead of failing — the group
+  // restriction is already enforced via allowedCategories, so the
+  // umbrella word adds no information. 2026-06-12 trace: follow-up
+  // "What's your budget for travel shoes?" parsed category "shoes";
+  // no tuple carries category="shoes", so the suggestion was wrongly
+  // dropped as catalog_intersection_empty.
+  if (facetChoice.category && domains && !fieldValueInDomain("category", facetChoice.category, domains)) {
+    const umbrella = new Set(
+      (Array.isArray(umbrellaCategoryTerms) ? umbrellaCategoryTerms : [])
+        .map((term) => String(term || "").toLowerCase().trim())
+        .filter(Boolean),
+    );
+    if (umbrella.has(facetChoice.category)) delete facetChoice.category;
+  }
+
+  // Sanitize the BASE (carried-over) scope: a gender/category/color
+  // value that doesn't exist in the tuple-space vocabulary cannot prove
+  // impossibility — it's an umbrella group name or stale non-catalog
+  // memory, not a facet. 2026-06-12 trace: memory carried
+  // category="footwear" (the merchant's umbrella "Footwear" GROUP name;
+  // tuples carry sandals/sneakers/boots/…), so EVERY gender chip
+  // evaluated impossible and <<Men's>>/<<Women's>> were stripped. The
+  // group restriction is already applied via allowedCategories, so
+  // dropping the out-of-vocabulary value loses nothing.
   const base = canonicalizeCatalogConstraints(constraints || {});
+  if (domains) {
+    for (const field of ["gender", "category", "color"]) {
+      if (base[field] && !fieldValueInDomain(field, base[field], domains)) {
+        delete base[field];
+      }
+    }
+  }
   const effectiveConstraints = canonicalizeCatalogConstraints({ ...base, ...facetChoice });
   if (Object.keys(facetChoice).length === 0) {
     return {

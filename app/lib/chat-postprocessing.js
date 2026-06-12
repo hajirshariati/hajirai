@@ -851,6 +851,23 @@ export function isUnanswerableSuggestion(question, { lastText = "", latestUserMe
   const lastLower = String(lastText || "").toLowerCase();
   const qLower = q.toLowerCase();
 
+  // Bot-voice rejector. Quick replies are sent AS the customer's next
+  // message when tapped, so a suggestion written in the assistant's
+  // voice ("Do you prefer sneakers or sandals?", "Do you need wide
+  // width options?" — live trace 2026-06-12) reads as the customer
+  // interrogating themselves. Drop assistant-voice questions aimed at
+  // the customer. Customer-voice questions TO the bot must keep
+  // passing: "do you have/carry/sell/offer/stock/ship …" and "can you
+  // show/find/recommend …" are exactly what quick replies are for —
+  // the verb after "you" is what separates the two voices.
+  if (
+    /^(?:do|would|are|could|can)\s+you\s+(?:prefer|need|want|like|looking|interested|usually|normally|considering)\b/i.test(qLower) ||
+    /\bare\s+you\s+(?:looking|shopping|buying)\b/i.test(qLower) ||
+    /\bwould\s+you\s+like\b/i.test(qLower)
+  ) {
+    return { unanswerable: true, reason: "bot_voice" };
+  }
+
   // Kids-coverage contradiction. When the main reply just said the
   // store doesn't carry kids' / teen / children's footwear, a follow-up
   // chip that re-opens the kids angle ("would adult women's shoes fit

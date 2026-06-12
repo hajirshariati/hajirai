@@ -2,12 +2,14 @@ import assert from "node:assert/strict";
 import {
   catalogFieldOptions,
   catalogScopeHasMatches,
+  catalogScopedNavigationQuestionVerdict,
   canonicalizeCatalogConstraints,
   colorExistsInCatalogScope,
   computeCatalogConstraintDomains,
   deriveCatalogMatchContract,
   productMatchesCategoryConstraint,
   readAttributeCI,
+  umbrellaCategoryTermsFromGroups,
 } from "../app/lib/catalog-matcher.server.js";
 
 let passed = 0;
@@ -195,6 +197,127 @@ test("M10 — adult unisex is not proof of kids availability", () => {
     catalogScopeHasMatches(unisexFacetIndex, { gender: "kids", category: "orthotics", color: "pink" }),
     true,
   );
+});
+
+// ── catalogScopedNavigationQuestionVerdict — base-scope sanitization ──
+//
+// 2026-06-12 production trace: customer "I have plantar fasciitis and
+// going on a trip to Italy, what shoes do you recommend?" → memory
+// carried category="footwear" — the merchant's umbrella "Footwear"
+// CATEGORY-GROUP name, not a tuple category (tuples carry
+// sandals/sneakers/boots/…). Every <<Men's>>/<<Women's>> chip merged
+// with that base scope evaluated impossible and was stripped; the
+// customer saw NO chips. Out-of-vocabulary base values must be dropped,
+// not used as proof of impossibility.
+
+const traceFacetIndex = {
+  categoryByGender: {
+    sneakers: ["men", "women"],
+    sandals: ["men", "women"],
+    boots: ["women"],
+  },
+  colorByGenderCategory: {
+    "men:sneakers": ["black", "navy"],
+    "women:sneakers": ["white", "pink"],
+  },
+};
+
+test("M11 — out-of-domain base category (umbrella group name) no longer blocks gender chips", () => {
+  for (const gender of ["men", "women"]) {
+    const verdict = catalogScopedNavigationQuestionVerdict({
+      question: gender === "men" ? "Men's" : "Women's",
+      choice: { gender },
+      constraints: { category: "footwear", condition: "plantar_fasciitis" },
+      facetIndex: traceFacetIndex,
+      allowedCategories: ["Sneakers", "Sandals", "Boots"],
+    });
+    assert.equal(verdict.possible, true, `${gender}: ${JSON.stringify(verdict)}`);
+    assert.equal(verdict.reason, "catalog_match");
+    // The umbrella value is dropped from the effective conjunction.
+    assert.equal(verdict.effectiveConstraints.category, undefined);
+  }
+
+  // An IN-domain base category still constrains strictly: boots are
+  // women-only here, so the Men's chip stays catalog-impossible.
+  const strict = catalogScopedNavigationQuestionVerdict({
+    question: "Men's",
+    choice: { gender: "men" },
+    constraints: { category: "boots" },
+    facetIndex: traceFacetIndex,
+    allowedCategories: ["Sneakers", "Sandals", "Boots"],
+  });
+  assert.equal(strict.possible, false);
+  assert.equal(strict.reason, "catalog_intersection_empty");
+});
+
+test("M12 — facetChoice color stays strict: missing color facts never make pink look available", () => {
+  // The chip's OWN facets are never sanitized — fail closed. A bucket
+  // with no color data must not make "pink" look available.
+  const noColorFacetIndex = {
+    categoryByGender: { sneakers: ["men"] },
+    colorByGenderCategory: {},
+  };
+  const out = catalogScopedNavigationQuestionVerdict({
+    question: "Pink",
+    choice: { color: "pink" },
+    constraints: {},
+    facetIndex: noColorFacetIndex,
+  });
+  assert.equal(out.possible, false);
+  assert.equal(out.reason, "catalog_intersection_empty");
+
+  // And a color the catalog DOES prove still passes under its scope.
+  const proven = catalogScopedNavigationQuestionVerdict({
+    question: "Pink",
+    choice: { color: "pink" },
+    constraints: { gender: "women" },
+    facetIndex: traceFacetIndex,
+  });
+  assert.equal(proven.possible, true);
+  assert.equal(proven.reason, "catalog_match");
+});
+
+test("M13 — umbrella facetChoice.category is dropped via merchant group terms, not failed", () => {
+  const merchantGroups = [
+    { name: "Footwear", categories: ["Sneakers", "Sandals"], triggers: ["shoes", "footwear"] },
+    { name: "Orthotics", categories: ["Orthotics"], triggers: ["insoles"] },
+  ];
+  const terms = umbrellaCategoryTermsFromGroups(merchantGroups);
+  assert.ok(terms.includes("footwear"));
+  assert.ok(terms.includes("shoes"));
+  assert.ok(terms.includes("shoe"), "light singular variant of trigger 'shoes'");
+
+  // 2026-06-12 trace: follow-up "What's your budget for travel shoes?"
+  // parsed category "shoes" — an umbrella trigger, not a tuple category.
+  const common = {
+    question: "What's your budget for travel shoes?",
+    choice: { category: "shoes" },
+    constraints: {},
+    facetIndex: traceFacetIndex,
+    allowedCategories: ["Sneakers", "Sandals"],
+  };
+  const withoutTerms = catalogScopedNavigationQuestionVerdict(common);
+  assert.equal(withoutTerms.possible, false, "pre-fix shape: umbrella choice fails closed without the terms");
+
+  const withTerms = catalogScopedNavigationQuestionVerdict({
+    ...common,
+    umbrellaCategoryTerms: terms,
+  });
+  assert.equal(withTerms.possible, true, JSON.stringify(withTerms));
+
+  // A REAL tuple category is never treated as umbrella, even when a
+  // group happens to name it: men's boots don't exist here, so the
+  // verdict stays catalog-impossible.
+  const real = catalogScopedNavigationQuestionVerdict({
+    question: "Show me men's boots",
+    choice: { category: "boots", gender: "men" },
+    constraints: {},
+    facetIndex: traceFacetIndex,
+    allowedCategories: ["Sneakers", "Sandals", "Boots"],
+    umbrellaCategoryTerms: [...terms, "boots"],
+  });
+  assert.equal(real.possible, false);
+  assert.equal(real.reason, "catalog_intersection_empty");
 });
 
 if (failed > 0) {
