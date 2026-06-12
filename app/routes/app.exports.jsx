@@ -32,7 +32,7 @@ function parseRange(searchParams) {
   return { startDate: start, endDate: end };
 }
 
-async function buildCsv(shop, section, rangeArg) {
+async function buildCsv(shop, section, rangeArg, vote = "") {
   if (section === "daily") {
     const daily = await getDailySeries(shop, rangeArg);
     return toCsv(
@@ -86,9 +86,17 @@ async function buildCsv(shop, section, rangeArg) {
   // into a single 'Conversation' column (turns separated by ' | ').
   if (section === "conversations") {
     const qs = await getRecentQuestions(shop, rangeArg, 500);
+    // Optional vote filter ("down" | "up" | "unrated") so the analytics
+    // page's export button downloads exactly the filtered view — e.g.
+    // just the responses customers flagged as not helpful.
+    const rows = vote === "down" || vote === "up"
+      ? qs.filter((q) => q.vote === vote)
+      : vote === "unrated"
+        ? qs.filter((q) => q.vote !== "up" && q.vote !== "down")
+        : qs;
     return toCsv(
       ["Date", "Vote", "First Question", "Last Question", "Flagged AI Response", "Products", "Conversation"],
-      qs.map((q) => [
+      rows.map((q) => [
         new Date(q.date).toISOString(),
         q.vote || "",
         q.question || "",
@@ -122,11 +130,13 @@ export const loader = async ({ request }) => {
   const { startDate, endDate } = parseRange(url.searchParams);
   const rangeArg = { startDate, endDate };
 
-  const csv = await buildCsv(session.shop, section, rangeArg);
+  const vote = url.searchParams.get("vote") || "";
+  const csv = await buildCsv(session.shop, section, rangeArg, vote);
   if (!csv) {
     return new Response(`Unknown export section: ${section}`, { status: 400 });
   }
 
-  const fname = `${section}_${startDate.toISOString().slice(0, 10)}_to_${endDate.toISOString().slice(0, 10)}.csv`;
+  const voteSlug = vote === "down" ? "not-helpful" : vote === "up" ? "helpful" : vote === "unrated" ? "no-vote" : "";
+  const fname = `${section}${voteSlug ? `-${voteSlug}` : ""}_${startDate.toISOString().slice(0, 10)}_to_${endDate.toISOString().slice(0, 10)}.csv`;
   return csvResponse(fname, csv);
 };
