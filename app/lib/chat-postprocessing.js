@@ -316,8 +316,11 @@ export function stripToolCallSyntax(text) {
 // without the get_product_details tool ever firing. This is a pattern
 // from training data — never a real signal. Detect and strip.
 
+// Two word orders: "available in size 9" AND "size 9 is available"
+// (live eval 2026-06-12: the model wrote "Size 9 is available!" and
+// the forward-only pattern missed it).
 export const STOCK_CLAIM_RE =
-  /\b(?:currently |right now |presently )?(?:available|in stock|we have (?:(?:it|them|these|those|that|this|some))?)\s+(?:in\s+)?(?:size\s+)?(?:\d+(?:\.\d+)?(?:[\s-](?:wide|narrow|x-?wide|w|n|m|d|ee|eee))?|wide|narrow|x-?wide)\b/i;
+  /\b(?:currently |right now |presently )?(?:available|in stock|we have (?:(?:it|them|these|those|that|this|some))?)\s+(?:in\s+)?(?:size\s+)?(?:\d+(?:\.\d+)?(?:[\s-](?:wide|narrow|x-?wide|w|n|m|d|ee|eee))?|wide|narrow|x-?wide)\b|\bsize\s+\d+(?:\.\d+)?(?:[\s-](?:wide|narrow|x-?wide))?\s+is\s+(?:currently\s+|still\s+)?(?:available|in\s+stock)\b/i;
 
 export function detectStockClaim(text) {
   if (typeof text !== "string" || !text) return false;
@@ -335,6 +338,7 @@ export function stripStockClaim(text) {
     .replace(STOCK_CLAIM_RE, "")
     .replace(/\s{2,}/g, " ")
     .replace(/\s+([.,!?])/g, "$1")
+    .replace(/([.!?])[.!?]+/g, "$1")
     .trim();
   if (out && !/[.!?]$/.test(out)) out += ".";
   return (out + " I can't check live stock from here — the product page or our support team can confirm the size.").trim();
@@ -650,6 +654,11 @@ const ORTHOTIC_ENUM_LABELS = {
   diabetic: "diabetic foot care",
   // useCase
   comfort_walking_everyday: "everyday walking",
+  // Tree enums that are single ordinary words (casual, comfort, dress,
+  // cleats, skates) are intentionally NOT in this map: the scrubber
+  // rewrites matching tokens inside customer-visible text, and a map
+  // entry for a common word mangles normal sentences and chip labels
+  // ("Dress shoes" → "dress shoes shoes"). They're already readable.
   comfort_memory_foam_everyday: "everyday memory-foam comfort",
   comfort_memory_foam: "memory-foam comfort",
   comfort_bundle: "all-day comfort",

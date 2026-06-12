@@ -35,7 +35,8 @@ import {
   filterForbiddenCategoryChips,
   filterContradictingGenderChips,
 } from "../app/lib/chip-filter.server.js";
-import { scrubRoleMarkers, scrubToolCallLeaks } from "../app/lib/chat-postprocessing.js";
+import { scrubRoleMarkers, scrubToolCallLeaks, detectStockClaim, stripStockClaim } from "../app/lib/chat-postprocessing.js";
+import { detectFalseGenderCategoryAffirmation } from "../app/lib/response-contract.server.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const argFlag = (name) => process.argv.find((a) => a.startsWith(`--${name}=`))?.slice(`--${name}=`.length);
@@ -180,6 +181,11 @@ async function runScenario(scenario) {
     catalogProductTypes,
     scopedGender: sessionGender,
     answeredChoices,
+    // Production parity (chat.jsx passes this on every turn): the
+    // gender-availability matrix renders into STORE FACTS, which is
+    // what stops confident false affirmations like "Yes, we carry
+    // men's boots" for women-only categories.
+    categoryGenderMap: AETREX_CATEGORY_GENDER_MAP,
   });
 
   let text;
@@ -242,6 +248,26 @@ async function runScenario(scenario) {
   text = fbcc.text;
   const fcgc = filterContradictingGenderChips(text, conversationText, AETREX_CATEGORY_GENDER_MAP);
   text = fcgc.text;
+
+  // Mirror production's stock-claim guard: no tools run in this
+  // harness, so any specific size-availability claim is hallucinated
+  // by construction — production strips it and substitutes the honest
+  // deferral (chat.jsx finalize chain).
+  if (detectStockClaim(text)) {
+    text = stripStockClaim(text);
+  }
+
+  // Mirror production's hallucinated-affirmation guard: "yes we carry
+  // men's boots" when the category map says women-only gets rewritten
+  // to honest framing before emit.
+  const fa = detectFalseGenderCategoryAffirmation(text, AETREX_CATEGORY_GENDER_MAP);
+  if (fa) {
+    const otherGender = fa.availableGenders.includes("women") ? "women's" : (fa.availableGenders.includes("men") ? "men's" : null);
+    const tail = otherGender
+      ? ` We do carry ${otherGender} ${fa.category.toLowerCase()} — happy to show those if helpful.`
+      : "";
+    text = `We don't carry ${fa.requestedGender} ${fa.category.toLowerCase()} in our catalog.${tail}`;
+  }
 
   // Mirror production's empty-text repair (chat.jsx:1345). When all
   // strips wipe the response to empty/near-empty, production emits a
@@ -321,6 +347,12 @@ async function runAll() {
       const tag = r.ok ? "✓" : "✗";
       const detail = r.ok ? "" : `  · ${r.reasons.join("; ")}`;
       console.log(`${tag} ${r.name}${detail}`);
+      if (!r.ok) {
+        // Always show what the model actually said on a failure —
+        // assertions alone can't distinguish a bad answer from a
+        // brittle keyword list.
+        console.log(`    RESPONSE: ${String(r.text || "").slice(0, 320).replace(/\n/g, " ")}`);
+      }
     }
   });
   await Promise.all(workers);

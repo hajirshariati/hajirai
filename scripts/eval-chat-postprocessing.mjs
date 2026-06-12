@@ -1345,6 +1345,17 @@ test("inline-chip gate — 'pick from / let me know' clarifier keeps chips", () 
   assert.equal(r.changed, false, `must keep chips; got: ${r.text}`);
 });
 
+test("stock claim — reversed word order 'Size 9 is available' is detected and stripped", () => {
+  // Live eval 2026-06-12: the model wrote "Size 9 is available!" and
+  // the forward-only pattern ("available in size 9") missed it.
+  assert.equal(detectStockClaim("Size 9 is available!"), true);
+  assert.equal(detectStockClaim("size 9.5 is in stock"), true);
+  assert.equal(detectStockClaim("what size do you want?"), false);
+  const out = stripStockClaim("I found the Jillian Sport. Size 9 is available! Want it?");
+  assert.doesNotMatch(out, /is available/i);
+  assert.match(out, /can't check live stock/i);
+});
+
 test("inline-chip gate — apostrophe-less gender spellings survive (<<Mens>>/<<Womens>>)", () => {
   // The gender detectors and choice-events fact regexes accept the
   // apostrophe-less spellings; the gate exemption must too, or the
