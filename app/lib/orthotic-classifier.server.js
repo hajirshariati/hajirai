@@ -97,7 +97,11 @@ const CLASSIFIER_TOOL = {
           "true if the customer's intent is an orthotic / insole / arch-support / footbed / insert recommendation. " +
           "Three cases set this to true: " +
           "(1) Customer named an orthotic-shaped noun: 'I need orthotics', 'recommend an insole for plantar fasciitis', " +
-          "'arch support for my flat feet'. " +
+          "'arch support for my flat feet', 'do you sell shoe inserts', 'do you have inserts'. " +
+          "'inserts' / 'shoe inserts' / 'insoles' / 'footbeds' all count as orthotic nouns. " +
+          "Questions asking WHAT orthotic/insert/arch-support someone should WEAR or USE are " +
+          "RECOMMENDATION requests, not informational: 'what orthotic should my grandson wear' → true, " +
+          "'what should my 7 year old wear for arch support' → true (arch support sought, no shoe noun). " +
           "(2) Customer mentioned a clinical foot condition with NO product noun at all: " +
           "'I have plantar fasciitis', 'my heels hurt', 'I'm a 45-year-old woman with plantar fasciitis', " +
           "'my arch hurts when I walk'. Orthotics are this merchant's primary clinical-support product, " +
@@ -129,6 +133,7 @@ const CLASSIFIER_TOOL = {
           "and the new request are BOTH signals. " +
           "(d) INFORMATIONAL / DEFINITIONAL QUESTIONS: if the latest message is asking what " +
           "something IS, how it works, what it's made of, what its specs are, or to be told " +
+          "(NOTE: 'what should X wear/use for <condition>' is a RECOMMENDATION, not informational — see case 1) " +
           "about a specific product — return isOrthoticRequest=false even if the named product " +
           "or topic is orthotic-related. The customer wants information, not a recommendation. " +
           "Examples: 'what is a thinsole?', 'what are Thinsoles made of?', 'how does the foam " +
@@ -171,7 +176,7 @@ const CLASSIFIER_TOOL = {
       },
       attributes: {
         type: "object",
-        description: "Orthotic attributes the customer explicitly stated in this or previous turns. Use null for any attribute the customer has NOT mentioned.",
+        description: "Attributes the customer explicitly stated in this or previous turns. ALWAYS extract them when present — including when isFootwearRequest=true or isOrthoticRequest=false ('shoes for plantar fasciitis' still carries condition=plantar_fasciitis). Use null for any attribute the customer has NOT mentioned.",
         properties: {
           gender: {
             type: ["string", "null"],
@@ -185,39 +190,44 @@ const CLASSIFIER_TOOL = {
           useCase: {
             type: ["string", "null"],
             enum: [
+              "dress",
               "dress_no_removable",
-              "non_removable",
-              "comfort_walking_everyday",
+              "dress_premium",
+              "casual",
+              "comfort",
               "comfort_memory_foam",
               "comfort_memory_foam_everyday",
-              "comfort_bundle",
               "diabetic",
               "athletic_running",
-              "athletic_training_gym",
-              "athletic_training_sports",
+              "athletic_training",
+              "athletic_general",
+              "cleats",
               "skates",
               "winter_boots",
-              "boots_construction",
+              "work_all_day",
               null,
             ],
             description:
-              "Shoe context the orthotic will go in. " +
+              "Shoe context the orthotic will go in. These enum values are the recommender " +
+              "tree's exact vocabulary — the resolver matches them against its master index, " +
+              "so any other spelling silently fails to match. " +
               "MAPPING RULES (use these exact enum values for the listed phrases): " +
-              "'dress shoes' / 'heels' / 'fashion shoes' / 'pumps' / 'flats' → 'dress_no_removable'. " +
-              "'non-removable insole' / 'fixed insole' / 'inside the shoe' / 'shoe with built-in insole' → 'non_removable'. " +
-              "'casual' / 'everyday' / 'walking' / 'day to day' / 'standing around' → 'comfort_walking_everyday'. " +
+              "'dress shoes' / 'heels' / 'fashion shoes' / 'pumps' / 'flats' → 'dress'. " +
+              "dress shoes WITHOUT a removable insole ('non-removable insole', 'fixed insole', 'built-in insole') → 'dress_no_removable'. " +
+              "'premium' / 'luxury' dress shoes → 'dress_premium'. " +
+              "'casual' / 'everyday' / 'walking' / 'day to day' / 'standing around' → 'casual'. " +
+              "'just comfort' / 'comfort and relief' / generic all-day comfort (no shoe type) → 'comfort'. " +
               "'memory foam' / 'extra cushion' / 'soft insole' / 'plush' (no 'everyday' qualifier) → 'comfort_memory_foam'. " +
               "'memory foam for everyday' / 'cushioned daily wear' → 'comfort_memory_foam_everyday'. " +
-              "'plantar fasciitis kit' / 'PF kit' / 'plantar fasciitis bundle' → 'comfort_bundle'. " +
               "'diabetic' / 'diabetes' / 'neuropathy' / 'diabetic-friendly' → 'diabetic'. " +
               "'running' / 'jog' / 'jogging' / 'marathon' / '5k' / '10k' → 'athletic_running'. " +
-              "'gym' / 'training' / 'crossfit' / 'weights' / 'lifting' / 'exercise' → 'athletic_training_gym'. " +
-              "'tennis' / 'basketball' / 'court shoes' / 'pickleball' / 'sports' / generic 'athletic' / 'active lifestyle' → 'athletic_training_sports'. " +
-              "'soccer' / 'football' / 'baseball' / 'lacrosse' / 'rugby' / 'spike shoes' / 'cleats' → 'athletic_training_sports'. " +
+              "'gym' / 'training' / 'crossfit' / 'weights' / 'lifting' / 'exercise' → 'athletic_training'. " +
+              "'tennis' / 'basketball' / 'court shoes' / 'pickleball' / 'sports' / generic 'athletic' / 'active lifestyle' → 'athletic_general'. " +
+              "'soccer' / 'football' / 'baseball' / 'lacrosse' / 'rugby' / 'spike shoes' / 'cleats' → 'cleats'. " +
               "'hockey' / 'ice skates' / 'skates' → 'skates'. " +
               "'winter boots' / 'snow boots' / 'cold weather boots' / 'shearling' → 'winter_boots'. " +
-              "'work boots' / 'construction' / 'standing all day' / 'on my feet all day' / 'warehouse' / 'nursing' → 'boots_construction'. " +
-              "If the customer is a Kid: pick the closest match (usually 'comfort_walking_everyday'). " +
+              "'work boots' / 'construction' / 'standing all day' / 'on my feet all day' / 'warehouse' / 'nursing' / 'nurse' → 'work_all_day'. " +
+              "If the customer is a Kid: pick the closest match (usually 'casual'). " +
               "CRITICAL — useCase must come from the CUSTOMER'S CURRENT MESSAGE, not from prior conversation context. " +
               "If the customer was earlier shopping for a DRESS or a WEDDING outfit or any FOOTWEAR (a different product), " +
               "do NOT project that occasion onto a new orthotic question. The orthotic's useCase is the SHOE TYPE the orthotic " +
@@ -248,7 +258,10 @@ const CLASSIFIER_TOOL = {
               null,
             ],
             description:
-              "Specific clinical condition the customer named. " +
+              "Specific clinical condition the customer named. Extract it whenever named, " +
+              "INCLUDING on footwear requests ('shoes for plantar fasciitis' → " +
+              "condition='plantar_fasciitis' with isFootwearRequest=true) and single-noun asks " +
+              "('an insole for plantar fasciitis' → condition='plantar_fasciitis'). " +
               "MAPPING RULES (use these exact enum values for the listed phrases — downstream resolver depends on them): " +
               "'flat feet' / 'fallen arches' / 'overpronation' / 'pronate inward' → 'overpronation_flat_feet' (NOT 'low_arch'). " +
               "'high arches' / 'high arch' / 'supination' / 'underpronation' / 'roll outward' → 'high_arch'. " +
