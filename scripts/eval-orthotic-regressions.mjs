@@ -985,8 +985,16 @@ await test("20a — 'show me Vania in red' drops category AND gender filter (nam
   );
   assert.equal(result.input.filters?.gender, undefined,
     "gender filter must be dropped so named-product search isn't blocked by stale gender memory");
-  assert.equal(result.input.filters?.color, "red", "color filter must be preserved");
-  assert.equal(result.input.query, "Vania", "query string must be preserved");
+  // 2026-06-12 contract change: a hard color filter erased named products
+  // that don't come in that color ("you don't have tamara in red?" → the
+  // Tamara never surfaced → false "we don't carry a Tamara" denial). The
+  // color now moves into the query text as a soft ranking signal instead.
+  assert.equal(result.input.filters?.color, undefined,
+    "color filter must be dropped so a named product still surfaces when it doesn't come in that color");
+  assert.match(result.input.query, /red/i,
+    "the customer's color intent must survive as a query term");
+  assert.match(result.input.query, /^Vania\b/,
+    "the named product must stay the leading query term");
 });
 
 await test("20b — generic category-only query keeps the category filter (no false positive)", () => {
