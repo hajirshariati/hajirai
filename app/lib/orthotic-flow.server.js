@@ -1059,6 +1059,101 @@ export function mentionsNonOrthoticFootwear(rawText) {
   return true;
 }
 
+// ─────────────────────────────────────────────────────────────
+// Conversation-level footwear commitment (production hijack,
+// 2026-06-12). The gate's footwear vetoes inspect the LATEST user
+// message — so when a customer asks for SHOES on turn 1 ("I have
+// plantar fasciitis and going on a trip to Italy, what shoes do
+// you recommend?"), the gate correctly falls through to the LLM,
+// the LLM asks "men's or women's?", and on turn 2 the bare chip
+// answer ("Women's") carries no footwear noun. Nothing vetoed,
+// the engagement rule saw accumulated condition + gender, and the
+// orthotic flow hijacked a footwear conversation with q_use_case.
+//
+// These two per-message detectors give the gate a conversation-
+// level memory of that commitment. They reuse the existing
+// latest-message vocabulary (looksLikeFootwearCommit,
+// mentionsNonOrthoticFootwear, looksLikeRecommendationRequest,
+// detectOrthoticIntent) — no new noun lists.
+
+// Footwear-side chip answers from the gate's own disambig
+// questions ("Footwear with arch support" from the domain
+// disambig; "The shoes themselves" / "Heels to wear" / "Just
+// shoes" from the path-ambiguity disambig; "New Footwear" from
+// the LLM's bifurcation chips seen in production traces).
+const FOOTWEAR_PATH_CHIP_RE =
+  /^\s*(?:Footwear with arch support|The shoes themselves|Heels to wear|Just shoes|New Footwear)\.?\s*$/i;
+
+/**
+ * Does this single user message commit the conversation to the
+ * FOOTWEAR path?
+ *
+ * Returns:
+ *   "strong" — explicit commit (footwear-side disambig chip, or a
+ *              looksLikeFootwearCommit shape like "find me
+ *              sneakers"). Counts even mid-orthotic-flow: a
+ *              customer who says "actually just show me sneakers"
+ *              is leaving the flow.
+ *   "weak"   — names a footwear product (mentionsNonOrthoticFootwear)
+ *              or asks for a footwear recommendation. The caller
+ *              must NOT count a weak commit when the message is
+ *              answering an active orthotic question ("Dress shoes
+ *              / heels" clicked on "What kind of shoes will the
+ *              orthotics go in?") — that context lives gate-side.
+ *   false    — no commitment.
+ *
+ * The recommendation-shape branch exists because
+ * mentionsNonOrthoticFootwear suppresses on clinical-condition
+ * signals — the right call for the gate's latest-turn veto (the
+ * domain disambig still gets a shot), but at the conversation
+ * level "I have plantar fasciitis … what shoes do you recommend?"
+ * is the customer literally asking for shoes.
+ */
+export function messageCommitsToFootwear(rawText) {
+  const t = String(rawText || "")
+    .replace(/[‘’‚‛]/g, "'")
+    .replace(/[“”„‟]/g, '"')
+    .trim();
+  if (!t) return false;
+  if (FOOTWEAR_PATH_CHIP_RE.test(t)) return "strong";
+  if (looksLikeFootwearCommit(t)) return "strong";
+  if (mentionsNonOrthoticFootwear(t)) return "weak";
+  if (
+    FOOTWEAR_PRODUCT_NOUN_RE.test(t) &&
+    !ORTHOTIC_PRODUCT_RE.test(t) &&
+    looksLikeRecommendationRequest(t)
+  ) {
+    return "weak";
+  }
+  return false;
+}
+
+// Orthotic-side chip answers from the gate's disambigs. The
+// PATH_RESOLUTION / ORTHOTIC_LOCK literal the gate matches for
+// path locking ("Orthotic insole for these") plus the domain
+// disambig's "Orthotic insole" / the LLM's "Orthotic Insert".
+// detectOrthoticIntent catches all of these via ORTHOTIC_PRODUCT_RE
+// anyway ("insole" / "insert"); the explicit literal keeps the
+// pivot contract readable and drift-proof.
+const ORTHOTIC_PATH_CHIP_RE =
+  /^\s*(?:Orthotic insole(?:\s+for\s+these)?|Orthotic insert)\.?\s*$/i;
+
+/**
+ * Does this single user message pivot the conversation to the
+ * ORTHOTIC path? A pivot AFTER a footwear commit re-opens the
+ * orthotic flow; a footwear commit with no subsequent pivot means
+ * the gate must stay out, even on bare chip-answer turns.
+ */
+export function messagePivotsToOrthotic(rawText) {
+  const t = String(rawText || "")
+    .replace(/[‘’‚‛]/g, "'")
+    .replace(/[“”„‟]/g, '"')
+    .trim();
+  if (!t) return false;
+  if (ORTHOTIC_PATH_CHIP_RE.test(t)) return true;
+  return detectOrthoticIntent(t);
+}
+
 /**
  * Run Layer 1 + 2 against EVERY question node in the tree to
  * pre-extract any answers the customer's bootstrap message

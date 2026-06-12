@@ -51,6 +51,8 @@ import {
   looksLikeAvailabilityQuestion,
   looksLikeFunctionalQuestion,
   looksLikeTransactionalQuestion,
+  messageCommitsToFootwear,
+  messagePivotsToOrthotic,
 } from "./orthotic-flow.server.js";
 import { executeRecommenderTool } from "./recommender-tools.server.js";
 import { buildStorefrontSearchCTA } from "./storefront-search-cta.server.js";
@@ -1416,6 +1418,107 @@ export async function maybeRunOrthoticFlow({
         `product without orthotic intent; falling through to LLM`,
     );
     return { handled: false };
+  }
+
+  // Hard veto #3 — conversation-level footwear commitment. Runs
+  // before BOTH bootstrap and engagement/continuation firing below.
+  //
+  // Production hijack 2026-06-12: turn 1 "I have plantar fasciitis
+  // and going on a trip to Italy, what shoes do you recommend?"
+  // correctly fell through to the LLM (footwear request), the LLM
+  // asked men's/women's, and the customer clicked "Women's". The
+  // bare chip answer carries no footwear noun, so neither hard veto
+  // #1 nor #2 fired (#1's prior-commit scan is also disabled when
+  // the classifier tags the chip turn as orthotic, and turn 1's
+  // condition mention suppresses looksLikeFootwearCommit /
+  // mentionsNonOrthoticFootwear per-message anyway). The engagement
+  // rule then fired on accumulated condition+gender and the gate
+  // emitted q_use_case — hijacking a customer who asked for SHOES
+  // and never expressed orthotic intent.
+  //
+  // Rule: if any PRIOR user message committed to footwear and no
+  // SUBSEQUENT user message (including the latest) pivoted to
+  // orthotic intent, the gate falls through to the LLM — even on
+  // chip-answer turns. A later orthotic pivot ("Orthotic insole for
+  // these", "actually I need inserts", a condition restated with
+  // orthotic words) re-opens the flow.
+  //
+  // Weak commits (a footwear noun / recommendation ask without an
+  // explicit "find me sneakers" shape) are ignored when the message
+  // is answering an active orthotic question — an exact seed chip
+  // label ("Dress shoes / heels") or any reply to an assistant turn
+  // that itself talks about orthotics ("What kind of shoes will the
+  // orthotics go in?"). Strong commits count regardless: "actually
+  // just show me sneakers" mid-flow IS the customer leaving.
+  {
+    const stripForChipMatch = (s) =>
+      String(s || "").trim().toLowerCase().replace(/[^a-z0-9]+/g, "");
+    const isExactOrthoticChipLabel = (text) => {
+      const norm = stripForChipMatch(text);
+      if (!norm || !Array.isArray(tree?.definition?.nodes)) return false;
+      for (const node of tree.definition.nodes) {
+        if (!node || node.type !== "question" || !Array.isArray(node.chips)) continue;
+        for (const chip of node.chips) {
+          const lbl = stripForChipMatch(chip?.label);
+          const val = stripForChipMatch(chip?.value);
+          if ((lbl && norm === lbl) || (val && norm === val)) return true;
+        }
+      }
+      return false;
+    };
+    const ORTHOTIC_CONTEXT_ASSISTANT_RE =
+      /\b(orthotics?|insoles?|inserts?|inner[- ]soles?|footbeds?|thinsoles?|heel[- ]cups?|arch\s+type|ankles\s+roll\s+inward)\b/i;
+    const seedQuestionTexts = (tree?.definition?.nodes || [])
+      .filter((n) => n && n.type === "question" && typeof n.question === "string" && n.question.trim())
+      .map((n) => n.question.trim());
+    const assistantTurnIsOrthoticContext = (text) => {
+      if (typeof text !== "string" || !text.trim()) return false;
+      if (ORTHOTIC_CONTEXT_ASSISTANT_RE.test(text)) return true;
+      return seedQuestionTexts.some((q) => text.includes(q));
+    };
+
+    let lastFootwearCommitIdx = -1;
+    let lastOrthoticPivotIdx = -1;
+    for (let i = 0; i < messages.length; i++) {
+      const m = messages[i];
+      if (!m || m.role !== "user" || typeof m.content !== "string") continue;
+      // Commit detection first: a message that asks for shoes wins as
+      // a commit even when it also names a condition (the incident's
+      // turn 1 is detectOrthoticIntent-true via "plantar fasciitis"
+      // yet is unambiguously a footwear request). Latest message is
+      // excluded — latest-turn commits are hard vetoes #1/#2's job.
+      const commit = i < messages.length - 1 ? messageCommitsToFootwear(m.content) : false;
+      if (commit === "strong") {
+        lastFootwearCommitIdx = i;
+        continue;
+      }
+      if (commit === "weak") {
+        const answeringOrthoticQuestion = (() => {
+          if (isExactOrthoticChipLabel(m.content)) return true;
+          for (let j = i - 1; j >= 0; j--) {
+            const prev = messages[j];
+            if (prev && prev.role === "assistant" && typeof prev.content === "string") {
+              return assistantTurnIsOrthoticContext(prev.content);
+            }
+          }
+          return false;
+        })();
+        if (!answeringOrthoticQuestion) {
+          lastFootwearCommitIdx = i;
+          continue;
+        }
+      }
+      if (messagePivotsToOrthotic(m.content)) {
+        lastOrthoticPivotIdx = i;
+      }
+    }
+    if (lastFootwearCommitIdx >= 0 && lastOrthoticPivotIdx <= lastFootwearCommitIdx) {
+      console.log(
+        `[orthotic-flow] footwear-commit veto (history): customer committed to footwear ` +
+          `on a prior turn and never pivoted; falling through to LLM`,
+      );
+      return { handled: false, case: "footwear_commit_history" };
+    }
   }
 
   // Off-topic + chip-fingerprint detection upfront — both are used
