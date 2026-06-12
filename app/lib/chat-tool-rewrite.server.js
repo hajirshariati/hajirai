@@ -139,12 +139,18 @@ const NAMED_PRODUCT_COMMON_WORDS = new Set([
 export function relaxCategoryOnNamedProduct(toolCall, ctx) {
   if (toolCall.name !== "search_products") return toolCall;
   const filters = toolCall.input?.filters;
-  // Run when EITHER a category or a gender filter is set. Previously this
-  // function only fired when category was present, which missed the case
-  // where injectLockedGender stamps a stale gender on a named-product
-  // search ("show me Jillian" with session.gender=men → search injects
-  // gender=men → returns wrong products because Jillian is women-only).
-  if (!filters || (!filters.category && !filters.gender)) return toolCall;
+  // Run when a category, gender, OR color filter is set. Category/gender:
+  // a stale memory value must not hide a customer-named product ("show me
+  // Jillian" with session.gender=men → gender=men returns zero Jillian).
+  // Color: a hard color filter erases the named product entirely when it
+  // doesn't come in that color. Live trace 2026-06-12: "you don't have
+  // tamara in red?" kept color=red, the Tamara (which exists, but not in
+  // red) never appeared in any tool result, and the bot answered "we
+  // don't carry a Tamara sandal" — a false denial of a real product. The
+  // color moves into the QUERY text instead (soft ranking signal), so the
+  // named product always surfaces and the model can answer honestly:
+  // "the Tamara comes in black and tan — not red. Want these red ones?"
+  if (!filters || (!filters.category && !filters.gender && !filters.color && !filters.color_family)) return toolCall;
 
   const query = String(toolCall.input?.query || "").trim();
   if (!query) return toolCall;
@@ -174,24 +180,38 @@ export function relaxCategoryOnNamedProduct(toolCall, ctx) {
 
   const droppedCategory = filters.category;
   const droppedGender = filters.gender;
-  const { category: _dropCat, gender: _dropGen, ...remainingFilters } = filters;
-  // Also drop gender. Live trace 2026-06-08: customer asked "how many
-  // points to buy Jillian for free?" with memory.gender=men from a
-  // prior turn. Jillian is a women's-only style; search with gender=men
-  // returned 0 Jillian + 2 random men's sandals (Maui flips, Milos
-  // slides), then the bot attached those wrong products to the answer.
-  // Customer-named products override stored gender — let search find
-  // the actual product across genders.
+  const droppedColor = filters.color || filters.color_family;
+  const {
+    category: _dropCat,
+    gender: _dropGen,
+    color: _dropColor,
+    color_family: _dropColorFamily,
+    ...remainingFilters
+  } = filters;
+  // Gender: live trace 2026-06-08 — "how many points to buy Jillian for
+  // free?" with memory.gender=men returned 0 Jillian + 2 random men's
+  // sandals. Customer-named products override stored gender.
+  // Color: dropped as a FILTER but preserved as a QUERY term below, so
+  // "Tamara in red" still ranks red first when a red Tamara exists, yet
+  // the Tamara always appears even when it doesn't.
   const droppedFields = [];
   if (droppedCategory) droppedFields.push(`category="${droppedCategory}"`);
   if (droppedGender) droppedFields.push(`gender="${droppedGender}"`);
+  if (droppedColor) droppedFields.push(`color="${droppedColor}"`);
   console.log(
     `[chat] named-product detected: "${namedProduct}" — dropping ${droppedFields.join(", ")} so search can find it across the catalog`,
   );
+  // Keep the customer's color intent alive as a soft signal: append the
+  // dropped color to the query text when it isn't already there.
+  let nextQuery = query;
+  if (droppedColor && !query.toLowerCase().includes(String(droppedColor).toLowerCase())) {
+    nextQuery = `${query} ${droppedColor}`.trim();
+  }
   return {
     ...toolCall,
     input: {
       ...toolCall.input,
+      query: nextQuery,
       filters: Object.keys(remainingFilters).length > 0 ? remainingFilters : undefined,
     },
   };
