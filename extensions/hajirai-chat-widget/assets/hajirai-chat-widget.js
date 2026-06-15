@@ -4,7 +4,7 @@
 /* Build marker — bump on widget changes so a live deploy can be verified
    in DevTools console. If you don't see this line after `shopify app deploy`
    + hard refresh, the new bundle isn't live (stale checkout or CDN cache). */
-try{console.log('[hajirai-widget] build 2026-06-15 viz-beside-view-product');}catch(e){}
+try{console.log('[hajirai-widget] build 2026-06-15b viz-equal-height');}catch(e){}
 
 /* Visual config comes from theme editor (liquid-injected as window.__AI_CHAT_CONFIG).
    Chat server URL is handled internally via app proxy at /apps/hajirai/chat. */
@@ -773,7 +773,7 @@ function injectVizButton(card,cta){
     // side by side (wraps gracefully if the card is too narrow).
     var row=document.createElement('div');
     row.className='ai-chat-viz-actions';
-    row.style.cssText='display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:4px';
+    row.style.cssText='display:flex;flex-wrap:wrap;gap:8px;align-items:stretch;margin-top:4px';
     viewCta.parentNode.insertBefore(row,viewCta);
     viewCta.style.margin='0';
     row.appendChild(viewCta);

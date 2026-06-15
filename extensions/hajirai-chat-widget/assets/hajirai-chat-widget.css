@@ -1361,7 +1361,9 @@ a.ai-chat-welcome__hint--link:hover {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  align-items: center;
+  /* stretch (not center) so Visualize matches the View product CTA's
+     height exactly, regardless of each button's own padding. */
+  align-items: stretch;
   margin-top: 4px;
   width: 100%;
 }
