@@ -34,7 +34,7 @@
 //     superlative — "what's the best" wants ONE answer).
 import { COMPARE_RE } from "./turn-intent.server.js";
 
-export const SINGULAR_INTENT_RE = /\btell me (?:more |a (?:bit|little) more )?about\b|\bmore (?:info|information|details) (?:on|about)\b|\b(?:what|how) about\s+(?:this|that|the\s+\w+\s+one\b)|\bhow is\b|\bis the\b|\bdoes (?:the|this|that)\b|\b(?:this|that) one\b|\bthe (?:first|second|third|last|cheapest|cheaper|priciest|most expensive|best|top|finest|red|blue|black|white)\s+(?:one\b|[a-z'-]+s?\b)|\bwhich\s+[a-z'-]+\s+(?:is|are)\s+(?:best|most|finest|top|the\s+(?:best|most))\b|\bwhat\s*'?s\s+(?:the\s+|your\s+|our\s+)?(?:best|cheapest|priciest|most expensive|finest|top|most\s+[a-z'-]+)\b/i;
+export const SINGULAR_INTENT_RE = /\btell me (?:more |a (?:bit|little) more )?about\b|\bmore (?:info|information|details) (?:on|about)\b|\b(?:what|how) about\s+(?:this|that|the\s+\w+\s+one\b)|\bhow is\b|\bis the\b|\bdoes (?:the|this|that)\b|\b(?:this|that) one\b|\bthe (?:first|second|third|last|cheapest|cheaper|priciest|most expensive|best|top|finest|red|blue|black|white)\s+(?:one\b|[a-z'-]+s?\b)|\bwhich\s+[a-z'-]+\s+(?:is|are)\s+(?:best|most|finest|top|the\s+(?:best|most))\b|\bwhat\s*'?s\s+(?:the\s+|your\s+|our\s+)?(?:best|cheapest|priciest|most expensive|finest|top|most\s+[a-z'-]+)\b|\b(?:just|only)\s+(?:one|1)\b|\bone\s+only\b|\ba\s+single\b|\bshow\s+me\s+(?:just\s+|only\s+)?one\b|\b(?:only\s+)?1\s+(?:shoe|pair|product|option|item|style)\b/i;
 
 // Referential-plural phrasing: the customer is pointing back at the
 // SET the assistant just showed ("the same thing for women", "show me
