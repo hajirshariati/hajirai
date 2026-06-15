@@ -1,6 +1,11 @@
 (function(){
 'use strict';
 
+/* Build marker — bump on widget changes so a live deploy can be verified
+   in DevTools console. If you don't see this line after `shopify app deploy`
+   + hard refresh, the new bundle isn't live (stale checkout or CDN cache). */
+try{console.log('[hajirai-widget] build 2026-06-15 viz-beside-view-product');}catch(e){}
+
 /* Visual config comes from theme editor (liquid-injected as window.__AI_CHAT_CONFIG).
    Chat server URL is handled internally via app proxy at /apps/hajirai/chat. */
 var C=window.__AI_CHAT_CONFIG||{};

@@ -1352,6 +1352,31 @@ a.ai-chat-welcome__hint--link:hover {
   }
 }
 
+/* "Visualize My Look" sits on the SAME line as "View product".
+   injectVizButton() wraps both CTAs in this flex row so they render
+   side by side inside the card. Force both children to size to their
+   content (not stretch to full width) regardless of the card layout
+   the row lands in (vertical showcase, horizontal :only-child, etc.). */
+.ai-chat-viz-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-top: 4px;
+  width: 100%;
+}
+.ai-chat-viz-actions .ai-chat-product-cta {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  flex: 0 1 auto;
+  width: auto;
+  margin: 0;
+}
+.ai-chat-viz-actions .ai-chat-viz-btn {
+  flex: 0 1 auto;
+}
+
 /* Showcase nav arrows — black circle, white chevron, vertically
    centered on the first card's image (anchor set in JS via
    --arrow-top so it stays correct at any card width). */
