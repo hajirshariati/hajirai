@@ -716,7 +716,7 @@ function choiceButtonsHtml(options){
 function vizSparkle(){return '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l1.6 4.8L18 8.4l-4.4 1.6L12 15l-1.6-4.9L6 8.4l4.4-1.6z"/><path d="M19 14l.8 2.4L22 17.2l-2.2.8L19 20l-.8-2L16 17.2l2.2-.8z" opacity=".7"/></svg>';}
 function vizImageIcon(){return '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>';}
 function vizLoadingHtml(step){
-  return '<div class="ai-chat-viz-card" style="margin-top:10px;border:1px solid rgba(45,107,79,.18);border-radius:14px;padding:16px;background:linear-gradient(180deg,rgba(45,107,79,.05),rgba(45,107,79,.02))">'+
+  return '<div class="ai-chat-viz-card" style="border:1px solid rgba(45,107,79,.18);border-radius:14px;padding:16px;background:linear-gradient(180deg,rgba(45,107,79,.05),rgba(45,107,79,.02))">'+
     '<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">'+
       '<span style="width:14px;height:14px;border:2px solid var(--ai-chat-primary,#2d6b4f);border-top-color:transparent;border-radius:50%;display:inline-block;animation:aiChatVizSpin .8s linear infinite;flex:none"></span>'+
       '<span class="ai-chat-viz-step" style="font-size:13px;color:#2d6b4f;font-weight:600">'+esc(step)+'</span>'+
@@ -727,9 +727,9 @@ function vizLoadingHtml(step){
   '</div>';
 }
 function vizResultHtml(src){
-  return '<div class="ai-chat-viz-card" style="margin-top:10px;border:1px solid rgba(0,0,0,.08);border-radius:14px;overflow:hidden;background:#fff">'+
-    '<img src="'+esc(src)+'" alt="Styled preview of this product" style="display:block;width:100%;height:auto"/>'+
-    '<div style="font-size:11.5px;color:#8a8a8a;padding:9px 12px;text-align:center;line-height:1.4">A quick AI preview to help you picture the look. The model and setting are just for inspiration — see the photo above for the exact product.</div>'+
+  return '<div class="ai-chat-viz-card" style="border:1px solid rgba(0,0,0,.08);border-radius:14px;overflow:hidden;background:#fff">'+
+    '<img src="'+esc(src)+'" alt="AI-generated styling preview" style="display:block;width:100%;height:auto"/>'+
+    '<div style="font-size:11px;color:#9a9a9a;padding:7px 10px;text-align:center;line-height:1.35">\u2728 AI-generated \u2014 may not exactly match the product.</div>'+
   '</div>';
 }
 function vizErrorHtml(msg){
@@ -784,17 +784,18 @@ function injectVizButton(card,cta){
 }
 function runVisualize(cta,card){
   if(!cta||!cta.productHandle)return;
+  // HIDE the CTA once tapped (cleaner than greying it out).
   var viz=card&&card.querySelector('.ai-chat-viz-btn');
-  if(viz){viz.style.opacity='0.5';viz.style.pointerEvents='none';}
-  // Drop the loading box + image BELOW the product card: insert after
-  // the whole products block so it spans the bubble width, never beside
-  // the card.
-  var products=card&&card.closest('.ai-chat-products');
-  var anchor=products||card;
-  if(!anchor||!anchor.parentNode)return;
+  if(viz)viz.style.display='none';
+  if(!card||!card.parentNode)return;
+  // Render the preview as a sibling immediately AFTER the card. The
+  // product row is a flex container, so this places the image BESIDE
+  // the card (card stays its width, image fills the rest).
   var host=document.createElement('div');
+  host.className='ai-chat-viz-host';
   host.setAttribute('role','status');host.setAttribute('aria-live','polite');host.setAttribute('aria-label','Creating your styling preview');
-  anchor.parentNode.insertBefore(host,anchor.nextSibling);
+  host.style.cssText='flex:1 1 58%;min-width:0;align-self:flex-start;margin-left:10px';
+  card.parentNode.insertBefore(host,card.nextSibling);
   vizFetch(host,cta);
 }
 // Loading → fetch → result/error. Runs INDEPENDENTLY of the chat stream
