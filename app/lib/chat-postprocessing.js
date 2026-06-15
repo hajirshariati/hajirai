@@ -1374,3 +1374,48 @@ export function dropNonFootwearWhenFootwearIntent(cards, userMessage) {
   if (footwear.length === 0 || nonFootwear.length === 0) return { cards, dropped: [] };
   return { cards: footwear, dropped: nonFootwear.map((c) => c?.handle || c?.title || "?") };
 }
+
+// Leading-title tokens that are NOT a product's model name — colors,
+// sizes, and generic filler that some titles open with. Keeps a color
+// word in the customer's message ("do you have it in black?") from
+// mis-anchoring onto a card whose title happens to start with it.
+export const NON_MODEL_LEADING_TOKENS = new Set([
+  "black", "white", "grey", "gray", "navy", "blue", "brown", "tan",
+  "beige", "cream", "pink", "red", "green", "purple", "silver", "gold",
+  "coffee", "burgundy", "charcoal", "olive", "khaki", "stone", "sand",
+  "small", "medium", "large", "wide", "narrow", "regular", "standard",
+  "mens", "womens", "kids", "unisex", "adult", "youth",
+  "the", "new", "classic", "original",
+]);
+
+// Resolve which already-shown card a fact/sizing follow-up refers to.
+// Customers reference a product by its short model name ("danika"),
+// not the full merchandised title ("Danika Arch Support Sneaker -
+// Pink"). Match strategy, most precise first:
+//   1. message contains the FULL card title
+//   2. message contains the card title's leading model-name token as a
+//      whole word (skipping generic color/size/filler leads)
+// Returns the matched card, or null when nothing matches unambiguously.
+//
+// Prod trace 2026-06-15: "what size should I wear in danika?" with 5
+// cards on screen returned null here (only full-title inclusion was
+// checked), the model re-searched + narrated, and the cleanup pipeline
+// stripped the narration to an empty reply — the question went
+// unanswered.
+export function resolveFocusedCardByName(message, cards) {
+  const lower = String(message || "").toLowerCase();
+  const list = Array.isArray(cards) ? cards : [];
+  if (!lower || list.length === 0) return null;
+  const byFullTitle = list.find((c) => {
+    const t = String(c?.title || "").trim().toLowerCase();
+    return t.length >= 5 && lower.includes(t);
+  });
+  if (byFullTitle) return byFullTitle;
+  const byModelName = list.find((c) => {
+    const first = String(c?.title || "").trim().split(/[\s\-–—/]+/)[0].toLowerCase();
+    if (first.length < 4 || !/^[a-z]+$/.test(first)) return false;
+    if (NON_MODEL_LEADING_TOKENS.has(first)) return false;
+    return new RegExp(`\\b${first}\\b`, "i").test(lower);
+  });
+  return byModelName || null;
+}

@@ -83,6 +83,7 @@ import {
   resolverPromisedRecommendation,
   dropNonFootwearWhenFootwearIntent,
   detectComparisonIntent,
+  resolveFocusedCardByName,
 } from "../lib/chat-postprocessing";
 import {
   finalizeOutboundReply,
@@ -3419,11 +3420,10 @@ async function handleChatPost({ shop, sessionAccessToken, request, internal = fa
         isColorFactFollowUp(latestUserMessage) ||
         isDirectProductFactQuestion(latestUserMessage);
       if (isFactFollowup) {
-        const lower = latestUserMessage.toLowerCase();
-        const named = priorProductCards.find((c) => {
-          const t = String(c?.title || "").trim().toLowerCase();
-          return t.length >= 5 && lower.includes(t);
-        });
+        // Bind to the product the customer named — by full title or by
+        // its short model-name token ("danika" → "Danika Arch Support
+        // Sneaker"). Falls back to the sole card when only one is shown.
+        const named = resolveFocusedCardByName(latestUserMessage, priorProductCards);
         focusProduct = named || (priorProductCards.length === 1 ? priorProductCards[0] : null);
         if (focusProduct) {
           console.log(`[chat] focus-product anchor: "${focusProduct.title}" (goal=${convGoal?.type || "fact-followup"})`);

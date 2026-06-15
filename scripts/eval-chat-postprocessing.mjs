@@ -51,6 +51,7 @@ import {
   resolverPromisedRecommendation,
   stripAvailabilityDenialSentences,
   dropNonFootwearWhenFootwearIntent,
+  resolveFocusedCardByName,
 } from "../app/lib/chat-postprocessing.js";
 import {
   isSingularPrescriptive,
@@ -1538,6 +1539,46 @@ test("fulfillment — fallback selector: never emits 'nothing's quite hitting' w
     `fallback for promised recommend must not contain forbidden no-match phrases: ${promisedFallback}`,
   );
   assert.ok(/nothing.{0,3}s quite hitting/i.test(selectFallback(noPromise)), "legacy fallback still fires when no resolver promise");
+});
+
+// =====================================================================
+// Focus-product anchor — short model-name reference
+// =====================================================================
+const SNEAKER_CARDS = [
+  { title: "Danika Arch Support Sneaker - Pink", handle: "danika-pink-ap100w" },
+  { title: "Renee Arch Support Sneaker - Grey", handle: "renee-grey-pc230w" },
+  { title: "Morgan Arch Support Sneaker - White", handle: "morgan-white" },
+];
+
+test("focus-anchor — short model name binds the right card (prod 2026-06-15 'what size should I wear in danika?')", () => {
+  const hit = resolveFocusedCardByName("what size should i wear in danika ?", SNEAKER_CARDS);
+  assert.ok(hit, "should resolve a card from the short name 'danika'");
+  assert.equal(hit.handle, "danika-pink-ap100w");
+});
+
+test("focus-anchor — full title still matches", () => {
+  const hit = resolveFocusedCardByName("does the Renee Arch Support Sneaker - Grey run small?", SNEAKER_CARDS);
+  assert.equal(hit?.handle, "renee-grey-pc230w");
+});
+
+test("focus-anchor — no product name with multiple cards stays null (ambiguous)", () => {
+  assert.equal(resolveFocusedCardByName("what size should i wear?", SNEAKER_CARDS), null);
+});
+
+test("focus-anchor — a color word in the message does not mis-anchor", () => {
+  // "pink" is a leading token guarded by NON_MODEL_LEADING_TOKENS, and
+  // also appears in a title — must not bind just because of the color.
+  const cards = [
+    { title: "Pink Lily Sandal", handle: "pink-lily" },
+    { title: "Maui Orthotic Flip", handle: "maui" },
+  ];
+  assert.equal(resolveFocusedCardByName("do you have it in pink?", cards), null);
+});
+
+test("focus-anchor — empty/garbage input is safe", () => {
+  assert.equal(resolveFocusedCardByName("", SNEAKER_CARDS), null);
+  assert.equal(resolveFocusedCardByName("hello there", SNEAKER_CARDS), null);
+  assert.equal(resolveFocusedCardByName("danika", []), null);
 });
 
 // =====================================================================
