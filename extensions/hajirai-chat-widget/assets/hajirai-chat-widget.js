@@ -714,12 +714,15 @@ function choiceButtonsHtml(options){
 }
 
 function vizSparkle(){return '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l1.6 4.8L18 8.4l-4.4 1.6L12 15l-1.6-4.9L6 8.4l4.4-1.6z"/><path d="M19 14l.8 2.4L22 17.2l-2.2.8L19 20l-.8-2L16 17.2l2.2-.8z" opacity=".7"/></svg>';}
+function vizImageIcon(){return '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>';}
 function vizLoadingHtml(step){
   return '<div class="ai-chat-viz-card" style="margin-top:10px;border:1px solid rgba(45,107,79,.18);border-radius:14px;padding:16px;background:linear-gradient(180deg,rgba(45,107,79,.05),rgba(45,107,79,.02))">'+
-    '<div style="height:150px;border-radius:10px;background:linear-gradient(90deg,#ececec 25%,#f6f6f6 37%,#ececec 63%);background-size:400% 100%;animation:aiChatViz 1.4s ease infinite"></div>'+
-    '<div style="display:flex;align-items:center;gap:8px;margin-top:12px">'+
-      '<span style="width:14px;height:14px;border:2px solid var(--ai-chat-primary,#2d6b4f);border-top-color:transparent;border-radius:50%;display:inline-block;animation:aiChatVizSpin .8s linear infinite"></span>'+
-      '<span class="ai-chat-viz-step" style="font-size:13px;color:#444;font-weight:500">'+esc(step)+'</span>'+
+    '<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">'+
+      '<span style="width:14px;height:14px;border:2px solid var(--ai-chat-primary,#2d6b4f);border-top-color:transparent;border-radius:50%;display:inline-block;animation:aiChatVizSpin .8s linear infinite;flex:none"></span>'+
+      '<span class="ai-chat-viz-step" style="font-size:13px;color:#2d6b4f;font-weight:600">'+esc(step)+'</span>'+
+    '</div>'+
+    '<div style="position:relative;height:160px;border-radius:10px;overflow:hidden;background:linear-gradient(90deg,#ececec 25%,#f6f6f6 37%,#ececec 63%);background-size:400% 100%;animation:aiChatViz 1.4s ease infinite">'+
+      '<span style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#b8b8b8;display:flex;flex-direction:column;align-items:center;gap:4px">'+vizImageIcon()+'<span style="font-size:11px;color:#a0a0a0">Creating your preview…</span></span>'+
     '</div>'+
   '</div>';
 }
@@ -765,14 +768,23 @@ function runVisualize(cta,btn,card){
   if(!anchorEl||!anchorEl.parentNode)return;
   if(btn){btn.style.opacity='0.5';btn.style.pointerEvents='none';}
   var host=document.createElement('div');
+  host.setAttribute('role','status');host.setAttribute('aria-live','polite');host.setAttribute('aria-label','Creating your styling preview');
   anchorEl.parentNode.insertBefore(host,anchorEl.nextSibling);
   var steps=['Analyzing the product…','Composing the scene…','Styling the look…','Rendering your preview…'];
   var si=0;host.innerHTML=vizLoadingHtml(steps[0]);scrollBottom();
   var iv=setInterval(function(){si=Math.min(si+1,steps.length-1);var l=host.querySelector('.ai-chat-viz-step');if(l)l.textContent=steps[si]},2200);
-  fetch(VISUALIZE_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({productHandle:cta.productHandle,styleContext:cta.styleContext||''})})
+  // Image generation can take a while and runs INDEPENDENTLY of the
+  // chat stream — the customer can keep typing and sending messages
+  // while this works. Own AbortController with a 60s ceiling so a
+  // hung provider doesn't spin forever.
+  var ctrl=(typeof AbortController!=='undefined')?new AbortController():null;
+  var to=setTimeout(function(){if(ctrl){try{ctrl.abort()}catch(e){}}},60000);
+  var opts={method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({productHandle:cta.productHandle,styleContext:cta.styleContext||''})};
+  if(ctrl)opts.signal=ctrl.signal;
+  fetch(VISUALIZE_URL,opts)
     .then(function(r){return r.json().catch(function(){return{}})})
-    .then(function(d){clearInterval(iv);if(d&&d.ok&&d.imageDataUrl){host.innerHTML=vizResultHtml(d.imageDataUrl)}else{showVizError(host,btn,cta,card,(d&&d.message)||'Could not create the preview right now.')}scrollBottom()})
-    .catch(function(){clearInterval(iv);showVizError(host,btn,cta,card,'Connection issue. Please try again.');scrollBottom()});
+    .then(function(d){clearInterval(iv);clearTimeout(to);if(d&&d.ok&&d.imageDataUrl){host.removeAttribute('aria-busy');host.innerHTML=vizResultHtml(d.imageDataUrl)}else{showVizError(host,btn,cta,card,(d&&d.message)||'Could not create the preview right now.')}scrollBottom()})
+    .catch(function(e){clearInterval(iv);clearTimeout(to);showVizError(host,btn,cta,card,(e&&e.name==='AbortError')?'That took too long — please try again.':'Connection issue. Please try again.');scrollBottom()});
 }
 
 function showVizError(host,btn,cta,card,msg){

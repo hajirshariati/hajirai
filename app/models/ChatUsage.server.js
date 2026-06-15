@@ -85,6 +85,8 @@ export async function getUsageSummary(shop, range = 30) {
 
   let totalCost = 0;
   let totalEmbeddingCost = 0;
+  let totalImageCost = 0;
+  let totalImageCount = 0;
   let totalInputTokens = 0;
   let totalOutputTokens = 0;
   let totalMessages = 0;
@@ -93,6 +95,23 @@ export async function getUsageSummary(shop, range = 30) {
   const dailyCosts = {};
 
   for (const r of records) {
+    const day = r.createdAt.toISOString().split("T")[0];
+    if (!dailyCosts[day]) dailyCosts[day] = { cost: 0, messages: 0 };
+
+    // Image-styling rows ("Visualize My Look") are their own usage
+    // records (model = "image:<provider>"), not chat messages. Fold
+    // their cost into the true total + daily spend, but DON'T count
+    // them as messages or as a model row — otherwise the message count
+    // and per-model table are skewed.
+    if (typeof r.model === "string" && r.model.startsWith("image:")) {
+      const imgCost = r.imageCostUsd || 0;
+      totalCost += imgCost;
+      totalImageCost += imgCost;
+      totalImageCount += r.imageCount || 1;
+      dailyCosts[day].cost += imgCost;
+      continue;
+    }
+
     // Every cost total folds in the turn's semantic-search (embedding)
     // spend so charts and totals reflect true cost, not just Anthropic
     // tokens. Pre-migration rows have no embeddingCostUsd → 0.
@@ -112,8 +131,6 @@ export async function getUsageSummary(shop, range = 30) {
     byModel[r.model].cost += r.costUsd;
     byModel[r.model].messages += 1;
 
-    const day = r.createdAt.toISOString().split("T")[0];
-    if (!dailyCosts[day]) dailyCosts[day] = { cost: 0, messages: 0 };
     dailyCosts[day].cost += turnCost;
     dailyCosts[day].messages += 1;
   }
@@ -130,6 +147,10 @@ export async function getUsageSummary(shop, range = 30) {
     // the analytics table's model rows + this row sum to the total.
     embeddingCost: totalEmbeddingCost,
     avgEmbeddingCostPerMessage: totalMessages > 0 ? totalEmbeddingCost / totalMessages : 0,
+    // "Visualize My Look" image-styling share of totalCost.
+    imageCost: totalImageCost,
+    imageCount: totalImageCount,
+    avgImageCostPerMessage: totalMessages > 0 ? totalImageCost / totalMessages : 0,
     byModel,
     dailyCosts,
     startDate: start.toISOString(),
@@ -142,7 +163,7 @@ export async function getDailySeries(shop, range = 30) {
   const [usageRows, feedbackRows] = await Promise.all([
     prisma.chatUsage.findMany({
       where: { shop, createdAt: { gte: start, lte: end } },
-      select: { createdAt: true, costUsd: true, embeddingCostUsd: true, inputTokens: true, outputTokens: true, toolCalls: true },
+      select: { createdAt: true, costUsd: true, embeddingCostUsd: true, imageCostUsd: true, model: true, inputTokens: true, outputTokens: true, toolCalls: true },
     }),
     prisma.chatFeedback.findMany({
       where: { shop, createdAt: { gte: start, lte: end } },
@@ -159,6 +180,11 @@ export async function getDailySeries(shop, range = 30) {
     const key = r.createdAt.toISOString().split("T")[0];
     const row = map.get(key);
     if (!row) continue;
+    // Image-styling rows add cost but aren't messages (see getUsageSummary).
+    if (typeof r.model === "string" && r.model.startsWith("image:")) {
+      row.cost += r.imageCostUsd || 0;
+      continue;
+    }
     row.messages += 1;
     row.cost += (r.costUsd || 0) + (r.embeddingCostUsd || 0);
     row.tokens += (r.inputTokens || 0) + (r.outputTokens || 0);

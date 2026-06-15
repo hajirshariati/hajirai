@@ -540,6 +540,16 @@ export default function Analytics() {
         avg: usage.avgEmbeddingCostPerMessage,
       });
     }
+    // "Visualize My Look" image-styling spend — counted by images
+    // generated (not messages), surfaced as its own row.
+    if (usage.imageCost > 0) {
+      rows.push({
+        model: "Visualize My Look (images)",
+        messages: usage.imageCount || 0,
+        cost: usage.imageCost,
+        avg: usage.imageCount > 0 ? usage.imageCost / usage.imageCount : null,
+      });
+    }
     return rows;
   }, [usage]);
 
@@ -1013,9 +1023,9 @@ export default function Analytics() {
               <Kpi
                 label="API Cost"
                 value={formatCost(usage.totalCost)}
-                sub={usage.embeddingCost > 0
-                  ? `Avg ${formatCost(usage.avgCostPerMessage)} / msg · incl. semantic search ${formatCost(usage.embeddingCost)}`
-                  : `Avg ${formatCost(usage.avgCostPerMessage)} / msg`}
+                sub={`Avg ${formatCost(usage.avgCostPerMessage)} / msg`
+                  + (usage.embeddingCost > 0 ? ` · semantic search ${formatCost(usage.embeddingCost)}` : "")
+                  + (usage.imageCost > 0 ? ` · image previews ${formatCost(usage.imageCost)}` : "")}
                 curr={usage.totalCost}
                 prev={previous.cost}
                 goodDirection="down"
