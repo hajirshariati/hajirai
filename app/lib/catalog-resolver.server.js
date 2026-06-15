@@ -565,8 +565,11 @@ const RESOLVER_CATEGORY_LEX = {
   clogs: "clogs", clog: "clogs",
   "slip-ons": "slip-ons", "slip-on": "slip-ons",
   slippers: "slippers", slipper: "slippers",
-  "mary janes": "mary-janes", "mary-janes": "mary-janes",
-  heels: "wedges-heels", wedges: "wedges-heels",
+  "mary janes": "mary-janes", "mary-janes": "mary-janes", "mary jane": "mary-janes",
+  // Singular forms matter: "blue heel" must establish the (women-only)
+  // category just like "heels" does, or the bot wrongly asks "men's or
+  // women's?" for a women-only category (prod 2026-06-15).
+  heels: "wedges-heels", heel: "wedges-heels", wedges: "wedges-heels", wedge: "wedges-heels",
   orthotics: "orthotics", orthotic: "orthotics", insoles: "orthotics", insole: "orthotics",
   accessories: "accessories", accessory: "accessories",
 };
