@@ -37,13 +37,17 @@ function buildStylistPrompt({ productTitle, styleContext }) {
     ? `Style it for this customer's described look: "${ctx}".`
     : "Style it in a tasteful, editorial e-commerce scene.";
   return [
-    "You are a professional fashion stylist creating ONE photorealistic styling preview for an online shopper.",
-    "The attached image is the EXACT product to feature.",
+    "You are a professional product stylist creating ONE photorealistic styling preview for an online shopper.",
+    "The attached image is the EXACT product to feature — it is the HERO of the shot and must dominate the frame.",
     "ABSOLUTE RULE — DO NOT CHANGE THE PRODUCT: reproduce it exactly as shown — identical shape, silhouette, color, materials, texture, hardware, stitching, patterns, logos, and proportions. Do not redesign, recolor, restyle, embellish, add, or remove anything on the product itself.",
     styleLine,
     `The product is: ${String(productTitle || "the item").trim()}.`,
-    "Show the product worn/used on a model (or styled in a clean lifestyle scene if a model doesn't fit the product), so the shopper can picture the complete look.",
-    "Keep the product the unmistakable focus and pixel-faithful to the reference. Photorealistic, natural lighting, clean modern e-commerce editorial quality. No text, watermarks, or logos added to the image.",
+    "COMPOSITION RULES (critical — the product must be unmistakably the focus):",
+    "- Frame the product LARGE and central: it should occupy roughly half the image, sit in the foreground, be sharply focused and well-lit, and be the first thing the eye lands on.",
+    "- If the product is footwear (shoes, sneakers, sandals, heels, boots, slippers, clogs): use a CLOSE, feet-forward crop framed from about the knee or mid-calf down. Show the shoes big and crisp. NEVER produce a full-length head-to-toe shot that shrinks the shoes to a small detail at the bottom of the frame.",
+    "- Any model, clothing, props, or background are SUPPORTING CONTEXT only — keep them secondary and never let them obscure, crop, or visually compete with the product.",
+    "- Use a shallow depth of field: product razor-sharp, background gently soft.",
+    "Keep the product pixel-faithful to the reference. Photorealistic, natural lighting, clean modern e-commerce editorial quality. No text, watermarks, or logos added to the image.",
   ].join("\n");
 }
 
