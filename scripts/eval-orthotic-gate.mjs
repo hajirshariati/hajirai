@@ -707,6 +707,52 @@ await test("regression (2026-06-12): condition + 'what shoes do you recommend?' 
   assert.equal(events.length, 0);
 });
 
+await test("regression (2026-06-15): a SIZING question + one-word scoping answers must NOT start the finder", async () => {
+  // Prod trace 2026-06-15: customer opened with "What size should I
+  // choose?", answered the bot's scoping questions with "Men's" then
+  // "Orthotics", and the gate hijacked into the recommender
+  // questionnaire — abandoning the original sizing question. The goal
+  // guard must keep the finder out so the LLM answers the sizing
+  // question with product context.
+  const { events, encoder, controller } = makeMockSse();
+  const out = await maybeRunOrthoticFlow({
+    messages: [
+      { role: "user", content: "What size should I choose?" },
+      { role: "assistant", content: "Happy to help with sizing! Are you shopping for men's, women's, or kids'?\n\n<<Men's>><<Women's>><<Kids>>" },
+      { role: "user", content: "Men's" },
+      { role: "assistant", content: "Got it — men's. Which category?\n\n<<Sneakers>><<Sandals>><<Orthotics>>" },
+      { role: "user", content: "Orthotics" },
+    ],
+    tree,
+    shop: "test.myshopify.com",
+    controller,
+    encoder,
+    classifiedIntent: { isOrthoticRequest: true, isFootwearRequest: false, isRejection: false, attributes: { gender: "Men" }, confidence: "high" },
+  });
+  assert.equal(out.handled, false, "sizing question must not be hijacked into the finder");
+  assert.equal(out.case, "info_question_goal");
+  assert.equal(events.length, 0);
+});
+
+await test("counter-case: a VOLUNTEERED orthotic request still starts the finder", async () => {
+  // The guard must be narrow: a real "I need orthotics" sentence (even
+  // after an earlier info question) still engages the questionnaire.
+  const { events, encoder, controller } = makeMockSse();
+  const out = await maybeRunOrthoticFlow({
+    messages: [
+      { role: "user", content: "what's your return policy?" },
+      { role: "assistant", content: "30-day returns on unworn items." },
+      { role: "user", content: "ok cool, I need orthotics" },
+    ],
+    tree,
+    shop: "test.myshopify.com",
+    controller,
+    encoder,
+    classifiedIntent: { isOrthoticRequest: true, isFootwearRequest: false, isRejection: false, attributes: {}, confidence: "high" },
+  });
+  assert.equal(out.handled, true, "a volunteered orthotic request must still run the finder");
+});
+
 await test("history veto does NOT fire on an exact flow-chip answer mid-flow (stale footwear commit)", async () => {
   // Mixed conversation: the customer asked for shoes early on, then
   // genuinely pivoted to orthotics and entered the flow. A bare chip

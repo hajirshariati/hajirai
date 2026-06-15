@@ -38,7 +38,7 @@ import { extractUserConstraints } from "./catalog-resolver.server.js";
 import { detectRejectedCategories } from "./chat-postprocessing.js";
 import { extractChoiceEvents } from "./choice-events.server.js";
 import { detectStorefrontSearchModifier } from "./storefront-search-cta.server.js";
-import { resolveTurnIntent } from "./turn-intent.server.js";
+import { resolveTurnIntent, detectConversationGoal } from "./turn-intent.server.js";
 
 const SCALAR_KEYS = [
   "gender", "category", "color", "size", "width",
@@ -254,9 +254,16 @@ export function buildSessionMemory({ messages, classifiedIntent, resolverState }
     //   { label, confidence, reason, staleKeysToDrop,
     //     extractedThisTurn: { gender?, category?, color?, ... } }
     latestTurnIntent: null,
+    // The customer's standing GOAL (speech-act): an info question
+    // (sizing/fit/price/policy) persists until an explicit shopping
+    // action overrides it. The recommender gate reads this to avoid
+    // hijacking an information question into the product finder.
+    pendingGoal: null,
   };
 
   if (!Array.isArray(messages) || messages.length === 0) return memory;
+
+  memory.pendingGoal = detectConversationGoal(messages);
 
   const rejectedSet = new Set();
   const choiceEventsByTurn = new Map();

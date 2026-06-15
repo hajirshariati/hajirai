@@ -76,7 +76,7 @@ function buildCompactGuidelines(fitPredictorEnabled) {
 }
 
 export function buildSystemPrompt(args, options = {}) {
-  const { config, knowledge, retrievedChunks, shop, attributeNames, categoryExclusions, querySynonyms, customerContext, fitPredictorEnabled, catalogProductTypes, fullCatalogProductTypes, scopedGender, answeredChoices, categoryGenderMap, activeCampaigns, merchantGroups } = args;
+  const { config, knowledge, retrievedChunks, shop, attributeNames, categoryExclusions, querySynonyms, customerContext, fitPredictorEnabled, catalogProductTypes, fullCatalogProductTypes, scopedGender, answeredChoices, categoryGenderMap, activeCampaigns, merchantGroups, focusProduct } = args;
   const name = config?.assistantName || "AI Shopping Assistant";
   const tagline = config?.assistantTagline || "";
   const llmOwns = isLlmOwnsTurnActive();
@@ -516,6 +516,26 @@ export function buildSystemPrompt(args, options = {}) {
       ].join("\n"),
     );
     pushVolatile(lines.join("\n"));
+  }
+
+  // Focus-product anchor (per-turn / volatile). The customer is asking a
+  // fact or sizing question about a product already on screen. Bind the
+  // answer to THAT product so the model answers it instead of searching
+  // and surfacing a different one. (prod trace 2026-06-15: "what size
+  // should I choose" after a recommendation kept returning a different
+  // product each turn.)
+  if (focusProduct && (focusProduct.title || focusProduct.handle)) {
+    const title = String(focusProduct.title || "").trim();
+    const price = focusProduct.price ? ` (${focusProduct.price})` : "";
+    pushVolatile(
+      [
+        `CURRENT PRODUCT IN FOCUS: the customer's latest question is about **${title}**${price}, which is already shown above in this conversation.`,
+        "- Answer their question (size, fit, price, color, availability, etc.) about THIS specific product.",
+        "- If you need its size range, available widths, colors, or stock, call get_product_details for THIS product — do not run a fresh search.",
+        "- Do NOT recommend or switch to a different product unless the customer explicitly names a new product or category.",
+        "- For sizing: give this product's actual size range and, if your knowledge/reviews indicate it, whether it runs true to size — then tell them to pick their usual size. Never invent a specific in-stock size without checking.",
+      ].join("\n"),
+    );
   }
 
   if (config?.disclaimerText) {

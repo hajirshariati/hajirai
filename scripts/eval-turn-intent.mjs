@@ -9,6 +9,8 @@ import assert from "node:assert/strict";
 import {
   resolveTurnIntent,
   TurnIntentLabels as L,
+  detectConversationGoal,
+  detectTurnGoal,
 } from "../app/lib/turn-intent.server.js";
 
 let passed = 0;
@@ -590,6 +592,39 @@ await test("T32 — 'compare the first two' (back-ref) preserves scope", () => {
   });
   assert.equal(intent.label, L.META);
   assert.deepEqual(intent.staleKeysToDrop, []);
+});
+
+// ---------------------------------------------------------------------------
+// Conversation GOAL detection (prod regression 2026-06-15: a sizing
+// question got hijacked into the orthotic finder).
+// ---------------------------------------------------------------------------
+const convGoal = (arr) => detectConversationGoal(arr.map((c) => ({ role: "user", content: c })));
+
+await test("GOAL — sizing question + one-word scoping answers stays 'sizing'", () => {
+  // The reported bug: "what size should I choose" then "Men's",
+  // "Orthotics" must NOT become a recommendation goal.
+  assert.deepEqual(convGoal(["What size should I choose?", "Men's", "Orthotics", "Memory foam — everyday wear", "Flat / Low"]), { type: "sizing", turnIndex: 0 });
+});
+
+await test("GOAL — explicit shopping AFTER an info question overrides it", () => {
+  assert.equal(convGoal(["what's your return policy", "ok cool. I need orthotics", "Men"]).type, "recommendation");
+});
+
+await test("GOAL — info question BEFORE the only shopping action does not flip prematurely", () => {
+  // recommendation stated first, then a size follow-up → the immediate
+  // goal is sizing (answer about the shown product), not re-recommend.
+  assert.equal(convGoal(["recommend an orthotic", "what size should I choose?"]).type, "sizing");
+});
+
+await test("GOAL — bare condition/category answers carry no goal (won't flip mid-flow)", () => {
+  assert.equal(detectTurnGoal("Memory foam — everyday wear"), null);
+  assert.equal(detectTurnGoal("Orthotics"), null);
+  assert.equal(detectTurnGoal("Men's"), null);
+});
+
+await test("GOAL — 'I need to return this' is policy, not a recommendation", () => {
+  assert.equal(detectTurnGoal("I need to return this"), "policy");
+  assert.equal(detectTurnGoal("I need orthotics"), "recommendation");
 });
 
 // ---------------------------------------------------------------------------
