@@ -85,6 +85,17 @@ await test("R0a — color attached to a garment word is NOT a footwear filter", 
   assert.equal(extractUserConstraints("looking for something to wear with a red gown").color, undefined);
 });
 
+await test("R0a2 — singular category words establish the category (prod 2026-06-15: 'blue heel')", () => {
+  // Singular must work exactly like plural, or the women-only category
+  // constraint never engages and the bot wrongly asks "men's or women's?".
+  assert.equal(extractUserConstraints("show me the best blue heel").category, "wedges-heels");
+  assert.equal(extractUserConstraints("blue heels").category, "wedges-heels");
+  assert.equal(extractUserConstraints("one wedge").category, "wedges-heels");
+  assert.equal(extractUserConstraints("a mary jane").category, "mary-janes");
+  // Plural still works.
+  assert.equal(extractUserConstraints("show me sneakers").category, "sneakers");
+});
+
 await test("R0b — color directly on a footwear noun IS extracted", () => {
   assert.equal(extractUserConstraints("show me blue sandals").color, "blue");
   assert.equal(extractUserConstraints("i need pink sandals").color, "pink");
