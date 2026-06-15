@@ -166,6 +166,16 @@ model ShopConfig {
   voyageApiKey           String   @default("")
   openaiApiKey           String   @default("")
 
+  // "Visualize My Look": AI styling-preview image for a single
+  // recommended product. imageProvider selects which API powers it
+  // ("gemini" | "openai"); openaiApiKey above is reused for OpenAI,
+  // geminiApiKey is the new Google AI key (encrypted). The CTA label
+  // is merchant-editable.
+  visualizeLookEnabled   Boolean  @default(false)
+  imageProvider          String   @default("")
+  geminiApiKey           String   @default("")
+  visualizeLookLabel     String   @default("Visualize My Look")
+
   supportUrl          String   @default("")
   supportLabel        String   @default("Contact customer service")
   trackingPageUrl     String   @default("")
@@ -332,6 +342,10 @@ model ChatUsage {
   // from Anthropic tokens since the merchant pays Voyage/OpenAI directly.
   embeddingTokens          Int      @default(0)
   embeddingCostUsd         Float    @default(0)
+  // "Visualize My Look" styling-preview image generations this turn,
+  // priced separately (merchant pays Gemini/OpenAI directly).
+  imageCount               Int      @default(0)
+  imageCostUsd             Float    @default(0)
   createdAt                DateTime @default(now())
 
   @@index([shop])

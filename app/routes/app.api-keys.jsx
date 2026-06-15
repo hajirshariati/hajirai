@@ -77,6 +77,10 @@ export const loader = async ({ request }) => {
     embeddingProvider: config.embeddingProvider || "",
     hasVoyageKey: (config.voyageApiKey || "") !== "",
     hasOpenaiKey: (config.openaiApiKey || "") !== "",
+    visualizeLookEnabled: config.visualizeLookEnabled === true,
+    imageProvider: config.imageProvider || "",
+    visualizeLookLabel: config.visualizeLookLabel || "Visualize My Look",
+    hasGeminiKey: (config.geminiApiKey || "") !== "",
     knowledgeRagEnabled: config.knowledgeRagEnabled === true,
     plan: { id: plan.id, name: plan.name, features: plan.features },
   };
@@ -135,6 +139,26 @@ export const action = async ({ request }) => {
       welcomeGlowFadeOutMs:   fadeOutMs,
       welcomeGlowSpeed:       speed,
     });
+    return { saved: true };
+  }
+
+  if (intent === "save_visualize_look") {
+    const enabled = formData.get("visualizeLookEnabled") === "true";
+    const provider = String(formData.get("imageProvider") || "").trim();
+    if (provider !== "" && provider !== "gemini" && provider !== "openai") {
+      return { error: "Invalid image provider." };
+    }
+    const label = String(formData.get("visualizeLookLabel") || "").trim().slice(0, 40);
+    const vData = {
+      visualizeLookEnabled: enabled,
+      imageProvider: provider,
+      visualizeLookLabel: label || "Visualize My Look",
+    };
+    const geminiKey = formData.get("geminiApiKey");
+    if (geminiKey !== null && geminiKey !== "") vData.geminiApiKey = geminiKey;
+    const oaiKey = formData.get("openaiApiKey");
+    if (oaiKey !== null && oaiKey !== "") vData.openaiApiKey = oaiKey;
+    await updateShopConfig(session.shop, vData);
     return { saved: true };
   }
 
@@ -274,6 +298,103 @@ const WELCOME_GLOW_STYLE_OPTIONS = [
 ];
 
 const DEFAULT_GLOW_COLORS = "#6366f1,#a855f7,#ec4899,#f59e0b,#10b981,#06b6d4";
+
+function VisualizeLookCard({ initialEnabled, initialProvider, initialLabel, hasGeminiKey, hasOpenaiKey }) {
+  const fetcher = useFetcher();
+  const [enabled, setEnabled] = useState(Boolean(initialEnabled));
+  const [provider, setProvider] = useState(initialProvider || "");
+  const [label, setLabel] = useState(initialLabel || "Visualize My Look");
+  const [geminiKey, setGeminiKey] = useState("");
+  const [openaiKey, setOpenaiKey] = useState("");
+  const saving = fetcher.state !== "idle";
+  const saved = fetcher.data?.saved === true;
+  const errorMsg = fetcher.data?.error;
+
+  const save = () => {
+    const fd = new FormData();
+    fd.set("intent", "save_visualize_look");
+    fd.set("visualizeLookEnabled", enabled ? "true" : "false");
+    fd.set("imageProvider", provider);
+    fd.set("visualizeLookLabel", label);
+    if (geminiKey) fd.set("geminiApiKey", geminiKey);
+    if (openaiKey) fd.set("openaiApiKey", openaiKey);
+    fetcher.submit(fd, { method: "post" });
+  };
+
+  return (
+    <Card>
+      <BlockStack gap="400">
+        <Checkbox
+          label="Enable “Visualize My Look”"
+          checked={enabled}
+          onChange={setEnabled}
+          helpText="When the assistant recommends exactly ONE product, customers get a standout button that generates an AI styling preview — the real product, styled for what they described. Shown only for single-product recommendations."
+        />
+        {enabled && (
+          <>
+            <Select
+              label="Image provider (you bring the key; you pay the provider per image)"
+              options={[
+                { label: "Choose a provider…", value: "" },
+                { label: "Google Gemini (Nano Banana) — best product fidelity", value: "gemini" },
+                { label: "OpenAI (gpt-image-1)", value: "openai" },
+              ]}
+              value={provider}
+              onChange={setProvider}
+              helpText="Gemini keeps the product most faithful to the original. Either way, generated images are AI styling previews — labeled as such to shoppers."
+            />
+            {provider === "gemini" && (
+              <TextField
+                label="Google AI Studio API key"
+                type="password"
+                value={geminiKey}
+                onChange={setGeminiKey}
+                autoComplete="off"
+                placeholder={hasGeminiKey ? "•••••••• (saved)" : "AIza..."}
+                helpText={hasGeminiKey
+                  ? "A key is saved. Leave blank to keep it; paste a new value to replace."
+                  : "Get a key at aistudio.google.com → API keys."}
+              />
+            )}
+            {provider === "openai" && (
+              <TextField
+                label="OpenAI API key"
+                type="password"
+                value={openaiKey}
+                onChange={setOpenaiKey}
+                autoComplete="off"
+                placeholder={hasOpenaiKey ? "•••••••• (saved)" : "sk-..."}
+                helpText={hasOpenaiKey
+                  ? "A key is saved (shared with Semantic search if set there). Leave blank to keep it."
+                  : "Get a key at platform.openai.com → API keys. Uses gpt-image-1 edits."}
+              />
+            )}
+            <TextField
+              label="Button label"
+              value={label}
+              onChange={setLabel}
+              autoComplete="off"
+              maxLength={40}
+              showCharacterCount
+              helpText="The text on the standout button shoppers tap."
+            />
+            <Banner tone="info">
+              <Text as="p" variant="bodySm">
+                Generative AI can occasionally alter fine product details. The preview is labeled “AI styling preview” to shoppers, and we feed your real product image as the locked reference to keep it faithful.
+              </Text>
+            </Banner>
+          </>
+        )}
+        {errorMsg && <Banner tone="critical"><Text as="p" variant="bodySm">{errorMsg}</Text></Banner>}
+        {saved && <Banner tone="success"><Text as="p" variant="bodySm">Saved.</Text></Banner>}
+        <div>
+          <Button onClick={save} loading={saving} variant="primary"
+            disabled={enabled && !provider}>Save</Button>
+        </div>
+      </BlockStack>
+    </Card>
+  );
+}
 
 function WelcomeGlowCard({
   initialStyle,
@@ -615,7 +736,7 @@ function HideUrlsPanel({ initial }) {
 }
 
 export default function ApiKeys() {
-  const { hasAnthropicKey, anthropicModel, modelStrategy, showFollowUps: initFollowUps, showFeedback: initFeedback, hasYotpoKey, hasAftershipKey, hideOnUrls, supportUrl: initSupportUrl, supportLabel: initSupportLabel, trackingPageUrl: initTrackingPageUrl, returnsPageUrl: initReturnsPageUrl, referralPageUrl: initReferralPageUrl, promptCaching: initCaching, klaviyoFormId: initKlaviyoFormId, klaviyoCompanyId: initKlaviyoCompanyId, klaviyoListId: initKlaviyoListId, vipModeEnabled: initVipMode, showLoginPill: initShowLoginPill, hasKlaviyoPrivateKey, hasYotpoLoyaltyKey, yotpoLoyaltyGuid: initYotpoLoyaltyGuid, loyaltyDisplay: initLoyaltyDisplay, loyaltyPointsPerDollar: initLoyaltyPointsPerDollar, loyaltyRounding: initLoyaltyRounding, dailyCapEnabled: initDailyCapEnabled, dailyCapMessages: initDailyCapMessages, embeddingProvider: initEmbeddingProvider, hasVoyageKey, hasOpenaiKey, knowledgeRagEnabled, plan, welcomeGlowStyle, welcomeGlowColors, welcomeGlowBorderWidth, welcomeGlowSize, welcomeGlowFadeInMs, welcomeGlowHoldMs, welcomeGlowFadeOutMs, welcomeGlowSpeed } = useLoaderData();
+  const { hasAnthropicKey, anthropicModel, modelStrategy, showFollowUps: initFollowUps, showFeedback: initFeedback, hasYotpoKey, hasAftershipKey, hideOnUrls, supportUrl: initSupportUrl, supportLabel: initSupportLabel, trackingPageUrl: initTrackingPageUrl, returnsPageUrl: initReturnsPageUrl, referralPageUrl: initReferralPageUrl, promptCaching: initCaching, klaviyoFormId: initKlaviyoFormId, klaviyoCompanyId: initKlaviyoCompanyId, klaviyoListId: initKlaviyoListId, vipModeEnabled: initVipMode, showLoginPill: initShowLoginPill, hasKlaviyoPrivateKey, hasYotpoLoyaltyKey, yotpoLoyaltyGuid: initYotpoLoyaltyGuid, loyaltyDisplay: initLoyaltyDisplay, loyaltyPointsPerDollar: initLoyaltyPointsPerDollar, loyaltyRounding: initLoyaltyRounding, dailyCapEnabled: initDailyCapEnabled, dailyCapMessages: initDailyCapMessages, embeddingProvider: initEmbeddingProvider, hasVoyageKey, hasOpenaiKey, visualizeLookEnabled: initVizEnabled, imageProvider: initImageProvider, visualizeLookLabel: initVizLabel, hasGeminiKey, knowledgeRagEnabled, plan, welcomeGlowStyle, welcomeGlowColors, welcomeGlowBorderWidth, welcomeGlowSize, welcomeGlowFadeInMs, welcomeGlowHoldMs, welcomeGlowFadeOutMs, welcomeGlowSpeed } = useLoaderData();
   const actionData = useActionData();
   const nav = useNavigation();
   const saving = nav.state === "submitting";
@@ -914,6 +1035,28 @@ export default function ApiKeys() {
                   )}
                 </BlockStack>
               </Card>
+            </Layout.AnnotatedSection>
+
+            <Layout.AnnotatedSection
+              title="Visualize My Look (AI styling preview)"
+              description={
+                <BlockStack gap="200">
+                  <Text as="p" tone="subdued" variant="bodySm">
+                    When the assistant lands on a single best product, shoppers can tap a standout button to see an AI styling preview — their actual product, styled for what they described (e.g. “heels to go with my blue dress”).
+                  </Text>
+                  <Text as="p" tone="subdued" variant="bodySm">
+                    Optional. Only appears for single-product recommendations. You bring your own image-provider key and pay that provider per image.
+                  </Text>
+                </BlockStack>
+              }
+            >
+              <VisualizeLookCard
+                initialEnabled={initVizEnabled}
+                initialProvider={initImageProvider}
+                initialLabel={initVizLabel}
+                hasGeminiKey={hasGeminiKey}
+                hasOpenaiKey={hasOpenaiKey}
+              />
             </Layout.AnnotatedSection>
 
             <Layout.AnnotatedSection

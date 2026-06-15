@@ -16,6 +16,8 @@ if(C.colorCtaHover)_rootStyle.setProperty('--ai-chat-cta-hover',     C.colorCtaH
 var CHAT_URL='/apps/hajirai/chat';
 var FEEDBACK_URL='/apps/hajirai/feedback';
 var CONFIG_URL='/apps/hajirai/widget-config';
+var VISUALIZE_URL='/apps/hajirai/visualize';
+(function(){try{if(document.getElementById('ai-chat-viz-style'))return;var st=document.createElement('style');st.id='ai-chat-viz-style';st.textContent='@keyframes aiChatViz{0%{background-position:100% 0}100%{background-position:-100% 0}}@keyframes aiChatVizSpin{to{transform:rotate(360deg)}}';(document.head||document.documentElement).appendChild(st)}catch(e){}})();
 var HRK='hajirai_hide_rules';
 var PCSK='hajirai_product_card_style';
 
@@ -711,6 +713,53 @@ function choiceButtonsHtml(options){
   return choicesWrap(ch);
 }
 
+function vizSparkle(){return '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l1.6 4.8L18 8.4l-4.4 1.6L12 15l-1.6-4.9L6 8.4l4.4-1.6z"/><path d="M19 14l.8 2.4L22 17.2l-2.2.8L19 20l-.8-2L16 17.2l2.2-.8z" opacity=".7"/></svg>';}
+function vizCtaHtml(cta){
+  return '<div class="ai-chat-viz-row" style="margin-top:12px">'+
+    '<button class="ai-chat-viz-btn" type="button" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px 16px;border:0;border-radius:12px;cursor:pointer;font-size:14px;font-weight:700;color:#fff;background:linear-gradient(100deg,var(--ai-chat-primary,#2d6b4f),var(--ai-chat-accent,#3a7d5c));box-shadow:0 4px 14px rgba(45,107,79,.32);letter-spacing:.2px">'+vizSparkle()+'<span>'+esc(cta.label||'Visualize My Look')+'</span></button>'+
+    '<div style="text-align:center;font-size:11px;color:#8a8a8a;margin-top:5px">AI styling preview · your real product</div>'+
+  '</div>';
+}
+function vizLoadingHtml(step){
+  return '<div class="ai-chat-viz-card" style="margin-top:12px;border:1px solid rgba(45,107,79,.18);border-radius:14px;padding:16px;background:linear-gradient(180deg,rgba(45,107,79,.05),rgba(45,107,79,.02))">'+
+    '<div style="height:150px;border-radius:10px;background:linear-gradient(90deg,#ececec 25%,#f6f6f6 37%,#ececec 63%);background-size:400% 100%;animation:aiChatViz 1.4s ease infinite"></div>'+
+    '<div style="display:flex;align-items:center;gap:8px;margin-top:12px">'+
+      '<span style="width:14px;height:14px;border:2px solid var(--ai-chat-primary,#2d6b4f);border-top-color:transparent;border-radius:50%;display:inline-block;animation:aiChatVizSpin .8s linear infinite"></span>'+
+      '<span class="ai-chat-viz-step" style="font-size:13px;color:#444;font-weight:500">'+esc(step)+'</span>'+
+    '</div>'+
+  '</div>';
+}
+function vizResultHtml(src){
+  return '<div class="ai-chat-viz-card" style="margin-top:12px;border:1px solid rgba(0,0,0,.08);border-radius:14px;overflow:hidden;background:#fff">'+
+    '<img src="'+esc(src)+'" alt="AI styling preview" style="display:block;width:100%;height:auto"/>'+
+    '<div style="font-size:11px;color:#8a8a8a;padding:8px 12px;text-align:center">AI styling preview — your actual product, styled. Scene is illustrative.</div>'+
+  '</div>';
+}
+function vizErrorHtml(cta,msg){
+  return '<div class="ai-chat-viz-card" style="margin-top:12px;border:1px solid rgba(0,0,0,.1);border-radius:12px;padding:13px 15px;background:#fff">'+
+    '<div style="font-size:13px;color:#555;margin-bottom:9px">'+esc(msg||'Could not generate the preview.')+'</div>'+
+    '<button class="ai-chat-viz-btn" type="button" style="display:inline-flex;align-items:center;gap:6px;padding:9px 14px;border:0;border-radius:10px;cursor:pointer;font-size:13px;font-weight:600;color:#fff;background:var(--ai-chat-primary,#2d6b4f)">'+vizSparkle()+'Try again</button>'+
+  '</div>';
+}
+function bindViz(scope,cta){
+  var btn=scope.querySelector('.ai-chat-viz-btn');
+  if(btn)btn.addEventListener('click',function(){runVisualize(cta,btn)});
+}
+function runVisualize(cta,btn){
+  if(!cta||!cta.productHandle)return;
+  var row=btn.closest('.ai-chat-viz-row')||btn.closest('.ai-chat-viz-card');
+  if(!row||!row.parentNode)return;
+  var host=document.createElement('div');
+  row.parentNode.replaceChild(host,row);
+  var steps=['Analyzing the product…','Composing the scene…','Styling the look…','Rendering your preview…'];
+  var si=0;host.innerHTML=vizLoadingHtml(steps[0]);scrollBottom();
+  var iv=setInterval(function(){si=Math.min(si+1,steps.length-1);var l=host.querySelector('.ai-chat-viz-step');if(l)l.textContent=steps[si]},2200);
+  fetch(VISUALIZE_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({productHandle:cta.productHandle,styleContext:cta.styleContext||''})})
+    .then(function(r){return r.json().catch(function(){return{}})})
+    .then(function(d){clearInterval(iv);if(d&&d.ok&&d.imageDataUrl){host.innerHTML=vizResultHtml(d.imageDataUrl)}else{host.innerHTML=vizErrorHtml(cta,(d&&d.message)||'Could not generate the preview right now.');bindViz(host,cta)}scrollBottom()})
+    .catch(function(){clearInterval(iv);host.innerHTML=vizErrorHtml(cta,'Connection issue. Please try again.');bindViz(host,cta);scrollBottom()});
+}
+
 function ctaHtml(linkCTA){
 return '<a class="ai-chat-cta-btn" style="display:block;margin-top:12px;padding:14px 16px;background:var(--ai-chat-primary,#2d6b4f);color:#fff;border-radius:10px;text-decoration:none;text-align:center;font-size:14px;font-weight:600;line-height:1.3" href="'+esc(linkCTA.url)+'" target="_blank" rel="noopener">'+esc(linkCTA.label||'Visit Support Hub')+' &rarr;</a>';
 }
@@ -911,14 +960,14 @@ showHighTraffic();
 function handleSSE(response){
 var reader=response.body.getReader();
 var decoder=new TextDecoder();
-var buf='',full='',prods=[],msgDiv=null,buffSugg=[],buffChoices=[],linkCTA=null,fitReport=null;
+var buf='',full='',prods=[],msgDiv=null,buffSugg=[],buffChoices=[],linkCTA=null,fitReport=null,vizCta=null;
 function proc(chunk){
 buf+=chunk;var lines=buf.split('\n');buf=lines.pop()||'';
 for(var i=0;i<lines.length;i++){
 var line=lines[i].trim();
 if(!line.startsWith('data: '))continue;
 var data=line.slice(6);
-if(data==='[DONE]'){finish(full,prods,msgDiv,buffSugg,linkCTA,fitReport,buffChoices);return true}
+if(data==='[DONE]'){finish(full,prods,msgDiv,buffSugg,linkCTA,fitReport,buffChoices,vizCta);return true}
 try{
 var p=JSON.parse(data);
 if(p.type==='text'||p.type==='content_block_delta'){
@@ -958,14 +1007,17 @@ if(p.type==='action'&&p.action==='show_dead_end'){
   setTimeout(function(){showKlaviyoForm('Stay Connected')},500);
   scrollBottom();
 }
-if(p.type==='done'){finish(full,prods,msgDiv,buffSugg,linkCTA,fitReport,buffChoices);return true}
+if(p.type==='visualize_cta'&&p.productHandle){
+  vizCta={productHandle:p.productHandle,productTitle:p.productTitle||'',styleContext:p.styleContext||'',label:p.label||'Visualize My Look'};
+}
+if(p.type==='done'){finish(full,prods,msgDiv,buffSugg,linkCTA,fitReport,buffChoices,vizCta);return true}
 if(p.type==='error'){
   showStreamError(p.message||'I\'m sorry, I\'m having trouble right now. Please try again in a moment.');
   return true;
 }
 }catch(e){}
 }return false}
-function read(){reader.read().then(function(r){if(r.done){if(full)finish(full,prods,msgDiv,buffSugg,linkCTA,fitReport,buffChoices);else showStreamError('I\'m having trouble right now. Please try again.');return}var done=proc(decoder.decode(r.value,{stream:true}));if(!done)read()}).catch(function(e){if(e.name!=='AbortError'){if(full)finish(full,prods,msgDiv,buffSugg,linkCTA,fitReport,buffChoices);else showStreamError('Connection lost. Please try again.')}})}
+function read(){reader.read().then(function(r){if(r.done){if(full)finish(full,prods,msgDiv,buffSugg,linkCTA,fitReport,buffChoices,vizCta);else showStreamError('I\'m having trouble right now. Please try again.');return}var done=proc(decoder.decode(r.value,{stream:true}));if(!done)read()}).catch(function(e){if(e.name!=='AbortError'){if(full)finish(full,prods,msgDiv,buffSugg,linkCTA,fitReport,buffChoices,vizCta);else showStreamError('Connection lost. Please try again.')}})}
 read();
 }
 
@@ -1018,7 +1070,7 @@ return '<div class="ai-chat-fit-card" role="region" aria-label="Size recommendat
 '</div>';
 }
 
-function finish(text,prods,md2,sugg,linkCTA,fitReport,sseChoices){
+function finish(text,prods,md2,sugg,linkCTA,fitReport,sseChoices,vizCta){
 clearWatchdog();
 typingEl.classList.remove('visible');isStreaming=false;sendBtn.disabled=false;
 errorRetryCount=0;
@@ -1043,6 +1095,10 @@ if(cleanText){
   var _saved={role:'assistant',content:cleanText,products:prods||[]};
   if(linkCTA&&linkCTA.url)_saved.linkCTA={url:linkCTA.url,label:linkCTA.label||''};
   messages.push(_saved);saveH(messages)
+}
+if(vizCta&&vizCta.productHandle&&mDiv){
+  var vbz=$('.ai-chat-msg-bubble',mDiv);
+  if(vbz){vbz.insertAdjacentHTML('beforeend',vizCtaHtml(vizCta));bindViz(vbz,vizCta);}
 }
 if(choices.length>0&&mDiv){
   var cb=$('.ai-chat-msg-bubble',mDiv);

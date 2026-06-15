@@ -95,6 +95,7 @@ import {
   scopedProductSearchInput,
 } from "../lib/emit-finalize.server";
 import { detectConversationGoal, ANCHOR_GOALS } from "../lib/turn-intent.server";
+import { buildVisualizeCtaEvent } from "../lib/visualize-cta.server";
 import prisma from "../db.server";
 import { recordChatUsage, getTodayMessageCount } from "../models/ChatUsage.server";
 import { computeEmbeddingCost } from "../lib/pricing.server";
@@ -2762,6 +2763,22 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
         type: "products",
         products: deduped
       })));
+
+      // Visualize My Look: when EXACTLY ONE product is recommended,
+      // offer the AI styling-preview CTA (distinct first chip in the
+      // widget). Single-product only, feature-gated, provider+key
+      // required — buildVisualizeCtaEvent returns null otherwise.
+      if (deduped.length === 1) {
+        const vizEvent = buildVisualizeCtaEvent({
+          config: ctx.shopConfig,
+          product: deduped[0],
+          messages: ctx.messages,
+        });
+        if (vizEvent) {
+          controller.enqueue(encoder.encode(sseChunk(vizEvent)));
+          console.log(`[chat] ${ctx.shop} visualize_cta emitted for "${vizEvent.productTitle}"`);
+        }
+      }
 
       // Collection CTA: AI-emitted <<Label|URL>> takes priority; otherwise look up
       // the dominant (category, gender) across the shown cards in the merchant's
