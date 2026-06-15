@@ -2777,6 +2777,19 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
         if (vizEvent) {
           controller.enqueue(encoder.encode(sseChunk(vizEvent)));
           console.log(`[chat] ${ctx.shop} visualize_cta emitted for "${vizEvent.productTitle}"`);
+        } else {
+          // Tell us EXACTLY why the CTA was withheld on a single-product
+          // turn — otherwise a missing button is impossible to debug.
+          const c = ctx.shopConfig || {};
+          const prov = String(c.imageProvider || "").trim();
+          const hasKey = prov === "gemini" ? Boolean(c.geminiApiKey) : prov === "openai" ? Boolean(c.openaiApiKey) : false;
+          const reason = !c.visualizeLookEnabled ? "feature disabled in Settings"
+            : !(prov === "gemini" || prov === "openai") ? `no image provider selected (imageProvider=${JSON.stringify(c.imageProvider)})`
+            : !hasKey ? `no API key saved for provider "${prov}"`
+            : !(deduped[0]?.image || deduped[0]?.featuredImageUrl) ? "product has no image"
+            : !deduped[0]?.handle ? "product has no handle"
+            : "unknown";
+          console.log(`[chat] ${ctx.shop} visualize_cta SUPPRESSED on single-product turn — reason: ${reason}`);
         }
       }
 
