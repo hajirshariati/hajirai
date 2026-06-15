@@ -143,6 +143,17 @@ test("'the cheapest one'", () => assert(detectSingularIntent("show me the cheape
 test("'the red one'", () => assert(detectSingularIntent("the red one please")));
 test("'how about this one' (singular qualifier)", () => assert(detectSingularIntent("how about this one")));
 test("'what about that one'", () => assert(detectSingularIntent("what about that one")));
+// Explicit count phrasings (prod 2026-06-15: customers asked for one
+// and kept getting multiple cards).
+test("'show me one only'", () => assert(detectSingularIntent("show me one only")));
+test("'only 1 shoe'", () => assert(detectSingularIntent("only 1 shoe")));
+test("'just one'", () => assert(detectSingularIntent("just one please")));
+test("'only one'", () => assert(detectSingularIntent("only one")));
+test("'a single one'", () => assert(detectSingularIntent("a single one")));
+test("'show me one'", () => assert(detectSingularIntent("show me one")));
+// Plurals must NOT be caught.
+test("'show me a few options' is NOT singular", () => assert(!detectSingularIntent("show me a few options")));
+test("'show me wedges' is NOT singular", () => assert(!detectSingularIntent("show me wedges")));
 
 // SHOULD NOT detect as singular
 test("'how about for women' (category pivot, NOT singular)", () => assert(!detectSingularIntent("how about for women")));

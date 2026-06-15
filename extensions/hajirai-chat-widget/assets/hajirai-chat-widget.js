@@ -739,60 +739,51 @@ function vizErrorHtml(msg){
   '</div>';
 }
 
-/* Inject the "Visualize My Look" button INTO the product card's action
-   row, beside "View product". The card is a single <a> link, so the
-   button stops click propagation to avoid navigating to the product. */
-function injectVizButton(card,cta){
-  if(!card||card.querySelector('.ai-chat-viz-btn'))return;
-  var info=card.querySelector('.ai-chat-product-info')||card;
-  var viewCta=card.querySelector('.ai-chat-product-cta');
-  var row=document.createElement('div');
-  row.className='ai-chat-card-actions';
-  row.style.cssText='display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px';
-  if(viewCta){viewCta.style.margin='0';row.appendChild(viewCta);}
-  var viz=document.createElement('span');
-  viz.className='ai-chat-viz-btn';
-  viz.setAttribute('role','button');viz.setAttribute('tabindex','0');
-  viz.style.cssText='display:inline-flex;align-items:center;gap:6px;padding:10px 14px;border-radius:10px;cursor:pointer;font-size:13px;font-weight:700;color:#fff;background:linear-gradient(100deg,var(--ai-chat-primary,#2d6b4f),var(--ai-chat-accent,#3a7d5c));box-shadow:0 3px 10px rgba(45,107,79,.3)';
-  viz.innerHTML=vizSparkle()+'<span>'+esc(cta.label||'Visualize My Look')+'</span>';
-  var go=function(e){if(e){e.preventDefault();e.stopPropagation();}runVisualize(cta,viz,card)};
-  viz.addEventListener('click',go);
-  viz.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){go(e)}});
-  row.appendChild(viz);
-  info.appendChild(row);
+/* "Visualize My Look" CTA — a clean, full-width button rendered BELOW
+   the product card at the bubble level. On click it replaces itself
+   with the loading box, then the generated image, directly below the
+   card. Kept out of the card's tap-target so the card layout is
+   untouched. */
+function vizCtaHtml(cta){
+  return '<div class="ai-chat-viz-row" style="margin-top:12px">'+
+    '<button class="ai-chat-viz-btn" type="button" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px 16px;border:0;border-radius:12px;cursor:pointer;font-size:14px;font-weight:700;color:#fff;background:linear-gradient(100deg,var(--ai-chat-primary,#2d6b4f),var(--ai-chat-accent,#3a7d5c));box-shadow:0 4px 14px rgba(45,107,79,.28);letter-spacing:.2px">'+vizSparkle()+'<span>'+esc(cta.label||'Visualize My Look')+'</span></button>'+
+  '</div>';
 }
-
-function runVisualize(cta,btn,card){
+function bindViz(scope,cta){
+  var btn=scope.querySelector('.ai-chat-viz-row .ai-chat-viz-btn');
+  if(btn)btn.addEventListener('click',function(){runVisualize(cta,btn)});
+}
+function runVisualize(cta,btn){
   if(!cta||!cta.productHandle)return;
-  var anchorEl=card||(btn&&btn.closest&&btn.closest('.ai-chat-product-card'))||btn;
-  if(!anchorEl||!anchorEl.parentNode)return;
-  if(btn){btn.style.opacity='0.5';btn.style.pointerEvents='none';}
+  var row=btn.closest('.ai-chat-viz-row');
   var host=document.createElement('div');
   host.setAttribute('role','status');host.setAttribute('aria-live','polite');host.setAttribute('aria-label','Creating your styling preview');
-  anchorEl.parentNode.insertBefore(host,anchorEl.nextSibling);
+  if(row&&row.parentNode){row.parentNode.replaceChild(host,row);}
+  else if(btn.parentNode){btn.parentNode.insertBefore(host,btn.nextSibling);}
+  else return;
+  vizFetch(host,cta);
+}
+// Loading → fetch → result/error. Runs INDEPENDENTLY of the chat stream
+// (own fetch, no input lock), so the customer can keep chatting while
+// the preview renders. 60s ceiling so a hung provider can't spin forever.
+function vizFetch(host,cta){
   var steps=['Analyzing the product…','Composing the scene…','Styling the look…','Rendering your preview…'];
   var si=0;host.innerHTML=vizLoadingHtml(steps[0]);scrollBottom();
   var iv=setInterval(function(){si=Math.min(si+1,steps.length-1);var l=host.querySelector('.ai-chat-viz-step');if(l)l.textContent=steps[si]},2200);
-  // Image generation can take a while and runs INDEPENDENTLY of the
-  // chat stream — the customer can keep typing and sending messages
-  // while this works. Own AbortController with a 60s ceiling so a
-  // hung provider doesn't spin forever.
   var ctrl=(typeof AbortController!=='undefined')?new AbortController():null;
   var to=setTimeout(function(){if(ctrl){try{ctrl.abort()}catch(e){}}},60000);
   var opts={method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({productHandle:cta.productHandle,styleContext:cta.styleContext||''})};
   if(ctrl)opts.signal=ctrl.signal;
   fetch(VISUALIZE_URL,opts)
     .then(function(r){return r.json().catch(function(){return{}})})
-    .then(function(d){clearInterval(iv);clearTimeout(to);if(d&&d.ok&&d.imageDataUrl){host.removeAttribute('aria-busy');host.innerHTML=vizResultHtml(d.imageDataUrl)}else{showVizError(host,btn,cta,card,(d&&d.message)||'Could not create the preview right now.')}scrollBottom()})
-    .catch(function(e){clearInterval(iv);clearTimeout(to);showVizError(host,btn,cta,card,(e&&e.name==='AbortError')?'That took too long — please try again.':'Connection issue. Please try again.');scrollBottom()});
+    .then(function(d){clearInterval(iv);clearTimeout(to);if(d&&d.ok&&d.imageDataUrl){host.innerHTML=vizResultHtml(d.imageDataUrl)}else{vizError(host,cta,(d&&d.message)||'Could not create the preview right now.')}scrollBottom()})
+    .catch(function(e){clearInterval(iv);clearTimeout(to);vizError(host,cta,(e&&e.name==='AbortError')?'That took too long — please try again.':'Connection issue. Please try again.');scrollBottom()});
 }
-
-function showVizError(host,btn,cta,card,msg){
+function vizError(host,cta,msg){
   host.innerHTML=vizErrorHtml(msg);
-  var retry=host.querySelector('.ai-chat-viz-retry');
-  if(retry)retry.addEventListener('click',function(){host.remove();if(btn){btn.style.opacity='';btn.style.pointerEvents='';}runVisualize(cta,btn,card)});
+  var r=host.querySelector('.ai-chat-viz-retry');
+  if(r)r.addEventListener('click',function(){vizFetch(host,cta)});
 }
-
 function ctaHtml(linkCTA){
 return '<a class="ai-chat-cta-btn" style="display:block;margin-top:12px;padding:14px 16px;background:var(--ai-chat-primary,#2d6b4f);color:#fff;border-radius:10px;text-decoration:none;text-align:center;font-size:14px;font-weight:600;line-height:1.3" href="'+esc(linkCTA.url)+'" target="_blank" rel="noopener">'+esc(linkCTA.label||'Visit Support Hub')+' &rarr;</a>';
 }
@@ -1130,9 +1121,8 @@ if(cleanText){
   messages.push(_saved);saveH(messages)
 }
 if(vizCta&&vizCta.productHandle&&mDiv){
-  var _vh=(vizCta.productHandle||'').replace(/"/g,'');
-  var _vcard=mDiv.querySelector('.ai-chat-product-card[data-handle="'+_vh+'"]');
-  if(_vcard)injectVizButton(_vcard,vizCta);
+  var _vbz=$('.ai-chat-msg-bubble',mDiv);
+  if(_vbz){_vbz.insertAdjacentHTML('beforeend',vizCtaHtml(vizCta));bindViz(_vbz,vizCta);}
 }
 if(choices.length>0&&mDiv){
   var cb=$('.ai-chat-msg-bubble',mDiv);
