@@ -714,14 +714,8 @@ function choiceButtonsHtml(options){
 }
 
 function vizSparkle(){return '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l1.6 4.8L18 8.4l-4.4 1.6L12 15l-1.6-4.9L6 8.4l4.4-1.6z"/><path d="M19 14l.8 2.4L22 17.2l-2.2.8L19 20l-.8-2L16 17.2l2.2-.8z" opacity=".7"/></svg>';}
-function vizCtaHtml(cta){
-  return '<div class="ai-chat-viz-row" style="margin-top:12px">'+
-    '<button class="ai-chat-viz-btn" type="button" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px 16px;border:0;border-radius:12px;cursor:pointer;font-size:14px;font-weight:700;color:#fff;background:linear-gradient(100deg,var(--ai-chat-primary,#2d6b4f),var(--ai-chat-accent,#3a7d5c));box-shadow:0 4px 14px rgba(45,107,79,.32);letter-spacing:.2px">'+vizSparkle()+'<span>'+esc(cta.label||'Visualize My Look')+'</span></button>'+
-    '<div style="text-align:center;font-size:11px;color:#8a8a8a;margin-top:5px">AI styling preview · your real product</div>'+
-  '</div>';
-}
 function vizLoadingHtml(step){
-  return '<div class="ai-chat-viz-card" style="margin-top:12px;border:1px solid rgba(45,107,79,.18);border-radius:14px;padding:16px;background:linear-gradient(180deg,rgba(45,107,79,.05),rgba(45,107,79,.02))">'+
+  return '<div class="ai-chat-viz-card" style="margin-top:10px;border:1px solid rgba(45,107,79,.18);border-radius:14px;padding:16px;background:linear-gradient(180deg,rgba(45,107,79,.05),rgba(45,107,79,.02))">'+
     '<div style="height:150px;border-radius:10px;background:linear-gradient(90deg,#ececec 25%,#f6f6f6 37%,#ececec 63%);background-size:400% 100%;animation:aiChatViz 1.4s ease infinite"></div>'+
     '<div style="display:flex;align-items:center;gap:8px;margin-top:12px">'+
       '<span style="width:14px;height:14px;border:2px solid var(--ai-chat-primary,#2d6b4f);border-top-color:transparent;border-radius:50%;display:inline-block;animation:aiChatVizSpin .8s linear infinite"></span>'+
@@ -730,34 +724,61 @@ function vizLoadingHtml(step){
   '</div>';
 }
 function vizResultHtml(src){
-  return '<div class="ai-chat-viz-card" style="margin-top:12px;border:1px solid rgba(0,0,0,.08);border-radius:14px;overflow:hidden;background:#fff">'+
-    '<img src="'+esc(src)+'" alt="AI styling preview" style="display:block;width:100%;height:auto"/>'+
-    '<div style="font-size:11px;color:#8a8a8a;padding:8px 12px;text-align:center">AI styling preview — your actual product, styled. Scene is illustrative.</div>'+
+  return '<div class="ai-chat-viz-card" style="margin-top:10px;border:1px solid rgba(0,0,0,.08);border-radius:14px;overflow:hidden;background:#fff">'+
+    '<img src="'+esc(src)+'" alt="Styled preview of this product" style="display:block;width:100%;height:auto"/>'+
+    '<div style="font-size:11.5px;color:#8a8a8a;padding:9px 12px;text-align:center;line-height:1.4">A quick AI preview to help you picture the look. The model and setting are just for inspiration — see the photo above for the exact product.</div>'+
   '</div>';
 }
-function vizErrorHtml(cta,msg){
-  return '<div class="ai-chat-viz-card" style="margin-top:12px;border:1px solid rgba(0,0,0,.1);border-radius:12px;padding:13px 15px;background:#fff">'+
-    '<div style="font-size:13px;color:#555;margin-bottom:9px">'+esc(msg||'Could not generate the preview.')+'</div>'+
-    '<button class="ai-chat-viz-btn" type="button" style="display:inline-flex;align-items:center;gap:6px;padding:9px 14px;border:0;border-radius:10px;cursor:pointer;font-size:13px;font-weight:600;color:#fff;background:var(--ai-chat-primary,#2d6b4f)">'+vizSparkle()+'Try again</button>'+
+function vizErrorHtml(msg){
+  return '<div style="margin-top:10px;border:1px solid rgba(0,0,0,.1);border-radius:12px;padding:13px 15px;background:#fff">'+
+    '<div style="font-size:13px;color:#555;margin-bottom:9px">'+esc(msg||'Could not create the preview.')+'</div>'+
+    '<button class="ai-chat-viz-retry" type="button" style="display:inline-flex;align-items:center;gap:6px;padding:9px 14px;border:0;border-radius:10px;cursor:pointer;font-size:13px;font-weight:600;color:#fff;background:var(--ai-chat-primary,#2d6b4f)">'+vizSparkle()+'Try again</button>'+
   '</div>';
 }
-function bindViz(scope,cta){
-  var btn=scope.querySelector('.ai-chat-viz-btn');
-  if(btn)btn.addEventListener('click',function(){runVisualize(cta,btn)});
+
+/* Inject the "Visualize My Look" button INTO the product card's action
+   row, beside "View product". The card is a single <a> link, so the
+   button stops click propagation to avoid navigating to the product. */
+function injectVizButton(card,cta){
+  if(!card||card.querySelector('.ai-chat-viz-btn'))return;
+  var info=card.querySelector('.ai-chat-product-info')||card;
+  var viewCta=card.querySelector('.ai-chat-product-cta');
+  var row=document.createElement('div');
+  row.className='ai-chat-card-actions';
+  row.style.cssText='display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px';
+  if(viewCta){viewCta.style.margin='0';row.appendChild(viewCta);}
+  var viz=document.createElement('span');
+  viz.className='ai-chat-viz-btn';
+  viz.setAttribute('role','button');viz.setAttribute('tabindex','0');
+  viz.style.cssText='display:inline-flex;align-items:center;gap:6px;padding:10px 14px;border-radius:10px;cursor:pointer;font-size:13px;font-weight:700;color:#fff;background:linear-gradient(100deg,var(--ai-chat-primary,#2d6b4f),var(--ai-chat-accent,#3a7d5c));box-shadow:0 3px 10px rgba(45,107,79,.3)';
+  viz.innerHTML=vizSparkle()+'<span>'+esc(cta.label||'Visualize My Look')+'</span>';
+  var go=function(e){if(e){e.preventDefault();e.stopPropagation();}runVisualize(cta,viz,card)};
+  viz.addEventListener('click',go);
+  viz.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){go(e)}});
+  row.appendChild(viz);
+  info.appendChild(row);
 }
-function runVisualize(cta,btn){
+
+function runVisualize(cta,btn,card){
   if(!cta||!cta.productHandle)return;
-  var row=btn.closest('.ai-chat-viz-row')||btn.closest('.ai-chat-viz-card');
-  if(!row||!row.parentNode)return;
+  var anchorEl=card||(btn&&btn.closest&&btn.closest('.ai-chat-product-card'))||btn;
+  if(!anchorEl||!anchorEl.parentNode)return;
+  if(btn){btn.style.opacity='0.5';btn.style.pointerEvents='none';}
   var host=document.createElement('div');
-  row.parentNode.replaceChild(host,row);
+  anchorEl.parentNode.insertBefore(host,anchorEl.nextSibling);
   var steps=['Analyzing the product…','Composing the scene…','Styling the look…','Rendering your preview…'];
   var si=0;host.innerHTML=vizLoadingHtml(steps[0]);scrollBottom();
   var iv=setInterval(function(){si=Math.min(si+1,steps.length-1);var l=host.querySelector('.ai-chat-viz-step');if(l)l.textContent=steps[si]},2200);
   fetch(VISUALIZE_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({productHandle:cta.productHandle,styleContext:cta.styleContext||''})})
     .then(function(r){return r.json().catch(function(){return{}})})
-    .then(function(d){clearInterval(iv);if(d&&d.ok&&d.imageDataUrl){host.innerHTML=vizResultHtml(d.imageDataUrl)}else{host.innerHTML=vizErrorHtml(cta,(d&&d.message)||'Could not generate the preview right now.');bindViz(host,cta)}scrollBottom()})
-    .catch(function(){clearInterval(iv);host.innerHTML=vizErrorHtml(cta,'Connection issue. Please try again.');bindViz(host,cta);scrollBottom()});
+    .then(function(d){clearInterval(iv);if(d&&d.ok&&d.imageDataUrl){host.innerHTML=vizResultHtml(d.imageDataUrl)}else{showVizError(host,btn,cta,card,(d&&d.message)||'Could not create the preview right now.')}scrollBottom()})
+    .catch(function(){clearInterval(iv);showVizError(host,btn,cta,card,'Connection issue. Please try again.');scrollBottom()});
+}
+
+function showVizError(host,btn,cta,card,msg){
+  host.innerHTML=vizErrorHtml(msg);
+  var retry=host.querySelector('.ai-chat-viz-retry');
+  if(retry)retry.addEventListener('click',function(){host.remove();if(btn){btn.style.opacity='';btn.style.pointerEvents='';}runVisualize(cta,btn,card)});
 }
 
 function ctaHtml(linkCTA){
@@ -1097,8 +1118,9 @@ if(cleanText){
   messages.push(_saved);saveH(messages)
 }
 if(vizCta&&vizCta.productHandle&&mDiv){
-  var vbz=$('.ai-chat-msg-bubble',mDiv);
-  if(vbz){vbz.insertAdjacentHTML('beforeend',vizCtaHtml(vizCta));bindViz(vbz,vizCta);}
+  var _vh=(vizCta.productHandle||'').replace(/"/g,'');
+  var _vcard=mDiv.querySelector('.ai-chat-product-card[data-handle="'+_vh+'"]');
+  if(_vcard)injectVizButton(_vcard,vizCta);
 }
 if(choices.length>0&&mDiv){
   var cb=$('.ai-chat-msg-bubble',mDiv);
