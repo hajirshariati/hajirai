@@ -742,3 +742,83 @@ export function resolveTurnIntent({
 }
 
 export const TurnIntentLabels = LABEL;
+
+// =====================================================================
+// Conversation GOAL detection (the customer's speech-act / what they
+// are actually trying to do).
+//
+// The engine tracks ATTRIBUTES (gender, category, color, useCase…) but
+// historically had no representation of the customer's GOAL. That gap
+// let accumulated attributes trigger the wrong tool: a shopper who
+// opened with "what size should I choose" and then answered scoping
+// questions ("Men's", "Orthotics") had those answers read as a request
+// to be walked through the orthotic product-FINDER — abandoning their
+// original sizing question (prod trace 2026-06-15).
+//
+// `detectConversationGoal` returns the conversation's primary goal:
+// an information QUESTION (sizing/fit/price/policy) persists as the
+// goal until the customer makes an explicit shopping action
+// (recommendation/browse) AFTER it. Consumers:
+//   - the recommender gate suppresses the finder when the goal is an
+//     info question (the finder is the wrong tool for "what size?");
+//   - the prompt anchors fact/sizing follow-ups to the shown product.
+// =====================================================================
+
+const GOAL_SIZING_RE =
+  /\b(?:what|which|correct|right|proper|true|best)\s+size\b|\bsize\s+(?:should|do|to|am|are|would)\b|\bshould\s+i\s+(?:choose|get|order|buy|pick|size)\b[^?]{0,30}\bsize\b|\bwhat\s+size\b|\bhow\s+(?:do\s+)?(?:the\s+)?(?:sizing|sizes)\b|\bdoes?\s+(?:it|this|these|they)\s+run\s+(?:true|small|large|big)\b|\btrue\s+to\s+size\b|\bsize\s+(?:up|down)\b|\bwhat'?s?\s+my\s+size\b|\bsize\s+(?:chart|guide)\b|\bsizing\b/i;
+const GOAL_FIT_RE =
+  /\bhow\s+(?:does|do|will)\s+(?:it|this|these|they)\s+fit\b|\b(?:will|does|do)\s+(?:it|this|these|they)\s+fit\b|\bwide\s+(?:feet|foot)\b|\bnarrow\s+(?:feet|foot)\b|\bfit\s+(?:guide|true|right)\b/i;
+const GOAL_PRICE_RE =
+  /\bhow\s+much\b|\bwhat'?s?\s+the\s+price\b|\bprice\s+of\b|\bhow\s+expensive\b/i;
+const GOAL_POLICY_RE =
+  /\b(?:return|returns|refund|exchange|warranty|guarantee|shipping|deliver(?:y|ies)?|track(?:ing)?|policy|polic(?:ies|y))\b/i;
+const GOAL_RECOMMEND_RE =
+  /\b(?:recommend|suggest|help\s+me\s+(?:find|choose|pick|decide)|which\s+(?:one\s+)?should\s+i\s+(?:get|buy|wear)|what\s+should\s+i\s+(?:get|buy|wear)|find\s+me\b|i\s+(?:need|want)\b|i'?m\s+looking\s+for|looking\s+for\b|best\s+(?:for|one\s+for)\b|guide\s+me\b|walk\s+me\s+through\b)\b/i;
+const GOAL_BROWSE_RE =
+  /\b(?:show\s+me|do\s+you\s+(?:have|carry|sell|stock)|got\s+any|browse|see\s+(?:your|some)|what\s+(?:do\s+you|kinds?\s+of))\b/i;
+
+// Info questions: the finder must NOT auto-start for these — the
+// customer asked a question, not "find me a product".
+export const INFO_QUESTION_GOALS = new Set(["sizing", "fit", "price", "policy"]);
+// Goals whose follow-ups should anchor to the already-shown product
+// rather than re-searching.
+export const ANCHOR_GOALS = new Set(["sizing", "fit", "price"]);
+
+export function detectTurnGoal(text) {
+  const value = String(text || "").trim();
+  if (!value) return null;
+  // Specific info-questions take precedence over generic shopping
+  // verbs ("what size should I choose" is sizing, not a recommendation).
+  if (GOAL_SIZING_RE.test(value)) return "sizing";
+  if (GOAL_FIT_RE.test(value)) return "fit";
+  if (GOAL_PRICE_RE.test(value)) return "price";
+  if (GOAL_POLICY_RE.test(value)) return "policy";
+  if (GOAL_RECOMMEND_RE.test(value)) return "recommendation";
+  if (GOAL_BROWSE_RE.test(value)) return "browse";
+  return null;
+}
+
+export function detectConversationGoal(messages) {
+  if (!Array.isArray(messages)) return null;
+  let firstQuestion = null; // earliest info-question goal
+  let lastShopping = null; // latest recommendation/browse goal
+  let idx = -1;
+  for (const m of messages) {
+    if (!m || m.role !== "user" || typeof m.content !== "string") continue;
+    idx += 1;
+    const goal = detectTurnGoal(m.content);
+    if (!goal) continue;
+    if (INFO_QUESTION_GOALS.has(goal)) {
+      if (!firstQuestion) firstQuestion = { type: goal, turnIndex: idx };
+    } else {
+      lastShopping = { type: goal, turnIndex: idx };
+    }
+  }
+  // An info question is the standing goal unless the customer made an
+  // explicit shopping action AFTER it (a genuine pivot to "find me one").
+  if (firstQuestion && (!lastShopping || lastShopping.turnIndex < firstQuestion.turnIndex)) {
+    return firstQuestion;
+  }
+  if (lastShopping) return lastShopping;
+  return firstQuestion || null;
+}

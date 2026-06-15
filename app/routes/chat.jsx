@@ -94,6 +94,7 @@ import {
   isCompoundPolicyProductQuestion,
   scopedProductSearchInput,
 } from "../lib/emit-finalize.server";
+import { detectConversationGoal, ANCHOR_GOALS } from "../lib/turn-intent.server";
 import prisma from "../db.server";
 import { recordChatUsage, getTodayMessageCount } from "../models/ChatUsage.server";
 import { computeEmbeddingCost } from "../lib/pricing.server";
@@ -2433,11 +2434,29 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
           (card) => protectedHandles.has(card.handle) || cardMatchesActiveGroup(card, ctx.activeCategoryGroup),
         );
         if (groupScoped.length === 0 && beforeGroup > 0) {
-          // Fail-open: filter wiped every card. Stale group lock; better
-          // to render the search results than ship an empty bubble that
-          // the customer reads as "AI claimed a recommendation but no
-          // card". Same fail-open pattern as the search layer.
-          console.log(`[chat] product-card group guard: WIPED ALL ${beforeGroup} for group=${ctx.activeCategoryGroup.name || "-"} → falling back to unfiltered`);
+          // Fail-open: the locked group wiped every card. This is almost
+          // always a STALE lock — e.g. the group locked to Footwear from
+          // an opening "men's/women's footwear" framing, but the customer
+          // is actually buying Orthotics (which go INSIDE footwear), so
+          // every orthotic card fails the Footwear test. Rather than ship
+          // an empty bubble, prefer the cards that match the customer's
+          // in-memory product category; only if that also empties do we
+          // fall back to the raw search pool.
+          const memCategory = String(ctx.sessionMemory?.explicit?.category || "").toLowerCase();
+          const categoryGroup = memCategory && Array.isArray(ctx.merchantGroups)
+            ? ctx.merchantGroups.find((g) =>
+                (g?.categories || []).some((c) => String(c).toLowerCase() === memCategory) ||
+                String(g?.name || "").toLowerCase() === memCategory)
+            : null;
+          const categoryScoped = categoryGroup
+            ? filteredPool.filter((card) => protectedHandles.has(card.handle) || cardMatchesActiveGroup(card, categoryGroup))
+            : [];
+          if (categoryScoped.length > 0) {
+            console.log(`[chat] product-card group guard: stale lock=${ctx.activeCategoryGroup.name || "-"} wiped all → re-scoped to in-memory category group=${categoryGroup.name || memCategory} (${categoryScoped.length}/${beforeGroup})`);
+            filteredPool = categoryScoped;
+          } else {
+            console.log(`[chat] product-card group guard: WIPED ALL ${beforeGroup} for group=${ctx.activeCategoryGroup.name || "-"} → falling back to unfiltered`);
+          }
         } else {
           if (groupScoped.length !== beforeGroup) {
             console.log(
@@ -3353,11 +3372,41 @@ async function handleChatPost({ shop, sessionAccessToken, request, internal = fa
       }
     }
 
+    // Focus-product anchor. When the customer asks a fact/sizing
+    // question about a product already on screen ("what size should I
+    // choose", "does it come in black", "how much is it"), bind the
+    // answer to THAT product so the model doesn't re-search and surface
+    // a different one (prod trace 2026-06-15: "what size" after a
+    // recommendation returned a different orthotic every turn). Only
+    // anchor when the target is unambiguous: the latest text names a
+    // shown card, or exactly one card is on screen.
+    let focusProduct = null;
+    if (Array.isArray(priorProductCards) && priorProductCards.length > 0) {
+      const convGoal = detectConversationGoal(messages);
+      const isFactFollowup =
+        (convGoal && ANCHOR_GOALS.has(convGoal.type)) ||
+        isSizeWidthFactFollowUp(latestUserMessage) ||
+        isColorFactFollowUp(latestUserMessage) ||
+        isDirectProductFactQuestion(latestUserMessage);
+      if (isFactFollowup) {
+        const lower = latestUserMessage.toLowerCase();
+        const named = priorProductCards.find((c) => {
+          const t = String(c?.title || "").trim().toLowerCase();
+          return t.length >= 5 && lower.includes(t);
+        });
+        focusProduct = named || (priorProductCards.length === 1 ? priorProductCards[0] : null);
+        if (focusProduct) {
+          console.log(`[chat] focus-product anchor: "${focusProduct.title}" (goal=${convGoal?.type || "fact-followup"})`);
+        }
+      }
+    }
+
     const promptBuild = buildSystemPrompt({
       config,
       knowledge,
       retrievedChunks,
       shop: shop,
+      focusProduct,
       attributeNames,
       categoryExclusions,
       querySynonyms,

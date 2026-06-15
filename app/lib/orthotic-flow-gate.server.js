@@ -59,6 +59,7 @@ import {
 import { executeRecommenderTool } from "./recommender-tools.server.js";
 import { buildStorefrontSearchCTA } from "./storefront-search-cta.server.js";
 import { scrubInternalEnums } from "./chat-postprocessing.js";
+import { detectConversationGoal, detectTurnGoal, INFO_QUESTION_GOALS } from "./turn-intent.server.js";
 
 // Format a recommender-returned product the same way chat-tools'
 // extractProductCards does. Inlined (rather than imported) to keep
@@ -716,6 +717,64 @@ export async function maybeRunOrthoticFlow({
         `[orthotic-flow] product-info follow-up detected; falling through to LLM (no orthotic question flow)`,
       );
       return { handled: false };
+    }
+  }
+
+  // GOAL GUARD. The recommender questionnaire is the tool for "find me
+  // an orthotic" — NOT for an information question. When the customer
+  // opened with a sizing / fit / price / policy question ("what size
+  // should I choose"), their short follow-up answers ("Men's",
+  // "Orthotics") are SCOPING that question, not asking to be walked
+  // through a product finder. Starting the questionnaire here abandons
+  // their actual question and feels like an associate who forgot what
+  // they asked (prod trace 2026-06-15). Suppress the finder unless the
+  // customer's latest message is itself an explicit recommendation
+  // request — then the finder is genuinely what they want.
+  //
+  // Scope is deliberately tight: only INFO_QUESTION_GOALS suppress.
+  // Recommendation / browse / unknown goals fall through to the normal
+  // gate behavior unchanged.
+  {
+    const convGoal = detectConversationGoal(messages);
+    const latestGoal = detectTurnGoal(rawUserText);
+    // Only suppress when the latest message is a SHORT SCOPING ANSWER
+    // (e.g. "Orthotics", "Men's") — the customer answering the bot's
+    // own clarifying question in service of their original information
+    // question. A full orthotic-intent sentence ("I need orthotics",
+    // "I have plantar fasciitis", "back to orthotics, men's please") is
+    // a genuine request and must still engage the finder.
+    const trimmed = rawUserText.trim().replace(/[.!?,]+$/, "");
+    const wordCount = trimmed.split(/\s+/).filter(Boolean).length;
+    const expressesShoppingIntent =
+      /\b(?:recommend|suggest|find|need|want|looking|show|help|get|buy|back\s+to)\b/i.test(trimmed);
+    const isShortScopingAnswer = wordCount <= 4 && !expressesShoppingIntent;
+    // Did the customer ever VOLUNTEER product shopping (in a real
+    // sentence, not a one-word chip answer)? "I have plantar fasciitis"
+    // / "do you sell shoes?" / "recommend an orthotic" all count — those
+    // conversations legitimately run the finder. The reported bug had
+    // NONE of these: the customer only asked "what size" and answered
+    // the bot's scoping questions with single words. We only suppress
+    // when shopping was never volunteered.
+    const volunteeredShopping = messages.some((m) => {
+      if (!m || m.role !== "user" || typeof m.content !== "string") return false;
+      const t = m.content.trim();
+      const wc = t.split(/\s+/).filter(Boolean).length;
+      if (wc < 3) return false; // bare chip/category/gender answer
+      const g = detectTurnGoal(t);
+      if (g === "recommendation" || g === "browse") return true;
+      return detectOrthoticIntent(t) || messagePivotsToOrthotic(t);
+    });
+    if (
+      convGoal &&
+      INFO_QUESTION_GOALS.has(convGoal.type) &&
+      latestGoal !== "recommendation" &&
+      isShortScopingAnswer &&
+      !volunteeredShopping
+    ) {
+      console.log(
+        `[orthotic-flow] suppressed: standing goal is '${convGoal.type}' (information question) and latest is a short scoping answer ("${trimmed.slice(0, 40)}") — falling through to LLM so the original question gets answered, not the product finder`,
+      );
+      return { handled: false, case: "info_question_goal" };
     }
   }
 
