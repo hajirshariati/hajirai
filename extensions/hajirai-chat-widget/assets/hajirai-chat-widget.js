@@ -744,23 +744,37 @@ function vizErrorHtml(msg){
    with the loading box, then the generated image, directly below the
    card. Kept out of the card's tap-target so the card layout is
    untouched. */
-function vizCtaHtml(cta){
-  return '<div class="ai-chat-viz-row" style="margin-top:12px">'+
-    '<button class="ai-chat-viz-btn" type="button" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px 16px;border:0;border-radius:12px;cursor:pointer;font-size:14px;font-weight:700;color:#fff;background:linear-gradient(100deg,var(--ai-chat-primary,#2d6b4f),var(--ai-chat-accent,#3a7d5c));box-shadow:0 4px 14px rgba(45,107,79,.28);letter-spacing:.2px">'+vizSparkle()+'<span>'+esc(cta.label||'Visualize My Look')+'</span></button>'+
-  '</div>';
+/* Inject the "Visualize My Look" button as a full-width row INSIDE the
+   product card. The card is display:flex/flex-wrap, so a child with
+   flex-basis:100% wraps cleanly to its own row at the bottom of the
+   card's box (no cramping). The card is a single <a> link, so the
+   button stops click propagation to avoid navigating to the product.
+   The generated image renders BELOW the card (see runVisualize). */
+function injectVizButton(card,cta){
+  if(!card||card.querySelector('.ai-chat-viz-btn'))return;
+  var viz=document.createElement('span');
+  viz.className='ai-chat-viz-btn';
+  viz.setAttribute('role','button');viz.setAttribute('tabindex','0');
+  viz.style.cssText='flex:0 0 100%;display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin-top:2px;padding:11px 14px;border-radius:10px;cursor:pointer;font-size:13.5px;font-weight:700;color:#fff;background:linear-gradient(100deg,var(--ai-chat-primary,#2d6b4f),var(--ai-chat-accent,#3a7d5c));box-shadow:0 3px 10px rgba(45,107,79,.28);box-sizing:border-box;letter-spacing:.2px';
+  viz.innerHTML=vizSparkle()+'<span>'+esc(cta.label||'Visualize My Look')+'</span>';
+  var go=function(e){if(e){e.preventDefault();e.stopPropagation();}runVisualize(cta,card)};
+  viz.addEventListener('click',go);
+  viz.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){go(e)}});
+  card.appendChild(viz);
 }
-function bindViz(scope,cta){
-  var btn=scope.querySelector('.ai-chat-viz-row .ai-chat-viz-btn');
-  if(btn)btn.addEventListener('click',function(){runVisualize(cta,btn)});
-}
-function runVisualize(cta,btn){
+function runVisualize(cta,card){
   if(!cta||!cta.productHandle)return;
-  var row=btn.closest('.ai-chat-viz-row');
+  var viz=card&&card.querySelector('.ai-chat-viz-btn');
+  if(viz){viz.style.opacity='0.5';viz.style.pointerEvents='none';}
+  // Drop the loading box + image BELOW the product card: insert after
+  // the whole products block so it spans the bubble width, never beside
+  // the card.
+  var products=card&&card.closest('.ai-chat-products');
+  var anchor=products||card;
+  if(!anchor||!anchor.parentNode)return;
   var host=document.createElement('div');
   host.setAttribute('role','status');host.setAttribute('aria-live','polite');host.setAttribute('aria-label','Creating your styling preview');
-  if(row&&row.parentNode){row.parentNode.replaceChild(host,row);}
-  else if(btn.parentNode){btn.parentNode.insertBefore(host,btn.nextSibling);}
-  else return;
+  anchor.parentNode.insertBefore(host,anchor.nextSibling);
   vizFetch(host,cta);
 }
 // Loading → fetch → result/error. Runs INDEPENDENTLY of the chat stream
@@ -1121,8 +1135,9 @@ if(cleanText){
   messages.push(_saved);saveH(messages)
 }
 if(vizCta&&vizCta.productHandle&&mDiv){
-  var _vbz=$('.ai-chat-msg-bubble',mDiv);
-  if(_vbz){_vbz.insertAdjacentHTML('beforeend',vizCtaHtml(vizCta));bindViz(_vbz,vizCta);}
+  var _vh=(vizCta.productHandle||'').replace(/"/g,'');
+  var _vcard=mDiv.querySelector('.ai-chat-product-card[data-handle="'+_vh+'"]');
+  if(_vcard)injectVizButton(_vcard,vizCta);
 }
 if(choices.length>0&&mDiv){
   var cb=$('.ai-chat-msg-bubble',mDiv);
