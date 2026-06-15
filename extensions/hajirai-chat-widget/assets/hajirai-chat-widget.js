@@ -752,35 +752,34 @@ function vizErrorHtml(msg){
    The generated image renders BELOW the card (see runVisualize). */
 function injectVizButton(card,cta){
   if(!card||card.querySelector('.ai-chat-viz-btn'))return;
-  // The card is a flex container in EITHER direction: showcase cards
-  // are column (img on top), legacy cards are row (img on the left).
-  // flex-basis:100% means 100% of the MAIN axis — in a column card
-  // that's 100% HEIGHT, which produced a giant overlapping button.
-  // So branch on the computed direction.
-  var isColumn=false;
-  try{isColumn=(getComputedStyle(card).flexDirection||'').indexOf('column')===0;}catch(e){}
-  var btnCss='box-sizing:border-box;width:100%;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:10px;padding:11px 14px;border-radius:10px;cursor:pointer;font-size:13.5px;font-weight:700;color:#fff;background:linear-gradient(100deg,var(--ai-chat-primary,#2d6b4f),var(--ai-chat-accent,#3a7d5c));box-shadow:0 3px 10px rgba(45,107,79,.28);letter-spacing:.2px';
+  // Place "Visualize My Look" BESIDE the "View product" button, on the
+  // same line, inside the card. Sized to match the View product CTA.
   var viz=document.createElement('span');
   viz.className='ai-chat-viz-btn';
   viz.setAttribute('role','button');viz.setAttribute('tabindex','0');
-  if(isColumn){
-    // Column card: a plain auto-height, full-width block stacks below.
-    viz.style.cssText='flex:0 0 auto;'+btnCss;
-  }else{
-    // Row card: force wrap + a zero-height full-width spacer so the
-    // button drops onto its own full-width line at the bottom.
-    try{card.style.flexWrap='wrap';}catch(e){}
-    var brk=document.createElement('span');
-    brk.setAttribute('aria-hidden','true');
-    brk.style.cssText='flex:0 0 100%;width:100%;height:0;margin:0;padding:0';
-    card.appendChild(brk);
-    viz.style.cssText='flex:0 0 auto;'+btnCss;
-  }
+  viz.style.cssText='display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:8px 14px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;letter-spacing:.02em;color:#fff;white-space:nowrap;background:linear-gradient(100deg,var(--ai-chat-primary,#2d6b4f),var(--ai-chat-accent,#3a7d5c));box-shadow:0 2px 8px rgba(45,107,79,.28)';
   viz.innerHTML=vizSparkle()+'<span>'+esc(cta.label||'Visualize My Look')+'</span>';
   var go=function(e){if(e){e.preventDefault();e.stopPropagation();}runVisualize(cta,card)};
   viz.addEventListener('click',go);
   viz.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){go(e)}});
-  card.appendChild(viz);
+  var viewCta=card.querySelector('.ai-chat-product-cta');
+  if(viewCta&&viewCta.parentNode&&getComputedStyle(viewCta).display!=='none'){
+    // Wrap "View product" + Visualize in a single flex row so they sit
+    // side by side (wraps gracefully if the card is too narrow).
+    var row=document.createElement('div');
+    row.className='ai-chat-viz-actions';
+    row.style.cssText='display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:4px';
+    viewCta.parentNode.insertBefore(row,viewCta);
+    viewCta.style.margin='0';
+    row.appendChild(viewCta);
+    row.appendChild(viz);
+  }else{
+    // Legacy layout hides "View product" — fall back to placing the
+    // button in the info area.
+    var info=card.querySelector('.ai-chat-product-info')||card;
+    viz.style.marginTop='8px';
+    info.appendChild(viz);
+  }
 }
 function runVisualize(cta,card){
   if(!cta||!cta.productHandle)return;
