@@ -35,6 +35,21 @@ export async function recordChatUsage({ shop, model, usage, toolCalls, embedding
   });
 }
 
+// "Visualize My Look" image generation. Recorded as its own usage row
+// (model = "image:<provider>") so it folds into spend totals without
+// polluting the per-Anthropic-model token math.
+export async function recordImageUsage({ shop, provider, costUsd = 0 }) {
+  return prisma.chatUsage.create({
+    data: {
+      shop,
+      model: `image:${provider || "unknown"}`,
+      costUsd: 0,
+      imageCount: 1,
+      imageCostUsd: Number(costUsd) || 0,
+    },
+  });
+}
+
 function resolveRange(arg) {
   if (arg instanceof Date || typeof arg === "string") {
     const start = arg instanceof Date ? arg : new Date(arg);
