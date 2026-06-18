@@ -10,6 +10,7 @@ import {
   customerAccountMcpEnabled,
   discoverCustomerAccountApi,
   callCustomerAccountMcp,
+  decryptSecret,
 } from "../lib/customer-account-mcp.server";
 
 function json(obj, status = 200) {
@@ -46,7 +47,7 @@ export async function loader({ request }) {
     }
     const res = await callCustomerAccountMcp({
       mcpUrl: api.mcp_api,
-      accessToken: row.accessToken,
+      accessToken: decryptSecret(row.accessToken),
       body: { jsonrpc: "2.0", id: 1, method: "tools/list" },
     });
     out.mcpStatus = res.status;

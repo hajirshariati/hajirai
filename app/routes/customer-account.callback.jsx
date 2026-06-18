@@ -14,6 +14,7 @@ import {
   customerAccountClientId,
   discoverOpenIdConfig,
   exchangeCodeForToken,
+  encryptSecret,
 } from "../lib/customer-account-mcp.server";
 
 const DONE_HTML =
@@ -52,8 +53,8 @@ export async function loader({ request }) {
     await prisma.customerAccountToken.update({
       where: { state },
       data: {
-        accessToken: token.access_token || null,
-        refreshToken: token.refresh_token || null,
+        accessToken: encryptSecret(token.access_token || null),
+        refreshToken: encryptSecret(token.refresh_token || null),
         expiresAt,
         codeVerifier: null, // consumed
       },

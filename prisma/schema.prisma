@@ -685,6 +685,7 @@ model CustomerAccountToken {
   id            String    @id @default(cuid())
   shop          String
   storefrontDomain String?
+  chatSessionId String?
   state         String?   @unique
   codeVerifier  String?
   customerId    String?
@@ -695,4 +696,5 @@ model CustomerAccountToken {
   updatedAt     DateTime  @updatedAt
 
   @@index([shop, customerId])
+  @@index([shop, chatSessionId])
 }
