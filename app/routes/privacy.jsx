@@ -252,9 +252,11 @@ export default function PrivacyPolicy() {
           <li>Aside from the order-conversion record described in §3, no shopper-identifying record is stored in our database.</li>
           <li>Per-store and per-IP rate limiting protects merchants from abuse.</li>
           <li>Webhook payloads from Shopify are HMAC-verified, and admin requests are authenticated with Shopify session tokens, before processing.</li>
+          <li>When a signed-in shopper asks about their own orders, their protected data (name, email, address, and order history) is accessed live from Shopify and used only to answer that request. It is not stored in our database, and each access is recorded in an internal access log that captures the event — never the underlying values.</li>
+          <li>We maintain a written security incident-response policy, restrict production data access to authorized operators with 2FA, separate test and production data, and review these practices at least annually.</li>
         </ul>
         <p>
-          No method of transmission or storage is 100% secure, and we do not warrant absolute security. If we become aware of a breach affecting personal data we process, we will notify affected merchants without undue delay so they can meet their own notification obligations as controllers.
+          No method of transmission or storage is 100% secure, and we do not warrant absolute security. If we become aware of a breach affecting personal data we process, we will notify Shopify and affected merchants without undue delay so they can meet their own notification obligations as controllers.
         </p>
 
         <h2>10. Your rights</h2>
