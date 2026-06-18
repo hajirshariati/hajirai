@@ -123,6 +123,16 @@ export async function fetchCustomerContext({ shop, accessToken, customerId, orde
   const customer = data?.customer;
   if (!customer) return null;
 
+  // PII access audit log. Records THAT protected customer data was
+  // accessed — the shop, the customer identifier, which field groups,
+  // and the declared purpose — so access to personal data is auditable
+  // (per our Protected Customer Data commitments). The actual values
+  // (name, email, address) are NEVER written to logs.
+  console.log(
+    `[pii-access] shop=${shop} customer=${customerId} ` +
+    `fields=name,email,address,orders purpose=customer_service,personalization source=admin_api`,
+  );
+
   const recentOrders = (customer.orders?.nodes || []).map((o) => {
     const fulfillments = (o.fulfillments || []).map((f) => ({
       status: f.status,
