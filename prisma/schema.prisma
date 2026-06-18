@@ -672,3 +672,27 @@ model RecentPurchase {
   @@index([shop, productId, createdAt])
   @@index([createdAt])
 }
+
+// Customer Account API (Customer Accounts MCP) auth state + tokens.
+// Two phases share one row, looked up by `state`:
+//   1. PKCE in-flight: state + codeVerifier saved before redirecting the
+//      shopper to Shopify's hosted login.
+//   2. Token: after the callback exchanges the code, the access/refresh
+//      tokens (scoped to that one signed-in customer) are stored here.
+// Used ONLY when CUSTOMER_ACCOUNT_MCP_ENABLED is on. Additive table —
+// nothing else references it, so it can't affect existing behavior.
+model CustomerAccountToken {
+  id            String    @id @default(cuid())
+  shop          String
+  storefrontDomain String?
+  state         String?   @unique
+  codeVerifier  String?
+  customerId    String?
+  accessToken   String?
+  refreshToken  String?
+  expiresAt     DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([shop, customerId])
+}
