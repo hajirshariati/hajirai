@@ -16,11 +16,62 @@
 // is a separate phase.
 
 import crypto from "node:crypto";
+import prisma from "../db.server";
 
 // Master switch. Off by default — turning it on only activates the new
 // routes; it does not change any existing behavior.
 export function customerAccountMcpEnabled() {
   return String(process.env.CUSTOMER_ACCOUNT_MCP_ENABLED || "").toLowerCase() === "true";
+}
+
+// ---- Token encryption at rest (AES-256-GCM) ----
+// Customer access/refresh tokens are encrypted before they touch the DB.
+// The key is derived (SHA-256) from ENCRYPTION_KEY so any key format
+// works. Stored as "v1:<base64(iv|tag|ciphertext)>". decryptSecret is
+// backward-compatible: a value without the "v1:" prefix is returned
+// as-is (legacy plaintext), so nothing breaks if a row predates this.
+const ENC_ALGO = "aes-256-gcm";
+function encKey() {
+  return crypto.createHash("sha256").update(String(process.env.ENCRYPTION_KEY || "")).digest();
+}
+export function encryptSecret(plain) {
+  if (plain == null) return null;
+  if (!process.env.ENCRYPTION_KEY) return plain; // dev fallback; set the key in prod
+  const iv = crypto.randomBytes(12);
+  const cipher = crypto.createCipheriv(ENC_ALGO, encKey(), iv);
+  const enc = Buffer.concat([cipher.update(String(plain), "utf8"), cipher.final()]);
+  const tag = cipher.getAuthTag();
+  return "v1:" + Buffer.concat([iv, tag, enc]).toString("base64");
+}
+export function decryptSecret(stored) {
+  if (stored == null) return null;
+  if (typeof stored !== "string" || !stored.startsWith("v1:")) return stored; // legacy plaintext
+  const buf = Buffer.from(stored.slice(3), "base64");
+  const iv = buf.subarray(0, 12);
+  const tag = buf.subarray(12, 28);
+  const enc = buf.subarray(28);
+  const decipher = crypto.createDecipheriv(ENC_ALGO, encKey(), iv);
+  decipher.setAuthTag(tag);
+  return Buffer.concat([decipher.update(enc), decipher.final()]).toString("utf8");
+}
+
+// Look up a valid (non-expired) customer token for a chat session.
+// Returns { accessToken, storefrontDomain, customerId } with the token
+// DECRYPTED, or null. A 60s skew guard avoids using a token about to
+// expire mid-request.
+export async function getValidTokenForSession(shop, chatSessionId) {
+  if (!shop || !chatSessionId) return null;
+  const row = await prisma.customerAccountToken.findFirst({
+    where: { shop, chatSessionId, accessToken: { not: null } },
+    orderBy: { createdAt: "desc" },
+  });
+  if (!row || !row.accessToken) return null;
+  if (row.expiresAt && row.expiresAt.getTime() < Date.now() + 60_000) return null;
+  return {
+    accessToken: decryptSecret(row.accessToken),
+    storefrontDomain: row.storefrontDomain,
+    customerId: row.customerId || null,
+  };
 }
 
 // The OAuth client_id is the app's API key (per Shopify: "Your AppID
@@ -111,4 +162,27 @@ export async function callCustomerAccountMcp({ mcpUrl, accessToken, body }) {
     body: JSON.stringify(body),
   });
   return res; // caller inspects 401 (→ re-auth) vs ok
+}
+
+// Call a specific MCP tool by name (JSON-RPC tools/call). Discovers the
+// MCP endpoint from the storefront domain, posts the request, and
+// returns the parsed `result`. Throws with err.code=401 when the token
+// is rejected (caller should prompt re-auth).
+export async function callMcpTool({ storefrontDomain, accessToken, name, args = {} }) {
+  const api = await discoverCustomerAccountApi(storefrontDomain);
+  if (!api.mcp_api) throw new Error("MCP endpoint unavailable for this store");
+  const res = await callCustomerAccountMcp({
+    mcpUrl: api.mcp_api,
+    accessToken,
+    body: { jsonrpc: "2.0", id: Date.now(), method: "tools/call", params: { name, arguments: args } },
+  });
+  if (res.status === 401) {
+    const e = new Error("customer token unauthorized");
+    e.code = 401;
+    throw e;
+  }
+  const json = await res.json().catch(() => null);
+  if (!res.ok || !json) throw new Error(`MCP tool ${name} failed (${res.status})`);
+  if (json.error) throw new Error(json.error.message || `MCP tool ${name} error`);
+  return json.result;
 }

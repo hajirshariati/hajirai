@@ -22,6 +22,7 @@ export async function loader({ request }) {
   const url = new URL(request.url);
   const shop = url.searchParams.get("shop") || "";
   const storefrontDomain = url.searchParams.get("storefront_domain") || "";
+  const chatSessionId = url.searchParams.get("session") || null;
   if (!shop || !storefrontDomain) {
     return new Response("Missing shop or storefront_domain", { status: 400 });
   }
@@ -35,7 +36,7 @@ export async function loader({ request }) {
   const state = generateState();
 
   await prisma.customerAccountToken.create({
-    data: { shop, storefrontDomain, state, codeVerifier },
+    data: { shop, storefrontDomain, chatSessionId, state, codeVerifier },
   });
 
   let oidc;
