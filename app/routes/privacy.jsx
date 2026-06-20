@@ -137,7 +137,7 @@ export default function PrivacyPolicy() {
         </header>
 
         <p>
-          SEoS Assistant (&quot;we&quot;, &quot;our&quot;, &quot;the app&quot;) is operated by HajirAi.
+          SEoS Assistant (&quot;we&quot;, &quot;our&quot;, &quot;the app&quot;) is operated by Aetrex Technology.
           This policy describes how SEoS Assistant processes data when a merchant
           installs it on a Shopify store, and how responsibility for that data is
           divided between the merchant, Shopify, and us.
@@ -150,7 +150,7 @@ export default function PrivacyPolicy() {
         <h2>1. Roles: who is responsible for what</h2>
         <ul>
           <li><strong>The merchant is the data controller</strong> for all shopper and store data processed through the app. The merchant decides whether to install the app, whether and where the chat widget appears, which features and integrations are enabled, and what catalog, policy, and knowledge content the assistant uses. The app processes shopper data solely on the merchant&apos;s behalf and according to the merchant&apos;s configuration.</li>
-          <li><strong>HajirAi acts as a data processor</strong> (a &quot;service provider&quot; under California law): we process personal information only to provide the app&apos;s services to the merchant, and not for our own purposes.</li>
+          <li><strong>Aetrex Technology acts as a data processor</strong> (a &quot;service provider&quot; under California law): we process personal information only to provide the app&apos;s services to the merchant, and not for our own purposes.</li>
           <li><strong>Shopify</strong> provides the platform, authentication, checkout, and billing under its own <a href="https://www.shopify.com/legal/privacy" rel="noreferrer">privacy policy</a> and terms. Orders, payments, and customer accounts live in Shopify, not in this app.</li>
           <li><strong>Shoppers&apos; privacy relationship is with the store they shop at.</strong> Shoppers should direct privacy questions and rights requests to the merchant, whose own privacy policy governs the storefront.</li>
         </ul>
@@ -287,7 +287,7 @@ export default function PrivacyPolicy() {
 
         <h2>14. Disclaimers and limitation of liability</h2>
         <p>
-          The app is provided <strong>&quot;as is&quot; and &quot;as available&quot;</strong>, without warranties of any kind, express or implied, including merchantability, fitness for a particular purpose, accuracy, and non-infringement. To the maximum extent permitted by applicable law: (a) HajirAi is not liable for any indirect, incidental, special, consequential, or punitive damages, or for lost profits, revenue, data, or goodwill, arising from or related to the use of the app or its AI-generated content; (b) HajirAi&apos;s total aggregate liability for any claim arising out of or relating to the app shall not exceed the amounts paid by the merchant to HajirAi for the app in the twelve (12) months preceding the claim; and (c) the merchant assumes all responsibility for its use and configuration of the app, for the content the assistant is configured to communicate, and for the legal compliance of its own store, product claims, and policies. Some jurisdictions do not allow certain exclusions, so parts of this section may not apply to you. If any provision of this policy is held unenforceable, the remaining provisions remain in full effect.
+          The app is provided <strong>&quot;as is&quot; and &quot;as available&quot;</strong>, without warranties of any kind, express or implied, including merchantability, fitness for a particular purpose, accuracy, and non-infringement. To the maximum extent permitted by applicable law: (a) Aetrex Technology is not liable for any indirect, incidental, special, consequential, or punitive damages, or for lost profits, revenue, data, or goodwill, arising from or related to the use of the app or its AI-generated content; (b) Aetrex Technology&apos;s total aggregate liability for any claim arising out of or relating to the app shall not exceed the amounts paid by the merchant to Aetrex Technology for the app in the twelve (12) months preceding the claim; and (c) the merchant assumes all responsibility for its use and configuration of the app, for the content the assistant is configured to communicate, and for the legal compliance of its own store, product claims, and policies. Some jurisdictions do not allow certain exclusions, so parts of this section may not apply to you. If any provision of this policy is held unenforceable, the remaining provisions remain in full effect.
         </p>
 
         <h2>15. Cookies</h2>
@@ -306,7 +306,7 @@ export default function PrivacyPolicy() {
         </p>
 
         <footer>
-          © HajirAi · SEoS Assistant
+          © Aetrex Technology · SEoS Assistant
         </footer>
         </div>
       </main>

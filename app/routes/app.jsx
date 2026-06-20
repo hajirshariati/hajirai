@@ -122,7 +122,6 @@ export default function App() {
           <Link to="/app/recommenders">Smart Recommenders</Link>
           <Link to="/app/analytics">Analytics</Link>
           <Link to="/app/api-keys">Settings</Link>
-          <Link to="/app/plans">Plans &amp; Support</Link>
         </NavMenu>
         <Outlet />
         <div

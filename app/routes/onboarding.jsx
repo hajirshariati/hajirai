@@ -1428,7 +1428,7 @@ export default function Onboarding() {
             <a href="/privacy">Privacy</a>
             <a href="/app" target="_blank" rel="noopener noreferrer">Open admin</a>
           </div>
-          <div>© HajirAi · SEoS Assistant</div>
+          <div>© Aetrex Technology · SEoS Assistant</div>
         </footer>
       </div>
 
