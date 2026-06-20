@@ -113,6 +113,16 @@ export default function App() {
           }
           .Polaris-Badge { border-radius: 999px; }
           .Polaris-Banner--withinPage { border-radius: 14px; }
+          /* Filled status banners (success / critical / info) sit on a
+             saturated background — their title, body text and icons must stay
+             white. The brand heading-ink rule above otherwise renders the
+             banner title near-black, which is unreadable on the green/red fill. */
+          .Polaris-Banner--textSuccessOnBgFill .Polaris-Text--root,
+          .Polaris-Banner--textCriticalOnBgFill .Polaris-Text--root,
+          .Polaris-Banner--textInfoOnBgFill .Polaris-Text--root { color: #fff !important; }
+          .Polaris-Banner--textSuccessOnBgFill svg, .Polaris-Banner--textSuccessOnBgFill path,
+          .Polaris-Banner--textCriticalOnBgFill svg, .Polaris-Banner--textCriticalOnBgFill path,
+          .Polaris-Banner--textInfoOnBgFill svg, .Polaris-Banner--textInfoOnBgFill path { fill: #fff !important; }
         `}</style>
         <NavMenu>
           <Link to="/app" rel="home">SEoS Assistant</Link>
