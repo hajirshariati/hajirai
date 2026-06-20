@@ -143,7 +143,7 @@ export default function App() {
           }}
         >
           <Text as="p" tone="subdued" variant="bodySm" alignment="center">
-            SEoS Assistant v1.0. All rights reserved. ·{" "}
+            SEoS Assistant by Aetrex Technology ·{" "}
             <a
               href="/privacy"
               target="_blank"

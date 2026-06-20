@@ -595,7 +595,13 @@ const STYLES = `
     .hero-brand, .hero h1, .hero p, .phase-nav { animation: none; opacity: 1; transform: none; }
     .phase-tab, .step, .theme-toggle { transition: none; }
     .egg-chat { animation: none; }
+  }  /* Mobile responsiveness */
+  @media (max-width: 480px) {
+    .hero { padding: 32px 16px 16px; }
+    .hero h1 { font-size: 24px; }
+    .hero-inner { max-width: 100%; }
   }
+
 `;
 
 // Inline script that runs BEFORE React hydrates so the saved theme

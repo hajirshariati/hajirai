@@ -85,15 +85,14 @@ export const loader = async ({ request }) => {
     fileCount: files.length,
     shop: session.shop,
     userFirstName,
-    // Deep link with activateAppId pre-selects and toggles our app
-    // embed in the theme editor (App Store req 5.1.3) — without it the
-    // merchant lands on the generic editor and has to find the embed
-    // manually. The id is the theme extension's uid from
-    // extensions/hajirai-chat-widget/shopify.extension.toml + the
-    // embed block's filename handle.
+    // Open the theme editor's "App embeds" panel, where the merchant toggles
+    // the SEoS Assistant embed on. We intentionally do NOT pass activateAppId:
+    // that requires the per-app *deployed* theme-extension UUID (different for
+    // every Shopify app), and a stale/incorrect id makes the editor throw
+    // "App embed does not exist". `?context=apps` reliably opens the embeds
+    // panel with our embed listed, with no error.
     themeEditorUrl:
-      `https://${session.shop}/admin/themes/current/editor` +
-      `?context=apps&activateAppId=678052ad-1f00-ade1-148e-c0076d6cf6a3793b2723/hajirai_chat`,
+      `https://${session.shop}/admin/themes/current/editor?context=apps`,
     widgetEnabled,
     productsCount: syncState.productsCount || 0,
     enrichmentCount,
@@ -2513,6 +2512,19 @@ export default function Home() {
           .seos-pip, .seos-card, .seos-card-arrow, .seos-metric, .seos-metric-detail, .seos-setup-body, .seos-setup-chev { transition: none; }
           .seos-pip-pulse { animation: none; }
         }
+                /* Mobile responsiveness */
+          @media (max-width: 768px) {
+            .seos-greet { font-size: 24px; line-height: 1.2; }
+            .seos-card-grid { grid-template-columns: 1fr; }
+            .seos-pagefoot { gap: 10px 18px; }
+          }
+          @media (max-width: 480px) {
+            .seos-testchat { width: 100%; }
+            .seos-greet { font-size: 20px; }
+            .seos-pagefoot { gap: 8px 12px; }
+            .seos-pagefoot-value { white-space: normal; }
+            .seos-testchat-prod-title { max-width: 140px; }
+          }
       `}</style>
       <div className="seos-home">
         <div className="seos-globe-bg" aria-hidden="true">

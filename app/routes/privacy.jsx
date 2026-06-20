@@ -118,7 +118,12 @@ const STYLES = `
     border-top: 1px solid rgba(26,46,38,0.10);
     color: #5e6f67;
     font-size: 14px;
+  }  /* Mobile responsiveness */
+  @media (max-width: 480px) {
+    .privacy .sheet { padding: 20px 16px; }
+    .privacy h1 { font-size: 24px; }
   }
+
 `;
 
 export default function PrivacyPolicy() {
