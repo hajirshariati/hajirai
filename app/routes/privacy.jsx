@@ -129,9 +129,6 @@ const STYLES = `
     .privacy .sheet { padding: 18px 16px; }
     .privacy a, .privacy code, .privacy td { overflow-wrap: anywhere; word-break: break-word; }
   }
-  /* Two-tone: green→berry header accent (matches the brand hairline) */
-  .privacy .head { position: relative; }
-  .privacy .head::after { content: ""; display: block; width: 120px; height: 3px; border-radius: 2px; margin-top: 14px; background: linear-gradient(90deg, #2D6B4F, #A8326B 72%, rgba(168,50,107,0)); }
 
 `;
 
