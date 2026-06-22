@@ -123,7 +123,19 @@ export default function App() {
           .Polaris-Banner--textSuccessOnBgFill svg, .Polaris-Banner--textSuccessOnBgFill path,
           .Polaris-Banner--textCriticalOnBgFill svg, .Polaris-Banner--textCriticalOnBgFill path,
           .Polaris-Banner--textInfoOnBgFill svg, .Polaris-Banner--textInfoOnBgFill path { fill: #fff !important; }
-        `}</style>
+                  /* ── Mobile responsiveness (admin) ── */
+          @media (max-width: 768px) {
+            .Polaris-Page { padding-left: 14px !important; padding-right: 14px !important; overflow-x: clip; }
+            .dd, .dx, .settings { overflow-wrap: anywhere; word-break: break-word; }
+            .dd .rmeta { white-space: normal !important; flex-wrap: wrap !important; row-gap: 4px; }
+            .dd .cbmsg { white-space: normal !important; }
+            .seos-card-grid { grid-template-columns: 1fr !important; }
+            .dd .cols, .dd .two { grid-template-columns: 1fr !important; }
+            .seos-pagefoot { gap: 8px 14px !important; }
+            .seos-pagefoot-value { white-space: normal !important; }
+            .seos-testchat { width: 100% !important; }
+          }
+      `}</style>
         <NavMenu>
           <Link to="/app" rel="home">SEoS Assistant</Link>
           <Link to="/app/rules">Rules</Link>

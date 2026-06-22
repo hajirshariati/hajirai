@@ -123,6 +123,12 @@ const STYLES = `
     .privacy .sheet { padding: 20px 16px; }
     .privacy h1 { font-size: 24px; }
   }
+  /* Mobile responsiveness v2 */
+  @media (max-width: 768px) {
+    .privacy { overflow-x: hidden; }
+    .privacy .sheet { padding: 18px 16px; }
+    .privacy a, .privacy code, .privacy td { overflow-wrap: anywhere; word-break: break-word; }
+  }
 
 `;
 

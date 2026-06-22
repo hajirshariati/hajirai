@@ -601,6 +601,26 @@ const STYLES = `
     .hero h1 { font-size: 24px; }
     .hero-inner { max-width: 100%; }
   }
+  /* Mobile responsiveness v2 */
+  @media (max-width: 768px) {
+    body, .page { overflow-x: hidden; }
+    .theme-toggle { top: 12px; right: 12px; padding: 6px 11px 6px 9px; font-size: 12px; }
+    .theme-toggle svg { width: 14px; height: 14px; }
+    .hero { padding: 60px 16px 20px; }
+    .hero h1 { font-size: 26px; }
+    .hero-inner { max-width: 100%; }
+    .container { padding: 0 16px; }
+    .phase-intro { flex-direction: column; align-items: flex-start; gap: 12px; padding: 18px 16px; }
+    .ptable td:first-child { width: auto; }
+    .sheet { padding: 18px 16px; }
+    .egg-chat { right: 12px; bottom: 12px; width: auto; max-width: calc(100vw - 24px); }
+  }
+  @media (max-width: 480px) {
+    .hero { padding: 56px 14px 18px; }
+    .hero h1 { font-size: 22px; }
+    .container { padding: 0 14px; }
+    .phase-tab { padding: 8px 13px; font-size: 12.5px; }
+  }
 
 `;
 
