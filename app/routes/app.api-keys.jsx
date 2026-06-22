@@ -876,6 +876,14 @@ export default function ApiKeys() {
               margin-top: 24px !important;
               padding-top: 24px !important;
             }
+            /* The "Get your API key here" helper links are raw <a> tags, so
+               they don't pick up Polaris' --p-color-text-link token and fall
+               back to the browser's blue/visited-purple default — jarring in
+               the green theme. Force the brand green on settings-page links. */
+            .Polaris-Layout__Annotation a,
+            .Polaris-Layout__AnnotationContent a { color: #2D6B4F; text-underline-offset: 2px; }
+            .Polaris-Layout__Annotation a:hover,
+            .Polaris-Layout__AnnotationContent a:hover { color: #245741; }
           `}</style>
           <p className="set-intro">Your assistant's API keys, model strategy, widget, and safety limits — all in one place.</p>
 
