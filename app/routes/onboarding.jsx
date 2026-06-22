@@ -621,6 +621,8 @@ const STYLES = `
     .container { padding: 0 14px; }
     .phase-tab { padding: 8px 13px; font-size: 12.5px; }
   }
+  /* Two-tone: green→berry hero accent (matches the brand hairline) */
+  .hero-inner::after { content: ""; width: 72px; height: 3px; border-radius: 2px; margin-top: 18px; background: linear-gradient(90deg, transparent, #2D6B4F 28%, #A8326B 78%, transparent); }
 
 `;
 

@@ -2525,6 +2525,9 @@ export default function Home() {
             .seos-pagefoot-value { white-space: normal; }
             .seos-testchat-prod-title { max-width: 140px; }
           }
+                /* Two-tone: green→berry hero accent (matches the brand hairline) */
+          .seos-subline { position: relative; }
+          .seos-subline::after { content: ""; display: block; width: 66px; height: 3px; border-radius: 2px; margin: 16px auto 0; background: linear-gradient(90deg, transparent, #2D6B4F 28%, #A8326B 78%, transparent); }
       `}</style>
       <div className="seos-home">
         <div className="seos-globe-bg" aria-hidden="true">

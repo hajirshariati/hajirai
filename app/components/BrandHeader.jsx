@@ -46,7 +46,7 @@ export default function BrandHeader({ title, gutter = true }) {
         style={{
           height: "3px",
           borderRadius: "2px",
-          background: "linear-gradient(90deg, #2D6B4F, #3a8a66, transparent)",
+          background: "linear-gradient(90deg, #2D6B4F, #A8326B 58%, rgba(168,50,107,0) 100%)",
         }}
       />
     </div>
