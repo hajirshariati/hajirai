@@ -282,6 +282,67 @@ await test("footwear path uses soft gender-gate escape instead of repeating gend
   assert.equal(events.length, 0);
 });
 
+await test("educational/clinical question is answered by LLM, not shunted into the funnel", async () => {
+  // Live 2026-06-22: customer opened with "for Morton's neuroma do i
+  // need to have met pad in my orthotics?" — a knowledge question. The
+  // classifier extracted condition=mortons_neuroma, which defeated the
+  // informational veto (it requires empty latestExtracted) and the gate
+  // emitted q_gender ("Who are these orthotics for?"), ignoring the
+  // question to start selling. The educational-question veto must fire.
+  // Reproduces the live shape: the customer was already engaged in the
+  // orthotic flow (so intentInHistory is true), and the widget strips
+  // the prior assistant turn's <<chip>> markers from history (so
+  // fingerprintNode is null) — exactly the path that previously emitted
+  // q_gender on a knowledge question.
+  const { events, encoder, controller } = makeMockSse();
+  const out = await maybeRunOrthoticFlow({
+    messages: [
+      { role: "user", content: "I'm looking at men's orthotics" },
+      { role: "assistant", content: "Great — what kind of shoes will they go in?" },
+      { role: "user", content: "for Morton's neuroma do i need to have met pad in my orthotics?" },
+    ],
+    tree,
+    shop: "test.myshopify.com",
+    controller,
+    encoder,
+    classifiedIntent: {
+      isOrthoticRequest: false,
+      isFootwearRequest: false,
+      isRejection: false,
+      attributes: { condition: "mortons_neuroma" },
+      confidence: "high",
+    },
+  });
+  assert.equal(out.handled, false);
+  assert.equal(out.case, "educational_question");
+  assert.equal(events.length, 0);
+});
+
+await test("a flat statement of shopping need still engages the funnel (not treated as educational)", async () => {
+  // Guard against over-vetoing: "I need orthotics for plantar fasciitis"
+  // is a shopping request, not a knowledge question — the gate should
+  // still engage and emit a chip question.
+  const { events, encoder, controller } = makeMockSse();
+  const out = await maybeRunOrthoticFlow({
+    messages: [
+      { role: "user", content: "I need orthotics for plantar fasciitis" },
+    ],
+    tree,
+    shop: "test.myshopify.com",
+    controller,
+    encoder,
+    classifiedIntent: {
+      isOrthoticRequest: true,
+      isFootwearRequest: false,
+      isRejection: false,
+      attributes: { condition: "plantar_fasciitis" },
+      confidence: "high",
+    },
+  });
+  assert.equal(out.handled, true);
+  assert.ok(events.length > 0);
+});
+
 await test("footwear path soft-escapes after repeated unanswered gender asks", async () => {
   const { events, encoder, controller } = makeMockSse();
   const out = await maybeRunOrthoticFlow({

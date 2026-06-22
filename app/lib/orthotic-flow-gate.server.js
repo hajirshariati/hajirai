@@ -1772,6 +1772,56 @@ export async function maybeRunOrthoticFlow({
     }
   }
 
+  // Educational / clinical question veto. The customer is ASKING a
+  // knowledge question — "for Morton's neuroma do I need a met pad in
+  // my orthotics?", "should I get posted orthotics for overpronation?",
+  // "is a met pad necessary for ball-of-foot pain?". These deserve a
+  // real, educational answer (LLM + RAG knowledge) FIRST — not an
+  // immediate jump into the product-finder funnel.
+  //
+  // Why the existing informational veto below misses these: the
+  // classifier extracts the condition from the question (e.g.
+  // condition=mortons_neuroma), so `latestExtracted` is non-empty and
+  // that veto (which requires it empty) is skipped. The gate then
+  // emits q_gender ("Who are these orthotics for?") and the customer's
+  // actual question goes unanswered — the bot looks like it ignored
+  // them and started selling. Reported live 2026-06-22.
+  //
+  // Falling through is safe: the LLM keeps the recommend_orthotic tool
+  // and the prompt's guidance, so it can answer the question and THEN
+  // offer to help find a product — the educational-first behavior we
+  // want — instead of the gate short-circuiting straight to chips.
+  //
+  // Guards keep this tight so genuine funnel entries still engage:
+  //   - Only when NOT answering a chip (no fingerprintNode) — a
+  //     question-shaped reply to an active chip is handled above.
+  //   - Only question shapes (informational OR functional), never bare
+  //     statements like "I have plantar fasciitis" (a real funnel entry).
+  //   - Never on an explicit recommendation request ("find me one",
+  //     "recommend an orthotic") — that IS funnel intent.
+  //   - Only when the customer didn't volunteer a funnel-SCOPING
+  //     attribute this turn (gender / useCase / arch / overpronation).
+  //     A bare condition mention inside the question is the TOPIC of
+  //     the question, not an answer to a chip — it doesn't count.
+  if (
+    !fingerprintNode &&
+    !looksLikeRecommendationRequest(rawUserText) &&
+    (looksLikeInformationalQuestion(rawUserText) || looksLikeFunctionalQuestion(rawUserText))
+  ) {
+    const volunteeredScopingAttr = ["gender", "useCase", "arch", "overpronation"].some(
+      (k) => latestExtracted[k] !== undefined,
+    );
+    if (!volunteeredScopingAttr) {
+      console.log(
+        `[orthotic-flow] educational/clinical question ("${rawUserText.slice(0, 60)}"); ` +
+          `answering via LLM before any product funnel ` +
+          `(info=${looksLikeInformationalQuestion(rawUserText)}, ` +
+          `functional=${looksLikeFunctionalQuestion(rawUserText)})`,
+      );
+      return { handled: false, case: "educational_question" };
+    }
+  }
+
   // Informational-question mid-flow veto. The customer IS engaged in
   // orthotic flow (intentInHistory or fingerprintNode), but THIS turn
   // is asking what something IS / how it works / what its specs are
