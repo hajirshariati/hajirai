@@ -859,6 +859,26 @@ export default function ApiKeys() {
           <BrandHeader title="Settings" gutter={false} />
           {/* Save feedback is an always-visible App Bridge toast, not a top banner. */}
 
+          {/* Data-Eraser-style settings: single-column annotated sections —
+              section title above a full-width hairline card, tight spacing, a
+              hairline divider between sections. Overrides Polaris' default
+              two-column annotated layout (which renders the description in a
+              narrow left rail). Page-scoped so it only affects Settings. */}
+          <style>{`
+            .set-intro { font-size: 13.5px; color: #5e6f67; max-width: 760px; margin: -6px 0 2px; }
+            .Polaris-Layout__AnnotationWrapper { display: block; margin: 0; }
+            .Polaris-Layout__Annotation,
+            .Polaris-Layout__AnnotationContent { display: block; margin: 0; max-width: 100%; width: 100%; }
+            .Polaris-Layout__Annotation { padding: 0 0 12px 0; }
+            .Polaris-Layout__AnnotatedSection { margin: 0 !important; max-width: 100% !important; }
+            .Polaris-Layout__AnnotatedSection + .Polaris-Layout__AnnotatedSection {
+              border-top: 1px solid rgba(30,27,51,0.08);
+              margin-top: 24px !important;
+              padding-top: 24px !important;
+            }
+          `}</style>
+          <p className="set-intro">Your assistant's API keys, model strategy, widget, and safety limits — all in one place.</p>
+
           <Layout>
             <Layout.AnnotatedSection
               title="AI Engine (required)"
