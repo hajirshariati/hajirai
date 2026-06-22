@@ -866,6 +866,13 @@ export default function ApiKeys() {
               narrow left rail). Page-scoped so it only affects Settings. */}
           <style>{`
             .set-intro { font-size: 13.5px; color: #5e6f67; max-width: 760px; margin: -6px 0 2px; }
+            /* Polaris offsets Layout with a negative margin (-space-400) that
+               its sections add back (+space-400) to land at the page edge.
+               Zeroing the section margin below would leave that negative
+               margin uncompensated and shove all content ~16px LEFT of the
+               BrandHeader/intro. Zero the Layout margin too so the section,
+               header, and intro share one left edge. */
+            .Polaris-Layout { margin: 0 !important; }
             .Polaris-Layout__AnnotationWrapper { display: block; margin: 0; }
             .Polaris-Layout__Annotation,
             .Polaris-Layout__AnnotationContent { display: block; margin: 0; max-width: 100%; width: 100%; }
