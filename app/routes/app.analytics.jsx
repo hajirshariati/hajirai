@@ -13,6 +13,7 @@ import {
   getTopProducts, getProductsByTool, getInterestBreakdown, cleanupOldMentions,
 } from "../models/ChatProductMention.server";
 import { getConversionSummary } from "../models/ChatConversion.server";
+import { getShopConfig } from "../models/ShopConfig.server";
 import BrandHeader from "../components/BrandHeader";
 import CostEstimator from "../components/CostEstimator";
 
@@ -78,7 +79,7 @@ export const loader = async ({ request }) => {
   const prevStart = new Date(prevEnd.getTime() - spanDays * 86400000);
   const prevRange = { startDate: prevStart, endDate: prevEnd };
 
-  const [usage, feedback, topProducts, productsByTool, interest, recentQuestions, daily, prevUsage, prevFeedback, conversions, prevConversions] = await Promise.all([
+  const [usage, feedback, topProducts, productsByTool, interest, recentQuestions, daily, prevUsage, prevFeedback, conversions, prevConversions, config] = await Promise.all([
     getUsageSummary(session.shop, rangeArg),
     getFeedbackSummary(session.shop, rangeArg),
     getTopProducts(session.shop, rangeArg, 10),
@@ -90,12 +91,14 @@ export const loader = async ({ request }) => {
     getFeedbackSummary(session.shop, prevRange),
     getConversionSummary(session.shop, rangeArg),
     getConversionSummary(session.shop, prevRange),
+    getShopConfig(session.shop),
   ]);
   cleanupOldFeedback().catch(() => {});
   cleanupOldMentions().catch(() => {});
 
   return {
     usage, feedback, topProducts, productsByTool, interest, recentQuestions, daily, conversions,
+    modelStrategy: config?.modelStrategy || "smart",
     previous: {
       messages: prevUsage.totalMessages,
       cost: prevUsage.totalCost,
@@ -472,7 +475,7 @@ function RangeSelector({ current, searchParams }) {
 }
 
 export default function Analytics() {
-  const { usage, feedback, productsByTool, interest, recentQuestions, daily, conversions, previous, range } = useLoaderData();
+  const { usage, feedback, productsByTool, interest, recentQuestions, daily, conversions, previous, range, modelStrategy } = useLoaderData();
   const [searchParams] = useSearchParams();
   const shopify = useAppBridge();
   const [exporting, setExporting] = useState(null);
@@ -1126,7 +1129,7 @@ export default function Analytics() {
             )}
           </SectionCard>
 
-          <CostEstimator avgCostPerMessage={usage.avgCostPerMessage} totalMessages={usage.totalMessages} />
+          <CostEstimator avgCostPerMessage={usage.avgCostPerMessage} totalMessages={usage.totalMessages} modelStrategy={modelStrategy} />
 
           <div className="seos-an-foot">
             Cost estimates based on AI engine pricing. User data hashed for privacy.

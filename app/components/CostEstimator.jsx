@@ -9,7 +9,6 @@ import { useState } from "react";
 // rate — and the anchor in use is always disclosed under the result.
 // Self-contained: carries its own styles so any page can drop it in.
 // ---------------------------------------------------------------------------
-const CALC_FALLBACK_RATE = 0.008; // typical blended $/AI request (Haiku-first routing)
 const CALC_MIN_SAMPLE = 25; // real requests needed before trusting the store's own average
 
 // Per-request cost falls as volume grows: at low traffic nearly every
@@ -19,19 +18,49 @@ const CALC_MIN_SAMPLE = 25; // real requests needed before trusting the store's 
 // low-volume average linearly to big traffic therefore overstates cost
 // badly — so the rate log-interpolates from the anchored low-volume rate
 // down to the at-scale blended rate between 2K and 100K requests/month.
-const CALC_AT_SCALE_RATE = 0.006;
 const CALC_AMORT_START = 2000;
 const CALC_AMORT_FULL = 100000;
 
-function effectiveRate(baseRate, monthlyRequests) {
-  if (baseRate <= CALC_AT_SCALE_RATE) return baseRate;
+// The per-request rate is driven mostly by which model answers — that's the
+// single biggest cost lever (see the AI-engine model-strategy setting). At
+// scale the dominant cost is the cached system-prefix READ, so the rates
+// below scale with each model's cache-read + output price relative to
+// Sonnet (pricing.server.js): Sonnet cacheRead $0.30/M, out $15/M (1.0x);
+// Haiku $0.10/M, $5/M (~1/3x); Opus $0.50/M, $25/M (~1.7x). The Sonnet
+// at-scale anchor ($0.006) is validated against real warm-cache spend.
+//   • Smart           → Sonnet for substantive turns (Haiku for trivial).
+//   • Cost optimized   → Haiku-first; Sonnet only on grounding escalation
+//                        and high-risk turns, so a Haiku-leaning blend.
+//   • Premium quality  → Opus on every turn.
+const STRATEGY_RATES = {
+  smart: { fallback: 0.008, atScale: 0.006 },
+  "cost-optimized": { fallback: 0.005, atScale: 0.0035 },
+  "always-opus": { fallback: 0.014, atScale: 0.011 },
+};
+
+// Map the stored strategy (incl. legacy values) to a rate profile + label.
+function strategyProfile(strategy) {
+  switch (strategy) {
+    case "cost-optimized":
+    case "always-haiku": // legacy: pure fast model — closest to cost-optimized
+      return { rates: STRATEGY_RATES["cost-optimized"], label: "Cost-optimized routing" };
+    case "always-opus":
+    case "premium":
+      return { rates: STRATEGY_RATES["always-opus"], label: "Premium quality" };
+    default: // smart, always-sonnet, unknown
+      return { rates: STRATEGY_RATES.smart, label: "Smart routing" };
+  }
+}
+
+function effectiveRate(baseRate, monthlyRequests, atScaleRate) {
+  if (baseRate <= atScaleRate) return baseRate;
   if (!Number.isFinite(monthlyRequests) || monthlyRequests <= CALC_AMORT_START) return baseRate;
   const t = Math.min(
     1,
     (Math.log10(monthlyRequests) - Math.log10(CALC_AMORT_START)) /
       (Math.log10(CALC_AMORT_FULL) - Math.log10(CALC_AMORT_START)),
   );
-  return baseRate + (CALC_AT_SCALE_RATE - baseRate) * t;
+  return baseRate + (atScaleRate - baseRate) * t;
 }
 
 const CALC_DEPTHS = [
@@ -49,9 +78,10 @@ function calcMoney(n) {
 
 const rateFmt = (r) => `$${r.toFixed(4).replace(/0+$/, "").replace(/\.$/, "")}`;
 
-export default function CostEstimator({ avgCostPerMessage, totalMessages }) {
+export default function CostEstimator({ avgCostPerMessage, totalMessages, modelStrategy = "smart" }) {
+  const { rates, label: strategyLabel } = strategyProfile(modelStrategy);
   const anchored = totalMessages >= CALC_MIN_SAMPLE && avgCostPerMessage > 0;
-  const baseRate = anchored ? avgCostPerMessage : CALC_FALLBACK_RATE;
+  const baseRate = anchored ? avgCostPerMessage : rates.fallback;
 
   const [sessionsRaw, setSessionsRaw] = useState("25,000");
   const [period, setPeriod] = useState("month");
@@ -83,7 +113,7 @@ export default function CostEstimator({ avgCostPerMessage, totalMessages }) {
   const turns = CALC_DEPTHS.find((d) => d.key === depth).turns;
   const conversations = monthlySessions * (engagement / 100);
   const requests = conversations * turns;
-  const rate = effectiveRate(baseRate, requests);
+  const rate = effectiveRate(baseRate, requests, rates.atScale);
   const scaled = rate < baseRate - 1e-9;
   const monthlyCost = requests * rate;
   const fmtInt = (n) => Math.round(n).toLocaleString("en-US");
@@ -385,13 +415,13 @@ export default function CostEstimator({ avgCostPerMessage, totalMessages }) {
             {scaled
               ? `${anchored
                 ? `Your store's current average is ${rateFmt(baseRate)} per AI request at today's low volume`
-                : `The typical low-volume rate is ${rateFmt(baseRate)} per AI request`}, but AI gets much cheaper at scale — prompt caching and fast-model routing bring it down to about ${rateFmt(rate)} per request at this traffic. The estimate uses the at-scale rate.`
+                : `The typical low-volume rate on ${strategyLabel} is ${rateFmt(baseRate)} per AI request`}, but AI gets much cheaper at scale — prompt caching and fast-model routing bring it down to about ${rateFmt(rate)} per request at this traffic. The estimate uses the at-scale rate.`
               : anchored
                 ? `Anchored on your store's real average of ${rateFmt(rate)} per AI request over the last 30 days.`
-                : `Based on a typical blended rate of ${rateFmt(rate)} per AI request. Once your store has chat activity, this switches to your real average automatically.`}
+                : `Based on the ${strategyLabel} blended rate of ${rateFmt(rate)} per AI request. Once your store has chat activity, this switches to your real average automatically.`}
           </div>
           <div className="seos-calc-anchor" style={{ marginTop: 4 }}>
-            Includes semantic search embedding costs when enabled.
+            Estimate reflects your current model strategy ({strategyLabel}) and includes semantic search embedding costs when enabled.
           </div>
         </div>
       </div>
