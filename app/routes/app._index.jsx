@@ -1665,24 +1665,22 @@ export default function Home() {
           font-weight: 650;
           letter-spacing: -0.5px;
           color: #1a2e26;
-        }
-        .seos-greet .seos-word {
-          display: inline-block;
+          /* Cherry warms across the whole greeting into the brand green. The
+             clip sits on the greeting itself and the words stay untransformed
+             on purpose — a per-word transform would split each word onto its
+             own layer and break the continuous text-clip. The whole line does
+             the rise/fade entrance as one unit. Solid color above is the
+             fallback where background-clip:text is unsupported. */
+          background-image: linear-gradient(100deg, #C0344D 0%, #2D6B4F 52%, #1a2e26 100%);
+          -webkit-background-clip: text;
+          background-clip: text;
+          -webkit-text-fill-color: transparent;
           opacity: 0;
           transform: translateY(10px);
           animation: seos-rise 0.55s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
         }
-        /* Just the first word warms from cherry into the brand green — a
-           restrained sprinkle of color. The clip lives on the word itself:
-           each word is transformed by the rise animation, which would drop it
-           from a parent-level text-clip mask and hide it. .seos-greet's solid
-           color stays as the fallback where background-clip:text is
-           unsupported. */
-        .seos-greet .seos-word:first-child {
-          background-image: linear-gradient(100deg, #C0344D 0%, #9A4A52 45%, #2D6B4F 100%);
-          -webkit-background-clip: text;
-          background-clip: text;
-          -webkit-text-fill-color: transparent;
+        .seos-greet .seos-word {
+          display: inline-block;
         }
         @keyframes seos-rise {
           to { opacity: 1; transform: translateY(0); }
@@ -2228,13 +2226,27 @@ export default function Home() {
           display: flex;
           flex-direction: column;
           border-radius: 16px;
-          background: #fff;
+          /* A faint cherry wash in the top-left corner fading to white —
+             a touch of warmth on every card without fighting the green art. */
+          background: linear-gradient(155deg, rgba(192,52,77,0.055) 0%, rgba(192,52,77,0.012) 26%, #fff 60%);
           border: 1px solid rgba(0,0,0,0.07);
           overflow: hidden;
           text-decoration: none !important;
           color: inherit !important;
           box-shadow: 0 1px 2px rgba(0,0,0,0.04);
           transition: transform 0.2s cubic-bezier(0.2, 0.7, 0.2, 1), box-shadow 0.2s ease, border-color 0.2s ease;
+        }
+        /* Cherry-into-green hairline along the card's top edge. */
+        .seos-card::before {
+          content: "";
+          position: absolute;
+          left: 0;
+          right: 0;
+          top: 0;
+          height: 3px;
+          background: linear-gradient(90deg, #C0344D 0%, #2D6B4F 60%);
+          opacity: 0.5;
+          pointer-events: none;
         }
         .seos-card:hover {
           transform: translateY(-3px);
@@ -2520,7 +2532,7 @@ export default function Home() {
         .seos-card-setupguide:hover { text-decoration: underline !important; }
 
         @media (prefers-reduced-motion: reduce) {
-          .seos-greet .seos-word, .seos-status-wrap, .seos-subline, .seos-testchat { animation: none; opacity: 1; transform: none; }
+          .seos-greet, .seos-greet .seos-word, .seos-status-wrap, .seos-subline, .seos-testchat { animation: none; opacity: 1; transform: none; }
           .seos-testchat-typing span { animation: none; }
           .seos-status-summary-dot { animation: none; }
           .seos-pip, .seos-card, .seos-card-arrow, .seos-metric, .seos-metric-detail, .seos-setup-body, .seos-setup-chev { transition: none; }
