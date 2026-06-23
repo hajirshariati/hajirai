@@ -2230,27 +2230,15 @@ export default function Home() {
           display: flex;
           flex-direction: column;
           border-radius: 16px;
-          /* A faint cherry wash in the top-left corner fading to white —
-             a touch of warmth on every card without fighting the green art. */
-          background: linear-gradient(155deg, rgba(192,52,77,0.055) 0%, rgba(192,52,77,0.012) 26%, #fff 60%);
+          /* A faint green wash in the top-left corner fading to white —
+             a quiet touch of brand color, kept subtle. */
+          background: linear-gradient(155deg, #e2f1e9 0%, #eef7f2 26%, #fff 60%);
           border: 1px solid rgba(0,0,0,0.07);
           overflow: hidden;
           text-decoration: none !important;
           color: inherit !important;
           box-shadow: 0 1px 2px rgba(0,0,0,0.04);
           transition: transform 0.2s cubic-bezier(0.2, 0.7, 0.2, 1), box-shadow 0.2s ease, border-color 0.2s ease;
-        }
-        /* Cherry-into-green hairline along the card's top edge. */
-        .seos-card::before {
-          content: "";
-          position: absolute;
-          left: 0;
-          right: 0;
-          top: 0;
-          height: 3px;
-          background: linear-gradient(90deg, #C0344D 0%, #2D6B4F 60%);
-          opacity: 0.5;
-          pointer-events: none;
         }
         .seos-card:hover {
           transform: translateY(-3px);
