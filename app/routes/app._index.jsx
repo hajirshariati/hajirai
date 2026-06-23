@@ -2230,9 +2230,10 @@ export default function Home() {
           display: flex;
           flex-direction: column;
           border-radius: 16px;
-          /* A faint green wash in the top-left corner fading to white —
-             a quiet touch of brand color, kept subtle. */
-          background: linear-gradient(155deg, #e2f1e9 0%, #eef7f2 26%, #fff 60%);
+          /* A faint, translucent green wash in the top-left corner (rgba, so
+             the page shows through) fading to solid white — a quiet touch of
+             brand color, kept subtle. */
+          background: linear-gradient(155deg, rgba(45,107,79,0.12) 0%, rgba(45,107,79,0.035) 26%, #fff 60%);
           border: 1px solid rgba(0,0,0,0.07);
           overflow: hidden;
           text-decoration: none !important;
