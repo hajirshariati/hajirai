@@ -792,11 +792,25 @@ function TestChat({ shop }) {
             // the text (the widget renders them as chips). Same here: strip
             // them from the bubble and render as tappable chips.
             const inline = [];
-            const cleanContent = String(m.content || "").replace(/<<([^<>]+)>>/g, (_, label) => {
-              const t = label.trim();
+            const pushChip = (label) => {
+              const t = String(label).trim();
               if (t) inline.push(t);
               return "";
-            }).replace(/[ \t]+\n/g, "\n").trim();
+            };
+            const cleanContent = String(m.content || "")
+              // Strip chip tokens — and consume any bold/italic markers hugging
+              // a chip, so removing "<<Men's>>" from "**<<Men's>>**" (or a
+              // bolded "**<<Men's>> or <<Women's>>**" phrase) doesn't leave
+              // orphan "**" stranded in the sentence.
+              .replace(/\*{0,2}<<([^<>]+)>>\*{0,2}/g, (_, label) => pushChip(label))
+              // Defensive: any bare tokens with no surrounding markers.
+              .replace(/<<([^<>]+)>>/g, (_, label) => pushChip(label))
+              // Tidy leftover empty emphasis and the gap a removed chip leaves.
+              .replace(/\*\*\s*\*\*/g, " ")
+              .replace(/\s+([.,!?])/g, "$1")
+              .replace(/[ \t]{2,}/g, " ")
+              .replace(/[ \t]+\n/g, "\n")
+              .trim();
             // Tiny markdown — **bold** and *italic*. The widget renders
             // these too; without this the admin chat shows raw asterisks.
             const renderRich = (text) => {
@@ -1837,7 +1851,7 @@ export default function Home() {
         @media (min-width: 768px) and (hover: hover) {
           .seos-rail-wrap.has-overflow { padding-right: 36px; }
           .seos-rail-wrap.has-overflow:not(.at-start) { padding-left: 36px; }
-          .seos-rail-arrow { display: inline-flex; }
+          .seos-rail-arrow:not([hidden]) { display: inline-flex; }
           .seos-rail-arrow:hover { background: #245a42; }
           .seos-rail-arrow:active { transform: translateY(-50%) scale(0.92); }
         }
