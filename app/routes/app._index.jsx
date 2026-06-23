@@ -1665,6 +1665,14 @@ export default function Home() {
           font-weight: 650;
           letter-spacing: -0.5px;
           color: #1a2e26;
+          /* A whisper of cherry at the head of the greeting that resolves
+             into the brand green — warmth without stealing focus. The solid
+             color above stays as the fallback wherever background-clip:text
+             isn't supported. */
+          background-image: linear-gradient(100deg, #C0344D 0%, #2D6B4F 44%, #1a2e26 100%);
+          -webkit-background-clip: text;
+          background-clip: text;
+          -webkit-text-fill-color: transparent;
         }
         .seos-greet .seos-word {
           display: inline-block;
@@ -1739,7 +1747,9 @@ export default function Home() {
         .seos-testchat-bubble strong { font-weight: 700; }
         .seos-testchat-bubble em { font-style: italic; }
         .is-user .seos-testchat-bubble {
-          background: #2D6B4F;
+          /* Echoes the hero greeting: a touch of cherry warming the brand
+             green. White text keeps full contrast on both ends. */
+          background: linear-gradient(135deg, #B73049 0%, #2D6B4F 58%);
           color: #fff;
           border-bottom-right-radius: 5px;
         }
