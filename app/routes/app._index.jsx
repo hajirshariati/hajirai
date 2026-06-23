@@ -1665,22 +1665,12 @@ export default function Home() {
           font-weight: 650;
           letter-spacing: -0.5px;
           color: #1a2e26;
-          /* Cherry warms across the whole greeting into the brand green. The
-             clip sits on the greeting itself and the words stay untransformed
-             on purpose — a per-word transform would split each word onto its
-             own layer and break the continuous text-clip. The whole line does
-             the rise/fade entrance as one unit. Solid color above is the
-             fallback where background-clip:text is unsupported. */
-          background-image: linear-gradient(100deg, #C0344D 0%, #2D6B4F 52%, #1a2e26 100%);
-          -webkit-background-clip: text;
-          background-clip: text;
-          -webkit-text-fill-color: transparent;
-          opacity: 0;
-          transform: translateY(10px);
-          animation: seos-rise 0.55s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
         }
         .seos-greet .seos-word {
           display: inline-block;
+          opacity: 0;
+          transform: translateY(10px);
+          animation: seos-rise 0.55s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
         }
         @keyframes seos-rise {
           to { opacity: 1; transform: translateY(0); }
@@ -2532,7 +2522,7 @@ export default function Home() {
         .seos-card-setupguide:hover { text-decoration: underline !important; }
 
         @media (prefers-reduced-motion: reduce) {
-          .seos-greet, .seos-greet .seos-word, .seos-status-wrap, .seos-subline, .seos-testchat { animation: none; opacity: 1; transform: none; }
+          .seos-greet .seos-word, .seos-status-wrap, .seos-subline, .seos-testchat { animation: none; opacity: 1; transform: none; }
           .seos-testchat-typing span { animation: none; }
           .seos-status-summary-dot { animation: none; }
           .seos-pip, .seos-card, .seos-card-arrow, .seos-metric, .seos-metric-detail, .seos-setup-body, .seos-setup-chev { transition: none; }
