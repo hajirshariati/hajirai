@@ -82,6 +82,7 @@ import {
   detectFootwearOverElicitation,
   resolverPromisedRecommendation,
   dropNonFootwearWhenFootwearIntent,
+  dropNonShoppableItems,
   detectComparisonIntent,
   resolveFocusedCardByName,
 } from "../lib/chat-postprocessing";
@@ -1346,8 +1347,14 @@ async function runPolicyTurnDispatch({ ctx, controller, encoder, retrievedChunks
 }
 
 
-function shouldAttachProductCardsForTurn({ text, ctx, recommenderAskedForMoreInfo }) {
+function shouldAttachProductCardsForTurn({ text, ctx, recommenderAskedForMoreInfo, orderTrackingTurn }) {
   const latest = ctx?.latestUserMessage || "";
+  // Order-status / tracking / returns turns are answered in text (order
+  // details + tracking link). Never force a product search onto them.
+  // Prod trace 2026-06-23: "check the status of my order" force-searched
+  // the tracking sentence and surfaced a $0.00 "VIP Processing" SKU as a
+  // product card. When get_customer_orders ran this turn, no cards.
+  if (orderTrackingTurn) return false;
   // Simple acknowledgments ("yes", "thanks", "ok", "sure", etc.) never
   // attach products even if the prior assistant text looks pitch-y.
   // Live trace 2026-06-08: customer typed "yes" after a referral-share
@@ -2159,6 +2166,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     text: fullResponseText,
     ctx,
     recommenderAskedForMoreInfo,
+    orderTrackingTurn: toolsCalledThisTurn.has("get_customer_orders"),
   });
   const ensuredCards = await ensureProductTurnCards({
     ctx,
@@ -2181,6 +2189,16 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
         `[chat] response-contract: code-owned exact no-match ` +
           `(${String(before || "").length}→${fullResponseText.length} chars, reason=${exactNoMatch.reason})`,
       );
+    }
+  }
+  // Non-shoppable guard: drop $0 service line items / fees (e.g. "VIP
+  // Processing") that semantic search can surface as fake product cards.
+  // Runs on every turn — these are never something a shopper browses.
+  {
+    const shoppable = dropNonShoppableItems(pool);
+    if (shoppable.dropped.length > 0) {
+      console.log(`[chat] ${ctx.shop} dropped non-shoppable item(s) from pool:`, shoppable.dropped);
+      pool = shoppable.cards;
     }
   }
   // wrong-topic guard: for a general footwear/gift request, drop

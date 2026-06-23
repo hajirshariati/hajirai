@@ -31,6 +31,18 @@ export function buildVisualizeCtaEvent({ config, product, messages }) {
   const image = product?.image || product?.featuredImageUrl || "";
   if (!handle || !image) return null; // need a product with an image to style
 
+  // "Visualize My Look" is an AI styling preview of the product being
+  // worn — it only makes sense for wearable footwear. Never offer it for
+  // accessories, shoe-care, socks, gift cards, or $0 service line items
+  // (prod trace 2026-06-23: a "VIP Processing" $0.00 SKU got the CTA on an
+  // order-status turn). Keeps real footwear (incl. orthotics) eligible.
+  const NON_WEARABLE_RE =
+    /\b(?:accessor|shoe[\s-]*care|care[\s-]*kit|cleaner|cleaning|protect|spray|sock|gift[\s-]*card|lace|freshener|deodor|processing|shipping|handling|surcharge|warranty|\bfee\b|deposit)/i;
+  const category = String(product?.category || product?._category || product?.productType || "");
+  if (NON_WEARABLE_RE.test(category) || NON_WEARABLE_RE.test(String(product?.title || ""))) return null;
+  const priceNum = Number(product?.price);
+  if (Number.isFinite(priceNum) && priceNum <= 0) return null;
+
   return {
     type: "visualize_cta",
     productHandle: handle,

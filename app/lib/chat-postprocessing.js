@@ -1375,6 +1375,30 @@ export function dropNonFootwearWhenFootwearIntent(cards, userMessage) {
   return { cards: footwear, dropped: nonFootwear.map((c) => c?.handle || c?.title || "?") };
 }
 
+// Titles/categories that are not shoppable products at all — $0 service
+// line items and fees that should never render as a product card. Prod
+// trace 2026-06-23: an order-status turn force-searched and surfaced a
+// "VIP Processing" ($0.00) SKU as a card with a "Visualize My Look" CTA.
+const NON_SHOPPABLE_RE =
+  /\b(?:processing|shipping|handling|surcharge|service\s*fee|\bfee\b|warranty|protection\s*plan|gift\s*card|e-?gift|deposit|donation|insurance)\b/i;
+
+// Drop non-shoppable items from a card pool, regardless of turn intent.
+// A $0-or-less price OR a service/fee-style title marks an item that a
+// shopper can't meaningfully browse, compare, or "visualize". Safe to run
+// universally — real products carry a positive price and a product title.
+export function dropNonShoppableItems(cards) {
+  if (!Array.isArray(cards) || cards.length === 0) return { cards, dropped: [] };
+  const isShoppable = (c) => {
+    const priceNum = Number(c?.price);
+    const freeish = Number.isFinite(priceNum) && priceNum <= 0;
+    const serviceTitle = NON_SHOPPABLE_RE.test(String(c?.title || ""));
+    return !freeish && !serviceTitle;
+  };
+  const keep = cards.filter(isShoppable);
+  const dropped = cards.filter((c) => !isShoppable(c)).map((c) => c?.handle || c?.title || "?");
+  return { cards: keep, dropped };
+}
+
 // Leading-title tokens that are NOT a product's model name — colors,
 // sizes, and generic filler that some titles open with. Keeps a color
 // word in the customer's message ("do you have it in black?") from
