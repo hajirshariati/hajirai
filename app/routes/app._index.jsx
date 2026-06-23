@@ -1665,20 +1665,24 @@ export default function Home() {
           font-weight: 650;
           letter-spacing: -0.5px;
           color: #1a2e26;
-          /* A whisper of cherry at the head of the greeting that resolves
-             into the brand green — warmth without stealing focus. The solid
-             color above stays as the fallback wherever background-clip:text
-             isn't supported. */
-          background-image: linear-gradient(100deg, #C0344D 0%, #2D6B4F 44%, #1a2e26 100%);
-          -webkit-background-clip: text;
-          background-clip: text;
-          -webkit-text-fill-color: transparent;
         }
         .seos-greet .seos-word {
           display: inline-block;
           opacity: 0;
           transform: translateY(10px);
           animation: seos-rise 0.55s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
+        }
+        /* Just the first word warms from cherry into the brand green — a
+           restrained sprinkle of color. The clip lives on the word itself:
+           each word is transformed by the rise animation, which would drop it
+           from a parent-level text-clip mask and hide it. .seos-greet's solid
+           color stays as the fallback where background-clip:text is
+           unsupported. */
+        .seos-greet .seos-word:first-child {
+          background-image: linear-gradient(100deg, #C0344D 0%, #9A4A52 45%, #2D6B4F 100%);
+          -webkit-background-clip: text;
+          background-clip: text;
+          -webkit-text-fill-color: transparent;
         }
         @keyframes seos-rise {
           to { opacity: 1; transform: translateY(0); }
