@@ -4125,6 +4125,7 @@ async function handleChatPost({ shop, sessionAccessToken, request, internal = fa
             const cleanResult = await runWithGroundingRetry({
               runLoop: runLoopOnce,
               initialMessages: messages,
+              categoryGenderMap: ctx.categoryGenderMap || null,
               maxRetries: 2,
               onAttempt: ({ attempt, validation, textLen, poolSize }) => {
                 console.log(

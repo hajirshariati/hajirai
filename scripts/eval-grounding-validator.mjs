@@ -299,4 +299,69 @@ test("empty errors → empty instruction", () => {
   assert.equal(buildRetryInstruction([]), "");
 });
 
+// ─── Rule 4: false catalog denial ──────────────────────────────
+const { detectFalseCatalogDenial } = __TEST__;
+// Aetrex-like men+women catalog: men have sneakers/sandals (= footwear),
+// boots are women-only, orthotics both.
+const CGMAP = {
+  sneakers: { genders: ["men", "women"] },
+  sandals: { genders: ["men", "women"] },
+  boots: { genders: ["women"] },
+  orthotics: { genders: ["men", "women"] },
+  accessories: { genders: ["unisex"] },
+};
+
+test("rule4: false denial of men's footwear (umbrella) → error", () => {
+  const out = validateGrounding({
+    text: "I couldn't find men's footwear in our current catalog. Try a different color or style?",
+    pool: [],
+    categoryGenderMap: CGMAP,
+  });
+  assert.equal(out.ok, false);
+  assert.equal(out.errors[0].kind, "false_catalog_denial");
+  assert.match(out.errors[0].message, /men's footwear/i);
+});
+
+test("rule4: false denial of a specific category that exists → error", () => {
+  const out = validateGrounding({
+    text: "We don't carry men's sandals right now.",
+    pool: [],
+    categoryGenderMap: CGMAP,
+  });
+  assert.equal(out.ok, false);
+  assert.equal(out.errors[0].kind, "false_catalog_denial");
+});
+
+test("rule4: GENUINE denial (men's boots — men have none) is NOT flagged", () => {
+  const out = validateGrounding({
+    text: "We don't carry men's boots — we only stock them in women's.",
+    pool: [],
+    categoryGenderMap: CGMAP,
+  });
+  assert.equal(out.ok, true);
+});
+
+test("rule4: honest COLOR relaxation ('no red sandals') is NOT flagged", () => {
+  const out = validateGrounding({
+    text: "We don't carry red sandals, but here are our warmer tones.",
+    pool: [],
+    categoryGenderMap: CGMAP,
+  });
+  assert.equal(out.ok, true);
+});
+
+test("rule4: no categoryGenderMap → rule is inert", () => {
+  const out = validateGrounding({
+    text: "I couldn't find men's footwear in our current catalog.",
+    pool: [],
+  });
+  assert.equal(out.ok, true);
+});
+
+test("rule4 helper: returns the matched gender+category", () => {
+  const d = detectFalseCatalogDenial("we don't carry men's sneakers", CGMAP);
+  assert.equal(d.gender, "men");
+  assert.equal(d.category, "sneakers");
+});
+
 console.log("\nAll grounding-validator tests done.");

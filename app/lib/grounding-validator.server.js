@@ -217,7 +217,54 @@ function cardSupportsFeature(card, feature) {
 // Errors describe what to tell the model on retry. Each error is
 // self-explanatory enough that the model can fix it without seeing
 // the validator's source.
-export function validateGrounding({ text, pool = [] } = {}) {
+// Rule-4 helper. Detect a FALSE catalog denial: the model claims we don't
+// carry a GENDER+CATEGORY that the catalog actually has (prod trace
+// 2026-06-24: "I couldn't find men's footwear" when men's footwear exists).
+// Conservative on purpose — only GENDERED denials ("men's <cat>") are
+// flagged, never bare-category denials, so honest color/size relaxation
+// ("no red sandals") is never touched. "footwear"/"shoes" is an umbrella
+// over any real footwear category. categoryGenderMap: { [cat]: { genders } }.
+function detectFalseCatalogDenial(text, categoryGenderMap) {
+  if (!text || !categoryGenderMap || typeof categoryGenderMap !== "object") return null;
+  const lower = String(text).toLowerCase();
+  const DENY =
+    "(?:don'?t|do not|doesn'?t|does not)\\s+(?:currently\\s+)?(?:carry|have|stock|sell|offer)|" +
+    "couldn'?t\\s+find|could\\s*not\\s+find|can'?t\\s+find|cannot\\s+find|no\\s+longer\\s+(?:carry|offer|stock)";
+  const GENDER_TOKENS = { men: ["men's", "mens", "men"], women: ["women's", "womens", "women"] };
+  const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const entries = Object.entries(categoryGenderMap).filter(
+    ([k, v]) => k && k.length >= 3 && v && Array.isArray(v.genders) && v.genders.length > 0,
+  );
+  // Footwear umbrella: a real footwear category (not orthotics/accessories).
+  const NON_FOOTWEAR = new Set(["orthotics", "orthotic", "insoles", "insole", "accessories", "accessory"]);
+  const genderHasAnyFootwear = (g) =>
+    entries.some(([k, v]) =>
+      !NON_FOOTWEAR.has(String(k).toLowerCase()) &&
+      v.genders.map((x) => String(x).toLowerCase()).some((x) => x === g || x === "unisex"),
+    );
+
+  for (const g of ["men", "women"]) {
+    const toks = GENDER_TOKENS[g].map(esc).join("|");
+    // Umbrella ("men's footwear" / "men's shoes") — flag if ANY footwear exists.
+    const umbrellaRe = new RegExp(`\\b(?:${DENY})\\b[^.?!\\n]{0,25}?\\b(?:${toks})\\s+(?:footwear|shoes?)\\b`, "i");
+    if (umbrellaRe.test(lower) && genderHasAnyFootwear(g)) {
+      return { gender: g, category: "footwear" };
+    }
+    // Specific category ("men's <cat>") — flag if that gender genuinely has it.
+    for (const [catKey, entry] of entries) {
+      const supported = new Set(entry.genders.map((x) => String(x).toLowerCase()));
+      if (!supported.has(g) && !supported.has("unisex")) continue;
+      const c = String(catKey).toLowerCase().trim();
+      const stem = c.endsWith("s") ? c.slice(0, -1) : c;
+      const catAlt = [...new Set([c, stem])].map((v) => `${esc(v)}s?`).join("|");
+      const re = new RegExp(`\\b(?:${DENY})\\b[^.?!\\n]{0,25}?\\b(?:${toks})\\s+(?:${catAlt})\\b`, "i");
+      if (re.test(lower)) return { gender: g, category: catKey };
+    }
+  }
+  return null;
+}
+
+export function validateGrounding({ text, pool = [], categoryGenderMap = null } = {}) {
   const errors = [];
   if (!text || typeof text !== "string") return { ok: true, errors };
 
@@ -296,6 +343,25 @@ export function validateGrounding({ text, pool = [] } = {}) {
     }
   }
 
+  // 4. False catalog denial. The model denied carrying a gender+category the
+  // catalog actually has — reject so it corrects itself instead of misleading
+  // the customer (and the response-contract having to silently rewrite it).
+  if (categoryGenderMap) {
+    const denial = detectFalseCatalogDenial(text, categoryGenderMap);
+    if (denial) {
+      const label = `${denial.gender === "men" ? "men's" : "women's"} ${String(denial.category).toLowerCase()}`;
+      errors.push({
+        kind: "false_catalog_denial",
+        claim: `we don't carry ${label}`,
+        message:
+          `You wrote that we don't carry ${label}, but the catalog DOES carry ` +
+          `${label}. Don't deny a category we stock. If a specific attribute ` +
+          `(a color, size, or width) wasn't available, name THAT honestly — but ` +
+          `present the ${label} we do have.`,
+      });
+    }
+  }
+
   return { ok: errors.length === 0, errors };
 }
 
@@ -334,4 +400,5 @@ export const __TEST__ = {
   extractPriceClaims,
   extractFeatureClaims,
   cardSupportsFeature,
+  detectFalseCatalogDenial,
 };
