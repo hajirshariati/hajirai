@@ -317,7 +317,12 @@ function exactChipAnswer(rawUserText, tree) {
     if (!node || node.type !== "question" || !node.attribute || !Array.isArray(node.chips)) continue;
     for (const chip of node.chips) {
       const lbl = String(chip?.label || "").toLowerCase().replace(/[^a-z0-9]+/g, "");
-      if (lbl && norm === lbl && chip.value != null) {
+      // Also accept the de-stuttered label ("Ball-of-foot pain / ball-of-
+      // foot pain" → "Ball-of-foot pain") that the widget now renders, so
+      // a click on the collapsed chip still matches.
+      const lblCol = collapseDuplicateSlashLabel(String(chip?.label || ""))
+        .toLowerCase().replace(/[^a-z0-9]+/g, "");
+      if ((norm === lbl || norm === lblCol) && chip.value != null) {
         return { attribute: node.attribute, value: chip.value };
       }
     }
@@ -471,6 +476,29 @@ function humanizeGender(value) {
   return "";
 }
 
+// A chip label of the form "A / B / …" where two or more parts are the
+// SAME (case-insensitively) renders as a stutter. Prod trace 2026-06-24:
+// the condition chip stored as "Ball-of-foot pain / ball-of-foot pain"
+// — a clinical+lay synonym pair (metatarsalgia + ball_of_foot_pain both
+// humanize to the same phrase) that the tree joined into one label. Drop
+// the redundant duplicate part(s); keep genuinely-different ones intact
+// ("Flat / Low", "Medium / High Arch", "Yes / Sometimes" are NOT collapsed).
+function collapseDuplicateSlashLabel(label) {
+  const raw = String(label || "").trim();
+  if (!raw.includes("/")) return raw;
+  const parts = raw.split("/").map((p) => p.trim()).filter(Boolean);
+  if (parts.length < 2) return raw;
+  const seen = new Set();
+  const kept = [];
+  for (const p of parts) {
+    const norm = p.toLowerCase().replace(/\s+/g, " ");
+    if (seen.has(norm)) continue;
+    seen.add(norm);
+    kept.push(p);
+  }
+  return kept.length === parts.length ? raw : kept.join(" / ");
+}
+
 // For the condition question: filter chips only for Kids customers
 // (where the dead-end risk is real because the merchant has limited
 // Kids SKUs and the resolver is strict-Kids). For adults, return
@@ -545,7 +573,9 @@ function renderQuestionText(node, answers, tree, context = null) {
   }
 
   const originalChipCount = Array.isArray(node.chips) ? node.chips.length : 0;
-  let chipLabels = chips.map((c) => String(c.label).trim()).filter(Boolean);
+  let chipLabels = chips
+    .map((c) => collapseDuplicateSlashLabel(String(c.label).trim()))
+    .filter(Boolean);
 
   // Context-carrying gender chips: the GENDER question's chips carry
   // the domain noun ("Men's orthotics" / "Women's orthotics" /
@@ -1319,8 +1349,10 @@ export async function maybeRunOrthoticFlow({
       if (!Array.isArray(node.chips)) continue;
       for (const chip of node.chips) {
         const lbl = String(chip?.label || "").toLowerCase().replace(/[^a-z0-9]+/g, "");
+        const lblCol = collapseDuplicateSlashLabel(String(chip?.label || ""))
+          .toLowerCase().replace(/[^a-z0-9]+/g, "");
         const val = String(chip?.value || "").toLowerCase().replace(/[^a-z0-9]+/g, "");
-        if (lbl && norm === lbl) return true;
+        if (lbl && (norm === lbl || norm === lblCol)) return true;
         if (val && norm === val) return true;
       }
     }
@@ -1630,8 +1662,9 @@ export async function maybeRunOrthoticFlow({
         if (!node || node.type !== "question" || !Array.isArray(node.chips)) continue;
         for (const chip of node.chips) {
           const lbl = stripForChipMatch(chip?.label);
+          const lblCol = stripForChipMatch(collapseDuplicateSlashLabel(chip?.label));
           const val = stripForChipMatch(chip?.value);
-          if ((lbl && norm === lbl) || (val && norm === val)) return true;
+          if ((lbl && (norm === lbl || norm === lblCol)) || (val && norm === val)) return true;
           // Gender chips are emitted decorated ("Women's orthotics");
           // accept the decorated label as a seed chip answer too.
           if (node.attribute === "gender") {
