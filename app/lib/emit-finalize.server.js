@@ -363,6 +363,24 @@ export function compoundProductFallbackText(ctx = {}) {
 // suspenders strip block.
 const TOOL_SYNTAX_LEAK_RE = /(?:<\/?(?:function_calls|invoke|antml|parameter)|\b(?:search_products|get_product_details|lookup_sku|find_similar_products|recommend_[a-z_]+)\s*\{)/i;
 
+// Trim an ORPHANED trailing connector left behind after narration
+// stripping. The model often writes "<answer>. Now, let me pull the
+// review data…" — banned-narration removes "let me pull…" but leaves a
+// dangling "Now," so the reply ends mid-thought ("…several miles a day.
+// Now"). Prod trace 2026-06-24 (Jillian sandal). Only strips a connector
+// that sits AFTER sentence-ending punctuation (so a real final word like
+// "Shop now." is never touched), then restores clean end punctuation.
+const DANGLING_CONNECTOR_RE =
+  /([.!?])\s+(?:Now|So|Then|Also|Plus|And|But|Alright|All right|Okay|OK|Well|Anyway|Anyhow|First|Next|Finally|Here['‘’]s|Here is)[\s,;:—–-]*$/i;
+function trimDanglingConnector(text) {
+  if (!text) return text;
+  let out = text;
+  while (DANGLING_CONNECTOR_RE.test(out)) {
+    out = out.replace(DANGLING_CONNECTOR_RE, "$1").trimEnd();
+  }
+  return out;
+}
+
 // The finalize chain. Body moved VERBATIM from chat.jsx runAgenticLoop
 // (post-LLM section). `pool` may be truncated (suppressions) or
 // replaced; callers must adopt the returned pool. `qualitySignals` is
@@ -426,6 +444,10 @@ export function finalizeOutboundReply({
         { fn: reflowInlineList,              name: "reflow-list" },
         { fn: tightenSequentialFactLines,    name: "tighten-facts" },
       ]),
+      // LAST — clean up an orphaned trailing connector ("…day. Now") that
+      // an earlier narration strip may have left dangling. Runs after all
+      // shape mutators so it sees the final text.
+      { fn: trimDanglingConnector,         name: "dangling-connector" },
     ];
     const preCleanupText = fullResponseText;
     const cleanupLogs = [];
