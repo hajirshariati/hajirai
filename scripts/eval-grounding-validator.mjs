@@ -382,4 +382,65 @@ test("a real product whose title contains a feature word still extracts", () => 
   assert.equal(fams[0].family, "danika");
 });
 
+// ─── Rule 5: false color denial ────────────────────────────────
+const JILLIAN_COLORS = {
+  title: "Jillian Braided Quarter Strap Sandal - Navy",
+  handle: "jillian-navy",
+  price_formatted: "$94.95",
+  _variantFacts: { availableColors: ["Navy", "Black", "White"] },
+  _attributes: { category: "Sandals" },
+  _tags: ["sandal"],
+};
+
+test("rule5: denying a color the product DOES stock is rejected", () => {
+  const out = validateGrounding({
+    text: "The **Jillian Braided Quarter Strap Sandal** doesn't come in black, sorry.",
+    pool: [JILLIAN_COLORS],
+  });
+  assert.equal(out.ok, false);
+  assert.ok(out.errors.some((e) => e.kind === "false_color_denial" && /black/i.test(e.claim)));
+});
+
+test("rule5: HONEST denial of a genuinely-absent color is NOT flagged", () => {
+  // Jillian has no red — saying so is correct and must pass.
+  const out = validateGrounding({
+    text: "The **Jillian Braided Quarter Strap Sandal** doesn't come in red.",
+    pool: [JILLIAN_COLORS],
+  });
+  assert.equal(out.ok, true);
+});
+
+test("rule5: single-card pool resolves the denial without a bold", () => {
+  const out = validateGrounding({ text: "Unfortunately it isn't available in white.", pool: [JILLIAN_COLORS] });
+  assert.ok(out.errors.some((e) => e.kind === "false_color_denial" && /white/i.test(e.claim)));
+});
+
+test("rule5: grey/gray equivalence — deny 'grey', card stores 'Gray'", () => {
+  const reagan = { title: "Reagan Sneaker - Gray", _variantFacts: { availableColors: ["Gray", "Rose Gold"] } };
+  const out = validateGrounding({ text: "The **Reagan Sneaker** doesn't come in grey.", pool: [reagan] });
+  assert.ok(out.errors.some((e) => e.kind === "false_color_denial"));
+});
+
+test("rule5: 'no black option' phrasing is caught", () => {
+  const out = validateGrounding({
+    text: "For the **Jillian Braided Quarter Strap Sandal**, there's no black option.",
+    pool: [JILLIAN_COLORS],
+  });
+  assert.ok(out.errors.some((e) => e.kind === "false_color_denial" && /black/i.test(e.claim)));
+});
+
+test("rule5: 'tan' denial does NOT false-match 'Titanium' evidence", () => {
+  const titan = { title: "Apex Runner - Titanium", _variantFacts: { availableColors: ["Titanium"] } };
+  const out = validateGrounding({ text: "The **Apex Runner** doesn't come in tan.", pool: [titan] });
+  assert.equal(out.ok, true);
+});
+
+test("rule5: a positive color mention is NOT flagged", () => {
+  const out = validateGrounding({
+    text: "The **Jillian Braided Quarter Strap Sandal** comes in navy and black.",
+    pool: [JILLIAN_COLORS],
+  });
+  assert.equal(out.ok, true);
+});
+
 console.log("\nAll grounding-validator tests done.");

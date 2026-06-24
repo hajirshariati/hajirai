@@ -273,6 +273,130 @@ function detectFalseCatalogDenial(text, categoryGenderMap) {
   return null;
 }
 
+// Rule-5 helpers. A FALSE color denial: the model tells the customer a
+// product doesn't come in a color it actually offers ("the Jillian doesn't
+// come in black" when black is a stocked variant). Customer-harm identical
+// to rule 4 (lost sale + wrong answer), one level down at the variant.
+//
+// Conservative by construction — fires ONLY when BOTH hold:
+//   (a) the model used a recognized color word inside a denial construction, and
+//   (b) the matched card's own variant/colour/title evidence contains that
+//       exact color (word-boundary match, so "tan" never matches "Titanium").
+// An HONEST denial ("no red Jillian" when there truly is no red) finds no
+// matching evidence and is never flagged. We only ever test a SPECIFIC color
+// the model named, so no global color taxonomy / normalization is needed —
+// keeping this module import-free (the eval harness runs without Prisma).
+const COLOR_WORDS = [
+  "black", "white", "navy", "blue", "red", "green", "tan", "brown", "grey", "gray",
+  "pink", "purple", "beige", "ivory", "cream", "gold", "silver", "bronze", "burgundy",
+  "charcoal", "khaki", "olive", "coral", "teal", "maroon", "mauve", "taupe", "camel",
+  "cognac", "oat", "oatmeal", "blush", "nude", "wine", "rust", "mustard", "lavender",
+  "mint", "peach", "yellow", "orange", "plum", "stone", "sand", "chestnut", "mocha",
+];
+const COLOR_ALT = COLOR_WORDS.join("|");
+// "...doesn't come in black", "isn't available in red", "no longer made in tan".
+const COLOR_DENY_IN_RE = new RegExp(
+  "(?:don'?t|do not|doesn'?t|does not|isn'?t|is not|aren'?t|are not|wasn'?t|" +
+  "no\\s+longer|not)\\s+(?:currently\\s+)?(?:come|comes|coming|have|has|offer|" +
+  "offered|stock|stocked|carry|carried|available|made|make|sold)\\b" +
+  "[^.?!\\n]{0,40}?\\bin\\s+(" + COLOR_ALT + ")\\b",
+  "ig",
+);
+// "no black option", "no red colorway", "no white version".
+const COLOR_DENY_NO_RE = new RegExp(
+  "\\bno\\s+(" + COLOR_ALT + ")\\s+(?:option|version|colou?rway|colou?r|variant)\\b",
+  "ig",
+);
+
+// Equivalence so "grey" denial matches "Gray" evidence (and vice versa).
+function colorEquivalents(color) {
+  const c = String(color).toLowerCase();
+  if (c === "grey") return ["grey", "gray"];
+  if (c === "gray") return ["gray", "grey"];
+  return [c];
+}
+
+// The color strings a card actually offers, from the same surfaces the
+// search/lookup tools attach (variant facts authoritative, then attributes,
+// then title suffix + tags). Lower-cased haystack; callers word-boundary test.
+function cardColorHaystack(card) {
+  if (!card || typeof card !== "object") return "";
+  const parts = [];
+  const vf = card._variantFacts && typeof card._variantFacts === "object" ? card._variantFacts : {};
+  for (const k of ["availableColors", "colors", "productAvailableColors"]) {
+    if (Array.isArray(vf[k])) parts.push(vf[k].join(" "));
+  }
+  if (Array.isArray(vf.byColor)) parts.push(vf.byColor.map((b) => (b && b.color) || "").join(" "));
+  const attr = card._attributes && typeof card._attributes === "object" ? card._attributes : {};
+  for (const k of ["color", "colour", "Color", "Colour", "Color Family", "colorFamily"]) {
+    const v = attr[k];
+    if (typeof v === "string") parts.push(v);
+    else if (Array.isArray(v)) parts.push(v.join(" "));
+  }
+  parts.push(String(card.title || ""));
+  if (Array.isArray(card._tags)) parts.push(card._tags.join(" "));
+  return parts.join(" ").toLowerCase();
+}
+
+function cardOffersColor(card, color) {
+  const hay = cardColorHaystack(card);
+  if (!hay) return false;
+  return colorEquivalents(color).some((c) => {
+    try {
+      return new RegExp(`\\b${c}\\b`, "i").test(hay);
+    } catch {
+      return false;
+    }
+  });
+}
+
+// Find false color denials. For each denial match, resolve WHICH product it's
+// about: the nearest bolded product family appearing before the match (the
+// product under discussion), else — when the pool holds exactly one card —
+// that card. Returns [{ productPhrase, color, card }].
+function detectFalseColorDenials(text, pool, poolByFamily) {
+  if (!text || typeof text !== "string") return [];
+  const cards = Array.isArray(pool) ? pool : [];
+  if (cards.length === 0) return [];
+  const bolds = extractBoldedProductFamilies(text);
+  const lower = text.toLowerCase();
+  // Pre-index bold family positions for "nearest bold before the denial".
+  const boldPositions = bolds
+    .map((b) => ({ ...b, idx: lower.indexOf(b.phrase.toLowerCase()) }))
+    .filter((b) => b.idx >= 0 && poolByFamily.has(b.family))
+    .sort((a, b) => a.idx - b.idx);
+
+  const resolveCard = (matchIdx) => {
+    let chosen = null;
+    for (const b of boldPositions) {
+      if (b.idx <= matchIdx) chosen = b;
+      else break;
+    }
+    if (chosen) return { card: poolByFamily.get(chosen.family), phrase: chosen.phrase };
+    if (cards.length === 1) return { card: cards[0], phrase: String(cards[0]?.title || "this product") };
+    return null;
+  };
+
+  const out = [];
+  const seen = new Set();
+  for (const re of [COLOR_DENY_IN_RE, COLOR_DENY_NO_RE]) {
+    re.lastIndex = 0;
+    let m;
+    while ((m = re.exec(text)) !== null) {
+      const color = String(m[1] || "").toLowerCase();
+      if (!color) continue;
+      const resolved = resolveCard(m.index);
+      if (!resolved || !resolved.card) continue;
+      if (!cardOffersColor(resolved.card, color)) continue; // honest denial — leave it
+      const key = `${titleFamily(resolved.phrase)}|${color}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      out.push({ productPhrase: resolved.phrase, color, card: resolved.card });
+    }
+  }
+  return out;
+}
+
 export function validateGrounding({ text, pool = [], categoryGenderMap = null } = {}) {
   const errors = [];
   if (!text || typeof text !== "string") return { ok: true, errors };
@@ -371,6 +495,24 @@ export function validateGrounding({ text, pool = [], categoryGenderMap = null } 
     }
   }
 
+  // 5. False color denial. The model told the customer a product doesn't
+  // come in a color it actually offers — reject so it corrects itself
+  // instead of suppressing a stocked variant (and costing a sale). Checked
+  // against the card's own variant/colour evidence; honest denials of
+  // genuinely-absent colors find no evidence and never fire.
+  const colorDenials = detectFalseColorDenials(text, pool, poolByFamily);
+  for (const { productPhrase, color } of colorDenials) {
+    errors.push({
+      kind: "false_color_denial",
+      claim: `${productPhrase} doesn't come in ${color}`,
+      message:
+        `You wrote that "${productPhrase}" doesn't come in ${color}, but that ` +
+        `product's own variant data lists ${color} as an available color. Don't ` +
+        `deny a color we stock — present the ${color} option. If a different ` +
+        `attribute (a size or width) was unavailable, name THAT honestly instead.`,
+    });
+  }
+
   return { ok: errors.length === 0, errors };
 }
 
@@ -410,4 +552,6 @@ export const __TEST__ = {
   extractFeatureClaims,
   cardSupportsFeature,
   detectFalseCatalogDenial,
+  detectFalseColorDenials,
+  cardOffersColor,
 };
