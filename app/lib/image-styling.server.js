@@ -18,6 +18,23 @@
 const GEMINI_IMAGE_MODEL = process.env.GEMINI_IMAGE_MODEL || "gemini-2.5-flash-image";
 const OPENAI_IMAGE_MODEL = process.env.OPENAI_IMAGE_MODEL || "gpt-image-1";
 
+// Hard ceilings so a slow/hung provider can't leave a socket open
+// forever (the app proxy kills the upstream connection long before
+// these, but without our own bound the fetch keeps running and burns
+// resources after the client is already gone). Env-overridable.
+const PROVIDER_TIMEOUT_MS = Number(process.env.VISUALIZE_PROVIDER_TIMEOUT_MS) || 45000;
+const IMAGE_FETCH_TIMEOUT_MS = Number(process.env.VISUALIZE_IMAGE_FETCH_TIMEOUT_MS) || 15000;
+
+// AbortSignal.timeout (Node 17.3+) — a self-arming abort that fires after
+// `ms` and rejects the fetch with a TimeoutError we translate below.
+function timeoutSignal(ms) {
+  try {
+    return AbortSignal.timeout(ms);
+  } catch {
+    return undefined; // very old runtime — degrade to no timeout
+  }
+}
+
 // Rough per-image cost (USD) for metering only — overridable via env.
 // Both providers land near $0.04/image at the sizes we request.
 const IMAGE_COST_USD = {
@@ -52,7 +69,7 @@ function buildStylistPrompt({ productTitle, styleContext }) {
 }
 
 async function fetchImageAsBase64(url) {
-  const res = await fetch(url);
+  const res = await fetch(url, { signal: timeoutSignal(IMAGE_FETCH_TIMEOUT_MS) });
   if (!res.ok) throw new Error(`could not fetch product image (${res.status})`);
   const contentType = res.headers.get("content-type") || "image/jpeg";
   const buf = Buffer.from(await res.arrayBuffer());
@@ -79,6 +96,7 @@ async function generateWithGemini({ apiKey, prompt, image }) {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
+    signal: timeoutSignal(PROVIDER_TIMEOUT_MS),
   });
   if (!res.ok) {
     const detail = await res.text().catch(() => "");
@@ -108,6 +126,7 @@ async function generateWithOpenAI({ apiKey, prompt, image }) {
     method: "POST",
     headers: { Authorization: `Bearer ${apiKey}` },
     body: form,
+    signal: timeoutSignal(PROVIDER_TIMEOUT_MS),
   });
   if (!res.ok) {
     const detail = await res.text().catch(() => "");
@@ -136,13 +155,42 @@ export async function generateStyledImage({
   if (!apiKey) throw new Error(`no API key configured for image provider "${provider}"`);
   if (!productImageUrl) throw new Error("product has no image to style");
 
-  const image = await fetchImageAsBase64(productImageUrl);
+  const startedAt = Date.now();
+  let image;
+  try {
+    image = await fetchImageAsBase64(productImageUrl);
+  } catch (err) {
+    if (err?.name === "TimeoutError" || err?.name === "AbortError") {
+      throw new Error(`product image fetch timed out after ${IMAGE_FETCH_TIMEOUT_MS}ms`);
+    }
+    throw err;
+  }
   const prompt = buildStylistPrompt({ productTitle, styleContext });
 
-  const imageDataUrl =
-    provider === "gemini"
-      ? await generateWithGemini({ apiKey, prompt, image })
-      : await generateWithOpenAI({ apiKey, prompt, image });
+  let imageDataUrl;
+  try {
+    imageDataUrl =
+      provider === "gemini"
+        ? await generateWithGemini({ apiKey, prompt, image })
+        : await generateWithOpenAI({ apiKey, prompt, image });
+  } catch (err) {
+    if (err?.name === "TimeoutError" || err?.name === "AbortError") {
+      throw new Error(
+        `${provider} image generation timed out after ${PROVIDER_TIMEOUT_MS}ms`,
+      );
+    }
+    throw err;
+  }
 
-  return { imageDataUrl, costUsd: IMAGE_COST_USD[provider] || 0.04, provider };
+  // Visibility for the visualize path (previously a black box). Duration
+  // tells us whether we're racing the app-proxy deadline; bytes tells us
+  // whether the base64 payload is large enough to trip a proxy response
+  // size limit. ~chars*0.75 ≈ decoded image bytes.
+  const ms = Date.now() - startedAt;
+  const payloadChars = imageDataUrl ? imageDataUrl.length : 0;
+  console.log(
+    `[image-styling] provider=${provider} ms=${ms} payloadChars=${payloadChars} ~bytes=${Math.round(payloadChars * 0.73)}`,
+  );
+
+  return { imageDataUrl, costUsd: IMAGE_COST_USD[provider] || 0.04, provider, ms, payloadChars };
 }

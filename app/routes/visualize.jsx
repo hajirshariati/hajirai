@@ -53,6 +53,12 @@ export const action = async ({ request }) => {
       );
     }
 
+    // Logged BEFORE generation so we have a record even when the app
+    // proxy severs the connection mid-flight (the access log shows
+    // "- - - - ms" with no status in that case, and nothing else fired).
+    const reqStart = Date.now();
+    console.log(`[visualize] ${shop} start provider=${provider} handle="${handle}"`);
+
     let result;
     try {
       result = await generateStyledImage({
@@ -64,12 +70,18 @@ export const action = async ({ request }) => {
         styleContext,
       });
     } catch (err) {
-      console.error(`[visualize] ${shop} generation failed (${provider}):`, err?.message || err);
+      console.error(
+        `[visualize] ${shop} generation failed (${provider}) after ${Date.now() - reqStart}ms:`,
+        err?.message || err,
+      );
       return Response.json(
         { ok: false, message: "The styling preview couldn't be generated right now. Please try again." },
         { status: 502 },
       );
     }
+    console.log(
+      `[visualize] ${shop} ok provider=${result.provider} totalMs=${Date.now() - reqStart} payloadChars=${result.payloadChars || 0}`,
+    );
 
     // Meter the image cost (merchant pays the provider directly).
     recordImageUsage({ shop, provider: result.provider, costUsd: result.costUsd }).catch((e) =>
