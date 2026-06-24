@@ -3,7 +3,9 @@ import { deleteProductByShopifyId } from "../models/Product.server";
 
 export const action = async ({ request }) => {
   const { shop, payload, topic } = await authenticate.webhook(request);
-  console.log(`Received ${topic} webhook for ${shop}`);
+  if (process.env.WEBHOOK_DEBUG === "true") {
+    console.log(`Received ${topic} webhook for ${shop}`);
+  }
   try {
     const shopifyId = payload?.admin_graphql_api_id || payload?.id;
     if (shopifyId) await deleteProductByShopifyId(shop, shopifyId);

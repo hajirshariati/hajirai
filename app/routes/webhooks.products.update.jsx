@@ -169,7 +169,12 @@ export const action = async ({ request }) => {
   if (!productId || !admin) return new Response();
   if (shouldDedupe(shop, productId)) return new Response();
 
-  console.log(`Received ${topic} webhook for ${shop}`);
+  // Per-webhook receipt log is high-volume (one+ per product change) and
+  // mostly clutters the platform logs. Gate it behind WEBHOOK_DEBUG; the
+  // meaningful drain/sync summaries below are always logged.
+  if (process.env.WEBHOOK_DEBUG === "true") {
+    console.log(`Received ${topic} webhook for ${shop}`);
+  }
 
   let q = QUEUES.get(shop);
   if (!q) {

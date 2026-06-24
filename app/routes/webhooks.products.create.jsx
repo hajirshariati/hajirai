@@ -12,7 +12,9 @@ export const action = async ({ request }) => {
     return new Response();
   }
 
-  console.log(`Received ${topic} webhook for ${shop}`);
+  if (process.env.WEBHOOK_DEBUG === "true") {
+    console.log(`Received ${topic} webhook for ${shop}`);
+  }
   try {
     const product = await upsertProductFromWebhook(shop, payload);
     if (product?.id) {
