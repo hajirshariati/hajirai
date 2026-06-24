@@ -771,6 +771,28 @@ export async function maybeRunOrthoticFlow({
     return { handled: false, case: "comparison_value_question" };
   }
 
+  // FOOTWEAR-INCLUSIVE request — the customer explicitly wants SHOES
+  // alongside (or instead of) insoles, e.g. "what insoles OR shoes for
+  // foot pain", "shoes and orthotics that help". The orthotic FINDER is
+  // for "find me an orthotic"; a cross-category ask should go to the
+  // LLM/catalog so it can recommend across footwear AND orthotics —
+  // running the insole questionnaire dead-ends it (prod trace 2026-06-24:
+  // "insoles or shoes for foot pain at work" walked condition→arch→
+  // overpronation and ended on a false "no men's footwear"). Match only
+  // the explicit "<insole-noun> or/and <footwear-noun>" construction (in
+  // either order) so "insoles FOR my running shoes" — a pure orthotic ask
+  // where footwear is just context — still runs the finder.
+  const INSOLE_THEN_SHOE_RE =
+    /\b(?:insoles?|inserts?|orthotics?|footbeds?)\b[^.?!]{0,40}?\b(?:or|and|&|\/|,)\b[^.?!]{0,40}?\b(?:shoes?|footwear|sneakers?|boots?|sandals?|clogs?|loafers?)\b/i;
+  const SHOE_THEN_INSOLE_RE =
+    /\b(?:shoes?|footwear|sneakers?|boots?|sandals?|clogs?|loafers?)\b[^.?!]{0,40}?\b(?:or|and|&|\/|,)\b[^.?!]{0,40}?\b(?:insoles?|inserts?|orthotics?|footbeds?)\b/i;
+  if (INSOLE_THEN_SHOE_RE.test(rawUserText) || SHOE_THEN_INSOLE_RE.test(rawUserText)) {
+    console.log(
+      `[orthotic-flow] footwear-inclusive request — falling through to LLM (not the orthotic finder)`,
+    );
+    return { handled: false, case: "footwear_inclusive_request" };
+  }
+
   // Product-info follow-up. The customer is asking about a SPECIFIC
   // product already in the conversation ("does the X come in other
   // colors", "is the Y available in size 9", "what's the price of Z").

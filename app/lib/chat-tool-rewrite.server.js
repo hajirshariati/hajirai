@@ -598,6 +598,17 @@ export function injectOccasionCategory(toolCall, ctx) {
   });
   if (customerNamedCategory) return toolCall;
 
+  // Don't remap an occasion to a FOOTWEAR category when the request is
+  // orthotic-scoped — the customer wants insoles, not "walking → sneakers".
+  // Prod trace 2026-06-24: an orthotic-context turn searched sneakers for an
+  // insole question because "walking-active" remapped category to Sneakers.
+  // This guard can only SUPPRESS a wrong footwear remap, never force one.
+  const ORTHOTIC_CONTEXT_RE = /\b(?:orthotics?|insoles?|inserts?|footbeds?|inner[\s-]?soles?)\b/i;
+  const groupName = String(ctx.activeCategoryGroup?.name || "").toLowerCase();
+  if (groupName.includes("orthotic") || ORTHOTIC_CONTEXT_RE.test(latest)) {
+    return toolCall;
+  }
+
   for (const { name, occasionRe, categoryRe } of OCCASION_TO_CATEGORY_PATTERNS) {
     if (!occasionRe.test(latest)) continue;
     const match = cats.find((c) => categoryRe.test(String(c)));
