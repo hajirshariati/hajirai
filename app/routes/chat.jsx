@@ -4057,14 +4057,22 @@ async function handleChatPost({ shop, sessionAccessToken, request, internal = fa
             const latestForRouting = String(body.message || "");
             const needsStrongModel =
               detectComparisonIntent(latestForRouting) ||
-              /\b(?:vs\.?|versus|difference between|compare)\b/i.test(latestForRouting);
+              /\b(?:vs\.?|versus|difference between|compare)\b/i.test(latestForRouting) ||
+              // Review / fit / durability / value questions need a grounded
+              // synthesis from review+return data. Haiku tends to answer
+              // these in a process-narration voice that the banned-narration
+              // scrubber then guts to a fragment, so the substantive half
+              // goes unanswered (prod trace 2026-06-24, Jillian strap/instep
+              // + "can I return it"). Sonnet follows the direct-voice rules,
+              // so route these straight to it on the first attempt.
+              /\b(?:reviews?\s+say|what\s+do\s+(?:reviewers?|customers?|buyers?|people)\s+(?:say|think)|runs?\s+(?:narrow|wide|small|large|big|tight)|true\s+to\s+size|size\s+up|size\s+down|high\s+instep|wide\s+(?:foot|feet|width)|narrow\s+(?:foot|feet|width)|hold[s]?\s+up|durab|well[-\s]?made|worth\s+(?:it|the\s+price|that)|how\s+long\s+(?:do|does|will)\s+(?:it|they|these)\s+last|can\s+i\s+return|does\s+the\s+(?:adjustable|strap|hook|buckle))\b/i.test(latestForRouting);
             const pickModel = (attempt) => {
               if (!hybridRouting) return sonnetModelForClean;
               if (turnStrategy === "always-opus") return OPUS_MODEL;
               if (turnStrategy === "always-haiku") return HAIKU_MODEL;
               if (turnStrategy === "always-sonnet") return sonnetModelForClean;
               if (turnStrategy === "cost-optimized") {
-                return attempt > 0 ? sonnetModelForClean : HAIKU_MODEL;
+                return attempt > 0 || needsStrongModel ? sonnetModelForClean : HAIKU_MODEL;
               }
               // smart (default)
               if (attempt > 0 || needsStrongModel) return sonnetModelForClean;
