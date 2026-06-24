@@ -485,15 +485,19 @@ function humanizeGender(value) {
 // ("Flat / Low", "Medium / High Arch", "Yes / Sometimes" are NOT collapsed).
 function collapseDuplicateSlashLabel(label) {
   const raw = String(label || "").trim();
-  if (!raw.includes("/")) return raw;
-  const parts = raw.split("/").map((p) => p.trim()).filter(Boolean);
+  if (!raw) return raw;
+  // Split on a slash (ASCII or unicode variants) or pipe.
+  const parts = raw.split(/\s*[/|⁄∕／]\s*/).map((p) => p.trim()).filter(Boolean);
   if (parts.length < 2) return raw;
   const seen = new Set();
   const kept = [];
   for (const p of parts) {
-    const norm = p.toLowerCase().replace(/\s+/g, " ");
-    if (seen.has(norm)) continue;
-    seen.add(norm);
+    // Aggressive key: ignore case, spaces, hyphens, and any punctuation so
+    // "Ball-of-foot pain" and "ball‑of‑foot pain" (different hyphen bytes)
+    // collapse. Genuinely different parts ("Flat" vs "Low") stay distinct.
+    const key = p.toLowerCase().replace(/[^a-z0-9]+/g, "");
+    if (!key || seen.has(key)) continue;
+    seen.add(key);
     kept.push(p);
   }
   return kept.length === parts.length ? raw : kept.join(" / ");

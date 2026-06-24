@@ -364,4 +364,22 @@ test("rule4 helper: returns the matched gender+category", () => {
   assert.equal(d.category, "sneakers");
 });
 
+// ─── Feature-header bolds are not products ──────────────────────
+test("'**Built-in Arch Support**' header is NOT extracted as a product", () => {
+  const fams = extractBoldedProductFamilies("The Danika has **Built-in Arch Support** and a cushioned footbed.");
+  assert.equal(fams.length, 0, `expected no product family; got ${JSON.stringify(fams)}`);
+});
+
+test("feature bolds (Memory Foam, Heel Cup, Removable Insole) are NOT products", () => {
+  for (const h of ["**Memory Foam**", "**Heel Cup**", "**Removable Insole**", "**Metatarsal Support**"]) {
+    assert.equal(extractBoldedProductFamilies(`Compare: ${h} vs the others.`).length, 0, `${h} should not extract`);
+  }
+});
+
+test("a real product whose title contains a feature word still extracts", () => {
+  const fams = extractBoldedProductFamilies("The **Danika Arch Support Sneaker** is a great pick.");
+  assert.equal(fams.length, 1);
+  assert.equal(fams[0].family, "danika");
+});
+
 console.log("\nAll grounding-validator tests done.");

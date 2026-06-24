@@ -74,6 +74,15 @@ function extractBoldedProductFamilies(text) {
     // 2026-06-10: "**Aetrex Signature Arch Support**" was flagged as
     // an ungrounded product and burned a retry on a grounded answer.
     if (/^Aetrex\b/i.test(inner)) continue;
+    // Feature/spec phrases the model bolds as compare/section headers
+    // ("Built-in Arch Support", "Memory Foam", "Heel Cup", "Removable
+    // Insole") are FEATURES, not product names. Prod trace 2026-06-24:
+    // "**Built-in Arch Support**" was extracted as a product (family
+    // "built") and burned 3 Sonnet retries on an otherwise-grounded
+    // comparison. Match the phrase as a whole so real product titles that
+    // merely contain these words (e.g. "Danika Arch Support Sneaker") still
+    // extract — those have a leading name token before the feature.
+    if (/^(?:built[\s-]?in\s+|with\s+|genuine\s+|true\s+)?(?:arch\s+support|memory\s+foam|heel\s+cup|metatarsal(?:\s+support|\s+pad)?|cork\s+(?:footbed|midsole)|biorocker|ultra[\s-]?sky|lynco|removable\s+insoles?|rocker[\s-]?bottom|orthotic\s+support)\b\s*$/i.test(inner)) continue;
     // Heading-style bolds end in punctuation (colon, em/en dash) —
     // "**The key difference:**", "**Quick take —**", "**Bottom line:**".
     // These are sentence headings, not product names. Live trace
