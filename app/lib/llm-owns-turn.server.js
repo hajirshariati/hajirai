@@ -43,69 +43,6 @@ export function isShadowModeEnabled() {
   return String(process.env.LLM_OWNS_ALL_TURNS_SHADOW || "").toLowerCase() === "true";
 }
 
-// ── Orthotic-gate shadow ────────────────────────────────────────────
-// The orthotic finder is a PRE-LLM router gate: it inspects the turn and,
-// when it decides the customer wants a fitting, short-circuits the turn
-// with its own deterministic chip questionnaire — the model never sees the
-// turn. That makes the gate a SECOND engage/defer decision-maker competing
-// with the model, which already has a `recommend_orthotic` TOOL it can call
-// for exactly the same job. Every bug in this domain (browse hijacked into
-// a quiz, an efficacy question answered with "what's your arch type?") is
-// the regex gate engaging where the model would not have.
-//
-// Before we hand that decision to the model (and let the questionnaire live
-// behind the tool), we measure the disagreement. When ORTHOTIC_GATE_SHADOW
-// is on AND the gate decided to engage, we ask the model — same conversation,
-// same tools — what IT would do, and log whether it agrees (reaches for the
-// recommender) or would have just answered. Pure observation: it never emits
-// to the customer and never alters the gate's behavior. Default OFF.
-export function isOrthoticGateShadowEnabled() {
-  return String(process.env.ORTHOTIC_GATE_SHADOW || "").toLowerCase() === "true";
-}
-
-// Run the shadow probe. Single non-streaming model call; inspects the first
-// turn's tool choice. Returns { llmChoice, agree } and logs one line. Throws
-// nothing to the caller — a probe failure must never affect the live turn.
-export async function logOrthoticGateShadow({
-  anthropic,
-  model,
-  system,
-  tools,
-  messages,
-  shop,
-  gateCase = "",
-}) {
-  try {
-    const probe = await anthropic.messages.create({
-      model,
-      max_tokens: 256,
-      system,
-      tools,
-      messages,
-    });
-    const toolUses = (probe?.content || []).filter((b) => b?.type === "tool_use");
-    const names = toolUses.map((u) => String(u?.name || "")).filter(Boolean);
-    const calledRecommend = names.some((n) => n.startsWith("recommend_"));
-    const calledOther = names.length > 0 && !calledRecommend;
-    const llmChoice = calledRecommend
-      ? "recommend_orthotic"
-      : calledOther
-        ? `other_tool(${names.join(",")})`
-        : "text_answer";
-    // Gate ENGAGED the finder; "agree" means the model would also reach for
-    // the recommender. text_answer / other_tool ⇒ the gate over-engaged.
-    const agree = calledRecommend;
-    console.log(
-      `[orthotic-gate-shadow] ${shop} gate=engage${gateCase ? `(case=${gateCase})` : ""} ` +
-        `llm=${llmChoice} agree=${agree}`,
-    );
-    return { llmChoice, agree };
-  } catch (err) {
-    console.log(`[orthotic-gate-shadow] ${shop} probe failed: ${err?.message || err}`);
-    return null;
-  }
-}
-
 // Collect the products the model saw this turn from tool result history.
 // runAgenticLoop pushes tool_result messages onto its conversation; we
 // scan those for cards so the validator can check claims against the
