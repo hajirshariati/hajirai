@@ -300,6 +300,31 @@ function chipsAchievableForNode(node, answers, tree) {
   });
 }
 
+// A chip click sends the chip's LABEL as the chat message; the LLM
+// classifier then re-derives the attribute and can emit a value OUTSIDE
+// the merchant tree's vocabulary — e.g. "Gym / training" → classifier
+// `athletic_training` while the tree's chip value is `athletic_training_gym`.
+// When the latest message is an exact chip-label match, the chip's own
+// `value` is the authoritative answer. Returns {attribute, value} or null.
+// Prod trace 2026-06-24: flat feet + Gym/training resolved to the neutral
+// fallback L1800D because useCase=athletic_training matched zero SKUs; the
+// chip value athletic_training_gym maps to the posted L820M.
+function exactChipAnswer(rawUserText, tree) {
+  if (!rawUserText || !tree?.definition?.nodes) return null;
+  const norm = String(rawUserText).trim().toLowerCase().replace(/[^a-z0-9]+/g, "");
+  if (!norm) return null;
+  for (const node of tree.definition.nodes) {
+    if (!node || node.type !== "question" || !node.attribute || !Array.isArray(node.chips)) continue;
+    for (const chip of node.chips) {
+      const lbl = String(chip?.label || "").toLowerCase().replace(/[^a-z0-9]+/g, "");
+      if (lbl && norm === lbl && chip.value != null) {
+        return { attribute: node.attribute, value: chip.value };
+      }
+    }
+  }
+  return null;
+}
+
 // A minimal greeting detector. Fires only when the customer's
 // message LEADS with a greeting (so "Hi, I have flat feet" qualifies
 // but "Do you have a high-arch option, by the way?" doesn't). The
@@ -1177,6 +1202,20 @@ export async function maybeRunOrthoticFlow({
     return { handled: true };
   }
 
+  // Authoritative chip-value override (runs last, just before the answer
+  // set is frozen). A chip click's own `value` beats the classifier's
+  // guess, which can fall outside the tree's vocabulary and hard-filter
+  // the resolver to zero candidates → neutral fallback. See exactChipAnswer.
+  {
+    const chipAns = exactChipAnswer(rawUserText, tree);
+    if (chipAns && latestExtracted[chipAns.attribute] !== chipAns.value) {
+      console.log(
+        `[orthotic-flow] chip-value override: ${chipAns.attribute}=` +
+          `${latestExtracted[chipAns.attribute] ?? "(none)"} → ${chipAns.value} (exact chip-label click)`,
+      );
+      latestExtracted[chipAns.attribute] = chipAns.value;
+    }
+  }
   const answers = { ...accumulated, ...latestExtracted };
 
   // Path-ambiguity disambig. When the customer earlier committed to
