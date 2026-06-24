@@ -56,7 +56,7 @@ import {
   decorateGenderChipLabel,
   getGenderChipContextNoun,
 } from "./orthotic-flow.server.js";
-import { executeRecommenderTool } from "./recommender-tools.server.js";
+import { executeRecommenderTool, normalizeUseCaseForTree } from "./recommender-tools.server.js";
 import { buildStorefrontSearchCTA } from "./storefront-search-cta.server.js";
 import { scrubInternalEnums } from "./chat-postprocessing.js";
 import { detectConversationGoal, detectTurnGoal, INFO_QUESTION_GOALS } from "./turn-intent.server.js";
@@ -1217,6 +1217,25 @@ export async function maybeRunOrthoticFlow({
     }
   }
   const answers = { ...accumulated, ...latestExtracted };
+
+  // useCase vocabulary guard. A coarse classifier/tool useCase that this
+  // tree doesn't understand (and can't be aliased to a granular value)
+  // would otherwise hard-filter the resolver to zero candidates and return
+  // the neutral fallback. Alias it to the tree's value when possible;
+  // otherwise DROP it so the flow asks the (authoritative) chip question
+  // instead of silently recommending the wrong orthotic.
+  if (answers.useCase) {
+    const mi = tree?.definition?.resolver?.masterIndex;
+    const normalizedUseCase = normalizeUseCaseForTree(answers.useCase, mi);
+    if (normalizedUseCase !== answers.useCase) {
+      console.log(
+        `[orthotic-flow] useCase guard: ${answers.useCase} → ` +
+          `${normalizedUseCase ?? "(dropped — not in tree, will ask)"}`,
+      );
+      if (normalizedUseCase) answers.useCase = normalizedUseCase;
+      else delete answers.useCase;
+    }
+  }
 
   // Path-ambiguity disambig. When the customer earlier committed to
   // FOOTWEAR (picked "Footwear with arch support" from the domain

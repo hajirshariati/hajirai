@@ -34,6 +34,53 @@ function applyDerivations(answers, derivations) {
   return out;
 }
 
+// The orthotic classifier and the recommend_<intent> tool schema emit a
+// COARSE useCase vocabulary (athletic_training, athletic_general, cleats,
+// work_all_day, casual, comfort, dress, …) that predates the granular
+// per-merchant tree values (athletic_training_gym, athletic_training_sports,
+// boots_construction, comfort_walking_everyday, dress_no_removable, …).
+// Nothing else bridges them, so a coarse value silently hard-filters the
+// resolver to zero candidates → neutral fallback. Each alias maps a coarse
+// value to the granular target(s) it could mean; it is applied ONLY when the
+// target EXISTS in this tree and the coarse source does NOT — so a merchant
+// still on the old vocabulary is never touched. (cleats folds into the
+// merchant's combined sports bucket when no dedicated cleats SKU exists.)
+const USE_CASE_ALIASES = {
+  athletic_training: ["athletic_training_gym"],
+  athletic_general: ["athletic_training_sports"],
+  cleats: ["athletic_training_sports"],
+  work_all_day: ["boots_construction"],
+  casual: ["comfort_walking_everyday"],
+  comfort: ["comfort_walking_everyday"],
+  dress: ["dress_no_removable"],
+  dress_premium: ["dress_no_removable"],
+};
+
+function treeUseCaseSet(masterIndex) {
+  const set = new Set();
+  if (Array.isArray(masterIndex)) {
+    for (const m of masterIndex) {
+      if (m && typeof m.useCase === "string" && m.useCase) set.add(m.useCase);
+    }
+  }
+  return set;
+}
+
+// Returns the tree-valid useCase for a (possibly coarse) value:
+//   - the value itself when it already exists in the tree
+//   - an aliased granular value when the coarse source maps to one present
+//     in the tree (and the source itself is absent)
+//   - null when it cannot be mapped (caller decides: drop & re-ask, or leave)
+export function normalizeUseCaseForTree(useCase, masterIndex) {
+  if (!useCase) return useCase;
+  const known = treeUseCaseSet(masterIndex);
+  if (known.has(useCase)) return useCase;
+  for (const target of USE_CASE_ALIASES[useCase] || []) {
+    if (known.has(target)) return target;
+  }
+  return null;
+}
+
 // Lazy-imported so this module can be loaded by tooling that
 // doesn't have @prisma/client available (e.g. the eval harness
 // running pure-function checks in CI). Cached after first await.
@@ -515,6 +562,18 @@ export async function executeRecommenderTool({ toolName, input, shop, trees, con
   }
 
   const filteredResolver = { ...tree.definition.resolver, masterIndex: availableMasterIndex };
+
+  // Bridge a coarse useCase (from the classifier / tool schema) to this
+  // tree's granular vocabulary BEFORE anything filters on it. Alias-only
+  // here — an unmappable value is left as-is (existing fallback behavior);
+  // the gate separately drops unmappable values to re-ask the chip.
+  if (input && input.useCase) {
+    const normalizedUseCase = normalizeUseCaseForTree(input.useCase, availableMasterIndex);
+    if (normalizedUseCase && normalizedUseCase !== input.useCase) {
+      console.log(`[recommender] useCase normalize: ${input.useCase} → ${normalizedUseCase}`);
+      input = { ...input, useCase: normalizedUseCase };
+    }
+  }
 
   // Apply tree-level derivations BEFORE resolving so merchant-
   // defined clinical mappings (condition → metSupport, arch →

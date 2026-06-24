@@ -126,9 +126,16 @@ export function resolveTree(answers, resolver) {
   // keep their family SKU because the specialty insole won't fit
   // the shoe shape.
   const SHOE_CONTEXT_LOCKS = new Set([
+    // Legacy coarse vocabulary (kept for trees still on it)
     "cleats", "skates", "winter_boots",
     "athletic_running", "athletic_training", "athletic_general",
     "dress_no_removable",
+    // Granular vocabulary (current trees). Equally shoe-shape-specific, so a
+    // specialty condition must not pull the resolver out of the family (e.g.
+    // heel_spurs + gym should stay in the Train line, not dead-end searching
+    // for a non-existent heel-spur SKU).
+    "athletic_training_gym", "athletic_training_sports",
+    "boots_construction", "non_removable",
   ]);
 
   let candidates;
