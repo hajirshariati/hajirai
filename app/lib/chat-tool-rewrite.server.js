@@ -603,9 +603,26 @@ export function injectOccasionCategory(toolCall, ctx) {
   // Prod trace 2026-06-24: an orthotic-context turn searched sneakers for an
   // insole question because "walking-active" remapped category to Sneakers.
   // This guard can only SUPPRESS a wrong footwear remap, never force one.
+  //
+  // Three independent signals, any one of which means orthotic-scoped:
+  //   1. The classifier tagged THIS turn as an orthotic request. This is
+  //      the authoritative signal and the one that catches chip answers —
+  //      a chip reply like "Walking / everyday" carries no orthotic noun
+  //      in its text, but the classifier still knows the conversation is
+  //      an orthotic flow (condition=arch_pain, useCase=walking, …). Prod
+  //      trace 2026-06-24 19:01:54: soft_browse_refine path still remapped
+  //      walking→Sneakers because the old guard only saw the (orthotic-
+  //      noun-free) chip text and an "ambiguous" active group.
+  //   2. The active category group is orthotics.
+  //   3. The latest message literally names an orthotic product noun.
   const ORTHOTIC_CONTEXT_RE = /\b(?:orthotics?|insoles?|inserts?|footbeds?|inner[\s-]?soles?)\b/i;
   const groupName = String(ctx.activeCategoryGroup?.name || "").toLowerCase();
-  if (groupName.includes("orthotic") || ORTHOTIC_CONTEXT_RE.test(latest)) {
+  const classifierSaysOrthotic = ctx?.classifiedIntent?.isOrthoticRequest === true;
+  if (
+    classifierSaysOrthotic ||
+    groupName.includes("orthotic") ||
+    ORTHOTIC_CONTEXT_RE.test(latest)
+  ) {
     return toolCall;
   }
 
