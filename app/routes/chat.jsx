@@ -3834,6 +3834,28 @@ async function handleChatPost({ shop, sessionAccessToken, request, internal = fa
               });
               gateHandled = !!gate?.handled;
               routerLog.orthoticGate = `handled=${gateHandled}` + (gate?.case ? ` case=${gate.case}` : "");
+              // Shadow measurement (default OFF): when the gate engages,
+              // ask the model what IT would do with the same conversation +
+              // tools, and log agreement. Observation only — does not emit
+              // to the customer or change the gate's behavior. This builds
+              // the evidence to eventually move the engage/defer decision
+              // from this pre-LLM gate to the model's recommend_orthotic tool.
+              if (gateHandled) {
+                const { isOrthoticGateShadowEnabled, logOrthoticGateShadow } = await import(
+                  "../lib/llm-owns-turn.server.js"
+                );
+                if (isOrthoticGateShadowEnabled()) {
+                  await logOrthoticGateShadow({
+                    anthropic,
+                    model: HAIKU_MODEL,
+                    system: systemPrompt,
+                    tools: activeTools,
+                    messages,
+                    shop,
+                    gateCase: gate?.case || "engage",
+                  });
+                }
+              }
               if (gateHandled) {
                 routerLog.finalPath = "orthotic_gate";
                 console.log(`[router] ${ctx.shop} ${routerLog.classifier}`);
