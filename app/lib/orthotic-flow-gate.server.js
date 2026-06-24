@@ -718,6 +718,29 @@ export async function maybeRunOrthoticFlow({
   const rawUserText = typeof last.content === "string" ? last.content : "";
   if (!rawUserText.trim()) return { handled: false };
 
+  // COMPARISON / VALUE QUESTION — answer it, don't run the finder.
+  // When the customer NAMES specific products and asks how they compare,
+  // what's different, or whether one is worth the price, they want an
+  // ANSWER, not the "what shoes will these go in?" questionnaire. The
+  // finder hijacks the question and (after the chip) drifts into a
+  // footwear browse (prod trace 2026-06-24: "Aetrex L2300M orthotics
+  // VERSUS Dr. Scholl's — what's different, is the price jump worth it"
+  // got asked "what kind of shoes will the orthotics go in?" then shown
+  // SNEAKERS). Bail to the LLM, which compares from tool data and
+  // declines the competitor honestly. Fires even on a fresh first turn
+  // (the product-info/goal guards below only bail on follow-ups).
+  const COMPARISON_RE = /\b(?:vs\.?|versus|compared?\s+to)\b/i;
+  const VALUE_RE =
+    /\b(?:worth\s+it|worth\s+the\s+(?:price|money|extra|jump|upgrade|cost)|price\s+jump|is\s+it\s+worth|justif(?:y|ies|ied)\s+the\s+(?:price|cost))\b/i;
+  const WHATS_DIFFERENT_RE =
+    /\b(?:what'?s?\s+(?:actually\s+|really\s+|the\s+)*differ(?:ent|ence)|difference\s+between)\b/i;
+  if (COMPARISON_RE.test(rawUserText) || VALUE_RE.test(rawUserText) || WHATS_DIFFERENT_RE.test(rawUserText)) {
+    console.log(
+      `[orthotic-flow] comparison/value question detected — falling through to LLM (not the orthotic finder)`,
+    );
+    return { handled: false, case: "comparison_value_question" };
+  }
+
   // Product-info follow-up. The customer is asking about a SPECIFIC
   // product already in the conversation ("does the X come in other
   // colors", "is the Y available in size 9", "what's the price of Z").
