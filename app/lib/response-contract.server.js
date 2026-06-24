@@ -1788,6 +1788,31 @@ function scopedLabel(scope = {}, fallback = "styles") {
   return parts.length > 0 ? parts.join(" ") : fallback;
 }
 
+// Does the catalog actually carry this gender+category? Uses ctx.category-
+// GenderMap ({ [category]: { genders: [...] } }). "footwear"/"shoes" is an
+// UMBRELLA, not a leaf category — true when the catalog has ANY real
+// footwear category (not orthotics/accessories) for the gender. Used to
+// suppress a false "we don't carry [gender] [category]" denial when the
+// scope genuinely exists (the orthotic resolver wrongly marks footwear
+// impossible).
+function genderCategoryExistsInCatalog(ctx, gender, category) {
+  const map = ctx?.categoryGenderMap;
+  const g = String(gender || "").toLowerCase().trim();
+  const c = String(category || "").toLowerCase().trim();
+  if (!map || typeof map !== "object" || !g || !c) return false;
+  const hasGenderFor = (catKey) => {
+    const entry = map[catKey];
+    if (!entry || !Array.isArray(entry.genders)) return false;
+    return entry.genders.map((x) => String(x).toLowerCase()).some((x) => x === g || x === "unisex");
+  };
+  const FOOTWEAR_UMBRELLA = new Set(["footwear", "shoes", "shoe"]);
+  const NON_FOOTWEAR = new Set(["orthotics", "orthotic", "insoles", "insole", "accessories", "accessory"]);
+  if (FOOTWEAR_UMBRELLA.has(c)) {
+    return Object.keys(map).some((k) => !NON_FOOTWEAR.has(String(k).toLowerCase()) && hasGenderFor(k));
+  }
+  return hasGenderFor(c) || hasGenderFor(c.replace(/s$/, "")) || hasGenderFor(`${c}s`);
+}
+
 export function buildCodeOwnedExactNoMatchText({ ctx = {} } = {}) {
   const resolver = ctx?.resolverState;
   const impossible = Array.isArray(resolver?.impossible_constraints)
@@ -1811,6 +1836,23 @@ export function buildCodeOwnedExactNoMatchText({ ctx = {} } = {}) {
   const scope = currentCatalogScopeFromContext(ctx);
   const primary = hardImpossible[0] || {};
   const groupCategory = scope.category || ctx?.activeCategoryGroup?.name || "";
+
+  // Catalog-reality guard. The ORTHOTIC resolver marks category="footwear"
+  // (or gender) impossible because IT only knows orthotic SKUs — but the
+  // catalog plainly carries men's footwear. Denying a gender+category that
+  // actually exists is a provably-false statement (prod trace 2026-06-24:
+  // "insoles or shoes for foot pain" walked the orthotic questionnaire then
+  // ended on "I couldn't find men's footwear"). Only category/gender misses
+  // are checkable here; a color miss ("no pink") is a real denial we keep.
+  if (primary.field === "category" || primary.field === "gender") {
+    const denyGender = primary.field === "gender" ? (primary.value || scope.gender) : scope.gender;
+    const denyCategory =
+      primary.field === "category" ? (primary.value || scope.category || groupCategory) : (scope.category || groupCategory);
+    if (genderCategoryExistsInCatalog(ctx, denyGender, denyCategory)) {
+      return { text: "", reason: "catalog_has_scope_not_denied" };
+    }
+  }
+
   let requested;
   if (primary.field === "color") {
     requested = [
