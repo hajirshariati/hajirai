@@ -1793,15 +1793,23 @@ export function buildCodeOwnedExactNoMatchText({ ctx = {} } = {}) {
   const impossible = Array.isArray(resolver?.impossible_constraints)
     ? resolver.impossible_constraints
     : [];
-  const isExactNoMatch =
-    resolver?.recommended_next_action?.type === "no_match" ||
-    impossible.length > 0;
-  if (!isExactNoMatch) {
+  // Only a HARD catalog facet that genuinely doesn't exist — color,
+  // gender, or category — warrants a "we don't carry that" denial. A
+  // no_match on a SOFT orthotic attribute (useCase/condition/arch/posted/
+  // metSupport) means "no orthotic SKU matches that exact attribute
+  // combo", NOT "we don't carry men's footwear". Phrasing the latter is
+  // a provably-false denial (prod trace 2026-06-24: "insoles or shoes for
+  // foot pain at work" → orthotic tree had no work_all_day SKU → bot said
+  // "I couldn't find men's footwear" and never even searched). Deny only
+  // on a hard-facet impossibility; otherwise fall through to search.
+  const HARD_FACETS = new Set(["color", "gender", "category"]);
+  const hardImpossible = impossible.filter((c) => HARD_FACETS.has(c?.field));
+  if (hardImpossible.length === 0) {
     return { text: "", reason: "not_exact_no_match" };
   }
 
   const scope = currentCatalogScopeFromContext(ctx);
-  const primary = impossible[0] || {};
+  const primary = hardImpossible[0] || {};
   const groupCategory = scope.category || ctx?.activeCategoryGroup?.name || "";
   let requested;
   if (primary.field === "color") {

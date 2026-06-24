@@ -1177,9 +1177,19 @@ async function convertEngineCtaToLink(cta, ctx) {
 
 function resolverHasExactNoMatch(resolverState) {
   if (!resolverState || resolverState.type !== "resolver_state") return false;
-  return (
-    resolverState.recommended_next_action?.type === "no_match" ||
-    (Array.isArray(resolverState.impossible_constraints) && resolverState.impossible_constraints.length > 0)
+  // Only a HARD catalog facet (color/gender/category) genuinely absent
+  // warrants a "we don't carry that" denial that also blocks search. A
+  // no_match on a SOFT orthotic attribute (useCase/condition/arch/...)
+  // must NOT deny the whole gender+category nor skip the search (prod
+  // trace 2026-06-24: "insoles or shoes for foot pain at work" → no
+  // work_all_day orthotic SKU → bot falsely said "I couldn't find men's
+  // footwear" and never searched). Let those fall through to a normal
+  // search so real men's footwear + orthotics surface.
+  const impossible = Array.isArray(resolverState.impossible_constraints)
+    ? resolverState.impossible_constraints
+    : [];
+  return impossible.some(
+    (c) => c?.field === "color" || c?.field === "gender" || c?.field === "category",
   );
 }
 
