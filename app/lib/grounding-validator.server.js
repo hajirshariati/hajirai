@@ -82,6 +82,19 @@ function extractBoldedProductFamilies(text) {
     if (/[:!?—–]$/.test(inner)) continue;
     // Product names don't end with verbs/closers like "is" or "and".
     if (/\b(?:is|are|was|were|and|or|but|the|a|an)$/i.test(inner)) continue;
+    // Size ranges / measurements the model bolds in fit & sizing answers
+    // ("**7 US through 15 US**", "**sizes 6–11**", "**9.5 wide**") are
+    // facts from variant data, NOT product names. Prod trace 2026-06-24:
+    // "**7 US through 15 US**" burned 3 attempts (Haiku + 2 Sonnet) on a
+    // correctly-grounded orthotic sizing answer.
+    if (/\b(?:US|UK|EU|EUR)\b/.test(inner) && /\d/.test(inner)) continue;
+    if (/^\s*(?:sizes?\s+)?\d+(?:\.\d+)?\s*(?:[-–—]|to|through|thru)\s*\d/i.test(inner)) continue;
+    if (/\b\d+(?:\.\d+)?\s*(?:cm|mm|in(?:ch(?:es)?)?|narrow|wide|medium)\b/i.test(inner)) continue;
+    // Quoted phrases the model bolds (definitions, translations, or a
+    // customer quote — '**"one who has completed the Hajj"**') are not
+    // product names. Prod trace 2026-06-24: a Farsi definition answer
+    // burned a Sonnet retry because the bolded gloss was read as a product.
+    if (/^["'“”‘’]/.test(inner) && /["'“”‘’]$/.test(inner)) continue;
     const family = titleFamily(inner);
     if (family) out.push({ phrase: inner, family });
   }
