@@ -381,6 +381,15 @@ export function finalizeOutboundReply({
   let fullResponseText = text;
   let pool = Array.isArray(poolIn) ? poolIn : [];
 
+  // Set when the cleanup pipeline below strips a substantial reply down
+  // to a near-empty fragment (e.g. the model's whole turn was a "Let me
+  // pull the review data…" announcement → banned-narration scrubs it to
+  // 3 chars). The fully-empty repair downstream only fires on "" — a
+  // tiny non-empty fragment slips past it and ships cards with no answer
+  // (prod trace 2026-06-24, Jillian sandal durability question). This
+  // flag lets that repair treat the fragment as empty.
+  let strippedNarrationToFragment = false;
+
   if (fullResponseText) {
     // Always-on text cleanup pipeline. Six independent mutators that
     // run unconditionally after every LLM turn — none gate the next,
@@ -418,6 +427,7 @@ export function finalizeOutboundReply({
         { fn: tightenSequentialFactLines,    name: "tighten-facts" },
       ]),
     ];
+    const preCleanupText = fullResponseText;
     const cleanupLogs = [];
     for (const step of cleanupSteps) {
       const before = fullResponseText;
@@ -434,6 +444,20 @@ export function finalizeOutboundReply({
     }
     if (cleanupLogs.length > 0) {
       console.log(`[chat] cleanup pipeline: ${cleanupLogs.join("+")}`);
+    }
+    // Did a narration/leak scrub gut a real answer down to a fragment?
+    // Only flag when we removed a substantial chunk (≥40 chars in) and
+    // what's left is essentially nothing (<12 chars) — a normal short
+    // reply ("Take a look!") never trips this because nothing was stripped.
+    const narrationStripFired = cleanupLogs.some(
+      (n) => n === "internal-leak" || n === "banned-narration" || n === "meta-narration" || n === "tool-syntax",
+    );
+    if (
+      narrationStripFired &&
+      preCleanupText.trim().length >= 40 &&
+      fullResponseText.trim().length < 12
+    ) {
+      strippedNarrationToFragment = true;
     }
   }
 
@@ -550,11 +574,15 @@ export function finalizeOutboundReply({
       // their own constraints irritate.
       fullResponseText = "Tell me a bit more — color, style, or what you're using them for — and I'll narrow it down.";
     }
-  } else if (!fullResponseText && pool.length > 0) {
-    // Strips wiped the entire text (e.g. AI's only output was
-    // "Let me look that up for you!") but a search returned products.
-    // Without a fallback we'd ship an empty bubble above the cards.
-    console.log(`[chat] empty-text repair: text wiped by strips, pool=${pool.length}`);
+  } else if (pool.length > 0 && (!fullResponseText || strippedNarrationToFragment)) {
+    // Strips wiped the entire text — or gutted it to a useless fragment
+    // (e.g. the AI's only output was "Let me pull the real review data…"
+    // → banned-narration scrubbed it to 3 chars) — but a search returned
+    // products. Without a fallback we'd ship an empty/near-empty bubble
+    // above the cards and the customer's question goes unanswered.
+    console.log(
+      `[chat] empty-text repair: text ${fullResponseText ? "gutted to fragment" : "wiped"} by strips, pool=${pool.length}`,
+    );
     qualitySignals.emptyAfterStrips = true;
     fullResponseText = "Take a look — these are the closest matches I've got.";
   }
