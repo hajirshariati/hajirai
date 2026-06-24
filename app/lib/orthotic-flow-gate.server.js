@@ -775,6 +775,34 @@ export async function maybeRunOrthoticFlow({
     return { handled: false, case: "comparison_value_question" };
   }
 
+  // EFFICACY / SKEPTIC QUESTION — "do these actually help?", "are they a
+  // waste of money?", "do insoles even work?". The customer wants an
+  // ANSWER (education / reassurance), not the fitting questionnaire.
+  // Prod trace 2026-06-24: "do insoles actually help with plantar
+  // fasciitis or are they a waste of money" — a high-intent buying
+  // question — was classified ortho=true and got asked "what's your arch
+  // type?" THREE times instead of an answer. The LLM has the RAG
+  // knowledge chunks to answer this honestly and then invite the finder.
+  //
+  // Two shapes, both tight to avoid swallowing genuine fitting requests:
+  //   1. Value-skepticism: "waste of money/time", "rip-off", "scam",
+  //      "gimmick", "snake oil", "any good", "even worth it".
+  //   2. Efficacy-skepticism: an interrogative (do/does/are/is/will/can)
+  //      paired with a doubt adverb (actually/really/even) and a
+  //      help/work verb — "do they actually help", "does it even work".
+  // A plain request like "I need orthotics that actually help my PF"
+  // has no leading interrogative, so it still engages the finder.
+  const VALUE_SKEPTIC_RE =
+    /\b(?:waste\s+of\s+(?:money|cash|time)|rip[\s-]?offs?|scams?|gimmicks?|snake[\s-]?oil|any\s+good|even\s+worth)\b/i;
+  const EFFICACY_SKEPTIC_RE =
+    /\b(?:do|does|are|is|will|can)\b[^.?!]{0,60}?\b(?:actually|really|even)\b[^.?!]{0,25}?\b(?:help|works?|worth|do\s+anything|make\s+a\s+difference)\b/i;
+  if (VALUE_SKEPTIC_RE.test(rawUserText) || EFFICACY_SKEPTIC_RE.test(rawUserText)) {
+    console.log(
+      `[orthotic-flow] efficacy/skeptic question detected — falling through to LLM (not the orthotic finder)`,
+    );
+    return { handled: false, case: "efficacy_skeptic_question" };
+  }
+
   // FOOTWEAR-INCLUSIVE request — the customer explicitly wants SHOES
   // alongside (or instead of) insoles, e.g. "what insoles OR shoes for
   // foot pain", "shoes and orthotics that help". The orthotic FINDER is
