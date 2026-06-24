@@ -138,6 +138,33 @@ export async function runWithGroundingRetry({
   let attempt = 0;
   let last = null;
   let lastErrors = [];
+  // Best substantial answer seen across attempts, for fragment recovery.
+  // The grounding validator sometimes false-rejects a legitimate
+  // product-feature phrase (prod 2026-06-24: "Built-in Aetrex Signature
+  // Arch Support" flagged as unsupported on a sandal that obviously has
+  // arch support). The model then "corrects" into a gutted retry that the
+  // scrubbers reduce to "Take a look — these are the closest matches" — a
+  // trivially-grounded NON-answer that passes validation and ships, while
+  // the real 1900-char answer is discarded. We keep the best substantial
+  // draft so we can ship it instead of a fragment. ONLY drafts whose only
+  // errors are the false-positive-prone `unsupported_feature_claim` kind
+  // qualify — we never recover a draft with a wrong price or a
+  // hallucinated product name.
+  let bestSubstantial = null; // { result, len }
+  const FRAGMENT_MAX = 90;
+  const SUBSTANTIAL_MIN = 250;
+  const considerSubstantial = (result, text, validation) => {
+    const len = (text || "").trim().length;
+    if (len < SUBSTANTIAL_MIN) return;
+    const onlySoftErrors =
+      validation.errors.length > 0 &&
+      validation.errors.length <= 3 &&
+      validation.errors.every((e) => e?.kind === "unsupported_feature_claim");
+    if (!onlySoftErrors) return;
+    if (!bestSubstantial || len > bestSubstantial.len) {
+      bestSubstantial = { result, len };
+    }
+  };
   // Usage accumulates across ALL attempts so the caller bills what was
   // actually spent — a validator retry costs a full extra model
   // round-trip and must not vanish from the usage record.
@@ -167,7 +194,23 @@ export async function runWithGroundingRetry({
       onAttempt({ attempt, validation, textLen: text.length, poolSize: pool.length });
     }
 
+    considerSubstantial(result, text, validation);
+
     if (validation.ok) {
+      // Don't ship a gutted fragment when an earlier attempt produced a
+      // real, substantial answer that was only soft-rejected (feature
+      // false-positive). The fragment "passes" grounding precisely because
+      // the scrubbers stripped it to nothing — that's a non-answer.
+      if (text.trim().length < FRAGMENT_MAX && bestSubstantial) {
+        console.log(
+          `[grounding-retry] recovered substantial draft (${bestSubstantial.len} chars) over fragment (${text.trim().length} chars)`,
+        );
+        return {
+          ...bestSubstantial.result,
+          totalUsage: { ...accUsage },
+          validation: { ok: true, errors: [], attempts: attempt + 1, recoveredSubstantial: true },
+        };
+      }
       return {
         ...result,
         totalUsage: { ...accUsage },
@@ -200,6 +243,21 @@ export async function runWithGroundingRetry({
       ],
     });
     attempt += 1;
+  }
+
+  // Retries exhausted. If the final attempt collapsed to a fragment but we
+  // captured a real, substantial answer earlier (soft-rejected only),
+  // ship that — a flagged-but-real answer beats a "Take a look" non-answer.
+  const lastText = (last?.fullResponseText || "").trim();
+  if (lastText.length < FRAGMENT_MAX && bestSubstantial) {
+    console.log(
+      `[grounding-retry] exhausted; recovered substantial draft (${bestSubstantial.len} chars) over fragment (${lastText.length} chars)`,
+    );
+    return {
+      ...bestSubstantial.result,
+      totalUsage: { ...accUsage },
+      validation: { ok: false, errors: lastErrors, attempts: attempt + 1, recoveredSubstantial: true },
+    };
   }
 
   return {
