@@ -28,9 +28,22 @@ export const action = async ({ request }) => {
     if (!config?.visualizeLookEnabled) {
       return Response.json({ ok: false, message: "Feature not enabled." }, { status: 403 });
     }
-    const provider = String(config.imageProvider || "").trim();
+    let provider = String(config.imageProvider || "").trim();
     if (!isImageProviderSupported(provider)) {
       return Response.json({ ok: false, message: "Image provider not configured." }, { status: 400 });
+    }
+    // Prefer Gemini ("Nano Banana") when a key is available: it returns a
+    // subject-preserving styled image in ~5-15s, whereas OpenAI gpt-image-1
+    // routinely runs 40-60s and times out behind the app proxy (prod trace
+    // 2026-06-24). Only override when we actually have a Gemini key; gate
+    // off with VISUALIZE_PREFER_GEMINI=false to honor the merchant's pick.
+    if (
+      provider === "openai" &&
+      String(config.geminiApiKey || "").trim() &&
+      process.env.VISUALIZE_PREFER_GEMINI !== "false"
+    ) {
+      console.log(`[visualize] ${shop} preferring gemini over openai (faster; gemini key present)`);
+      provider = "gemini";
     }
 
     const body = await request.json().catch(() => ({}));

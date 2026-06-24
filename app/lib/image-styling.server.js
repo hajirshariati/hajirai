@@ -22,7 +22,7 @@ const OPENAI_IMAGE_MODEL = process.env.OPENAI_IMAGE_MODEL || "gpt-image-1";
 // forever (the app proxy kills the upstream connection long before
 // these, but without our own bound the fetch keeps running and burns
 // resources after the client is already gone). Env-overridable.
-const PROVIDER_TIMEOUT_MS = Number(process.env.VISUALIZE_PROVIDER_TIMEOUT_MS) || 45000;
+const PROVIDER_TIMEOUT_MS = Number(process.env.VISUALIZE_PROVIDER_TIMEOUT_MS) || 55000;
 const IMAGE_FETCH_TIMEOUT_MS = Number(process.env.VISUALIZE_IMAGE_FETCH_TIMEOUT_MS) || 15000;
 
 // AbortSignal.timeout (Node 17.3+) — a self-arming abort that fires after
@@ -113,10 +113,16 @@ async function generateWithGemini({ apiKey, prompt, image }) {
 
 async function generateWithOpenAI({ apiKey, prompt, image }) {
   // gpt-image-1 edits: multipart form with the reference image + prompt.
+  // gpt-image-1 default quality is "auto" → "high", which routinely runs
+  // 40-60s and blows past the app-proxy/request window (prod trace
+  // 2026-06-24: 45s timeout). "low" cuts that to ~10-20s with quality
+  // that's fine for a styling preview; env-overridable if a merchant
+  // wants to trade speed for fidelity.
   const form = new FormData();
   form.append("model", OPENAI_IMAGE_MODEL);
   form.append("prompt", prompt);
   form.append("size", "1024x1024");
+  form.append("quality", process.env.OPENAI_IMAGE_QUALITY || "low");
   form.append(
     "image",
     new Blob([image.bytes], { type: image.mimeType || "image/png" }),
