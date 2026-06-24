@@ -191,8 +191,17 @@ export function recommenderToToolDef(tree) {
     gender:
       "Allowed values: 'Men', 'Women', 'Kids'. NEVER pass 'Unisex' — that's a product-side compatibility tag, not a customer-facing gender.",
   };
+  // The tree's own attributePrompts carry the LIVE vocabulary for the
+  // vocabulary-bearing fields (useCase/condition); prefer them so the tool
+  // description never drifts from the tree's actual values.
+  const attributePrompts =
+    tree.definition.attributePrompts && typeof tree.definition.attributePrompts === "object"
+      ? tree.definition.attributePrompts
+      : {};
   for (const a of attrs) {
-    const hint = ATTR_HINTS[a.name];
+    const treePrompt =
+      a.name === "useCase" || a.name === "condition" ? attributePrompts[a.name] : null;
+    const hint = treePrompt || ATTR_HINTS[a.name];
     const prop = {
       type: "string",
       description: hint || `${a.name} attribute used to refine the recommendation`,
@@ -809,6 +818,7 @@ export async function executeRecommenderTool({ toolName, input, shop, trees, con
       ? { masterSku: result.runnerUp.masterSku, title: result.runnerUp.title }
       : null,
     attributesUsed: result.attrs,
+    relaxedUseCase: result.relaxedUseCase || null,
     note: "Show this product as the recommended pick. The card data is in `product`.",
   };
 }

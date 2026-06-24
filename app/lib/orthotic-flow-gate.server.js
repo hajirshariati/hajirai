@@ -2190,6 +2190,14 @@ function describeAnswers(answers) {
 
 function buildResolveIntro(result, attrs) {
   const title = String(result?.title || "this orthotic").trim();
+  // Nearest-match: the resolver couldn't satisfy the exact shoe-context and
+  // relaxed it to keep the clinical fit. Say so honestly instead of implying
+  // it's an exact match.
+  if (result?.relaxedUseCase) {
+    const want = humanizeUseCase(result.relaxedUseCase);
+    const forWhat = want ? ` made specifically for ${want}` : " for that exact shoe type";
+    return `We don't have an orthotic${forWhat}, but for your arch and support needs **${title}** is the closest match.`;
+  }
   return `Based on what you've shared, **${title}** is the best match.`;
 }
 

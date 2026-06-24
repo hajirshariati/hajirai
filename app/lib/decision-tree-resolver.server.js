@@ -195,6 +195,32 @@ export function resolveTree(answers, resolver) {
   // ahead of metSupport.
 
   if (candidates.length === 0) {
+    // Nearest-match relaxation BEFORE the neutral global fallback. The
+    // requested shoe-context (useCase) has no SKU for this gender — but the
+    // global default is unposted / medium-arch, which is clinically WRONG
+    // when the customer needs posting. Relax the useCase only, keep the
+    // clinical attributes (arch / posted / metSupport), and surface the
+    // closest REAL match so the customer still gets an arch- and
+    // posting-correct orthotic. The caller frames it honestly via
+    // `relaxedUseCase`. Skipped for Kids (handled by the kids logic below).
+    if (attrs.useCase && !isKidsGender(attrs.gender)) {
+      const relaxedPool = resolver.masterIndex.filter((m) => genderMatch(m, attrs.gender));
+      if (relaxedPool.length > 0) {
+        const relaxedScored = relaxedPool
+          .map((c) => ({ c, s: score(c, attrs) }))
+          .sort((a, b) => (b.s !== a.s ? b.s - a.s : String(a.c.masterSku).localeCompare(String(b.c.masterSku))));
+        const relaxedWinner = relaxedScored[0]?.c || null;
+        if (relaxedWinner) {
+          return {
+            resolved: relaxedWinner,
+            reason: `relaxed useCase '${attrs.useCase}' — no SKU for that shoe context; nearest clinical match`,
+            attrs,
+            relaxedUseCase: attrs.useCase,
+            runnerUp: relaxedScored[1]?.c || null,
+          };
+        }
+      }
+    }
     // Refuse the global fallback for Kids unless the fallback itself
     // is Kids-tagged. The merchant's universal default is typically a
     // Unisex SKU — fine for adults, wrong for children.
