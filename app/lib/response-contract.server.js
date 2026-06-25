@@ -1621,6 +1621,28 @@ export function verifyClaimsAgainstCards({ text, cards } = {}) {
 
   const next = out.join(" ").replace(/\s{2,}/g, " ").trim();
 
+  // Catastrophic-strip guard. If verification would gut a SUBSTANTIAL answer
+  // down to a fragment (or nothing), DON'T — keep the original. A zeroed or
+  // fragmented reply ships the customer cards with no real answer (or a
+  // generic "Take a look" non-answer), which is strictly worse than letting
+  // the text through. On the LLM-owns path the grounding validator
+  // (reject-and-retry) is the AUTHORITATIVE feature-claim check and has
+  // already vetted this text; this verifier is a secondary net and must not
+  // silently destroy a real answer over a merchant-specific fact-field miss
+  // (prod: "which boots have memory foam?" → catalog stores footbed="ll"
+  // warehouse code → verifier zeroed 172 chars → customer saw cards, no
+  // answer). Partial strips that leave a usable reply are still applied.
+  const SUBSTANTIAL_INPUT = 120;
+  const FRAGMENT_OUTPUT = 60;
+  if (input.trim().length >= SUBSTANTIAL_INPUT && next.length < FRAGMENT_OUTPUT) {
+    console.warn(
+      `[response-contract] verifier catastrophic-strip averted: ` +
+        `${input.trim().length}→${next.length} chars would gut the reply; keeping original ` +
+        `(reasons=${logs.join("+")})`,
+    );
+    return { text: input.trim(), changed: false, logs };
+  }
+
   // Observability — over-strip warning. When the verifier removes
   // ≥50% of the AI's text length, the listing-template fallback
   // (`ensureCompleteCustomerText`) typically swaps in a generic
