@@ -1631,7 +1631,7 @@ function hasCompetitorBrandMention(text) {
 // containsAvailabilityDenial lives in app/lib/chat-helpers.server.js so
 // the test suite can import it without dragging the route loader graph.
 
-async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, controller, encoder, promptCaching, tools, promptStableLength = 0, forceNoTools = false }) {
+async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, controller, encoder, promptCaching, tools, promptStableLength = 0, forceNoTools = false, deferTextEmit = false }) {
   const totalUsage = { input_tokens: 0, output_tokens: 0, cache_creation_input_tokens: 0, cache_read_input_tokens: 0 };
   let toolCallCount = 0;
   // Track whether ANY recommend_* tool fired this turn. Used to
@@ -2359,10 +2359,17 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     })));
   }
 
-  controller.enqueue(encoder.encode(sseChunk({
-    type: "text",
-    text: fullResponseText
-  })));
+  // deferTextEmit (LLM-owns path): the grounding-retry runner may override
+  // this attempt's text — shorten a recovered answer or swap in a safe
+  // deterministic fallback when validation fails. The widget APPENDS text
+  // chunks, so the failed text must NOT enter the stream; the caller emits
+  // the authoritative final text from the returned result instead.
+  if (!deferTextEmit) {
+    controller.enqueue(encoder.encode(sseChunk({
+      type: "text",
+      text: fullResponseText
+    })));
+  }
 
   // STALE-CARDS GUARD: emit an empty products event up front so the
   // widget clears any cards left over from prior turns. The card-render
@@ -4206,6 +4213,7 @@ async function handleChatPost({ shop, sessionAccessToken, request, internal = fa
                 controller: { enqueue: (c) => attemptBuf.push(c) },
                 encoder,
                 forceNoTools: rewriteOnly,
+                deferTextEmit: true,
                 // Force prompt caching ON for the LLM-owns path. The
                 // system prompt is ~80KB and goes to Sonnet on EVERY
                 // hop; without caching, Anthropic re-reads it from
@@ -4254,9 +4262,16 @@ async function handleChatPost({ shop, sessionAccessToken, request, internal = fa
                 );
               },
             });
-            // Flush ONLY the final (accepted or last-attempt) buffer,
-            // then close the stream — runAgenticLoop does NOT emit
-            // `done` itself (the legacy path emits it after follow-ups).
+            // Emit the AUTHORITATIVE final text first (text emit was
+            // deferred in runAgenticLoop). runWithGroundingRetry sets
+            // fullResponseText to the accepted answer, a shortened recovered
+            // answer, or a safe deterministic fallback — never the failed
+            // draft or a "tell me more" fragment. Then flush the final
+            // buffer (cards/CTAs only — no text chunk).
+            controller.enqueue(encoder.encode(sseChunk({
+              type: "text",
+              text: cleanResult.fullResponseText || "",
+            })));
             for (const c of attemptBuf) controller.enqueue(c);
             // Honor the admin "Follow-up questions" toggle on this path
             // too — previously only the legacy path generated them, so

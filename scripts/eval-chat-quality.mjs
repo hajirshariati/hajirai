@@ -18,6 +18,7 @@ import {
   injectLockedGender,
   injectLockedCategory,
   injectOccasionCategory,
+  injectDefaultGenderOnClearNeed,
   rewriteToolCall,
   isPrecededByNegation,
 } from "../app/lib/chat-tool-rewrite.server.js";
@@ -1562,6 +1563,50 @@ cases.push({
       },
     );
     assert.equal(out.input.filters.category, "Sneakers");
+  },
+});
+
+cases.push({
+  name: "gender-default: 'plantar fasciitis sandals for vacation' → women (don't ask gender first)",
+  run: () => {
+    const out = injectDefaultGenderOnClearNeed(
+      search({ query: "plantar fasciitis sandals", filters: { category: "Sandals" } }),
+      { latestUserMessage: "plantar fasciitis sandals for my vacation" },
+    );
+    assert.equal(out.input.filters.gender, "women");
+  },
+});
+
+cases.push({
+  name: "gender-default: a bare 'show me shoes' browse does NOT get a default gender",
+  run: () => {
+    const out = injectDefaultGenderOnClearNeed(
+      search({ query: "shoes" }),
+      { latestUserMessage: "show me some shoes" },
+    );
+    assert.equal(out.input?.filters?.gender, undefined);
+  },
+});
+
+cases.push({
+  name: "gender-default: a male signal ('for my husband') is respected, no women default",
+  run: () => {
+    const out = injectDefaultGenderOnClearNeed(
+      search({ query: "walking shoes" }),
+      { latestUserMessage: "walking shoes for my husband with plantar fasciitis" },
+    );
+    assert.equal(out.input?.filters?.gender, undefined);
+  },
+});
+
+cases.push({
+  name: "gender-default: an explicit gender from the model is left untouched",
+  run: () => {
+    const out = injectDefaultGenderOnClearNeed(
+      search({ query: "plantar fasciitis", filters: { gender: "men" } }),
+      { latestUserMessage: "plantar fasciitis walking shoes" },
+    );
+    assert.equal(out.input.filters.gender, "men");
   },
 });
 

@@ -829,6 +829,30 @@ export function redirectOrthoticSearchToRecommender(toolCall, ctx) {
   return { name: `recommend_${orthoticTree.intent}`, input: {}, id: toolCall.id };
 }
 
+// Fix #4: when the model searches on a CLEAR need (condition, use-case/
+// occasion, or named-product value/fit question) without a gender — and the
+// customer hasn't signaled they're shopping for a man — default to the
+// store's primary women's line instead of forcing a "men's or women's?"
+// gate. The customer can switch with one chip. This only adjusts a search
+// the model already decided to run; it never creates a gender on a bare
+// "show me shoes" browse.
+const CLEAR_NEED_FOR_GENDER_RE =
+  /\b(plantar|fasciitis|bunion|neuroma|metatarsal|overpronat|heel\s+pain|arch\s+(?:pain|support)|flat\s+feet|vacation|trip\b|travel|walking|standing|wedding|hiking|all[-\s]?day|worth\b|hold\s+up|good\s+for)\b/i;
+const MALE_SIGNAL_RE =
+  /\b(men'?s?|male|man\b|guy|guys|husband|boyfriend|\bdad\b|father|\bson\b|his\b|\bhe\b|\bhim\b)\b/i;
+export function injectDefaultGenderOnClearNeed(toolCall, ctx) {
+  if (toolCall.name !== "search_products") return toolCall;
+  const filters = toolCall.input?.filters || {};
+  if (String(filters.gender || "").trim()) return toolCall; // model already chose
+  if (ctx.sessionGender) return toolCall;                    // session lock wins
+  const latest = String(ctx.latestUserMessage || "");
+  if (!latest) return toolCall;
+  if (MALE_SIGNAL_RE.test(latest)) return toolCall;          // shopping for a man
+  if (!CLEAR_NEED_FOR_GENDER_RE.test(latest)) return toolCall;
+  console.log(`[chat] gender-default: clear need, no gender stated → women (primary line)`);
+  return { ...toolCall, input: { ...toolCall.input, filters: { ...filters, gender: "women" } } };
+}
+
 export function rewriteToolCall(toolCall, ctx) {
   let rewritten = toolCall;
   rewritten = forceComparisonLookup(rewritten, ctx);
@@ -836,6 +860,7 @@ export function rewriteToolCall(toolCall, ctx) {
   rewritten = stripStaleCategoriesOnScopeReset(rewritten, ctx);
   rewritten = injectStructuredColorFilter(rewritten, ctx);
   rewritten = injectLockedGender(rewritten, ctx);
+  rewritten = injectDefaultGenderOnClearNeed(rewritten, ctx);
   rewritten = injectLockedCategory(rewritten, ctx);
   rewritten = injectOccasionCategory(rewritten, ctx);
   // Run named-product relaxation LAST: it drops the category filter
