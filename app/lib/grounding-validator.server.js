@@ -528,6 +528,21 @@ const PRODUCT_DATA_INTENT_RE = new RegExp(
 const GENERIC_FALLBACK_RE =
   /^(?:take\s+a\s+look\b|here\s+are\s+the\s+(?:matching|closest)|these\s+are\s+the\s+closest|i'?m\s+not\s+finding\s+a\s+clean\s+match|tell\s+me\s+a\s+bit\s+more\b)/i;
 
+// BLOCKING vs WARNING. Only true safety/factual problems force a retry and
+// block shipping. Answer-quality rules (length, answer-first, fragment,
+// sizing, generic-fallback, missing-lookup) are observability WARNINGS for
+// now — they're logged as quality_warning but never retry or gut the reply.
+// (Stabilization: the hard-blocking quality rules were causing retry-loops
+// and "couldn't verify / tell me more" non-answers in production.)
+const BLOCKING_KINDS = new Set([
+  "ungrounded_product_name",
+  "wrong_price",
+  "unsupported_feature_claim",
+  "false_catalog_denial",
+  "false_color_denial",
+  "raw_handle_leak",
+]);
+
 function retailWordCount(text) {
   return String(text || "").trim().split(/\s+/).filter(Boolean).length;
 }
@@ -541,7 +556,7 @@ function firstSentenceOf(text) {
 
 export function validateGrounding({ text, pool = [], categoryGenderMap = null, userMessage = "", namedProductMentioned = false, searchAttempted = false } = {}) {
   const errors = [];
-  if (!text || typeof text !== "string") return { ok: true, errors };
+  if (!text || typeof text !== "string") return { ok: true, errors, warnings: [] };
 
   const poolByFamily = new Map();
   for (const card of pool || []) {
@@ -809,7 +824,11 @@ export function validateGrounding({ text, pool = [], categoryGenderMap = null, u
     }
   }
 
-  return { ok: errors.length === 0, errors };
+  // Partition: only blocking (safety/factual) errors fail validation and
+  // force a retry. Everything else is an observability warning.
+  const blocking = errors.filter((e) => BLOCKING_KINDS.has(e.kind));
+  const warnings = errors.filter((e) => !BLOCKING_KINDS.has(e.kind));
+  return { ok: blocking.length === 0, errors: blocking, warnings };
 }
 
 // Build the retry instruction text the agent loop hands back to the

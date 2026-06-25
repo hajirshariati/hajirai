@@ -491,10 +491,10 @@ const Q_WALKING =
 const Q_VALUE =
   "everyone keeps recommending the Aetrex Jillian sandal for plantar fasciitis, I can find it for around a hundred dollars — is it actually worth that compared to supportive sandals I've already tried at half the price that haven't made a difference";
 
-test("rule7: decision question opened with generic browse copy is rejected", () => {
+test("rule7: decision question opened with generic browse copy is flagged (warning, not blocking)", () => {
   const out = validateGrounding({ text: "Here are some sandals that might work for you.", pool: JILLIAN_POOL, userMessage: Q_WALKING });
-  assert.equal(out.ok, false);
-  assert.ok(out.errors.some((e) => e.kind === "answer_first"));
+  assert.equal(out.ok, true, "quality issues are observability warnings, not blockers");
+  assert.ok(out.warnings.some((e) => e.kind === "answer_first"));
 });
 
 test("rule7: a concise answer-first reply passes (walking suitability)", () => {
@@ -509,13 +509,13 @@ test("rule7: a concise answer-first reply passes (walking suitability)", () => {
 test("rule8: an essay-length product answer is rejected as too_long", () => {
   const essay = "The Jillian is a comfortable and supportive sandal. ".repeat(40);
   const out = validateGrounding({ text: essay, pool: JILLIAN_POOL, userMessage: Q_VALUE });
-  assert.ok(out.errors.some((e) => e.kind === "too_long"));
+  assert.ok(out.warnings.some((e) => e.kind === "too_long"));
 });
 
 test("rule8: length cap is exempt when the customer asked to compare in detail", () => {
   const essay = "The Jillian is a comfortable and supportive sandal. ".repeat(40);
   const out = validateGrounding({ text: essay, pool: JILLIAN_POOL, userMessage: "compare the Jillian vs the Savannah in detail" });
-  assert.equal(out.errors.some((e) => e.kind === "too_long"), false);
+  assert.equal(out.warnings.some((e) => e.kind === "too_long"), false);
 });
 
 test("rule8: a concise value answer passes (plantar-fasciitis worth-it)", () => {
@@ -543,7 +543,7 @@ test("rule9: named product + condition question with no search forces a lookup",
     namedProductMentioned: true,
     searchAttempted: false,
   });
-  assert.ok(out.errors.some((e) => e.kind === "missing_product_lookup"));
+  assert.ok(out.warnings.some((e) => e.kind === "missing_product_lookup"));
 });
 
 test("rule9: educational question (no named product) does NOT force a lookup", () => {
@@ -554,7 +554,7 @@ test("rule9: educational question (no named product) does NOT force a lookup", (
     namedProductMentioned: false,
     searchAttempted: false,
   });
-  assert.equal(out.errors.some((e) => e.kind === "missing_product_lookup"), false);
+  assert.equal(out.warnings.some((e) => e.kind === "missing_product_lookup"), false);
 });
 
 test("rule9: a named product already searched (but not found) does NOT loop", () => {
@@ -565,7 +565,7 @@ test("rule9: a named product already searched (but not found) does NOT loop", ()
     namedProductMentioned: true,
     searchAttempted: true,
   });
-  assert.equal(out.errors.some((e) => e.kind === "missing_product_lookup"), false);
+  assert.equal(out.warnings.some((e) => e.kind === "missing_product_lookup"), false);
 });
 
 // ─── Rule 10: generic fallback is a non-answer on specific questions ──
@@ -579,7 +579,7 @@ test("rule10: 'Take a look' fallback fails on a value/suitability question", () 
     namedProductMentioned: true,
     searchAttempted: true,
   });
-  assert.ok(out.errors.some((e) => e.kind === "generic_fallback_non_answer"));
+  assert.ok(out.warnings.some((e) => e.kind === "generic_fallback_non_answer"));
 });
 
 test("rule10: the same fallback is allowed for a plain browse request", () => {
@@ -625,7 +625,7 @@ test("rule9: 'Are the Jillian sandals good for plantar fasciitis?' forces a look
     namedProductMentioned: true,
     searchAttempted: false,
   });
-  assert.ok(out.errors.some((e) => e.kind === "missing_product_lookup"));
+  assert.ok(out.warnings.some((e) => e.kind === "missing_product_lookup"));
 });
 
 // ─── Rule 11: fragment / non-answer ────────────────────────────
@@ -634,20 +634,20 @@ test("rule11: interjection-only fragments are rejected ('Great question —')", 
   const pool = [{ title: "Jillian Braided Quarter Strap Sandal - Black", handle: "jillian-black-sc450w" }];
   for (const frag of ["Great question —", "Absolutely —", "I'd say —"]) {
     const out = validateGrounding({ text: frag, pool, userMessage: "is the Jillian good for walking?" });
-    assert.ok(out.errors.some((e) => e.kind === "fragment_non_answer"), `should flag: ${frag}`);
+    assert.ok(out.warnings.some((e) => e.kind === "fragment_non_answer"), `should flag: ${frag}`);
   }
 });
 
 test("rule11: cards alone do NOT make a fragment valid", () => {
   const pool = [{ title: "Jillian Braided Quarter Strap Sandal - Black", handle: "jillian-black-sc450w" }];
   const out = validateGrounding({ text: "Here you go!", pool, userMessage: "show me sandals" });
-  assert.ok(out.errors.some((e) => e.kind === "fragment_non_answer"));
+  assert.ok(out.warnings.some((e) => e.kind === "fragment_non_answer"));
 });
 
 test("rule11: a normal short browse sentence with cards passes", () => {
   const pool = [{ title: "Jillian Braided Quarter Strap Sandal - Black", handle: "jillian-black-sc450w" }];
   const out = validateGrounding({ text: "Here are some supportive sandals great for all-day wear.", pool, userMessage: "show me sandals" });
-  assert.equal(out.errors.some((e) => e.kind === "fragment_non_answer"), false);
+  assert.equal(out.warnings.some((e) => e.kind === "fragment_non_answer"), false);
 });
 
 // ─── Rule 12: sizing/availability answered in text ─────────────
@@ -661,7 +661,7 @@ test("rule12: a card-only reply to a sizing question is rejected", () => {
     namedProductMentioned: true,
     searchAttempted: true,
   });
-  assert.ok(out.errors.some((e) => e.kind === "sizing_not_addressed"));
+  assert.ok(out.warnings.some((e) => e.kind === "sizing_not_addressed"));
 });
 
 test("rule12: real sizing guidance in text passes", () => {
@@ -673,7 +673,7 @@ test("rule12: real sizing guidance in text passes", () => {
     namedProductMentioned: true,
     searchAttempted: true,
   });
-  assert.equal(out.errors.some((e) => e.kind === "sizing_not_addressed"), false);
+  assert.equal(out.warnings.some((e) => e.kind === "sizing_not_addressed"), false);
 });
 
 test("rule12: a color-availability question is NOT treated as sizing", () => {
@@ -685,7 +685,7 @@ test("rule12: a color-availability question is NOT treated as sizing", () => {
     namedProductMentioned: true,
     searchAttempted: true,
   });
-  assert.equal(out.errors.some((e) => e.kind === "sizing_not_addressed"), false);
+  assert.equal(out.warnings.some((e) => e.kind === "sizing_not_addressed"), false);
 });
 
 // ─── Rule 8 (Fix #5): character cap + comparison stays concise ──
@@ -694,7 +694,7 @@ test("rule8: an answer over ~500 chars is rejected even if under 160 words", () 
   const pool = [{ title: "Jillian Braided Quarter Strap Sandal - Black", handle: "jillian-black-sc450w" }];
   const long = "The Jillian is a comfortable supportive sandal with a contoured footbed and adjustable straps. ".repeat(7);
   const out = validateGrounding({ text: long, pool, userMessage: "is the Jillian good for walking?" });
-  assert.ok(out.errors.some((e) => e.kind === "too_long"));
+  assert.ok(out.warnings.some((e) => e.kind === "too_long"));
 });
 
 test("Fix #3: a concise Jillian-vs-Savannah comparison passes in one shot", () => {
@@ -722,7 +722,7 @@ test("Fix #3: a 1000-char comparison wall is rejected as too_long", () => {
     namedProductMentioned: true,
     searchAttempted: true,
   });
-  assert.ok(out.errors.some((e) => e.kind === "too_long"));
+  assert.ok(out.warnings.some((e) => e.kind === "too_long"));
 });
 
 console.log("\nAll grounding-validator tests done.");

@@ -316,16 +316,16 @@ test("shadowDiffRecord flags new-only-empty (regression risk)", () => {
   assert.equal(diff.delta.oldOnlyEmpty, false);
 });
 
-// ─── Retry behavior: soft-accept, safe fallback, recovery ──────
+// ─── Retry behavior: quality = warning (ship), block only on factual ──
 
 const SANDAL_POOL = [{ handle: "jillian-black", title: "Jillian Braided Quarter Strap Sandal - Black", price_formatted: "$139.95" }];
 const withCards = (text) => ({ fullResponseText: text, finalProductCards: SANDAL_POOL, messages: [] });
 
-test("Fix #2: a too-long decision answer soft-accepts after one retry (shortened, ok=true)", async () => {
+test("quality issue (too long) ships immediately as a warning — no retry, no block", async () => {
   let calls = 0;
   const longAnswer =
     "Yes — the Jillian has solid arch support and a contoured footbed, a genuinely good pick for plantar fasciitis on lighter days. " +
-    "It's a comfort sandal though, not a performance walking shoe, so for nonstop theme-park miles a sturdier option gives more all-day stability. ".repeat(4);
+    "It is a comfort sandal though, not a performance walking shoe, so for nonstop theme-park miles a sturdier option gives more all-day stability. ".repeat(4);
   const runLoop = async () => { calls += 1; return withCards(longAnswer); };
   const out = await runWithGroundingRetry({
     runLoop,
@@ -333,52 +333,70 @@ test("Fix #2: a too-long decision answer soft-accepts after one retry (shortened
     userMessage: "is the Jillian good for plantar fasciitis?",
     namedProductMentioned: true,
   });
-  assert.equal(out.validation.ok, true, "soft style should accept, not fail");
-  assert.equal(out.validation.attempts, 2, "exactly one retry, then accept");
-  assert.ok(out.validation.softWarnings?.includes("too_long"));
-  assert.ok(out.fullResponseText.length <= 520, `should be shortened, got ${out.fullResponseText.length}`);
+  assert.equal(out.validation.ok, true, "quality issues do not block");
+  assert.equal(calls, 1, "no retry on a quality-only issue");
+  assert.equal(out.fullResponseText, longAnswer, "ships the model's real answer, unmutated");
 });
 
-test("Fix #1: exhaustion ships an intent-aware safe fallback, never a fragment or 'tell me more'", async () => {
-  const runLoop = async () => withCards("Great question —");
+test("a 'fragment' is a warning now (ships) — quality no longer forces a non-answer", async () => {
+  let calls = 0;
+  const runLoop = async () => { calls += 1; return withCards("Great question —"); };
   const out = await runWithGroundingRetry({
     runLoop,
     initialMessages: [{ role: "user", content: "x" }],
     userMessage: "is the Aetrex Jillian worth $100 for plantar fasciitis?",
     namedProductMentioned: true,
-    maxRetries: 2,
   });
-  assert.equal(out.validation.ok, false);
-  assert.equal(out.validation.deterministicFallback, true);
-  assert.notEqual(out.fullResponseText.trim(), "Great question —", "must NOT ship the fragment");
-  assert.equal(/tell me a bit more/i.test(out.fullResponseText), false, "must NOT be the generic 'tell me more'");
-  assert.match(out.fullResponseText, /closest matches/i, "named-product + cards fallback offers the matches");
+  assert.equal(out.validation.ok, true, "fragment is a warning, not a blocker");
+  assert.equal(calls, 1);
 });
 
-test("Fix #1: sizing exhaustion gives safe sizing guidance, not 'tell me more'", async () => {
-  const runLoop = async () => withCards("Here's the Jillian!");
+test("no deterministic 'couldn't verify / tell me more' fallback is ever produced", async () => {
+  // A normal advisory answer with cards ships as-is — never replaced by a
+  // generic ask, even though it carries quality warnings.
+  const runLoop = async () => withCards("The Jillian is a comfy everyday sandal; for long walking days a sturdier style is better.");
   const out = await runWithGroundingRetry({
     runLoop,
     initialMessages: [{ role: "user", content: "x" }],
-    userMessage: "what size should I get in the Jillian? my feet swell",
+    userMessage: "is the Jillian worth it for plantar fasciitis?",
     namedProductMentioned: true,
-    maxRetries: 2,
   });
-  assert.equal(out.validation.ok, false);
-  assert.match(out.fullResponseText, /usual size/i, "sizing fallback gives safe guidance");
-  assert.equal(/tell me a bit more/i.test(out.fullResponseText), false);
+  assert.equal(/tell me a bit more|couldn't pull up verified|couldn.t verify/i.test(out.fullResponseText), false);
+  assert.equal(out.validation.deterministicFallback, undefined, "no safe-fallback path");
+  assert.match(out.fullResponseText, /Jillian/);
 });
 
-test("Fix #3: a substantial answer is recovered (shortened) over later fragments, not replaced", async () => {
+test("a TRUE factual error (wrong price) still blocks and retries", async () => {
   let calls = 0;
-  const substantial =
-    "Yes — the Jillian is a genuinely supportive sandal with built-in arch support and a contoured cork footbed, so it's a solid plantar-fasciitis pick for everyday wear and lighter walking. " +
-    "For nonstop all-day mileage a sportier walking style gives more stability, but for daily comfort the Jillian holds up well. " +
-    "The footbed cradles the arch and the straps adjust for swelling, which is why it stays comfortable across a long day on your feet, even in warm weather. Want me to show a sturdier alternative for the heaviest walking days too?";
   const runLoop = async () => {
     calls += 1;
-    // Attempt 1: substantial but too long (saved). Attempt 2+: collapse to a
-    // fragment (a non-style error, so no soft-accept) → exhaustion recovers #1.
+    // Always quotes a wrong price → blocking. Never satisfied → exhausts.
+    return withCards("The **Jillian Braided Quarter Strap Sandal** is $59.95.");
+  };
+  const out = await runWithGroundingRetry({
+    runLoop,
+    initialMessages: [{ role: "user", content: "x" }],
+    userMessage: "how much is the Jillian?",
+    maxRetries: 2,
+  });
+  assert.equal(calls, 3, "blocking factual error retries to the cap");
+  assert.equal(out.validation.ok, false);
+  // Ships the model's last attempt, NOT a generic 'tell me more' fallback.
+  assert.equal(out.validation.deterministicFallback, undefined);
+  assert.equal(/tell me a bit more|couldn.t verify/i.test(out.fullResponseText), false);
+});
+
+test("recovery: a substantial answer flagged only by the feature-claim check is recovered over a later fragment", async () => {
+  let calls = 0;
+  const substantial =
+    "The **Jillian Braided Quarter Strap Sandal** has memory foam cushioning that cradles the arch all day, " +
+    "with adjustable straps that adapt to swelling and a contoured footbed built for long days on your feet, " +
+    "so it stays comfortable from morning to night and is a dependable everyday pick for plantar-fasciitis relief.";
+  const runLoop = async () => {
+    calls += 1;
+    // Attempt 1: substantial but trips unsupported_feature_claim (memory foam
+    // not in the card) → blocking, saved. Attempt 2: a tiny fragment that now
+    // passes (fragment is a warning) → recovery ships the substantial answer.
     return calls === 1 ? withCards(substantial) : withCards("Absolutely —");
   };
   const out = await runWithGroundingRetry({
@@ -386,12 +404,9 @@ test("Fix #3: a substantial answer is recovered (shortened) over later fragments
     initialMessages: [{ role: "user", content: "x" }],
     userMessage: "is the Jillian good for plantar fasciitis?",
     namedProductMentioned: true,
-    maxRetries: 2,
   });
   assert.equal(out.validation.recoveredSubstantial, true);
-  assert.match(out.fullResponseText, /arch support/i, "recovered the real answer's content");
-  assert.doesNotMatch(out.fullResponseText, /^Absolutely/, "did not ship the later fragment");
-  assert.ok(out.fullResponseText.length <= 520, `recovered answer is shortened, got ${out.fullResponseText.length}`);
+  assert.match(out.fullResponseText, /memory foam/i, "recovered the substantial answer");
 });
 
 console.log("\nAll llm-owns-turn orchestrator tests done.");

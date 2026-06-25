@@ -192,61 +192,6 @@ export function gatherPoolFromResult(result, fallbackMessages = []) {
 //     validation: { ok, errors, attempts },
 //   }
 
-// Truth/safety errors that must NEVER ship — they keep blocking through
-// every attempt and, if still failing at exhaustion, force a deterministic
-// safe fallback instead of the bad draft.
-const HARD_BLOCKER_KINDS = new Set([
-  "ungrounded_product_name",
-  "wrong_price",
-  "unsupported_feature_claim",
-  "false_catalog_denial",
-  "false_color_denial",
-  "raw_handle_leak",
-  "missing_product_lookup",
-]);
-// Style failures that are downgraded to warnings AFTER the first retry —
-// shipping a real-but-slightly-imperfect answer beats looping or gutting.
-const SOFT_STYLE_KINDS = new Set(["too_long", "answer_first"]);
-
-const SHORTEN_CHARS = Number(process.env.VALIDATOR_MAX_CHARS) || 500;
-
-// Keep whole sentences up to a character budget (answer-first content lives
-// at the front, so this preserves the actual answer). Never leaves a
-// dangling half-sentence.
-function shortenToBudget(text, maxChars = SHORTEN_CHARS) {
-  const t = String(text || "").trim();
-  if (t.length <= maxChars) return t;
-  const sentences = t.split(/(?<=[.!?])\s+/);
-  let out = "";
-  for (const s of sentences) {
-    if (out && (out + " " + s).length > maxChars) break;
-    out = out ? out + " " : s;
-    if (out.length >= maxChars) break;
-  }
-  if (!out) out = t.slice(0, maxChars).replace(/\s+\S*$/, "").trim();
-  return out;
-}
-
-// Intent-aware safe fallback for when validation can't be satisfied. NEVER
-// returns generic "tell me more" or a fragment — it answers honestly within
-// the intent, and only promises "closest matches" when cards actually exist.
-function buildSafeFallback(userMessage, hasCards) {
-  const m = String(userMessage || "").toLowerCase();
-  const isSizing = /\bwhat\s+size|which\s+size|size\s+(?:should|do|would|to)|true\s+to\s+size|size\s+up|size\s+down|size\s*\d|runs?\s+(?:small|large|big|narrow|wide|tight)/i.test(m);
-  const isComparison = /\b(?:vs\.?|versus|compare|which\s+is\s+better|better\s+for|which\s+(?:one\s+)?should)\b/i.test(m);
-
-  if (isSizing) {
-    return "I can't verify exact size guidance from the product data right now, but a safe bet is to start with your usual size — if your feet swell or you're between sizes, look for an adjustable strap and lean on our easy returns so you can swap if the fit isn't right.";
-  }
-  if (isComparison && hasCards) {
-    return "Both are solid picks and I want to double-check the finer specs before I call a winner — take a look at the options below. If all-day walking support matters most, tell me and I'll point you to the sturdier one; if it's more about style for lighter days, the other's a great choice.";
-  }
-  if (hasCards) {
-    return "I want to double-check that style's details before I give you a firm answer — here are the closest matches so you can compare in the meantime, and tell me what matters most and I'll narrow it down.";
-  }
-  return "I couldn't pull up verified details for that just now — want me to run the search again, or tell me a bit more (support, style, or budget) so I can find the right pair?";
-}
-
 export async function runWithGroundingRetry({
   runLoop,
   initialMessages,
@@ -284,15 +229,14 @@ export async function runWithGroundingRetry({
   const considerSubstantial = (result, text, validation) => {
     const len = (text || "").trim().length;
     if (len < SUBSTANTIAL_MIN) return;
-    // Preserve a substantial real answer whose only problems are the
-    // false-positive-prone feature claim OR pure style (too long / not
-    // answer-first). At exhaustion we shorten and ship it rather than
-    // collapsing to a "tell me more" non-answer.
-    const RECOVERABLE = new Set(["unsupported_feature_claim", "too_long", "answer_first"]);
+    // Preserve a substantial real answer whose only BLOCKING problem is the
+    // false-positive-prone feature claim — at exhaustion we ship it rather
+    // than collapse to a non-answer. (Quality issues no longer block, so
+    // they don't reach here.)
     const onlySoftErrors =
       validation.errors.length > 0 &&
       validation.errors.length <= 3 &&
-      validation.errors.every((e) => RECOVERABLE.has(e?.kind));
+      validation.errors.every((e) => e?.kind === "unsupported_feature_claim");
     if (!onlySoftErrors) return;
     if (!bestSubstantial || len > bestSubstantial.len) {
       bestSubstantial = { result, len };
@@ -343,6 +287,16 @@ export async function runWithGroundingRetry({
       onAttempt({ attempt, validation, textLen: text.length, poolSize: pool.length });
     }
 
+    // Observability: log answer-quality warnings (length, answer-first,
+    // fragment, sizing, generic-fallback, missing-lookup). These do NOT
+    // block or retry — they're for monitoring how often the model's first
+    // draft falls short so we can tune the prompt/routing instead.
+    if (Array.isArray(validation.warnings) && validation.warnings.length > 0) {
+      console.log(
+        `[quality_warning] attempt=${attempt + 1} kinds=${validation.warnings.map((w) => w.kind).join(",")}`,
+      );
+    }
+
     considerSubstantial(result, text, validation);
 
     if (validation.ok) {
@@ -368,27 +322,6 @@ export async function runWithGroundingRetry({
     }
 
     lastErrors = validation.errors;
-
-    // Fix #2: after the FIRST retry (attempt >= 1), demote pure style
-    // failures (too long / not answer-first) to warnings and SHIP the
-    // answer — a real reply that's a touch long beats looping to a third
-    // attempt or collapsing to a fragment. Truth/safety errors never reach
-    // here as "all soft", so they keep blocking.
-    if (attempt >= 1 && validation.errors.every((e) => SOFT_STYLE_KINDS.has(e.kind))) {
-      const tooLong = validation.errors.some((e) => e.kind === "too_long");
-      const shipped = tooLong ? shortenToBudget(text) : text;
-      console.log(
-        `[grounding-retry] soft-accept after retry (${validation.errors.map((e) => e.kind).join(",")})` +
-          (tooLong ? ` — shortened ${text.length}→${shipped.length} chars` : ""),
-      );
-      return {
-        ...result,
-        fullResponseText: shipped,
-        totalUsage: { ...accUsage },
-        validation: { ok: true, errors: [], attempts: attempt + 1, softWarnings: validation.errors.map((e) => e.kind) },
-      };
-    }
-
     // Don't retry if we've hit the cap.
     if (attempt >= maxRetries) break;
 
@@ -420,37 +353,27 @@ export async function runWithGroundingRetry({
     attempt += 1;
   }
 
-  // Retries exhausted. NEVER ship the failed draft (it may be a fragment, a
-  // raw handle, a wrong price, or a "tell me more" non-answer).
-  //
-  // Fix #3: if we captured a real substantial answer earlier (only soft /
-  // false-positive-prone errors), ship it — shortened to budget — instead
-  // of discarding it.
+  // Blocking (safety/factual) errors exhausted retries. If we captured a
+  // substantial answer earlier whose only issue was the false-positive-prone
+  // feature-claim check, ship that real answer rather than discarding it.
   if (bestSubstantial) {
-    const shortened = shortenToBudget(bestSubstantial.result?.fullResponseText || "");
     console.log(
-      `[grounding-retry] exhausted; shipping recovered substantial answer (${bestSubstantial.len}→${shortened.length} chars)`,
+      `[grounding-retry] exhausted; shipping recovered substantial answer (${bestSubstantial.len} chars)`,
     );
     return {
       ...bestSubstantial.result,
-      fullResponseText: shortened,
       totalUsage: { ...accUsage },
       validation: { ok: false, errors: lastErrors, attempts: attempt + 1, recoveredSubstantial: true },
     };
   }
 
-  // Fix #1: otherwise, ship an intent-aware safe fallback built on the last
-  // attempt's cards — never the failed text, never a generic fragment.
-  const lastPool = gatherPoolFromResult(last, messages);
-  const fallbackText = buildSafeFallback(userMessage, lastPool.length > 0);
-  console.log(
-    `[grounding-retry] exhausted; shipping deterministic safe fallback (intent-aware, cards=${lastPool.length})`,
-  );
+  // Otherwise ship the model's last attempt (its real answer with cards) —
+  // NOT a deterministic "couldn't verify / tell me more" ask. The handle and
+  // internal-language scrubs in emit-finalize remain as the final safety net.
   return {
-    ...(last || {}),
-    fullResponseText: fallbackText,
+    ...last,
     totalUsage: { ...accUsage },
-    validation: { ok: false, errors: lastErrors, attempts: attempt + 1, deterministicFallback: true },
+    validation: { ok: false, errors: lastErrors, attempts: attempt + 1 },
   };
 }
 
