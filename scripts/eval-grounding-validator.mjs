@@ -453,4 +453,34 @@ test("rule5: a positive color mention is NOT flagged", () => {
   assert.equal(out.ok, true);
 });
 
+// ─── Rule 6: raw handle / slug leak ────────────────────────────
+
+test("rule6: a bare product handle as the whole reply is rejected", () => {
+  // Live trace 2026-06-25: cleanup gutted a draft to the handle, twice.
+  const pool = [{ title: "Jillian Braided Quarter Strap Sandal - White", handle: "jillian-cork-sc364w" }];
+  const out = validateGrounding({ text: "Jillian-cork-sc364w jillian-cork-sc364w", pool });
+  assert.equal(out.ok, false, "raw handle must fail validation");
+  assert.ok(out.errors.some((e) => e.kind === "raw_handle_leak"), "must flag raw_handle_leak");
+});
+
+test("rule6: a handle-like SKU slug not in the pool is still rejected", () => {
+  const out = validateGrounding({ text: "Try the jillian-sport-black-ins-8000w model.", pool: [] });
+  assert.ok(out.errors.some((e) => e.kind === "raw_handle_leak"));
+});
+
+test("rule6: ordinary hyphenated words are NOT flagged", () => {
+  const pool = [{ title: "Darcy Slip-On Sneaker - Black", handle: "darcy-black" }];
+  const out = validateGrounding({ text: "These are great slip-on, anti-fatigue, lace-up options.", pool });
+  assert.equal(out.ok, true, "slip-on / anti-fatigue / lace-up must pass");
+});
+
+test("rule6: a clean reply using the real display name passes", () => {
+  const pool = [{ title: "Jillian Braided Quarter Strap Sandal - White", handle: "jillian-cork-sc364w" }];
+  const out = validateGrounding({
+    text: "The Jillian Braided Quarter Strap Sandal has solid arch support for all-day walking.",
+    pool,
+  });
+  assert.equal(out.ok, true);
+});
+
 console.log("\nAll grounding-validator tests done.");

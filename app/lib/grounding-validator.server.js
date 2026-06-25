@@ -397,6 +397,41 @@ function detectFalseColorDenials(text, pool, poolByFamily) {
   return out;
 }
 
+// Raw product handle / slug detector. Cleanup can strip a malformed draft
+// down to a bare handle ("jillian-cork-sc364w") — an internal hyphenated
+// slug the customer must never see (live trace 2026-06-25 shipped
+// "Jillian-cork-sc364w jillian-cork-sc364w" as the entire reply). We flag
+// a hyphenated token when it either (a) exactly matches a handle in this
+// turn's pool, or (b) has 3+ hyphen parts ending in a SKU-like segment
+// (letters+digits, e.g. "sc364w", "8000w"). Ordinary hyphenated words
+// ("slip-on", "anti-fatigue", "lace-up") have no SKU tail and aren't pool
+// handles, so they never trip.
+const HANDLE_SKU_TAIL_RE = /^[a-z]{0,4}\d{2,5}[a-z]{0,2}$/;
+function detectRawHandleLeaks(text, pool) {
+  const out = [];
+  const seen = new Set();
+  const handles = new Set();
+  for (const c of Array.isArray(pool) ? pool : []) {
+    const h = String(c?.handle || "").toLowerCase().trim();
+    if (h) handles.add(h);
+  }
+  const slugRe = /[A-Za-z0-9]+(?:-[A-Za-z0-9]+)+/g;
+  let m;
+  while ((m = slugRe.exec(text)) !== null) {
+    const slug = m[0];
+    const lc = slug.toLowerCase();
+    if (seen.has(lc)) continue;
+    const segs = lc.split("-");
+    const last = segs[segs.length - 1];
+    const looksLikeSku = segs.length >= 3 && HANDLE_SKU_TAIL_RE.test(last) && /\d/.test(last);
+    if (handles.has(lc) || looksLikeSku) {
+      seen.add(lc);
+      out.push(slug);
+    }
+  }
+  return out;
+}
+
 export function validateGrounding({ text, pool = [], categoryGenderMap = null } = {}) {
   const errors = [];
   if (!text || typeof text !== "string") return { ok: true, errors };
@@ -523,6 +558,24 @@ export function validateGrounding({ text, pool = [], categoryGenderMap = null } 
     });
   }
 
+  // 6. Raw handle/slug leak. A customer-facing reply must never contain an
+  // internal product handle/SKU slug ("jillian-cork-sc364w"). Cleanup can
+  // strip a malformed draft down to one and the truth-checks above would
+  // still pass it (a handle isn't a false claim). Reject so the model
+  // rewrites with the real display name.
+  const handleLeaks = detectRawHandleLeaks(text, pool);
+  for (const slug of handleLeaks) {
+    errors.push({
+      kind: "raw_handle_leak",
+      claim: slug,
+      message:
+        `You wrote "${slug}", which is a raw product handle/slug, not a ` +
+        `customer-facing name. Rewrite using the product's real display ` +
+        `title only (e.g. "Jillian Braided Quarter Strap Sandal") — never a ` +
+        `hyphenated handle or SKU code.`,
+    });
+  }
+
   return { ok: errors.length === 0, errors };
 }
 
@@ -564,4 +617,5 @@ export const __TEST__ = {
   detectFalseCatalogDenial,
   detectFalseColorDenials,
   cardOffersColor,
+  detectRawHandleLeaks,
 };

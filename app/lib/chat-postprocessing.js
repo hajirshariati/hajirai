@@ -488,6 +488,41 @@ export function scrubToolCallLeaks(text) {
 }
 
 // =====================================================================
+// Raw handle / slug emit guard
+// =====================================================================
+//
+// Final safety net: an internal product handle/slug ("jillian-cork-sc364w")
+// must never reach the customer, even if the grounding validator's retries
+// don't clean it. Mirrors the validator's detector — strip a hyphenated
+// token when it matches a pool handle, or has 3+ parts ending in a SKU-like
+// segment (letters+digits). Ordinary hyphenated words ("slip-on",
+// "anti-fatigue") have no SKU tail and aren't pool handles, so they survive.
+const RAW_HANDLE_SKU_TAIL_RE = /^[a-z]{0,4}\d{2,5}[a-z]{0,2}$/;
+export function stripRawHandles(text, pool = []) {
+  if (!text || typeof text !== "string") return { text: text || "", changed: false };
+  const handles = new Set(
+    (Array.isArray(pool) ? pool : [])
+      .map((c) => String(c?.handle || "").toLowerCase().trim())
+      .filter(Boolean),
+  );
+  let removed = false;
+  let out = text.replace(/[A-Za-z0-9]+(?:-[A-Za-z0-9]+)+/g, (slug) => {
+    const lc = slug.toLowerCase();
+    const segs = lc.split("-");
+    const last = segs[segs.length - 1];
+    const looksLikeSku = segs.length >= 3 && RAW_HANDLE_SKU_TAIL_RE.test(last) && /\d/.test(last);
+    if (handles.has(lc) || looksLikeSku) {
+      removed = true;
+      return "";
+    }
+    return slug;
+  });
+  if (!removed) return { text, changed: false };
+  out = out.replace(/\s{2,}/g, " ").replace(/\s+([.,!?;:])/g, "$1").trim();
+  return { text: out, changed: true };
+}
+
+// =====================================================================
 // Role-marker scrub
 // =====================================================================
 // If the model literally generates "Human:" / "Assistant:" tokens in

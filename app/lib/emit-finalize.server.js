@@ -44,6 +44,7 @@ import {
 } from "./chat-helpers.server.js";
 import {
   stripInternalLeaks,
+  stripRawHandles,
   scrubInternalEnums,
   stripUnsafeInlineChips,
   detectRejectedCategories,
@@ -448,6 +449,12 @@ export function finalizeOutboundReply({
       // an earlier narration strip may have left dangling. Runs after all
       // shape mutators so it sees the final text.
       { fn: trimDanglingConnector,         name: "dangling-connector" },
+      // ABSOLUTE LAST — emit guard: a raw product handle/slug must never
+      // reach the customer, even if validator retries didn't clean it.
+      // Runs after every other strip so it catches a handle a prior step
+      // may have left exposed (live trace 2026-06-25: a draft cleaned down
+      // to "Jillian-cork-sc364w jillian-cork-sc364w").
+      { fn: (t) => stripRawHandles(t, pool), name: "raw-handle" },
     ];
     const preCleanupText = fullResponseText;
     const cleanupLogs = [];
@@ -479,6 +486,13 @@ export function finalizeOutboundReply({
       preCleanupText.trim().length >= 40 &&
       fullResponseText.trim().length < 12
     ) {
+      strippedNarrationToFragment = true;
+    }
+    // The handle emit guard can empty a handle-only reply regardless of the
+    // pre-cleanup length (the bad draft may itself have been short). Whenever
+    // stripping a raw handle leaves a fragment, force the pool fallback so we
+    // never ship a bare/empty bubble in place of the slug.
+    if (cleanupLogs.includes("raw-handle") && fullResponseText.trim().length < 12) {
       strippedNarrationToFragment = true;
     }
   }

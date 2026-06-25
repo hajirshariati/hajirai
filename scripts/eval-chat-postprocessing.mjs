@@ -41,6 +41,7 @@ import {
   suggestionContradictsGender,
   detectFootwearOverElicitation,
   stripInternalLeaks,
+  stripRawHandles,
   containsInternalLanguageLeak,
   scrubInternalEnums,
   friendlyEnumLabel,
@@ -928,6 +929,27 @@ test("internal-leak — strips 'The resolver state indicates...' lead-in", () =>
   assert.equal(containsInternalLanguageLeak(r.text), false, `output must be free of internal terms: ${r.text}`);
   assert.ok(/no men's orthotics/i.test(r.text), `meaningful tail must survive: ${r.text}`);
   assert.ok(/^[A-Z]/.test(r.text), `first letter must be capitalized: ${r.text}`);
+});
+
+test("raw-handle — bare handle reply is stripped to empty (emit guard)", () => {
+  // Live trace 2026-06-25: "Jillian-cork-sc364w jillian-cork-sc364w" shipped.
+  const pool = [{ title: "Jillian Braided Quarter Strap Sandal - White", handle: "jillian-cork-sc364w" }];
+  const r = stripRawHandles("Jillian-cork-sc364w jillian-cork-sc364w", pool);
+  assert.equal(r.changed, true, "must strip the handle");
+  assert.equal(/[a-z]+-[a-z0-9-]+/i.test(r.text), false, `no slug may survive: ${r.text}`);
+});
+
+test("raw-handle — a handle embedded mid-sentence is removed, prose kept", () => {
+  const pool = [{ title: "Jillian Braided Quarter Strap Sandal", handle: "jillian-cork-sc364w" }];
+  const r = stripRawHandles("The Jillian (jillian-cork-sc364w) has great arch support.", pool);
+  assert.equal(r.changed, true);
+  assert.equal(r.text.includes("jillian-cork-sc364w"), false);
+  assert.ok(/arch support/i.test(r.text), `prose must survive: ${r.text}`);
+});
+
+test("raw-handle — ordinary hyphenated words survive", () => {
+  const r = stripRawHandles("These slip-on, anti-fatigue options are great.", []);
+  assert.equal(r.changed, false, "no slug present");
 });
 
 test("internal-leak — Foot Roller handle/session plumbing leak is replaced wholesale", () => {
