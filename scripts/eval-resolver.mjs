@@ -21,7 +21,7 @@
 //   R12 no cards while asking
 
 import assert from "node:assert/strict";
-import { resolveCatalogTurn, buildResolverStatePromptBlock, extractUserConstraints } from "../app/lib/catalog-resolver.server.js";
+import { resolveCatalogTurn, buildResolverStatePromptBlock, extractUserConstraints, detectSpecificProduct } from "../app/lib/catalog-resolver.server.js";
 
 let passed = 0;
 let failed = 0;
@@ -683,6 +683,36 @@ await test("buildResolverStatePromptBlock — produces non-empty block for resol
 await test("buildResolverStatePromptBlock — returns empty string for skip output", () => {
   const block = buildResolverStatePromptBlock({ type: "skip", reason: "facet_index_not_built" });
   assert.equal(block, "");
+});
+
+// R13 — the brand name must never resolve to a product. "the Aetrex
+// Jillian Braided Quarter Strap Sandal" previously matched the lone
+// brand-prefixed accessory ("Aetrex Foot Roller") because "aetrex" was a
+// unique first-token, while "jillian" was ambiguous (live trace 2026-06-25).
+await test("detectSpecificProduct — 'Aetrex <product>' does not resolve to the brand accessory", async () => {
+  const facts = [
+    { productHandle: "a001538", title: "Aetrex Foot Roller" },
+    { productHandle: "jillian-black-sc450w", title: "Jillian Braided Quarter Strap Sandal - Black" },
+    { productHandle: "jillian-sport-sc100w", title: "Jillian Sport Sandal - Black" },
+    { productHandle: "jillian-white-sc453w", title: "Jillian Braided Quarter Strap Sandal - White" },
+  ];
+  const msg = "I'm deciding whether to order the Aetrex Jillian Braided Quarter Strap Sandal — will it hold up for all-day walking?";
+  const r = await detectSpecificProduct("shop", msg, { _testFacts: facts });
+  assert.notEqual(r, "a001538", "must NOT resolve the brand name to the Foot Roller accessory");
+  // "jillian" is ambiguous across 3 products, so the safe answer is null —
+  // the search still finds the sandal; no wrong product gets pinned.
+  assert.equal(r, null, `ambiguous named product should resolve to null, got ${r}`);
+});
+
+// R14 — a genuinely unique product token still resolves (guard against
+// the stopword addition over-suppressing real matches).
+await test("detectSpecificProduct — a unique product name still resolves", async () => {
+  const facts = [
+    { productHandle: "a001538", title: "Aetrex Foot Roller" },
+    { productHandle: "vania-black-xy1", title: "Vania Slip On - Black" },
+  ];
+  const r = await detectSpecificProduct("shop", "is the Vania available in my size?", { _testFacts: facts });
+  assert.equal(r, "vania-black-xy1", `unique 'vania' should resolve, got ${r}`);
 });
 
 console.log("");

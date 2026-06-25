@@ -766,6 +766,13 @@ const SPECIFIC_PRODUCT_STOPWORDS = new Set([
   "leather", "suede", "fabric", "mesh", "knit", "rubber",
   "size", "wide", "narrow", "medium", "standard", "regular",
   "new", "classic", "comfort", "premium", "pro", "edition",
+  // Store brand/vendor name — customers naturally say "the Aetrex X".
+  // Every product IS an Aetrex product, so "aetrex" is never a
+  // distinguishing product token. Worse, it had been matching the lone
+  // brand-prefixed accessory ("Aetrex Foot Roller") as a unique token,
+  // so "the Aetrex Jillian Braided Quarter Strap Sandal" resolved to the
+  // Foot Roller instead of the sandal (live trace 2026-06-25).
+  "aetrex",
   // common use-case verbs/nouns the AI mentions alongside an activity
   "hiking", "walking", "running", "standing", "travel", "traveling",
   "work", "working", "casual", "dress", "formal", "athletic", "sport", "sports",
