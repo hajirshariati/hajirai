@@ -594,4 +594,38 @@ test("rule10: the same fallback is allowed for a plain browse request", () => {
   assert.equal(out.ok, true);
 });
 
+// ─── Evidence in the retry instruction (rewrite-only retries) ──
+
+test("buildRetryInstruction injects compact product evidence (no handles)", () => {
+  const pool = [{
+    title: "Jillian Braided Quarter Strap Sandal - Black",
+    handle: "jillian-black-sc450w",
+    price_formatted: "$139.95",
+    _variantFacts: { availableColors: ["Black", "White"] },
+    _claimFacts: { archSupport: { value: true } },
+  }];
+  const out = buildRetryInstruction([{ kind: "too_long", message: "shorten it" }], "a long draft", pool);
+  assert.ok(/Product evidence/i.test(out), "evidence block present");
+  assert.ok(out.includes("Jillian Braided Quarter Strap Sandal - Black"), "title present");
+  assert.ok(out.includes("$139.95"), "price present");
+  assert.ok(out.includes("archSupport"), "key fact present");
+  assert.equal(out.includes("jillian-black-sc450w"), false, "handle must be hidden");
+});
+
+test("buildRetryInstruction with empty pool omits the evidence block", () => {
+  const out = buildRetryInstruction([{ kind: "too_long", message: "shorten it" }], "draft", []);
+  assert.equal(/Product evidence/i.test(out), false);
+});
+
+test("rule9: 'Are the Jillian sandals good for plantar fasciitis?' forces a lookup", () => {
+  const out = validateGrounding({
+    text: "The Jillian is a supportive option many shoppers like.",
+    pool: [],
+    userMessage: "Are the Jillian sandals good for plantar fasciitis?",
+    namedProductMentioned: true,
+    searchAttempted: false,
+  });
+  assert.ok(out.errors.some((e) => e.kind === "missing_product_lookup"));
+});
+
 console.log("\nAll grounding-validator tests done.");

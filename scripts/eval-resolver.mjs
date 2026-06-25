@@ -21,7 +21,7 @@
 //   R12 no cards while asking
 
 import assert from "node:assert/strict";
-import { resolveCatalogTurn, buildResolverStatePromptBlock, extractUserConstraints, detectSpecificProduct } from "../app/lib/catalog-resolver.server.js";
+import { resolveCatalogTurn, buildResolverStatePromptBlock, extractUserConstraints, detectSpecificProduct, mentionsCatalogProductFamily } from "../app/lib/catalog-resolver.server.js";
 
 let passed = 0;
 let failed = 0;
@@ -713,6 +713,34 @@ await test("detectSpecificProduct — a unique product name still resolves", asy
   ];
   const r = await detectSpecificProduct("shop", "is the Vania available in my size?", { _testFacts: facts });
   assert.equal(r, "vania-black-xy1", `unique 'vania' should resolve, got ${r}`);
+});
+
+// R15 — family-level named-product detection. An ambiguous family name
+// (multiple Jillian/Savannah variants) must still count as "named a product"
+// even though detectSpecificProduct returns null for it.
+const FAMILY_FACTS = [
+  { title: "Jillian Braided Quarter Strap Sandal - Black" },
+  { title: "Jillian Sport Sandal - Black" },
+  { title: "Savannah Adjustable Quarter Strap Sandal - Taupe" },
+  { title: "Danika Sneaker - Ivory" },
+];
+
+await test("mentionsCatalogProductFamily — ambiguous 'Jillian' counts as a named product", async () => {
+  const hit = await mentionsCatalogProductFamily("shop", "Are the Jillian sandals good for plantar fasciitis?", { _testFacts: FAMILY_FACTS });
+  assert.equal(hit, true);
+  // ...even though the strict resolver can't pin a unique handle:
+  const strict = await detectSpecificProduct("shop", "Are the Jillian sandals good for plantar fasciitis?", { _testFacts: FAMILY_FACTS });
+  assert.equal(strict, null, "strict resolver stays null for the ambiguous family");
+});
+
+await test("mentionsCatalogProductFamily — 'Jillian or Savannah' counts as named", async () => {
+  const hit = await mentionsCatalogProductFamily("shop", "which is better for walking, Jillian or Savannah?", { _testFacts: FAMILY_FACTS });
+  assert.equal(hit, true);
+});
+
+await test("mentionsCatalogProductFamily — generic words do NOT count", async () => {
+  assert.equal(await mentionsCatalogProductFamily("shop", "show me black sandals under $120", { _testFacts: FAMILY_FACTS }), false);
+  assert.equal(await mentionsCatalogProductFamily("shop", "is arch support necessary for plantar fasciitis?", { _testFacts: FAMILY_FACTS }), false);
 });
 
 console.log("");

@@ -322,7 +322,7 @@ export async function runWithGroundingRetry({
     // NOT return its messages array, so result?.messages is undefined
     // and the retry conversation would otherwise reference "your
     // previous reply" without the model ever seeing that reply.
-    const retryInstruction = buildRetryInstruction(validation.errors, text);
+    const retryInstruction = buildRetryInstruction(validation.errors, text, pool);
     messages = (result?.messages || messages).slice();
     messages.push({
       role: "user",

@@ -853,6 +853,43 @@ export async function detectSpecificProduct(shop, message, { _testFacts } = {}) 
   return Array.from(candidates)[0];
 }
 
+// Does the message mention ANY catalog product FAMILY by name — even an
+// ambiguous one ("Jillian", "Savannah", "Danika") that maps to several
+// variants/styles? detectSpecificProduct returns null for those (it needs a
+// unique handle), but for "did the customer name a product?" the answer is
+// still YES. Used to force a product lookup on named-product value/fit/
+// condition questions. Matches a message token against the FIRST meaningful
+// token of any catalog title (brand/color/category/etc. are stopwords, so a
+// bare "black" or "sandal" never counts). Returns boolean.
+export async function mentionsCatalogProductFamily(shop, message, { _testFacts } = {}) {
+  if (!shop || !message || typeof message !== "string") return false;
+  const lcText = message.toLowerCase();
+  let facts;
+  if (Array.isArray(_testFacts)) {
+    facts = _testFacts;
+  } else {
+    facts = await prisma.catalogFact.findMany({
+      where: { shop, variantId: null },
+      select: { title: true },
+      take: 1000,
+    });
+  }
+  if (!facts || facts.length === 0) return false;
+
+  const families = new Set();
+  for (const f of facts) {
+    const tok = firstMeaningfulToken(f.title);
+    if (tok) families.add(tok);
+  }
+  const msgTokens = lcText
+    .split(/[^a-z0-9]+/)
+    .filter((t) => t && t.length >= 4 && !SPECIFIC_PRODUCT_STOPWORDS.has(t));
+  for (const t of msgTokens) {
+    if (families.has(t)) return true;
+  }
+  return false;
+}
+
 // Permissive named-product resolver for similar-product turns.
 //
 // detectSpecificProduct above requires the matched token to be

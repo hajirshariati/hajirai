@@ -42,7 +42,7 @@ import { fetchYotpoLoyalty } from "../lib/yotpo-loyalty.server";
 import { buildRecommenderTools } from "../lib/recommender-tools.server";
 import { maybeRunOrthoticFlow } from "../lib/orthotic-flow-gate.server";
 import { classifyOrthoticTurn, shouldRunOrthoticClassifier } from "../lib/orthotic-classifier.server";
-import { resolveCatalogTurn, buildResolverStatePromptBlock, extractUserConstraints, detectSpecificProduct } from "../lib/catalog-resolver.server";
+import { resolveCatalogTurn, buildResolverStatePromptBlock, extractUserConstraints, detectSpecificProduct, mentionsCatalogProductFamily } from "../lib/catalog-resolver.server";
 import { getCatalogFacetIndex } from "../lib/catalog-facts.server";
 import { catalogScopedNavigationQuestionVerdict, umbrellaCategoryTermsFromGroups } from "../lib/catalog-matcher.server";
 import { buildSessionMemory, detectClarifyingQuestionType, memorySummary, buildSessionMemoryPromptBlock } from "../lib/session-memory.server";
@@ -4229,11 +4229,9 @@ async function handleChatPost({ shop, sessionAccessToken, request, internal = fa
             const latestForNamed = ctx.latestUserMessage || "";
             if (/\b(?:worth|hold\s+up|good\s+for|durable|plantar|fasciitis|bunion|neuroma|metatarsal|size|sizing|fit|fits|in\s+stock|come[s]?\s+in|available|which\s+(?:one\s+)?should|should\s+i\s+(?:buy|get|order|choose)|more\s+of\s+a|all[-\s]?day|walking|standing)\b/i.test(latestForNamed)) {
               try {
-                const { findProductHandleForSimilarAnchor } = await import("../lib/catalog-resolver.server");
-                namedProductMentioned = Boolean(
-                  (await detectSpecificProduct(ctx.shop, latestForNamed)) ||
-                  (await findProductHandleForSimilarAnchor(ctx.shop, latestForNamed)),
-                );
+                // Family-level: "Jillian"/"Savannah"/"Danika" count as named
+                // products even when ambiguous across variants.
+                namedProductMentioned = await mentionsCatalogProductFamily(ctx.shop, latestForNamed);
               } catch (err) {
                 console.error(`[named-product] detection failed:`, err?.message || err);
               }

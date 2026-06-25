@@ -741,9 +741,48 @@ export function validateGrounding({ text, pool = [], categoryGenderMap = null, u
 // previousText: the failed draft. Included because runAgenticLoop does
 // not return its internal messages array, so the retry conversation
 // would otherwise reference "your previous reply" the model can't see.
-export function buildRetryInstruction(errors = [], previousText = "") {
+// Compact, customer-safe evidence block built from the pool so a
+// REWRITE-ONLY retry (tools disabled) still has the real product facts —
+// the retry conversation re-runs from the original messages and does NOT
+// carry tool results, so without this the model would rewrite from the
+// failed draft alone. Handles/SKUs are deliberately omitted (the customer
+// must never see them, and the raw_handle_leak rule would reject an echo).
+function buildEvidenceSummary(pool = []) {
+  const cards = (Array.isArray(pool) ? pool : []).slice(0, 6);
+  const lines = [];
+  for (const c of cards) {
+    const title = String(c?.title || "").trim();
+    if (!title) continue;
+    const parts = [title];
+    const price = c?.price_formatted || (c?.price != null && c?.price !== "" ? `$${c.price}` : "");
+    if (price) parts.push(String(price));
+    const colors =
+      (c?._variantFacts && c._variantFacts.availableColors) ||
+      c?.availableColors ||
+      [];
+    if (Array.isArray(colors) && colors.length) {
+      parts.push(`colors: ${colors.slice(0, 8).join(", ")}`);
+    }
+    const facts = [];
+    const cf = c?._claimFacts || {};
+    for (const [k, v] of Object.entries(cf)) {
+      const truthy = v === true || (v && v.value === true);
+      if (truthy) facts.push(k);
+    }
+    if (facts.length) parts.push(facts.slice(0, 6).join(", "));
+    lines.push(`- ${parts.join(" — ")}`);
+  }
+  if (!lines.length) return "";
+  return [
+    "Product evidence available to you THIS TURN (use these exact facts; do NOT invent details or show any handle/SKU):",
+    ...lines,
+  ].join("\n");
+}
+
+export function buildRetryInstruction(errors = [], previousText = "", pool = []) {
   if (!errors || errors.length === 0) return "";
   const lines = errors.slice(0, 4).map((e, i) => `${i + 1}. ${e.message}`);
+  const evidence = buildEvidenceSummary(pool);
   const draftBlock = previousText
     ? [
         "Your previous draft (never shown to the customer):",
@@ -764,6 +803,7 @@ export function buildRetryInstruction(errors = [], previousText = "") {
     ...draftBlock,
     intro,
     ...lines,
+    ...(evidence ? ["", evidence] : []),
     "",
     "Rewrite the reply. If the only honest answer is that you can't verify the requested claim, say that plainly — that's a correct answer, not a failure.",
   ].join("\n");
