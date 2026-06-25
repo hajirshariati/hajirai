@@ -628,4 +628,101 @@ test("rule9: 'Are the Jillian sandals good for plantar fasciitis?' forces a look
   assert.ok(out.errors.some((e) => e.kind === "missing_product_lookup"));
 });
 
+// ─── Rule 11: fragment / non-answer ────────────────────────────
+
+test("rule11: interjection-only fragments are rejected ('Great question —')", () => {
+  const pool = [{ title: "Jillian Braided Quarter Strap Sandal - Black", handle: "jillian-black-sc450w" }];
+  for (const frag of ["Great question —", "Absolutely —", "I'd say —"]) {
+    const out = validateGrounding({ text: frag, pool, userMessage: "is the Jillian good for walking?" });
+    assert.ok(out.errors.some((e) => e.kind === "fragment_non_answer"), `should flag: ${frag}`);
+  }
+});
+
+test("rule11: cards alone do NOT make a fragment valid", () => {
+  const pool = [{ title: "Jillian Braided Quarter Strap Sandal - Black", handle: "jillian-black-sc450w" }];
+  const out = validateGrounding({ text: "Here you go!", pool, userMessage: "show me sandals" });
+  assert.ok(out.errors.some((e) => e.kind === "fragment_non_answer"));
+});
+
+test("rule11: a normal short browse sentence with cards passes", () => {
+  const pool = [{ title: "Jillian Braided Quarter Strap Sandal - Black", handle: "jillian-black-sc450w" }];
+  const out = validateGrounding({ text: "Here are some supportive sandals great for all-day wear.", pool, userMessage: "show me sandals" });
+  assert.equal(out.errors.some((e) => e.kind === "fragment_non_answer"), false);
+});
+
+// ─── Rule 12: sizing/availability answered in text ─────────────
+
+test("rule12: a card-only reply to a sizing question is rejected", () => {
+  const pool = [{ title: "Jillian Braided Quarter Strap Sandal - Black", handle: "jillian-black-sc450w" }];
+  const out = validateGrounding({
+    text: "Here's the Jillian for you.",
+    pool,
+    userMessage: "what size should I get in Jillian?",
+    namedProductMentioned: true,
+    searchAttempted: true,
+  });
+  assert.ok(out.errors.some((e) => e.kind === "sizing_not_addressed"));
+});
+
+test("rule12: real sizing guidance in text passes", () => {
+  const pool = [{ title: "Jillian Braided Quarter Strap Sandal - Black", handle: "jillian-black-sc450w" }];
+  const out = validateGrounding({
+    text: "Aetrex sandals run true to size, so start with your usual 8.5 — and since your feet swell, the adjustable straps give extra room. Easy returns if the fit's off.",
+    pool,
+    userMessage: "what size should I get in Jillian? my feet swell",
+    namedProductMentioned: true,
+    searchAttempted: true,
+  });
+  assert.equal(out.errors.some((e) => e.kind === "sizing_not_addressed"), false);
+});
+
+test("rule12: a color-availability question is NOT treated as sizing", () => {
+  const pool = [{ title: "Jillian Braided Quarter Strap Sandal - Black", handle: "jillian-black-sc450w" }];
+  const out = validateGrounding({
+    text: "The Jillian comes in black, white, and cork.",
+    pool,
+    userMessage: "what colors does the Jillian come in?",
+    namedProductMentioned: true,
+    searchAttempted: true,
+  });
+  assert.equal(out.errors.some((e) => e.kind === "sizing_not_addressed"), false);
+});
+
+// ─── Rule 8 (Fix #5): character cap + comparison stays concise ──
+
+test("rule8: an answer over ~500 chars is rejected even if under 160 words", () => {
+  const pool = [{ title: "Jillian Braided Quarter Strap Sandal - Black", handle: "jillian-black-sc450w" }];
+  const long = "The Jillian is a comfortable supportive sandal with a contoured footbed and adjustable straps. ".repeat(7);
+  const out = validateGrounding({ text: long, pool, userMessage: "is the Jillian good for walking?" });
+  assert.ok(out.errors.some((e) => e.kind === "too_long"));
+});
+
+test("Fix #3: a concise Jillian-vs-Savannah comparison passes in one shot", () => {
+  const pool = [
+    { title: "Jillian Braided Quarter Strap Sandal - Black", handle: "jillian-black-sc450w" },
+    { title: "Savannah Adjustable Quarter Strap Sandal - Taupe", handle: "savannah-taupe-ss500w" },
+  ];
+  const out = validateGrounding({
+    text: "For all-day walking, the Savannah is the stronger pick — more stable support and a sturdier sole. The Jillian is better for style and lighter casual days. Want me to show the Savannah?",
+    pool,
+    userMessage: "Which is better for all-day walking, Jillian or Savannah?",
+    namedProductMentioned: true,
+    searchAttempted: true,
+  });
+  assert.equal(out.ok, true, JSON.stringify(out.errors));
+});
+
+test("Fix #3: a 1000-char comparison wall is rejected as too_long", () => {
+  const pool = [{ title: "Jillian Braided Quarter Strap Sandal - Black", handle: "jillian-black-sc450w" }];
+  const wall = "The Jillian and the Savannah are both excellent supportive sandals with contoured footbeds. ".repeat(12);
+  const out = validateGrounding({
+    text: wall,
+    pool,
+    userMessage: "Which is better for all-day walking, Jillian or Savannah?",
+    namedProductMentioned: true,
+    searchAttempted: true,
+  });
+  assert.ok(out.errors.some((e) => e.kind === "too_long"));
+});
+
 console.log("\nAll grounding-validator tests done.");

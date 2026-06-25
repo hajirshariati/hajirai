@@ -1532,6 +1532,40 @@ cases.push({
 });
 
 cases.push({
+  name: "occasion-category: 'cute, standing all day at a wedding' must NOT remap to Sneakers",
+  run: () => {
+    // "standing all day" matches walking-active (→ Sneakers) but the wedding
+    // /"cute" dressy context must suppress that and land on a dressy category.
+    const out = injectOccasionCategory(
+      search({ query: "comfortable" }),
+      {
+        latestUserMessage: "I want something cute but I'll be standing all day at a wedding. Should I get Jillian or something else?",
+        catalogCategories: FOOTWEAR_CATALOG,
+      },
+    );
+    const cat = out.input?.filters?.category;
+    assert.notEqual(cat, "Sneakers", "dressy/wedding context must not force Sneakers");
+    // formal-dressy lands on the first dressy match (Loafers) — or leaves it
+    // open for the model; either is acceptable, just never Sneakers.
+    assert.ok(cat === undefined || /loafer|wedge|mary|oxford|sandal|heel/i.test(String(cat)), `expected a dressy category or none, got ${cat}`);
+  },
+});
+
+cases.push({
+  name: "occasion-category: plain 'standing all day' (no dressy) still → Sneakers",
+  run: () => {
+    const out = injectOccasionCategory(
+      search({ query: "comfort" }),
+      {
+        latestUserMessage: "I'm on my feet standing all day at work",
+        catalogCategories: FOOTWEAR_CATALOG,
+      },
+    );
+    assert.equal(out.input.filters.category, "Sneakers");
+  },
+});
+
+cases.push({
   name: "occasion-category: 'beach vacation' → Sandals (beach-pool)",
   run: () => {
     // "vacation" matches walking-active first → Sneakers. Customer also

@@ -626,8 +626,22 @@ export function injectOccasionCategory(toolCall, ctx) {
     return toolCall;
   }
 
+  // Fix #4: a dressy / formal / "cute" context must NOT be hijacked by the
+  // broad active-occasion remaps — "standing all day at a wedding" matches
+  // walking-active ("all day") and wrongly forces Sneakers. When a dressy
+  // signal is present, suppress the active/sneaker patterns so the
+  // formal-dressy pattern (or the model itself) picks an appropriate
+  // category (sandals, wedges, Mary Janes, loafers) instead.
+  const DRESSY_CONTEXT_RE =
+    /\b(wedding|formal|dressy|gala|prom|black[- ]?tie|cocktail|reception|special\s+occasion|fancy|elegant|evening\s+(?:event|out|wear)|gown|cute|chic|date\s+night|dinner\s+party)\b/i;
+  const dressyContext = DRESSY_CONTEXT_RE.test(latest);
+
   for (const { name, occasionRe, categoryRe } of OCCASION_TO_CATEGORY_PATTERNS) {
     if (!occasionRe.test(latest)) continue;
+    if (dressyContext && (name === "walking-active" || name === "running")) {
+      console.log(`[chat] occasion-category: "${name}" suppressed — dressy/formal context present`);
+      continue;
+    }
     const match = cats.find((c) => categoryRe.test(String(c)));
     if (match) {
       console.log(`[chat] occasion-category: "${name}" detected → filters.category="${match}"`);

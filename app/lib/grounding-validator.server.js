@@ -440,6 +440,40 @@ function detectRawHandleLeaks(text, pool) {
 // are unaffected) and killable in prod via VALIDATOR_STYLE_RULES=off.
 
 const MAX_RETAIL_WORDS = Number(process.env.VALIDATOR_MAX_WORDS) || 160;
+// Visual cap: 160 words still overflows the narrow widget. ~500 chars is
+// the comfortable ceiling for a normal answer. Env-overridable.
+const MAX_RETAIL_CHARS = Number(process.env.VALIDATOR_MAX_CHARS) || 500;
+// A substantive answer to a decision question should be at least this many
+// words (answer + tradeoff + next step). Below it reads as a fragment.
+const MIN_DECISION_WORDS = Number(process.env.VALIDATOR_MIN_DECISION_WORDS) || 25;
+// Any reply this short on a turn with a real question or cards is a
+// fragment ("Great question —", "Absolutely —", "I'd say —").
+const FRAGMENT_MIN_WORDS = 5;
+
+// A sizing / availability question — must be answered in TEXT, not just
+// with a card carousel.
+const SIZING_AVAILABILITY_RE = new RegExp(
+  "\\bwhat\\s+size\\b" + "|" +
+  "\\bwhich\\s+size\\b" + "|" +
+  "\\bsize\\s+(?:should|do|would|to\\s+(?:get|order|buy))\\b" + "|" +
+  "\\b(?:run|runs)\\s+(?:small|large|big|narrow|wide|tight)\\b" + "|" +
+  "\\btrue\\s+to\\s+size\\b" + "|" +
+  "\\bsize\\s+up\\b|\\bsize\\s+down\\b" + "|" +
+  "\\bsize\\s*\\d+(?:\\.5)?\\b" + "|" +
+  "\\b(?:in\\s+stock|out\\s+of\\s+stock|sold\\s+out|back\\s+in\\s+stock)\\b",
+  "i",
+);
+// Heuristic that the reply actually ENGAGES sizing/availability (so we
+// don't false-reject a real answer). Mentions a size/fit concept, an
+// availability verdict, or a safe-guidance hook.
+const SIZING_ANSWERED_RE = new RegExp(
+  "\\b(?:size|sizing|fit|fits|true\\s+to\\s+size|half[-\\s]?size|usual|swell|adjustable|strap|snug|roomy|go\\s+up|go\\s+down|size\\s+up|size\\s+down|in\\s+stock|out\\s+of\\s+stock|sold\\s+out|available|unavailable|return|returns|exchange|width|wide|narrow)\\b" + "|" +
+  "\\b\\d+(?:\\.5)?\\b",
+  "i",
+);
+// A reply that ends mid-thought on a connector/dash — the classic gutted
+// fragment ("Great question —", "I'd say —").
+const DANGLING_FRAGMENT_RE = /[—–-]\s*$|\b(?:so|but|and|or|because|with|for|to|the)\s*$/i;
 
 // A decision / suitability question — the kind that MUST be answered in
 // the first sentence ("is it worth it?", "will it hold up?", "good for
@@ -713,21 +747,65 @@ export function validateGrounding({ text, pool = [], categoryGenderMap = null, u
 
     // 8. Overlong. A normal product/advisory answer must stay concise
     // unless the customer asked for depth (comparison, reviews, specs,
-    // policy, "explain", "in detail", etc.).
+    // policy, "explain", "in detail", etc.). Capped on BOTH words and raw
+    // characters — 160 words still overflows the narrow widget visually.
     if (isProductTurn && !wantsDetail) {
       const words = retailWordCount(text);
-      if (words > MAX_RETAIL_WORDS) {
+      const chars = text.trim().length;
+      if (words > MAX_RETAIL_WORDS || chars > MAX_RETAIL_CHARS) {
         errors.push({
           kind: "too_long",
-          claim: `${words} words`,
+          claim: `${words} words / ${chars} chars`,
           message:
-            `Your draft is ${words} words — too long for a retail chat answer. ` +
-            `Rewrite it as a concise retail sales answer: answer the customer ` +
-            `directly in the first sentence, give one honest reason or tradeoff, ` +
-            `then one best next step or alternative. Keep it under 5 sentences. ` +
-            `Do NOT remove necessary caveats.`,
+            `Your draft is ${words} words (${chars} characters) — too long for ` +
+            `the chat widget. Rewrite it as a concise retail sales answer: answer ` +
+            `directly in the first sentence, give one honest tradeoff, then one ` +
+            `best next step. Keep it under 5 sentences and under ${MAX_RETAIL_CHARS} ` +
+            `characters. Do NOT remove necessary caveats.`,
         });
       }
+    }
+
+    // 11. Fragment / non-answer. A real question or a card carousel demands
+    // a substantive reply — an interjection-only opener ("Great question —",
+    // "Absolutely —"), a dangling mid-thought, or an ultra-short blurb is a
+    // non-answer. Product cards ALONE cannot make a fragment valid.
+    const hasCards = pool && pool.length > 0;
+    const hasSpecificQuestion = isDecisionQ || needsProductData;
+    if (hasSpecificQuestion || hasCards) {
+      const words = retailWordCount(text);
+      const trimmed = text.trim();
+      const isFragment =
+        words < FRAGMENT_MIN_WORDS ||
+        DANGLING_FRAGMENT_RE.test(trimmed) ||
+        (isDecisionQ && words < MIN_DECISION_WORDS);
+      if (isFragment) {
+        errors.push({
+          kind: "fragment_non_answer",
+          claim: trimmed.slice(0, 80),
+          message:
+            `Your reply ("${trimmed.slice(0, 60)}…") is a fragment, not an answer. ` +
+            `Write a complete, substantive reply that actually answers the ` +
+            `customer in plain sentences — a direct answer, one reason/tradeoff, ` +
+            `and a next step. Cards on their own are not an answer.`,
+        });
+      }
+    }
+
+    // 12. Sizing / availability must be answered in TEXT. A card carousel is
+    // not an answer to "what size should I get?" If exact guidance isn't
+    // available, give the best SAFE guidance in words.
+    if (SIZING_AVAILABILITY_RE.test(msg) && !SIZING_ANSWERED_RE.test(text)) {
+      errors.push({
+        kind: "sizing_not_addressed",
+        claim: firstSentenceOf(text).slice(0, 80),
+        message:
+          "The customer asked a sizing/availability question — answer it in " +
+          "TEXT, not just with cards. If you can't confirm exact size/stock, " +
+          "give the best safe guidance: start with their usual size, factor in " +
+          "swelling/adjustable straps, mention easy returns or how it runs, or " +
+          "ask whether they prefer a snug or roomy fit.",
+      });
     }
   }
 
