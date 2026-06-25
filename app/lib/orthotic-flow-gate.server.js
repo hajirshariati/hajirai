@@ -622,6 +622,43 @@ function renderQuestionText(node, answers, tree, context = null) {
   return prefix ? `${prefix}\n\n${body}` : body;
 }
 
+// Chip labels for a single attribute's question, computed with the SAME
+// filtering renderQuestionText uses: NONSENSE_GENDER strip, catalog
+// availability (chipsAchievableForNode), Kids condition tightening,
+// stutter-collapse (collapseDuplicateSlashLabel), and gender-context
+// decoration. Exported so the recommend_orthotic TOOL can offer the SAME
+// deterministic chips when it asks a question in LLM-owned mode — the gate's
+// emit path and the conversational tool path never drift. Returns [] when the
+// attribute has no question node or every chip would dead-end (the caller
+// then just asks the question in prose). Mirrors the chip block above; kept
+// standalone rather than refactoring renderQuestionText to avoid touching the
+// gate's live emit path.
+export function orthoticChipLabelsForAttribute(tree, attribute, answers = {}) {
+  if (!tree || !tree.definition || !Array.isArray(tree.definition.nodes) || !attribute) return [];
+  const node = tree.definition.nodes.find(
+    (n) => n && n.type === "question" && n.attribute === attribute,
+  );
+  if (!node) return [];
+  const NONSENSE_GENDER = /^(?:unisex|other|either|both)\b/i;
+  let chips = (node.chips || []).filter((c) => {
+    const label = String(c?.label || "").trim();
+    return label && !NONSENSE_GENDER.test(label);
+  });
+  chips = chipsAchievableForNode({ ...node, chips }, answers || {}, tree);
+  if (node.attribute === "condition" && answers && isKidsGenderValue(answers.gender)) {
+    const allowed = availableConditionsForAnswers(tree, answers);
+    if (allowed && allowed.size > 0) chips = chips.filter((c) => allowed.has(c.value));
+  }
+  let labels = chips
+    .map((c) => collapseDuplicateSlashLabel(String(c.label).trim()))
+    .filter(Boolean);
+  if (node.attribute === "gender") {
+    const contextNoun = getGenderChipContextNoun(tree?.definition);
+    labels = labels.map((l) => decorateGenderChipLabel(l, contextNoun));
+  }
+  return labels;
+}
+
 /**
  * Apply skipIfKnown / autoSkipIfSingle node transitions to walk
  * past nodes whose answer is already known. The state machine's

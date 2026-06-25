@@ -1,5 +1,9 @@
 import { resolveTree } from "./decision-tree-resolver.server.js";
 import { validateDecisionTree } from "./decision-tree-schema.server.js";
+// Runtime-only use (called inside executeRecommenderTool, never at module
+// load) so the orthotic-flow-gate ⇄ recommender-tools import cycle is safe —
+// hoisted function export, resolved by the time the tool runs.
+import { orthoticChipLabelsForAttribute } from "./orthotic-flow-gate.server.js";
 
 // Apply tree-level derivations to the customer's answer set BEFORE
 // resolving. Derivations let merchants encode rules like "if
@@ -526,16 +530,36 @@ export async function executeRecommenderTool({ toolName, input, shop, trees, con
         // defaults; merchant overrides via attributePrompts.
         return `- What is the customer's ${k}?`;
       }).join("\n");
+      // Deterministic choice chips for the FIRST question, reusing the
+      // orthotic gate's EXACT chip logic so LLM-owned mode keeps the same
+      // tappable UX the pre-LLM gate emitted. The customer taps a chip; its
+      // label round-trips as their next message and the classifier maps it
+      // back to the enum value (the same path the gate relied on). Empty when
+      // the attribute has no usable chips — the model then just asks in prose.
+      // Best-effort: never let chip rendering break attribute collection.
+      let chipDirective = "";
+      try {
+        const firstChips = orthoticChipLabelsForAttribute(tree, missing[0], mergedInput);
+        if (Array.isArray(firstChips) && firstChips.length > 0) {
+          chipDirective =
+            `\n\nEnd your question with these tappable choice chips VERBATIM — each wrapped in << >>, ` +
+            `space-separated, with nothing after them:\n` +
+            firstChips.map((l) => `<<${l}>>`).join(" ");
+        }
+      } catch (chipErr) {
+        console.warn(`[recommender] chip render failed (asking in prose): ${chipErr?.message || chipErr}`);
+      }
       console.log(
         `[recommender] gate: ${missing.length} required attribute(s) missing on ` +
-          `tool call — ${missing.join(", ")}. Asking LLM to gather first.`,
+          `tool call — ${missing.join(", ")}. Asking LLM to gather first.` +
+          (chipDirective ? ` (with chips for ${missing[0]})` : ""),
       );
       return {
         needMoreInfo: true,
         missingAttributes: missing,
         instruction:
           `Before recommending, ${missing.length === 1 ? "this attribute is" : "these attributes are"} still missing: ${missing.join(", ")}. ` +
-          `ASK ONLY THE FIRST QUESTION below — one question per turn. Do NOT preface with "a few quick questions" or "I just need a few details" or number the question ("1.", "2.") — those phrasings imply a multi-question form, but each missing attribute is collected on its own conversational turn. Just ask the first question naturally as if it's the only thing you need. After the customer answers, call recommend_${tree.intent} again with what they gave you; the tool will tell you what's still missing.\n\nQuestions, in order (ask only the first):\n${questions}\n\nUse only the enum values listed in this tool's schema for those attributes.`,
+          `ASK ONLY THE FIRST QUESTION below — one question per turn. Do NOT preface with "a few quick questions" or "I just need a few details" or number the question ("1.", "2.") — those phrasings imply a multi-question form, but each missing attribute is collected on its own conversational turn. Just ask the first question naturally as if it's the only thing you need. After the customer answers, call recommend_${tree.intent} again with what they gave you; the tool will tell you what's still missing.\n\nQuestions, in order (ask only the first):\n${questions}\n\nUse only the enum values listed in this tool's schema for those attributes.${chipDirective}`,
         attributesProvided: provided,
       };
     }
