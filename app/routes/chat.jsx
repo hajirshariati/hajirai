@@ -118,6 +118,26 @@ const OPUS_MODEL = process.env.OPUS_MODEL || "claude-opus-4-7";
 const MAX_TOKENS = parseInt(process.env.CHAT_MAX_TOKENS, 10) || 1024;
 const MAX_TOOL_HOPS = parseInt(process.env.CHAT_MAX_TOOL_HOPS, 10) || 3;
 
+// Suitability / advisory-shape questions — "will this hold up for all-day
+// walking?", "is it more of a casual sandal?", "good enough for...", "can I
+// wear these to...". These are NOT product-list turns: the customer wants a
+// JUDGMENT, so the per-card "write one brief listing sentence" directive is
+// wrong for them. When this matches the latest user message we ask the model
+// for a real recommendation with honest tradeoffs instead. False positives
+// are low-harm (a slightly richer answer), so the pattern errs inclusive.
+const ADVISORY_INTENT_RE = new RegExp(
+  "\\bhold(?:s)?\\s+up\\b" + "|" +
+  "\\b(?:durable|sturdy|long[-\\s]?lasting|hard[-\\s]?wearing)\\b" + "|" +
+  "\\bmore\\s+of\\s+a\\b" + "|" +
+  "\\bcasual\\s+(?:stroll|wear|or\\b)" + "|" +
+  "\\b(?:good|ok|okay|suitable|right|ideal|appropriate|enough|comfortable|fine|work(?:s)?)\\s+(?:enough\\s+)?(?:for|to)\\b" + "|" +
+  "\\b(?:all[-\\s]?day|week[-\\s]?long|every[-\\s]?day|hours?\\s+of)\\b" + "|" +
+  "\\bcan\\s+i\\s+(?:wear|use)\\b" + "|" +
+  "\\bwould\\s+(?:this|it|these|they)\\s+(?:work|hold|be)\\b" + "|" +
+  "\\bis\\s+(?:this|it|that|the)\\b[^.?!\\n]{0,40}\\b(?:casual|dressy|formal|active|sporty|athletic|supportive)\\b",
+  "i",
+);
+
 const DEPRECATED_MODELS = new Set(["claude-sonnet-4-20250514", "claude-3-5-sonnet-20241022", "claude-3-5-sonnet-20240620", "claude-opus-4-20250514"]);
 
 const RATE_LIMIT_PER_IP_SHOP = parseInt(process.env.RATE_LIMIT_PER_IP_SHOP, 10) || 20;
@@ -1907,7 +1927,9 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
           u.name === "find_similar_products" ||
           u.name.startsWith("recommend_")
         )) {
-          payload._display = "Product card is shown automatically. Do NOT list products with links or repeat the SKU/handle in your text. Write a brief 1-2 sentence summary explaining why this fits.";
+          payload._display = ADVISORY_INTENT_RE.test(ctx.userText || "")
+            ? "Product card(s) are shown automatically. Do NOT list products with links or repeat SKUs/handles. The customer is asking for a SUITABILITY JUDGMENT, not a product list — answer their actual question directly in 2-4 sentences: say whether this product fits their stated use (activity, duration, climate/environment), name the honest tradeoff, and only then point to a better-suited alternative if one genuinely applies. Recommend like a knowledgeable salesperson, not a catalog blurb."
+            : "Product card is shown automatically. Do NOT list products with links or repeat the SKU/handle in your text. Write a brief 1-2 sentence summary explaining why this fits.";
         }
         return {
           type: "tool_result",

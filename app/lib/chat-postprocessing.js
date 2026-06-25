@@ -570,6 +570,15 @@ const FORBIDDEN_INTERNAL_TERMS_RE = new RegExp(
     "do(?:_|\\s+)?not(?:_|\\s+)?ask" + "|" +
     "system\\s+prompt" + "|" +
     "tool\\s+call" + "|" +
+    // Session/handle plumbing the model occasionally narrates when a
+    // resolver match is wrong — e.g. "the product handle in your session
+    // is linked to our Foot Roller accessory" (live trace 2026-06-25).
+    // The customer must never hear about handles, sessions, or resolver
+    // linkage; any of these → the reply is unsafe and gets replaced.
+    "product\\s+handle" + "|" +
+    "(?:in\\s+)?your\\s+session" + "|" +
+    "session\\s+is\\s+linked" + "|" +
+    "resolver" + "|" +
     "search\\s+because\\s+resolver" +
   ")\\b",
   "i",

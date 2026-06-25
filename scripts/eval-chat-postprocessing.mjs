@@ -930,6 +930,25 @@ test("internal-leak — strips 'The resolver state indicates...' lead-in", () =>
   assert.ok(/^[A-Z]/.test(r.text), `first letter must be capitalized: ${r.text}`);
 });
 
+test("internal-leak — Foot Roller handle/session plumbing leak is replaced wholesale", () => {
+  // Live trace 2026-06-25: a wrong resolver match made the model narrate
+  // "the product handle in your session is linked to our Foot Roller
+  // accessory…". Handle/session/resolver-linkage must never reach a customer.
+  const before =
+    "It looks like the product handle in your session is linked to our Foot Roller accessory, not the Jillian Braided Quarter Strap Sandal — let me pull the right product for you!";
+  const r = stripInternalLeaks(before);
+  assert.equal(r.replaced, true, "handle/session leak must be replaced wholesale");
+  assert.equal(containsInternalLanguageLeak(r.text), false, `output must be free of internal terms: ${r.text}`);
+  assert.equal(/product handle|your session|linked to/i.test(r.text), false, `plumbing phrases must be gone: ${r.text}`);
+});
+
+test("internal-leak — benign sales advice with no plumbing is left intact", () => {
+  const before = "The Jillian is comfortable for casual walking, but for week-long theme-park days I'd steer you to a sportier walking sandal.";
+  const r = stripInternalLeaks(before);
+  assert.equal(r.replaced, false, "must not nuke a clean sales answer");
+  assert.equal(r.changed, false, "clean answer should pass through unchanged");
+});
+
 test("internal-leak — strips 'Based on the resolver state, ...' lead-in", () => {
   const before = "Based on the resolver state, I don't see a pink men's sneaker in our catalog.";
   const r = stripInternalLeaks(before);
