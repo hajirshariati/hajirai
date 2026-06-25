@@ -55,21 +55,22 @@ export function isImageProviderSupported(provider) {
 // authority; the text only governs the SCENE around it.
 function buildStylistPrompt({ productTitle, styleContext }) {
   const ctx = String(styleContext || "").trim();
-  const styleLine = ctx
-    ? `Style it for this customer's described look: "${ctx}".`
-    : "Style it in a tasteful, editorial e-commerce scene.";
+  const sceneLine = ctx
+    ? `Choose the setting from BOTH the footwear style AND what the shopper told us they need it for: "${ctx}". If the shopper named a destination, occasion, activity, or weather, set the scene THERE (e.g. they mentioned hiking or a mountain → a real mountain trail; a beach or vacation → a sunny boardwalk or sand path; the gym or running → a track or city street; a wedding or evening out → an elegant venue). Match the environment to what they actually said.`
+    : "Choose a real-world setting that naturally suits this style of footwear (boots → outdoor trail, sandals → sunny boardwalk, sneakers → city street or park, heels → elegant evening venue).";
   return [
-    "You are a professional product stylist creating ONE photorealistic styling preview for an online shopper.",
-    "The attached image is the EXACT product to feature — it is the HERO of the shot and must dominate the frame.",
-    "ABSOLUTE RULE — DO NOT CHANGE THE PRODUCT: reproduce it exactly as shown — identical shape, silhouette, color, materials, texture, hardware, stitching, patterns, logos, and proportions. Do not redesign, recolor, restyle, embellish, add, or remove anything on the product itself.",
-    styleLine,
+    "You are a professional footwear stylist creating ONE photorealistic action shot for an online shopper.",
+    "The attached image(s) are the EXACT product to feature. When several images are attached they are MULTIPLE ANGLES OF THE SAME single product (top/front/side) — not different products. The footwear is the HERO of the shot and must dominate the frame.",
+    "ABSOLUTE RULE — DO NOT CHANGE THE PRODUCT: reproduce it exactly as shown across the reference angles — identical shape, silhouette, color, materials, texture, hardware, stitching, patterns, logos, and proportions. Do not redesign, recolor, restyle, embellish, add, or remove anything on the product itself.",
     `The product is: ${String(productTitle || "the item").trim()}.`,
-    "COMPOSITION RULES (critical — the product must be unmistakably the focus):",
-    "- Frame the product LARGE and central: it should occupy roughly half the image, sit in the foreground, be sharply focused and well-lit, and be the first thing the eye lands on.",
-    "- If the product is footwear (shoes, sneakers, sandals, heels, boots, slippers, clogs): use a CLOSE, feet-forward crop framed from about the knee or mid-calf down. Show the shoes big and crisp. NEVER produce a full-length head-to-toe shot that shrinks the shoes to a small detail at the bottom of the frame.",
-    "- Any model, clothing, props, or background are SUPPORTING CONTEXT only — keep them secondary and never let them obscure, crop, or visually compete with the product.",
-    "- Use a shallow depth of field: product razor-sharp, background gently soft.",
-    "Keep the product pixel-faithful to the reference. Photorealistic, natural lighting, clean modern e-commerce editorial quality. No text, watermarks, or logos added to the image.",
+    "MOTION (required): show a person WALKING — captured mid-stride in natural motion, one foot stepping forward with the weight shifting, as if photographed in the middle of a walk. NEVER a static standing, seated, or posed-still shot. The person should always read as moving.",
+    "SCENE: " + sceneLine,
+    "COMPOSITION RULES (critical — the footwear must be unmistakably the focus):",
+    "- Use a CLOSE, feet-forward crop framed from roughly the knee or mid-calf down, following the feet in motion. Show the shoes LARGE and crisp — they should occupy about half the frame and sit in the sharp foreground. NEVER a full-length head-to-toe shot that shrinks the shoes to a small detail.",
+    "- Keep the footwear razor-sharp and perfectly lit even while walking: freeze the shoes crisply. Any motion blur belongs ONLY in the background, NEVER on the product.",
+    "- The person, clothing, and environment are SUPPORTING CONTEXT only — secondary, and never obscuring, cropping, or visually competing with the footwear.",
+    "- Shallow depth of field: footwear razor-sharp, background gently soft with a subtle sense of movement.",
+    "Keep the product pixel-faithful to the reference angles. Photorealistic, natural lighting, clean modern editorial quality. No text, watermarks, or added logos.",
   ].join("\n");
 }
 
