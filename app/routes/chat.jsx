@@ -65,6 +65,7 @@ import {
   isDirectProductFactQuestion,
   titleStyleFamily,
   detectNamedProductMismatch,
+  ensureCompleteCustomerText,
   validateTurnResult,
 } from "../lib/response-contract.server";
 import {
@@ -1700,6 +1701,12 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
 
   const activeTools = tools || TOOLS;
 
+  // Tracks the final hop's stop_reason. If the loop exits with this still
+  // === "tool_use", the model was cut off by the hop budget mid-tool-use
+  // (it wanted to call another tool) — any text it left is an incomplete
+  // preamble, NOT a finished answer to the customer.
+  let lastStopReason = null;
+
   for (let hop = 0; hop < MAX_TOOL_HOPS; hop++) {
     // If the previous hop emitted text and this hop is about to emit more,
     // insert a paragraph break so the two streamed chunks don't run together
@@ -1743,6 +1750,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     );
     addUsage(totalUsage, final.usage || {});
     console.log(`[chat] hop=${hop} stop=${final.stop_reason} ms=${Date.now() - hopStart} textLen=${fullResponseText.length}`);
+    lastStopReason = final.stop_reason;
 
     if (final.stop_reason !== "tool_use") {
       break;
@@ -1911,6 +1919,27 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   }
 
   let initialPool = Array.from(allProductPool.values());
+
+  // When the model exhausts the hop budget while still wanting another tool
+  // (lastStopReason === "tool_use"), whatever text it streamed is an
+  // incomplete preamble before that never-made tool call — not a finished
+  // answer. If that fragment is unsalvageable (would be replaced downstream
+  // by the generic "Here are the matching styles" caption), discard it and
+  // fall through to the answer-only wrap-up so the customer's actual
+  // question gets answered from the tool results already gathered. Live
+  // trace 2026-06-25: "will the Jillian hold up for all-day walking?" burned
+  // all 3 hops on searches, left a 198-char dangling preamble, and emitted a
+  // 37-char canned caption instead of an answer.
+  const budgetExhausted = lastStopReason === "tool_use";
+  if (budgetExhausted && fullResponseText && initialPool.length > 0) {
+    const completeness = ensureCompleteCustomerText({ text: fullResponseText });
+    if (completeness.reason === "fallback_after_dangling" || completeness.reason === "empty") {
+      console.log(
+        `[chat] ${ctx.shop} hop budget exhausted with incomplete preamble (${fullResponseText.length} chars) — regenerating final answer`,
+      );
+      fullResponseText = "";
+    }
+  }
 
   if (!fullResponseText && initialPool.length > 0) {
     // Wrap-up call is safe to retry — no partial output yet.
