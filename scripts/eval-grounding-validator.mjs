@@ -253,10 +253,20 @@ test("spec-section headings (Style & Materials, Comfort Features, Fit & Sizing) 
 test("real product name (no trailing punctuation in bold) still extracted", () => {
   // Belt-and-suspenders — make sure the heading-end guard doesn't
   // accidentally swallow legitimate product names.
+  // Pool is non-empty (a search ran) but doesn't contain Phantom → the
+  // extractor must still surface it as ungrounded. (Empty-pool/info turns
+  // are intentionally NOT flagged — see the dedicated test below.)
   const text = "**Phantom Sneaker** is our pick.";
-  const out = validateGrounding({ text, pool: [] });
+  const out = validateGrounding({ text, pool: [NOELLE] });
   assert.equal(out.ok, false);
   assert.ok(out.errors.some((e) => e.kind === "ungrounded_product_name"));
+});
+
+test("bolded product on an info turn (empty pool / no search) is NOT flagged", () => {
+  // prod 2026-06-25: "**Plantar Fasciitis Kit**" in a "do insoles help?"
+  // answer wrongly forced a Sonnet retry. No pool ⇒ nothing to ground ⇒ skip.
+  const out = validateGrounding({ text: "The **Plantar Fasciitis Kit** can help with that.", pool: [] });
+  assert.equal(out.ok, true);
 });
 
 // ─── Retry instruction is well-formed ──────────────────────────

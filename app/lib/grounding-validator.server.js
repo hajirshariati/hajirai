@@ -410,20 +410,30 @@ export function validateGrounding({ text, pool = [], categoryGenderMap = null } 
   // 1. Named-product grounding.
   // Every bolded product family must correspond to a card in the pool.
   // (Tech/feature bolds were already filtered by extractBoldedProductFamilies.)
-  const boldFamilies = extractBoldedProductFamilies(text);
-  const seenFamilies = new Set();
-  for (const { phrase, family } of boldFamilies) {
-    if (seenFamilies.has(family)) continue;
-    seenFamilies.add(family);
-    if (!poolByFamily.has(family)) {
-      errors.push({
-        kind: "ungrounded_product_name",
-        claim: phrase,
-        message:
-          `You wrote "${phrase}" as a product but no tool result this turn ` +
-          `contains a product whose title starts with "${family}". ` +
-          `Either remove that product mention or call a tool to surface it first.`,
-      });
+  //
+  // ONLY when there IS a product pool this turn. On an info/policy/efficacy
+  // turn no search ran (pool empty) and a bolded product is an honest
+  // reference, not a "here's what I'm showing you" claim — flagging it just
+  // burns retries (prod 2026-06-25: "**Plantar Fasciitis Kit**" on a "do
+  // insoles help?" answer, "**Miles**…" wrongly forced a Sonnet retry). With
+  // an empty pool there's also nothing to ground against, so the rule can
+  // only false-positive. Rules 2/3 already skip on no-card; this matches.
+  if (poolByFamily.size > 0) {
+    const boldFamilies = extractBoldedProductFamilies(text);
+    const seenFamilies = new Set();
+    for (const { phrase, family } of boldFamilies) {
+      if (seenFamilies.has(family)) continue;
+      seenFamilies.add(family);
+      if (!poolByFamily.has(family)) {
+        errors.push({
+          kind: "ungrounded_product_name",
+          claim: phrase,
+          message:
+            `You wrote "${phrase}" as a product but no tool result this turn ` +
+            `contains a product whose title starts with "${family}". ` +
+            `Either remove that product mention or call a tool to surface it first.`,
+        });
+      }
     }
   }
 
