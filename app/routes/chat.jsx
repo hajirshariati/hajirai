@@ -4209,6 +4209,7 @@ async function handleChatPost({ shop, sessionAccessToken, request, internal = fa
               runLoop: runLoopOnce,
               initialMessages: messages,
               categoryGenderMap: ctx.categoryGenderMap || null,
+              userMessage: ctx.latestUserMessage || "",
               maxRetries: 2,
               onAttempt: ({ attempt, validation, textLen, poolSize }) => {
                 console.log(

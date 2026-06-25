@@ -432,7 +432,55 @@ function detectRawHandleLeaks(text, pool) {
   return out;
 }
 
-export function validateGrounding({ text, pool = [], categoryGenderMap = null } = {}) {
+// ─── Retail answer-contract helpers (rules 7 & 8) ──────────────────
+//
+// These enforce SHAPE, not truth: a product/advisory answer should be
+// concise and lead with a direct answer, not an essay or generic browse
+// copy. Gated on a non-empty userMessage (so truth-only callers / evals
+// are unaffected) and killable in prod via VALIDATOR_STYLE_RULES=off.
+
+const MAX_RETAIL_WORDS = Number(process.env.VALIDATOR_MAX_WORDS) || 160;
+
+// A decision / suitability question — the kind that MUST be answered in
+// the first sentence ("is it worth it?", "will it hold up?", "good for
+// plantar fasciitis?", "casual or active?", "which should I buy?").
+const DECISION_QUESTION_RE = new RegExp(
+  "\\bis\\s+it\\s+(?:actually\\s+)?worth\\b" + "|" +
+  "\\bworth\\s+(?:it|the|that|buying|paying|the\\s+(?:money|price|extra))\\b" + "|" +
+  "\\bwill\\s+(?:it|this|these|they)\\s+(?:hold\\s+up|last|work|be|survive)\\b" + "|" +
+  "\\bhold\\s+up\\b" + "|" +
+  "\\bgood\\s+(?:for|enough)\\b" + "|" +
+  "\\b(?:good|ok|okay|suitable|durable|comfortable|right|enough)\\s+(?:for|to)\\b" + "|" +
+  "\\bmore\\s+of\\s+a\\b" + "|" +
+  "\\bwhich\\s+(?:one\\s+)?(?:should|do|would|is)\\b" + "|" +
+  "\\bshould\\s+i\\s+(?:buy|order|get|choose|pick|go)\\b" + "|" +
+  "\\b(?:is|are)\\s+(?:this|it|that|these|they)\\b[^.?!\\n]{0,40}\\b(?:casual|active|sporty|dressy|formal|worth|suitable)\\b",
+  "i",
+);
+
+// The user explicitly wants depth — exempt from the length cap. Mirrors
+// emit-finalize's REVIEW_FIT_RETURN_OR_COMPARE_RE so the two layers agree.
+const DETAIL_REQUEST_RE = new RegExp(
+  "\\b(?:compare|comparison|vs\\.?|versus|difference\\s+between|review|reviews|rated|rating|what\\s+(?:do\\s+)?(?:people|customers|others)\\s+(?:say|think)|return|refund|exchange|policy|warranty|spec|specs|material|technolog|feature|ingredient|how\\s+(?:does|do)\\s+(?:it|they)\\s+work|how\\s+it\\s+works|what\\s+makes|explain|in\\s+detail|details|detailed|breakdown|walk\\s+me\\s+through|everything\\s+about|tell\\s+me\\s+(?:more|everything)|full\\b)\\b",
+  "i",
+);
+
+// Generic listing/browse leads that must NOT open a decision answer.
+const GENERIC_LEAD_RE =
+  /^(?:here\s+(?:are|is|'?s)\b|these\s+are\b|take\s+a\s+look\b|i\s+found\b|i'?ve\s+(?:got|found)\b|let\s+me\s+(?:show|pull|grab)\b|check\s+(?:out|these)\b|browse\b|i\s+have\s+(?:a\s+few|some)\b|we\s+(?:have|carry)\b)/i;
+
+function retailWordCount(text) {
+  return String(text || "").trim().split(/\s+/).filter(Boolean).length;
+}
+
+function firstSentenceOf(text) {
+  const t = String(text || "").trim();
+  if (!t) return "";
+  const m = t.match(/^[^.!?\n]*[.!?]?/);
+  return (m ? m[0] : t).trim();
+}
+
+export function validateGrounding({ text, pool = [], categoryGenderMap = null, userMessage = "" } = {}) {
   const errors = [];
   if (!text || typeof text !== "string") return { ok: true, errors };
 
@@ -576,6 +624,52 @@ export function validateGrounding({ text, pool = [], categoryGenderMap = null } 
     });
   }
 
+  // ── Retail answer-contract rules (shape, not truth) ──────────────
+  // Gated on a real customer message and a prod kill-switch. These run
+  // last so a truth failure (which matters more) is reported first.
+  const msg = String(userMessage || "").trim();
+  if (msg && process.env.VALIDATOR_STYLE_RULES !== "off") {
+    const isDecisionQ = DECISION_QUESTION_RE.test(msg);
+    const wantsDetail = DETAIL_REQUEST_RE.test(msg);
+    const isProductTurn = (pool && pool.length > 0) || isDecisionQ;
+
+    // 7. Answer-first. A decision/suitability question must be answered in
+    // the first sentence — not opened with generic listing/browse copy.
+    if (isDecisionQ) {
+      const lead = firstSentenceOf(text);
+      if (GENERIC_LEAD_RE.test(lead)) {
+        errors.push({
+          kind: "answer_first",
+          claim: lead.slice(0, 80),
+          message:
+            `The customer asked a direct question ("${msg.slice(0, 90)}") but your ` +
+            `draft opens with generic browse copy ("${lead.slice(0, 60)}…"). Lead with ` +
+            `a DIRECT answer in the first sentence (yes / no / it depends — and why), ` +
+            `THEN mention products. Never open with "here are…" / "take a look…".`,
+        });
+      }
+    }
+
+    // 8. Overlong. A normal product/advisory answer must stay concise
+    // unless the customer asked for depth (comparison, reviews, specs,
+    // policy, "explain", "in detail", etc.).
+    if (isProductTurn && !wantsDetail) {
+      const words = retailWordCount(text);
+      if (words > MAX_RETAIL_WORDS) {
+        errors.push({
+          kind: "too_long",
+          claim: `${words} words`,
+          message:
+            `Your draft is ${words} words — too long for a retail chat answer. ` +
+            `Rewrite it as a concise retail sales answer: answer the customer ` +
+            `directly in the first sentence, give one honest reason or tradeoff, ` +
+            `then one best next step or alternative. Keep it under 5 sentences. ` +
+            `Do NOT remove necessary caveats.`,
+        });
+      }
+    }
+  }
+
   return { ok: errors.length === 0, errors };
 }
 
@@ -598,9 +692,16 @@ export function buildRetryInstruction(errors = [], previousText = "") {
         "",
       ]
     : [];
+  // Style-only failures (length/answer-first) aren't "factual issues" —
+  // frame the intro to fit whichever kind of error we're handing back.
+  const STYLE_KINDS = new Set(["too_long", "answer_first", "raw_handle_leak"]);
+  const allStyle = errors.every((e) => STYLE_KINDS.has(e.kind));
+  const intro = allStyle
+    ? "That draft needs to be reshaped before it can go to the customer:"
+    : "That draft has factual issues that need correcting before it can go to the customer:";
   return [
     ...draftBlock,
-    "That draft has factual issues that need correcting before it can go to the customer:",
+    intro,
     ...lines,
     "",
     "Rewrite the reply. If the only honest answer is that you can't verify the requested claim, say that plainly — that's a correct answer, not a failure.",
@@ -618,4 +719,9 @@ export const __TEST__ = {
   detectFalseColorDenials,
   cardOffersColor,
   detectRawHandleLeaks,
+  DECISION_QUESTION_RE,
+  DETAIL_REQUEST_RE,
+  GENERIC_LEAD_RE,
+  retailWordCount,
+  firstSentenceOf,
 };

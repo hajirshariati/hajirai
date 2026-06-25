@@ -483,4 +483,54 @@ test("rule6: a clean reply using the real display name passes", () => {
   assert.equal(out.ok, true);
 });
 
+// ─── Rules 7 & 8: retail answer contract (Jillian screenshots) ──
+
+const JILLIAN_POOL = [{ title: "Jillian Braided Quarter Strap Sandal - Black", handle: "jillian-black-sc450w" }];
+const Q_WALKING =
+  "I have a week-long family reunion in a hot climate where I'll be walking through theme parks all day. I'm deciding whether to order the Aetrex Jillian Braided Quarter Strap Sandal — will it hold up for that much active walking or is it more of a casual stroll sandal?";
+const Q_VALUE =
+  "everyone keeps recommending the Aetrex Jillian sandal for plantar fasciitis, I can find it for around a hundred dollars — is it actually worth that compared to supportive sandals I've already tried at half the price that haven't made a difference";
+
+test("rule7: decision question opened with generic browse copy is rejected", () => {
+  const out = validateGrounding({ text: "Here are some sandals that might work for you.", pool: JILLIAN_POOL, userMessage: Q_WALKING });
+  assert.equal(out.ok, false);
+  assert.ok(out.errors.some((e) => e.kind === "answer_first"));
+});
+
+test("rule7: a concise answer-first reply passes (walking suitability)", () => {
+  const out = validateGrounding({
+    text: "The Jillian holds up well for casual all-day wear, but it's a comfort sandal, not a performance walking shoe — for nonstop theme-park miles I'd pair it with a sportier option like the Savannah. Want me to show that?",
+    pool: JILLIAN_POOL,
+    userMessage: Q_WALKING,
+  });
+  assert.equal(out.ok, true, JSON.stringify(out.errors));
+});
+
+test("rule8: an essay-length product answer is rejected as too_long", () => {
+  const essay = "The Jillian is a comfortable and supportive sandal. ".repeat(40);
+  const out = validateGrounding({ text: essay, pool: JILLIAN_POOL, userMessage: Q_VALUE });
+  assert.ok(out.errors.some((e) => e.kind === "too_long"));
+});
+
+test("rule8: length cap is exempt when the customer asked to compare in detail", () => {
+  const essay = "The Jillian is a comfortable and supportive sandal. ".repeat(40);
+  const out = validateGrounding({ text: essay, pool: JILLIAN_POOL, userMessage: "compare the Jillian vs the Savannah in detail" });
+  assert.equal(out.errors.some((e) => e.kind === "too_long"), false);
+});
+
+test("rule8: a concise value answer passes (plantar-fasciitis worth-it)", () => {
+  const out = validateGrounding({
+    text: "Worth it if past sandals failed on fit, not just price — the Jillian adds real arch support and a contoured footbed that flat half-price pairs lack. If support was the gap, it'll feel different. Want me to compare it to the Savannah?",
+    pool: JILLIAN_POOL,
+    userMessage: Q_VALUE,
+  });
+  assert.equal(out.ok, true, JSON.stringify(out.errors));
+});
+
+test("rules 7/8: skip entirely when no userMessage is supplied (truth-only callers)", () => {
+  const essay = "The Jillian is a comfortable and supportive sandal. ".repeat(40);
+  const out = validateGrounding({ text: essay, pool: JILLIAN_POOL });
+  assert.equal(out.ok, true);
+});
+
 console.log("\nAll grounding-validator tests done.");

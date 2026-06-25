@@ -199,6 +199,9 @@ export async function runWithGroundingRetry({
   // Catalog gender×category truth, so the validator can reject a false
   // "we don't carry men's footwear" denial and let the model self-correct.
   categoryGenderMap = null,
+  // The customer's latest message — lets the validator enforce the retail
+  // answer contract (answer-first + concise) for decision/advisory turns.
+  userMessage = "",
 } = {}) {
   let messages = (initialMessages || []).slice();
   let attempt = 0;
@@ -254,7 +257,7 @@ export async function runWithGroundingRetry({
     mergeUsage(result?.totalUsage);
     const text = result?.fullResponseText || "";
     const pool = gatherPoolFromResult(result, messages);
-    const validation = validateGrounding({ text, pool, categoryGenderMap });
+    const validation = validateGrounding({ text, pool, categoryGenderMap, userMessage });
 
     if (typeof onAttempt === "function") {
       onAttempt({ attempt, validation, textLen: text.length, poolSize: pool.length });
