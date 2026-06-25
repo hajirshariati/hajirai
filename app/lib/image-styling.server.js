@@ -25,6 +25,11 @@ const OPENAI_IMAGE_MODEL = process.env.OPENAI_IMAGE_MODEL || "gpt-image-1";
 const PROVIDER_TIMEOUT_MS = Number(process.env.VISUALIZE_PROVIDER_TIMEOUT_MS) || 55000;
 const IMAGE_FETCH_TIMEOUT_MS = Number(process.env.VISUALIZE_IMAGE_FETCH_TIMEOUT_MS) || 15000;
 
+// How many reference angles to feed the image model. More views = more
+// faithful product reproduction; capped so the request stays well within
+// the proxy window. Env-overridable.
+const MAX_REFERENCE_IMAGES = Math.max(1, Number(process.env.VISUALIZE_MAX_REFERENCE_IMAGES) || 4);
+
 // AbortSignal.timeout (Node 17.3+) — a self-arming abort that fires after
 // `ms` and rejects the fetch with a TimeoutError we translate below.
 function timeoutSignal(ms) {
@@ -77,18 +82,18 @@ async function fetchImageAsBase64(url) {
   return { base64: buf.toString("base64"), mimeType: contentType.split(";")[0].trim(), bytes: buf };
 }
 
-async function generateWithGemini({ apiKey, prompt, image }) {
+async function generateWithGemini({ apiKey, prompt, images }) {
   const endpoint =
     `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_IMAGE_MODEL}:generateContent?key=${encodeURIComponent(apiKey)}`;
+  // Feed every reference angle we have. Multiple views (top/front/side) let
+  // the model reproduce the product faithfully instead of inventing the
+  // sides a single photo never showed.
+  const reqParts = [{ text: prompt }];
+  for (const img of images) {
+    reqParts.push({ inline_data: { mime_type: img.mimeType, data: img.base64 } });
+  }
   const body = {
-    contents: [
-      {
-        parts: [
-          { text: prompt },
-          { inline_data: { mime_type: image.mimeType, data: image.base64 } },
-        ],
-      },
-    ],
+    contents: [{ parts: reqParts }],
     // Ask for an image back.
     generationConfig: { responseModalities: ["IMAGE"] },
   };
@@ -111,7 +116,10 @@ async function generateWithGemini({ apiKey, prompt, image }) {
   return `data:${mime};base64,${data}`;
 }
 
-async function generateWithOpenAI({ apiKey, prompt, image }) {
+async function generateWithOpenAI({ apiKey, prompt, images }) {
+  // OpenAI edits take the primary reference only (single-image request kept
+  // byte-for-byte stable); the multi-angle win applies to the Gemini path.
+  const image = images[0];
   // gpt-image-1 edits: multipart form with the reference image + prompt.
   // gpt-image-1 default quality is "auto" → "high", which routinely runs
   // 40-60s and blows past the app-proxy/request window (prod trace
@@ -158,6 +166,7 @@ export async function generateStyledImage({
   geminiApiKey = "",
   openaiApiKey = "",
   productImageUrl,
+  productImageUrls,
   productTitle = "",
   styleContext = "",
 }) {
@@ -166,17 +175,35 @@ export async function generateStyledImage({
   }
   const apiKey = provider === "gemini" ? geminiApiKey : openaiApiKey;
   if (!apiKey) throw new Error(`no API key configured for image provider "${provider}"`);
-  if (!productImageUrl) throw new Error("product has no image to style");
+
+  // Accept a list of reference angles (preferred) or a single URL (legacy).
+  // De-dupe and bound it so a slow/huge gallery can't blow the request window.
+  const candidateUrls = (
+    Array.isArray(productImageUrls) && productImageUrls.length
+      ? productImageUrls
+      : [productImageUrl]
+  )
+    .map((u) => String(u || "").trim())
+    .filter(Boolean)
+    .filter((u, i, a) => a.indexOf(u) === i)
+    .slice(0, MAX_REFERENCE_IMAGES);
+  if (!candidateUrls.length) throw new Error("product has no image to style");
 
   const startedAt = Date.now();
-  let image;
-  try {
-    image = await fetchImageAsBase64(productImageUrl);
-  } catch (err) {
-    if (err?.name === "TimeoutError" || err?.name === "AbortError") {
-      throw new Error(`product image fetch timed out after ${IMAGE_FETCH_TIMEOUT_MS}ms`);
-    }
-    throw err;
+  // Fetch all references in parallel; tolerate individual failures as long as
+  // at least one survives (so a single dead gallery URL can't kill the run).
+  const fetched = await Promise.all(
+    candidateUrls.map((u) =>
+      fetchImageAsBase64(u).catch((err) => {
+        if (err?.name === "TimeoutError" || err?.name === "AbortError") return null;
+        console.error(`[image-styling] reference fetch failed (${u}):`, err?.message || err);
+        return null;
+      }),
+    ),
+  );
+  const images = fetched.filter(Boolean);
+  if (!images.length) {
+    throw new Error(`product image fetch failed or timed out after ${IMAGE_FETCH_TIMEOUT_MS}ms`);
   }
   const prompt = buildStylistPrompt({ productTitle, styleContext });
 
@@ -184,8 +211,8 @@ export async function generateStyledImage({
   try {
     imageDataUrl =
       provider === "gemini"
-        ? await generateWithGemini({ apiKey, prompt, image })
-        : await generateWithOpenAI({ apiKey, prompt, image });
+        ? await generateWithGemini({ apiKey, prompt, images })
+        : await generateWithOpenAI({ apiKey, prompt, images });
   } catch (err) {
     if (err?.name === "TimeoutError" || err?.name === "AbortError") {
       throw new Error(
@@ -202,7 +229,7 @@ export async function generateStyledImage({
   const ms = Date.now() - startedAt;
   const payloadChars = imageDataUrl ? imageDataUrl.length : 0;
   console.log(
-    `[image-styling] provider=${provider} ms=${ms} payloadChars=${payloadChars} ~bytes=${Math.round(payloadChars * 0.73)}`,
+    `[image-styling] provider=${provider} refs=${images.length} ms=${ms} payloadChars=${payloadChars} ~bytes=${Math.round(payloadChars * 0.73)}`,
   );
 
   return { imageDataUrl, costUsd: IMAGE_COST_USD[provider] || 0.04, provider, ms, payloadChars };

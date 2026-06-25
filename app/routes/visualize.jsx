@@ -8,10 +8,11 @@
 // with by the client. Style context (the customer's described look) is
 // passed from the conversation.
 
-import { authenticate } from "../shopify.server";
+import { authenticate, unauthenticated } from "../shopify.server";
 import prisma from "../db.server";
 import { getShopConfig } from "../models/ShopConfig.server";
 import { generateStyledImage, isImageProviderSupported } from "../lib/image-styling.server";
+import { getProductImageUrls } from "../models/Product.server";
 import { recordImageUsage } from "../models/ChatUsage.server";
 
 export const loader = async () => {
@@ -57,13 +58,26 @@ export const action = async ({ request }) => {
     // client). Scoped to this shop.
     const product = await prisma.product.findFirst({
       where: { shop, handle },
-      select: { title: true, featuredImageUrl: true },
+      select: { title: true, featuredImageUrl: true, shopifyId: true },
     });
     if (!product?.featuredImageUrl) {
       return Response.json(
         { ok: false, message: "We couldn't find an image for that product to style." },
         { status: 404 },
       );
+    }
+
+    // Pull the product's full media gallery (multiple angles) so the image
+    // model can reproduce the product faithfully instead of inventing the
+    // sides a single featured photo never shows. Best-effort: any failure
+    // falls straight back to the one featured image — never blocks the run.
+    let productImageUrls = [product.featuredImageUrl];
+    try {
+      const { admin } = await unauthenticated.admin(shop);
+      const gallery = await getProductImageUrls(admin, product.shopifyId);
+      if (gallery.length) productImageUrls = gallery;
+    } catch (err) {
+      console.error(`[visualize] ${shop} gallery fetch failed, using featured only:`, err?.message || err);
     }
 
     // Logged BEFORE generation so we have a record even when the app
@@ -79,6 +93,7 @@ export const action = async ({ request }) => {
         geminiApiKey: config.geminiApiKey || "",
         openaiApiKey: config.openaiApiKey || "",
         productImageUrl: product.featuredImageUrl,
+        productImageUrls,
         productTitle: product.title || "",
         styleContext,
       });

@@ -174,6 +174,44 @@ export async function fetchAndUpsertProduct(admin, shop, shopifyGid) {
   return upsertProduct(shop, node, mappings);
 }
 
+// Fetch up to `max` distinct product image URLs (multiple angles) for a
+// product by its Shopify GID — used by "Visualize My Look" so the image
+// model gets several reference views (top, front, side) instead of only
+// the single featured photo. With one angle the model has to INVENT the
+// unseen sides of the product when rendering it worn, which is the main
+// source of "doesn't look like the real thing". Best-effort: returns []
+// on any error so the caller can fall back to the stored featured image.
+export async function getProductImageUrls(admin, shopifyGid, max = 4) {
+  if (!admin || !shopifyGid) return [];
+  const query = `#graphql
+    query ProductMedia($id: ID!) {
+      product(id: $id) {
+        featuredImage { url }
+        media(first: 12) {
+          nodes { ... on MediaImage { image { url } } }
+        }
+      }
+    }`;
+  try {
+    const resp = await admin.graphql(query, { variables: { id: shopifyGid } });
+    const json = await resp.json();
+    const p = json?.data?.product;
+    if (!p) return [];
+    const urls = [];
+    const push = (u) => {
+      const v = String(u || "").trim();
+      if (v && !urls.includes(v)) urls.push(v);
+    };
+    // Featured image first so it's the primary reference; gallery angles follow.
+    push(p.featuredImage?.url);
+    for (const n of p.media?.nodes || []) push(n?.image?.url);
+    return urls.slice(0, Math.max(1, max));
+  } catch (err) {
+    console.error(`[product-images] media fetch failed for ${shopifyGid}:`, err?.message || err);
+    return [];
+  }
+}
+
 export async function deleteProductByShopifyId(shop, shopifyId) {
   const gid = typeof shopifyId === "string" && shopifyId.startsWith("gid://")
     ? shopifyId
