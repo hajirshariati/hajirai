@@ -123,6 +123,13 @@ async function generateWithOpenAI({ apiKey, prompt, image }) {
   form.append("prompt", prompt);
   form.append("size", "1024x1024");
   form.append("quality", process.env.OPENAI_IMAGE_QUALITY || "low");
+  // input_fidelity=high is the single most important fidelity lever for
+  // gpt-image-1 edits: it forces the model to PRESERVE the reference
+  // image's fine details (the product's exact shape, color, materials,
+  // hardware) instead of loosely re-imagining it. Default ("low") is why
+  // styled products came back looking nothing like the real item. Costs a
+  // little more latency/tokens; env-overridable to dial back if needed.
+  form.append("input_fidelity", process.env.OPENAI_IMAGE_INPUT_FIDELITY || "high");
   form.append(
     "image",
     new Blob([image.bytes], { type: image.mimeType || "image/png" }),
