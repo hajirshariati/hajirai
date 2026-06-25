@@ -1799,10 +1799,18 @@ function genderCategoryExistsInCatalog(ctx, gender, category) {
   const map = ctx?.categoryGenderMap;
   const g = String(gender || "").toLowerCase().trim();
   const c = String(category || "").toLowerCase().trim();
-  if (!map || typeof map !== "object" || !g || !c) return false;
+  // Gender is OPTIONAL here. The customer often names a category with no
+  // gender ("what shoes have worked for arch pain?"); denying it because we
+  // can't pin a gender is a provably-false denial (prod trace 2026-06-25:
+  // "my arches ache on long walks, what's worked for people my age" — gender
+  // unstated — got "I couldn't find footwear in our current catalog"). Only a
+  // category is required to do the existence check.
+  if (!map || typeof map !== "object" || !c) return false;
   const hasGenderFor = (catKey) => {
     const entry = map[catKey];
-    if (!entry || !Array.isArray(entry.genders)) return false;
+    if (!entry || !Array.isArray(entry.genders) || entry.genders.length === 0) return false;
+    // No gender stated → the category exists if it exists for ANY gender.
+    if (!g) return true;
     return entry.genders.map((x) => String(x).toLowerCase()).some((x) => x === g || x === "unisex");
   };
   const FOOTWEAR_UMBRELLA = new Set(["footwear", "shoes", "shoe"]);
