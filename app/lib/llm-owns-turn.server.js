@@ -192,6 +192,37 @@ export function gatherPoolFromResult(result, fallbackMessages = []) {
 //     validation: { ok, errors, attempts },
 //   }
 
+// Deterministic length cap (no retry, no model call). Answer-quality length
+// is a WARNING, not a blocker — but a wall of text still shouldn't reach the
+// customer, so when the validator flags `too_long` we trim the reply to whole
+// sentences within budget at ship time. Detail-requested turns (reviews,
+// compare-in-detail, specs, policy) never raise `too_long`, so they're never
+// trimmed.
+const SHORTEN_CHARS = Number(process.env.VALIDATOR_MAX_CHARS) || 500;
+function shortenToBudget(text, maxChars = SHORTEN_CHARS) {
+  const t = String(text || "").trim();
+  if (t.length <= maxChars) return t;
+  const sentences = t.split(/(?<=[.!?])\s+/);
+  let out = "";
+  for (const s of sentences) {
+    if (out && (out + " " + s).length > maxChars) break;
+    out = out ? out + " " + s : s;
+    if (out.length >= maxChars) break;
+  }
+  if (!out) out = t.slice(0, maxChars).replace(/\s+\S*$/, "").trim();
+  return out;
+}
+function applyLengthCap(result, warnings) {
+  const tooLong = Array.isArray(warnings) && warnings.some((w) => w.kind === "too_long");
+  if (!tooLong || !result?.fullResponseText) return result;
+  const trimmed = shortenToBudget(result.fullResponseText);
+  if (trimmed.length < result.fullResponseText.length) {
+    console.log(`[grounding-retry] length cap: trimmed ${result.fullResponseText.length}→${trimmed.length} chars`);
+    return { ...result, fullResponseText: trimmed };
+  }
+  return result;
+}
+
 export async function runWithGroundingRetry({
   runLoop,
   initialMessages,
@@ -211,6 +242,7 @@ export async function runWithGroundingRetry({
   let attempt = 0;
   let last = null;
   let lastErrors = [];
+  let lastWarnings = [];
   // Best substantial answer seen across attempts, for fragment recovery.
   // The grounding validator sometimes false-rejects a legitimate
   // product-feature phrase (prod 2026-06-24: "Built-in Aetrex Signature
@@ -298,6 +330,7 @@ export async function runWithGroundingRetry({
     }
 
     considerSubstantial(result, text, validation);
+    lastWarnings = validation.warnings || [];
 
     if (validation.ok) {
       // Don't ship a gutted fragment when an earlier attempt produced a
@@ -309,13 +342,13 @@ export async function runWithGroundingRetry({
           `[grounding-retry] recovered substantial draft (${bestSubstantial.len} chars) over fragment (${text.trim().length} chars)`,
         );
         return {
-          ...bestSubstantial.result,
+          ...applyLengthCap(bestSubstantial.result, lastWarnings),
           totalUsage: { ...accUsage },
           validation: { ok: true, errors: [], attempts: attempt + 1, recoveredSubstantial: true },
         };
       }
       return {
-        ...result,
+        ...applyLengthCap(result, validation.warnings),
         totalUsage: { ...accUsage },
         validation: { ok: true, errors: [], attempts: attempt + 1 },
       };
@@ -361,7 +394,7 @@ export async function runWithGroundingRetry({
       `[grounding-retry] exhausted; shipping recovered substantial answer (${bestSubstantial.len} chars)`,
     );
     return {
-      ...bestSubstantial.result,
+      ...applyLengthCap(bestSubstantial.result, lastWarnings),
       totalUsage: { ...accUsage },
       validation: { ok: false, errors: lastErrors, attempts: attempt + 1, recoveredSubstantial: true },
     };
@@ -371,7 +404,7 @@ export async function runWithGroundingRetry({
   // NOT a deterministic "couldn't verify / tell me more" ask. The handle and
   // internal-language scrubs in emit-finalize remain as the final safety net.
   return {
-    ...last,
+    ...applyLengthCap(last, lastWarnings),
     totalUsage: { ...accUsage },
     validation: { ok: false, errors: lastErrors, attempts: attempt + 1 },
   };

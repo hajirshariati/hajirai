@@ -321,7 +321,7 @@ test("shadowDiffRecord flags new-only-empty (regression risk)", () => {
 const SANDAL_POOL = [{ handle: "jillian-black", title: "Jillian Braided Quarter Strap Sandal - Black", price_formatted: "$139.95" }];
 const withCards = (text) => ({ fullResponseText: text, finalProductCards: SANDAL_POOL, messages: [] });
 
-test("quality issue (too long) ships immediately as a warning — no retry, no block", async () => {
+test("too-long answer ships in ONE pass (no retry) but is deterministically trimmed to budget", async () => {
   let calls = 0;
   const longAnswer =
     "Yes — the Jillian has solid arch support and a contoured footbed, a genuinely good pick for plantar fasciitis on lighter days. " +
@@ -333,9 +333,22 @@ test("quality issue (too long) ships immediately as a warning — no retry, no b
     userMessage: "is the Jillian good for plantar fasciitis?",
     namedProductMentioned: true,
   });
-  assert.equal(out.validation.ok, true, "quality issues do not block");
+  assert.equal(out.validation.ok, true, "length is a warning, never blocks");
   assert.equal(calls, 1, "no retry on a quality-only issue");
-  assert.equal(out.fullResponseText, longAnswer, "ships the model's real answer, unmutated");
+  assert.ok(out.fullResponseText.length < longAnswer.length, "wall of text was trimmed");
+  assert.ok(out.fullResponseText.length <= 520, `trimmed to budget, got ${out.fullResponseText.length}`);
+  assert.match(out.fullResponseText, /^Yes —/, "kept the answer-first opening");
+});
+
+test("a concise answer (under budget) is shipped untouched", async () => {
+  const concise = "Yes — the Jillian has real arch support and a contoured footbed, a solid plantar-fasciitis pick for everyday wear. Want a sturdier walking option too?";
+  const out = await runWithGroundingRetry({
+    runLoop: async () => withCards(concise),
+    initialMessages: [{ role: "user", content: "x" }],
+    userMessage: "is the Jillian good for plantar fasciitis?",
+    namedProductMentioned: true,
+  });
+  assert.equal(out.fullResponseText, concise, "short answers are never mutated");
 });
 
 test("a 'fragment' is a warning now (ships) — quality no longer forces a non-answer", async () => {

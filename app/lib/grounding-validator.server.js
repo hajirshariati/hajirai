@@ -523,6 +523,15 @@ const PRODUCT_DATA_INTENT_RE = new RegExp(
   "i",
 );
 
+// A two-product comparison turn. On these the model makes per-product
+// DISTINCTIONS ("the Savannah is sturdier for walking") that the feature
+// checker misreads as unsupported universal claims, causing pointless retry
+// loops (live trace 2026-06-25: "Jillian or Savannah?" looped 3× on
+// "Savannah wins for walking"). The response-contract verifier already skips
+// compare turns for the same reason; we mirror that here.
+const COMPARISON_RE =
+  /\b(?:vs\.?|versus|compare[ds]?|comparison|which\s+is\s+better|better\s+(?:for|than)|which\s+(?:one\s+)?should\s+i)\b/i;
+
 // Generic "browse these" fallbacks that emit-finalize ships when a real
 // answer was wiped — a non-answer for any specific question.
 const GENERIC_FALLBACK_RE =
@@ -621,7 +630,10 @@ export function validateGrounding({ text, pool = [], categoryGenderMap = null, u
   // supported by that card's description, tags, attributes, or claim
   // facts. This is the rule that catches "Noelle has both technologies
   // built in" — Noelle's card has no BioRocker/UltraSky evidence.
-  const featureClaims = extractFeatureClaims(text);
+  // Skip on comparison turns: per-product distinctions ("X is sturdier than
+  // Y for walking") read as unsupported claims and burn retries with no win.
+  const isComparison = COMPARISON_RE.test(String(userMessage || ""));
+  const featureClaims = isComparison ? [] : extractFeatureClaims(text);
   const seenFeatureClaims = new Set();
   for (const { family, productPhrase, feature } of featureClaims) {
     const key = `${family}|${feature}`;
