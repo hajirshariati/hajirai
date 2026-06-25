@@ -533,4 +533,65 @@ test("rules 7/8: skip entirely when no userMessage is supplied (truth-only calle
   assert.equal(out.ok, true);
 });
 
+// ─── Rule 9: force product lookup on named-product data questions ──
+
+test("rule9: named product + condition question with no search forces a lookup", () => {
+  const out = validateGrounding({
+    text: "The Jillian is generally supportive and many people find it helpful.",
+    pool: [],
+    userMessage: "is the Jillian good for plantar fasciitis?",
+    namedProductMentioned: true,
+    searchAttempted: false,
+  });
+  assert.ok(out.errors.some((e) => e.kind === "missing_product_lookup"));
+});
+
+test("rule9: educational question (no named product) does NOT force a lookup", () => {
+  const out = validateGrounding({
+    text: "Arch support helps distribute pressure and can ease plantar fasciitis for many people.",
+    pool: [],
+    userMessage: "is arch support necessary for plantar fasciitis?",
+    namedProductMentioned: false,
+    searchAttempted: false,
+  });
+  assert.equal(out.errors.some((e) => e.kind === "missing_product_lookup"), false);
+});
+
+test("rule9: a named product already searched (but not found) does NOT loop", () => {
+  const out = validateGrounding({
+    text: "I couldn't find that exact pair in stock, but here's a close option.",
+    pool: [],
+    userMessage: "do you have the Jillian in black size 8?",
+    namedProductMentioned: true,
+    searchAttempted: true,
+  });
+  assert.equal(out.errors.some((e) => e.kind === "missing_product_lookup"), false);
+});
+
+// ─── Rule 10: generic fallback is a non-answer on specific questions ──
+
+test("rule10: 'Take a look' fallback fails on a value/suitability question", () => {
+  const pool = [{ title: "Jillian Braided Quarter Strap Sandal - Black", handle: "jillian-black-sc450w" }];
+  const out = validateGrounding({
+    text: "Take a look — these are the closest matches I've got.",
+    pool,
+    userMessage: "is the Jillian worth it for plantar fasciitis?",
+    namedProductMentioned: true,
+    searchAttempted: true,
+  });
+  assert.ok(out.errors.some((e) => e.kind === "generic_fallback_non_answer"));
+});
+
+test("rule10: the same fallback is allowed for a plain browse request", () => {
+  const pool = [{ title: "Jillian Braided Quarter Strap Sandal - Black", handle: "jillian-black-sc450w" }];
+  const out = validateGrounding({
+    text: "Take a look — these are the closest matches I've got.",
+    pool,
+    userMessage: "show me some sandals",
+    namedProductMentioned: false,
+    searchAttempted: true,
+  });
+  assert.equal(out.ok, true);
+});
+
 console.log("\nAll grounding-validator tests done.");

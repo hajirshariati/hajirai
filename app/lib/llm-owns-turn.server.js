@@ -202,6 +202,9 @@ export async function runWithGroundingRetry({
   // The customer's latest message — lets the validator enforce the retail
   // answer contract (answer-first + concise) for decision/advisory turns.
   userMessage = "",
+  // True when the customer named a specific catalog product this turn — so
+  // the validator can force a product lookup on value/fit/condition questions.
+  namedProductMentioned = false,
 } = {}) {
   let messages = (initialMessages || []).slice();
   let attempt = 0;
@@ -248,16 +251,32 @@ export async function runWithGroundingRetry({
     for (const k of Object.keys(accUsage)) accUsage[k] += u[k] || 0;
   };
 
+  // Style-only validator failures (length, answer-first, raw handle) are
+  // fixable by REWRITING the existing draft — the data is already correct.
+  // Re-running the full agentic loop (and its product searches) for those
+  // is wasted money/latency, so the next attempt runs tools-off. Data
+  // failures (ungrounded name, wrong price, missing lookup, false denial)
+  // still re-run tools so the model can fetch what it's missing.
+  const REWRITE_ONLY_KINDS = new Set(["too_long", "answer_first", "raw_handle_leak"]);
+  let nextRewriteOnly = false;
+
   while (attempt <= maxRetries) {
     // `attempt` lets the caller route models per attempt — e.g. run
     // attempt 0 on Haiku and escalate retries to Sonnet so a validator
     // rejection gets the stronger model for the correction.
-    const result = await runLoop({ messages: messages.slice(), attempt });
+    const result = await runLoop({ messages: messages.slice(), attempt, rewriteOnly: nextRewriteOnly });
     last = result;
     mergeUsage(result?.totalUsage);
     const text = result?.fullResponseText || "";
     const pool = gatherPoolFromResult(result, messages);
-    const validation = validateGrounding({ text, pool, categoryGenderMap, userMessage });
+    const validation = validateGrounding({
+      text,
+      pool,
+      categoryGenderMap,
+      userMessage,
+      namedProductMentioned,
+      searchAttempted: Boolean(result?.productSearchAttempted),
+    });
 
     if (typeof onAttempt === "function") {
       onAttempt({ attempt, validation, textLen: text.length, poolSize: pool.length });
@@ -290,6 +309,11 @@ export async function runWithGroundingRetry({
     lastErrors = validation.errors;
     // Don't retry if we've hit the cap.
     if (attempt >= maxRetries) break;
+
+    // If EVERY failure is style-only, the next attempt rewrites the draft
+    // with tools disabled. If even one is a data failure, keep tools on.
+    nextRewriteOnly = validation.errors.length > 0
+      && validation.errors.every((e) => REWRITE_ONLY_KINDS.has(e.kind));
 
     // Hand the errors back to the model. The retry instruction is
     // appended as a NEW user turn so the model treats it as a

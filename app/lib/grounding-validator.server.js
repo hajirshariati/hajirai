@@ -469,6 +469,31 @@ const DETAIL_REQUEST_RE = new RegExp(
 const GENERIC_LEAD_RE =
   /^(?:here\s+(?:are|is|'?s)\b|these\s+are\b|take\s+a\s+look\b|i\s+found\b|i'?ve\s+(?:got|found)\b|let\s+me\s+(?:show|pull|grab)\b|check\s+(?:out|these)\b|browse\b|i\s+have\s+(?:a\s+few|some)\b|we\s+(?:have|carry)\b)/i;
 
+// Intents that REQUIRE real product data to answer honestly — value,
+// suitability, condition-fit, sizing, availability. A named-product
+// question of this shape must be grounded in fetched product/variant data,
+// not general knowledge, and a generic "browse these" fallback is a
+// non-answer for it. (Pure educational/clinical questions — "is arch
+// support necessary for plantar fasciitis?" — are gated out separately by
+// requiring that the customer actually NAMED a product.)
+const PRODUCT_DATA_INTENT_RE = new RegExp(
+  "\\b(?:worth\\b|hold\\s+up|holds\\s+up|durable|last\\b|lasts\\b)" + "|" +
+  "\\bgood\\s+(?:for|enough)\\b" + "|" +
+  "\\b(?:suitable|comfortable|right|enough)\\s+(?:for|to)\\b" + "|" +
+  "\\bmore\\s+of\\s+a\\b" + "|" +
+  "\\bwhich\\s+(?:one\\s+)?(?:should|do|would|is)\\b" + "|" +
+  "\\bshould\\s+i\\s+(?:buy|order|get|choose|pick|go)\\b" + "|" +
+  "\\b(?:plantar|fasciitis|bunion|neuroma|metatarsal|overpronat|supinat|sesamoid|capsulitis|fallen\\s+arch|flat\\s+feet|heel\\s+(?:pain|spur)|arch\\s+(?:pain|support))\\b" + "|" +
+  "\\b(?:size|sizing|fit|fits|true\\s+to\\s+size|wide|narrow|in\\s+stock|come[s]?\\s+in|available|availabilit)\\b" + "|" +
+  "\\b(?:walking|standing|all[-\\s]?day|active)\\b",
+  "i",
+);
+
+// Generic "browse these" fallbacks that emit-finalize ships when a real
+// answer was wiped — a non-answer for any specific question.
+const GENERIC_FALLBACK_RE =
+  /^(?:take\s+a\s+look\b|here\s+are\s+the\s+(?:matching|closest)|these\s+are\s+the\s+closest|i'?m\s+not\s+finding\s+a\s+clean\s+match|tell\s+me\s+a\s+bit\s+more\b)/i;
+
 function retailWordCount(text) {
   return String(text || "").trim().split(/\s+/).filter(Boolean).length;
 }
@@ -480,7 +505,7 @@ function firstSentenceOf(text) {
   return (m ? m[0] : t).trim();
 }
 
-export function validateGrounding({ text, pool = [], categoryGenderMap = null, userMessage = "" } = {}) {
+export function validateGrounding({ text, pool = [], categoryGenderMap = null, userMessage = "", namedProductMentioned = false, searchAttempted = false } = {}) {
   const errors = [];
   if (!text || typeof text !== "string") return { ok: true, errors };
 
@@ -632,6 +657,42 @@ export function validateGrounding({ text, pool = [], categoryGenderMap = null, u
     const isDecisionQ = DECISION_QUESTION_RE.test(msg);
     const wantsDetail = DETAIL_REQUEST_RE.test(msg);
     const isProductTurn = (pool && pool.length > 0) || isDecisionQ;
+    const needsProductData = PRODUCT_DATA_INTENT_RE.test(msg);
+    const poolEmpty = !pool || pool.length === 0;
+
+    // 9. Missing product lookup. The customer named a specific product and
+    // asked something that needs its real data (value/suitability/condition/
+    // size), but the model answered WITHOUT fetching it — no search ran and
+    // no product data is in the pool. Force a lookup. (Only when no search
+    // was even attempted, so a genuinely-not-found product doesn't loop.)
+    if (namedProductMentioned && needsProductData && poolEmpty && !searchAttempted) {
+      errors.push({
+        kind: "missing_product_lookup",
+        claim: msg.slice(0, 80),
+        message:
+          "The customer asked about a specific product they named, but you " +
+          "answered without looking it up — no product was fetched this turn. " +
+          "Call get_product_details (or search_products) for that product " +
+          "FIRST, then answer from its real attributes/variants. Never answer " +
+          "a named-product value/fit/condition question from memory alone.",
+      });
+    }
+
+    // 10. Generic fallback as a non-answer. A "browse these / take a look"
+    // line is fine for a plain browse request, but it's a non-answer to a
+    // specific value/suitability/sizing/availability question.
+    if (needsProductData && GENERIC_FALLBACK_RE.test(text.trim())) {
+      errors.push({
+        kind: "generic_fallback_non_answer",
+        claim: firstSentenceOf(text).slice(0, 80),
+        message:
+          "You replied with a generic 'browse these' line, but the customer " +
+          "asked a specific question (value, suitability, sizing, or " +
+          "availability). That's a non-answer. Answer it directly using the " +
+          "product data you have; if you truly can't verify something, say " +
+          "exactly what and offer to check it — never a generic 'take a look'.",
+      });
+    }
 
     // 7. Answer-first. A decision/suitability question must be answered in
     // the first sentence — not opened with generic listing/browse copy.
@@ -722,6 +783,8 @@ export const __TEST__ = {
   DECISION_QUESTION_RE,
   DETAIL_REQUEST_RE,
   GENERIC_LEAD_RE,
+  PRODUCT_DATA_INTENT_RE,
+  GENERIC_FALLBACK_RE,
   retailWordCount,
   firstSentenceOf,
 };

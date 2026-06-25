@@ -1631,7 +1631,7 @@ function hasCompetitorBrandMention(text) {
 // containsAvailabilityDenial lives in app/lib/chat-helpers.server.js so
 // the test suite can import it without dragging the route loader graph.
 
-async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, controller, encoder, promptCaching, tools, promptStableLength = 0 }) {
+async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, controller, encoder, promptCaching, tools, promptStableLength = 0, forceNoTools = false }) {
   const totalUsage = { input_tokens: 0, output_tokens: 0, cache_creation_input_tokens: 0, cache_read_input_tokens: 0 };
   let toolCallCount = 0;
   // Track whether ANY recommend_* tool fired this turn. Used to
@@ -1757,6 +1757,10 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
           max_tokens: MAX_TOKENS,
           system,
           tools: activeTools,
+          // Rewrite-only mode (style-only validator retry): forbid tool
+          // calls so the model reshapes its existing draft from the tool
+          // results already in `messages` — no expensive re-search.
+          ...(forceNoTools ? { tool_choice: { type: "none" } } : {}),
           messages,
         });
         for await (const event of stream) {
@@ -4158,7 +4162,17 @@ async function handleChatPost({ shop, sessionAccessToken, request, internal = fa
               // ("show me women's sneakers", "black sneakers") DON'T match —
               // those already work on Haiku and stay cheap.
               /\b(?:do\s+you\s+(?:have|carry|sell)|what\s+(?:shoes?|footwear|kind\s+of\s+(?:shoes?|footwear))|what\s+(?:would|should|do\s+you\s+recommend))\b[^.?!\n]{0,60}\b(?:shoes?|footwear|sneakers?|sandals?|boots?|loafers?|clogs?|slippers?|insoles?|orthotics?|wear|walk|stand|feet|foot|arch|heel)\b/i.test(latestForRouting) ||
-              /\b(?:shoes?|footwear|insoles?|orthotics?)\b[^.?!\n]{0,40}\b(?:or|and)\b[^.?!\n]{0,40}\b(?:shoes?|footwear|insoles?|orthotics?)\b/i.test(latestForRouting);
+              /\b(?:shoes?|footwear|insoles?|orthotics?)\b[^.?!\n]{0,40}\b(?:or|and)\b[^.?!\n]{0,40}\b(?:shoes?|footwear|insoles?|orthotics?)\b/i.test(latestForRouting) ||
+              // Advisory / value / medical-adjacent judgment questions. Haiku
+              // writes weak, hedgy, or process-narrated first drafts on these
+              // ("is the Jillian good for plantar fasciitis?", "is it worth
+              // it?", "which should I buy?", "casual or active?"), which then
+              // burn validator retries. Sonnet answers them cleanly first-try,
+              // so route straight to it (one Sonnet call beats Haiku + a Sonnet
+              // retry). Simple browse/search stays on Haiku.
+              /\b(?:plantar|fasciitis|bunion|neuroma|metatarsal|overpronat|supinat|sesamoid|capsulitis|fallen\s+arch|flat\s+feet|heel\s+(?:pain|spur)|arch\s+(?:pain|support))\b/i.test(latestForRouting) ||
+              /\bis\s+(?:it|this|that|the|these|they)\b[^.?!\n]{0,45}\b(?:good\s+for|worth|casual|active|sporty|dressy|formal|suitable|right\s+for|enough)\b/i.test(latestForRouting) ||
+              /\b(?:which\s+(?:one\s+)?should\s+i|should\s+i\s+(?:buy|get|order|choose|pick)|more\s+of\s+a)\b/i.test(latestForRouting);
             const pickModel = (attempt) => {
               if (!hybridRouting) return sonnetModelForClean;
               if (turnStrategy === "always-opus") return OPUS_MODEL;
@@ -4176,11 +4190,11 @@ async function handleChatPost({ shop, sessionAccessToken, request, internal = fa
             // this, a failed attempt's text would stream to the widget
             // and the retry's text would stream again (duplicate reply).
             let attemptBuf = [];
-            const runLoopOnce = async ({ messages: msgs, attempt = 0 }) => {
+            const runLoopOnce = async ({ messages: msgs, attempt = 0, rewriteOnly = false }) => {
               attemptBuf = [];
               const turnModel = pickModel(attempt);
               if (turnModel !== sonnetModelForClean) {
-                console.log(`[llm-owns-turn] ${ctx.shop} model=${turnModel} (hybrid, attempt=${attempt + 1})`);
+                console.log(`[llm-owns-turn] ${ctx.shop} model=${turnModel} (hybrid, attempt=${attempt + 1}${rewriteOnly ? ", rewrite-only" : ""})`);
               }
               return await runAgenticLoop({
                 anthropic,
@@ -4191,6 +4205,7 @@ async function handleChatPost({ shop, sessionAccessToken, request, internal = fa
                 ctx: { ...ctx },
                 controller: { enqueue: (c) => attemptBuf.push(c) },
                 encoder,
+                forceNoTools: rewriteOnly,
                 // Force prompt caching ON for the LLM-owns path. The
                 // system prompt is ~80KB and goes to Sonnet on EVERY
                 // hop; without caching, Anthropic re-reads it from
@@ -4205,11 +4220,30 @@ async function handleChatPost({ shop, sessionAccessToken, request, internal = fa
                 tools: activeTools,
               });
             };
+            // Fix #2: did the customer NAME a catalog product this turn? If
+            // so, a value/fit/condition question about it must be grounded in
+            // fetched product data (the validator's missing_product_lookup
+            // rule). Gate the catalog query behind a cheap intent regex so
+            // plain browse turns don't pay a DB round-trip.
+            let namedProductMentioned = false;
+            const latestForNamed = ctx.latestUserMessage || "";
+            if (/\b(?:worth|hold\s+up|good\s+for|durable|plantar|fasciitis|bunion|neuroma|metatarsal|size|sizing|fit|fits|in\s+stock|come[s]?\s+in|available|which\s+(?:one\s+)?should|should\s+i\s+(?:buy|get|order|choose)|more\s+of\s+a|all[-\s]?day|walking|standing)\b/i.test(latestForNamed)) {
+              try {
+                const { findProductHandleForSimilarAnchor } = await import("../lib/catalog-resolver.server");
+                namedProductMentioned = Boolean(
+                  (await detectSpecificProduct(ctx.shop, latestForNamed)) ||
+                  (await findProductHandleForSimilarAnchor(ctx.shop, latestForNamed)),
+                );
+              } catch (err) {
+                console.error(`[named-product] detection failed:`, err?.message || err);
+              }
+            }
             const cleanResult = await runWithGroundingRetry({
               runLoop: runLoopOnce,
               initialMessages: messages,
               categoryGenderMap: ctx.categoryGenderMap || null,
               userMessage: ctx.latestUserMessage || "",
+              namedProductMentioned,
               maxRetries: 2,
               onAttempt: ({ attempt, validation, textLen, poolSize }) => {
                 console.log(
