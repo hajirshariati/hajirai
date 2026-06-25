@@ -4097,7 +4097,17 @@ async function handleChatPost({ shop, sessionAccessToken, request, internal = fa
               // goes unanswered (prod trace 2026-06-24, Jillian strap/instep
               // + "can I return it"). Sonnet follows the direct-voice rules,
               // so route these straight to it on the first attempt.
-              /\b(?:reviews?\s+say|what\s+do\s+(?:reviewers?|customers?|buyers?|people)\s+(?:say|think)|runs?\s+(?:narrow|wide|small|large|big|tight)|true\s+to\s+size|size\s+up|size\s+down|high\s+instep|wide\s+(?:foot|feet|width)|narrow\s+(?:foot|feet|width)|hold[s]?\s+up|durab|well[-\s]?made|worth\s+(?:it|the\s+price|that)|how\s+long\s+(?:do|does|will)\s+(?:it|they|these)\s+last|can\s+i\s+return|does\s+the\s+(?:adjustable|strap|hook|buckle))\b/i.test(latestForRouting);
+              /\b(?:reviews?\s+say|what\s+do\s+(?:reviewers?|customers?|buyers?|people)\s+(?:say|think)|runs?\s+(?:narrow|wide|small|large|big|tight)|true\s+to\s+size|size\s+up|size\s+down|high\s+instep|wide\s+(?:foot|feet|width)|narrow\s+(?:foot|feet|width)|hold[s]?\s+up|durab|well[-\s]?made|worth\s+(?:it|the\s+price|that)|how\s+long\s+(?:do|does|will)\s+(?:it|they|these)\s+last|can\s+i\s+return|does\s+the\s+(?:adjustable|strap|hook|buckle))\b/i.test(latestForRouting) ||
+              // Vague footwear-browse / availability turns: "do you have men's
+              // shoes?", "what shoes are good for…", "what shoes or insoles
+              // have worked…". Haiku over-elicits here (asks "for yourself or
+              // someone else?" instead of searching and showing products /
+              // category chips). Sonnet follows the search + category-chip
+              // rules, so route these to it on attempt 0. Explicit searches
+              // ("show me women's sneakers", "black sneakers") DON'T match —
+              // those already work on Haiku and stay cheap.
+              /\b(?:do\s+you\s+(?:have|carry|sell)|what\s+(?:shoes?|footwear|kind\s+of\s+(?:shoes?|footwear))|what\s+(?:would|should|do\s+you\s+recommend))\b[^.?!\n]{0,60}\b(?:shoes?|footwear|sneakers?|sandals?|boots?|loafers?|clogs?|slippers?|insoles?|orthotics?|wear|walk|stand|feet|foot|arch|heel)\b/i.test(latestForRouting) ||
+              /\b(?:shoes?|footwear|insoles?|orthotics?)\b[^.?!\n]{0,40}\b(?:or|and)\b[^.?!\n]{0,40}\b(?:shoes?|footwear|insoles?|orthotics?)\b/i.test(latestForRouting);
             const pickModel = (attempt) => {
               if (!hybridRouting) return sonnetModelForClean;
               if (turnStrategy === "always-opus") return OPUS_MODEL;
