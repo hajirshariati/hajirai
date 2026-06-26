@@ -69,12 +69,14 @@ import {
   ensureCompleteCustomerText,
   repairProductTurnAssembly,
   buildCodeOwnedProductListingText,
+  titleStyleFamily,
 } from "./response-contract.server.js";
 import {
   canonicalizeCatalogConstraints,
   umbrellaCategoryTermsFromGroups,
 } from "./catalog-matcher.server.js";
 import { extractUserConstraints } from "./catalog-resolver.server.js";
+import { isAnswerWorkflow, buildAnswerWorkflowExhaustionText } from "./turn-plan.server.js";
 
 // Knowledge / info questions — kept in sync with KNOWLEDGE_QUESTION_RE
 // in product-turn-engine.server.js. Used to skip the response-contract
@@ -250,6 +252,96 @@ export function scopedProductSearchInput(ctx = {}) {
     input: { query, filters, limit: 6 },
     scope: { gender, category, color, size, width, condition },
   };
+}
+
+// Answer-workflow forced search — current-turn evidence only, NO stale memory.
+//
+// The default scopedProductSearchInput pulls category/color/size from session
+// memory FIRST (`scope.X || latest.X`), which is exactly how a Disney/sneakers
+// turn contaminated a later "Do you have Savannah in champagne?" availability
+// turn into query="sneakers". For answer workflows we build the forced/fallback
+// search from (a) the model's first plan-enforced family search this turn —
+// captured as `capturedInput`, whose query already names the family — falling
+// back to (b) the latest customer message text, plus constraints extracted
+// ONLY from the latest message. The named family owns the query; it can never
+// become "sneakers". Variant filters (size/width) are dropped so the FAMILY
+// card still surfaces when the exact variant isn't in stock (the precise
+// availability is answered in TEXT); gender comes from the plan when stated.
+export function buildAnswerWorkflowForcedSearch({ ctx = {}, capturedInput = null } = {}) {
+  const latestMsg = String(ctx.latestUserMessage || "");
+  const latest = extractUserConstraints(latestMsg);
+  const plan = ctx.turnPlan || {};
+
+  const filters = {};
+  const gender = plan.gender === "men" || plan.gender === "women" ? plan.gender : latest.gender;
+  if (gender) filters.gender = gender;
+  // Color is a real, ensureProductTurnCards-relaxable variant filter — keep it
+  // only when the LATEST message named it. Size/width are intentionally NOT
+  // applied to the card search (they'd empty the family); the model answers
+  // them in text and the customer checks the card.
+  if (latest.color) filters.color = latest.color;
+
+  // Query: the captured family search (best — names the family), else the raw
+  // latest message (which contains the family name), else "shoes".
+  const capturedQuery = capturedInput?.query ? String(capturedInput.query).trim() : "";
+  const query = capturedQuery || latestMsg.slice(0, 160).trim() || "shoes";
+
+  return {
+    input: { query, filters, limit: 6 },
+    scope: { gender, color: latest.color, size: latest.size, width: latest.width },
+  };
+}
+
+// Family token from a free-text search query (e.g. the captured evidence
+// query "Savannah adjustable quarter strap sandal" → "savannah").
+export function familyFromQuery(query) {
+  return titleStyleFamily(String(query || "")).toLowerCase();
+}
+
+function escapeReLocal(s) {
+  return String(s).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+// ── alignCardsToAnswerText ──────────────────────────────────────────
+// Product/text alignment validator (answer workflows). Text and cards MUST
+// come from the SAME current-turn evidence pool. If the answer text names a
+// product family (the one the model searched, or a family present in the turn
+// evidence) but the DISPLAYED cards are a DIFFERENT family, those cards are
+// stale-memory contamination — e.g. text "The Savannah comes in Champagne"
+// while the cards are Danika/Kinsley/Carly sneakers. Recover the named family
+// from the evidence pool when we have it; otherwise suppress the mismatched
+// cards so the answer stands alone (never show the wrong product).
+//
+// Conservative: only acts when the text names a SPECIFIC family. A generic
+// condition_recommendation answer that names no product is left untouched.
+// Returns { cards, changed, reason }.
+export function alignCardsToAnswerText({ text = "", cards = [], evidencePool = [], namedFamilyHint = "" } = {}) {
+  if (!Array.isArray(cards) || cards.length === 0) return { cards, changed: false, reason: "no-cards" };
+  const lc = String(text || "").toLowerCase();
+  if (!lc.trim()) return { cards, changed: false, reason: "no-text" };
+
+  const familyOf = (c) => titleStyleFamily(String(c?.title || "")).toLowerCase();
+  const inText = (fam) => Boolean(fam) && fam.length >= 4 && new RegExp(`\\b${escapeReLocal(fam)}\\b`).test(lc);
+
+  // Aligned: at least one displayed card's family appears in the answer text.
+  const displayedFamilies = cards.map(familyOf).filter(Boolean);
+  if (displayedFamilies.some(inText)) return { cards, changed: false, reason: "aligned" };
+
+  // Does the text actually name a family? Prefer the hint (the family the model
+  // searched), else any evidence-pool family present in the text.
+  const hint = String(namedFamilyHint || "").toLowerCase();
+  const evidenceFamilies = (evidencePool || []).map(familyOf).filter(Boolean);
+  const textNamesFamily = inText(hint) || evidenceFamilies.some(inText);
+  if (!textNamesFamily) return { cards, changed: false, reason: "text-names-no-family" };
+
+  // The text names a family the displayed cards don't represent. Recover it
+  // from the evidence pool if present; else suppress the mismatched cards.
+  const recovered = (evidencePool || []).filter((c) => {
+    const f = familyOf(c);
+    return inText(f) || (hint && f === hint);
+  });
+  if (recovered.length > 0) return { cards: recovered, changed: true, reason: "replaced-with-text-family" };
+  return { cards: [], changed: true, reason: "suppressed-mismatch" };
 }
 
 export function compoundPolicyFallbackText(latestMessage = "") {
@@ -620,7 +712,13 @@ export function finalizeOutboundReply({
       `[chat] empty-text repair: text ${fullResponseText ? "gutted to fragment" : "wiped"} by strips, pool=${pool.length}`,
     );
     qualitySignals.emptyAfterStrips = true;
-    fullResponseText = "Take a look — these are the closest matches I've got.";
+    // Answer workflows are owed a real answer — never the generic "take a
+    // look" pitch. Use the honest, evidence-grounded line (names the products,
+    // states the situation). The grounding validator + retry get a chance to
+    // produce a true synthesized answer; this is the floor if they can't.
+    fullResponseText = isAnswerWorkflow(ctx.turnPlan)
+      ? buildAnswerWorkflowExhaustionText(ctx.turnPlan, pool)
+      : "Take a look — these are the closest matches I've got.";
   }
 
   if (
@@ -993,8 +1091,10 @@ export function finalizeOutboundReply({
   // the turn shape (cards present vs not).
   if (!fullResponseText || fullResponseText.trim().length < 3) {
     if (pool.length > 0) {
-      fullResponseText = "Take a look — these are the closest matches I've got.";
-      console.log(`[chat] ${ctx.shop} empty-text repair (pool=${pool.length}): substituted generic pitch`);
+      fullResponseText = isAnswerWorkflow(ctx.turnPlan)
+        ? buildAnswerWorkflowExhaustionText(ctx.turnPlan, pool)
+        : "Take a look — these are the closest matches I've got.";
+      console.log(`[chat] ${ctx.shop} empty-text repair (pool=${pool.length}): substituted ${isAnswerWorkflow(ctx.turnPlan) ? "honest answer-workflow line" : "generic pitch"}`);
     } else if (productSearchAttempted) {
       fullResponseText = "I couldn't find a match for that — happy to try a different angle if you can tell me more.";
       console.log(`[chat] ${ctx.shop} empty-text repair (search-attempted, no pool): substituted clarify-ask`);

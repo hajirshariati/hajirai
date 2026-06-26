@@ -565,6 +565,15 @@ const ANSWER_WORKFLOW_NAMES = new Set([
   "condition_recommendation",
 ]);
 
+// Quality kinds that are observability-only on browse turns but BLOCKING on
+// answer workflows (the customer is owed a real, substantive answer).
+export const ANSWER_WORKFLOW_BLOCKING_KINDS = new Set([
+  "answer_workflow_non_answer",
+  "fragment_non_answer",
+  "sizing_not_addressed",
+  "generic_fallback_non_answer",
+]);
+
 // Stock clarifier stalls — a non-answer when the plan said act-don't-ask.
 const PLAN_CLARIFIER_RE =
   /\b(men'?s?\s+or\s+women'?s?|women'?s?\s+or\s+men'?s?|are\s+you\s+shopping\s+for|what\s+(?:style|color|colou?r|budget|kind|type)\b[^.?!]*\?|tell\s+me\s+(?:a\s+(?:little|bit)\s+)?more)\b/i;
@@ -881,9 +890,15 @@ export function validateGrounding({ text, pool = [], categoryGenderMap = null, u
   }
 
   // Partition: only blocking (safety/factual) errors fail validation and
-  // force a retry. Everything else is an observability warning.
-  const blocking = errors.filter((e) => BLOCKING_KINDS.has(e.kind));
-  const warnings = errors.filter((e) => !BLOCKING_KINDS.has(e.kind));
+  // force a retry. Everything else is an observability warning — EXCEPT on
+  // answer workflows, where a fragment, an unaddressed sizing question, or a
+  // generic fallback is also a non-answer and must block (a 16-char reply can
+  // never be "ok" for "what size should I get in Jillian?").
+  const isAnswerWf = ANSWER_WORKFLOW_NAMES.has(workflow);
+  const isBlocking = (e) =>
+    BLOCKING_KINDS.has(e.kind) || (isAnswerWf && ANSWER_WORKFLOW_BLOCKING_KINDS.has(e.kind));
+  const blocking = errors.filter(isBlocking);
+  const warnings = errors.filter((e) => !isBlocking(e));
   return { ok: blocking.length === 0, errors: blocking, warnings };
 }
 

@@ -27,6 +27,7 @@
 import {
   validateGrounding,
   buildRetryInstruction,
+  ANSWER_WORKFLOW_BLOCKING_KINDS,
 } from "./grounding-validator.server.js";
 import { isAnswerWorkflow, buildAnswerWorkflowExhaustionText } from "./turn-plan.server.js";
 
@@ -375,7 +376,7 @@ export async function runWithGroundingRetry({
     // retry can search for the products it needs to answer.
     const onlyAnswerNonAnswer =
       validation.errors.length > 0 &&
-      validation.errors.every((e) => e.kind === "answer_workflow_non_answer");
+      validation.errors.every((e) => ANSWER_WORKFLOW_BLOCKING_KINDS.has(e.kind));
     nextRewriteOnly =
       (validation.errors.length > 0 && validation.errors.every((e) => REWRITE_ONLY_KINDS.has(e.kind))) ||
       (onlyAnswerNonAnswer && pool.length > 0);
@@ -426,7 +427,7 @@ export async function runWithGroundingRetry({
   if (
     isAnswerWorkflow(turnPlan) &&
     Array.isArray(lastErrors) &&
-    lastErrors.some((e) => e.kind === "answer_workflow_non_answer")
+    lastErrors.some((e) => ANSWER_WORKFLOW_BLOCKING_KINDS.has(e.kind))
   ) {
     const honest = buildAnswerWorkflowExhaustionText(turnPlan, lastPool);
     console.log(

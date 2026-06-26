@@ -97,6 +97,9 @@ import {
   isPolicyOrServiceQuestion,
   isCompoundPolicyProductQuestion,
   scopedProductSearchInput,
+  buildAnswerWorkflowForcedSearch,
+  alignCardsToAnswerText,
+  familyFromQuery,
 } from "../lib/emit-finalize.server";
 import { detectConversationGoal, ANCHOR_GOALS } from "../lib/turn-intent.server";
 import { buildVisualizeCtaEvent } from "../lib/visualize-cta.server";
@@ -1688,6 +1691,11 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   const outboundLinks = [];
   let finalProductCards = [];
   let hasKlaviyoForm = false;
+  // Evidence lock (answer workflows). The first product search the model runs
+  // this turn — after plan enforcement — is the authoritative family query.
+  // The forced-card fallback reuses it instead of stale session memory so the
+  // displayed cards stay locked to the same family as the answer text.
+  let turnEvidenceSearchInput = null;
 
 
   // Two-block system when the prompt builder marked a stable prefix:
@@ -1816,6 +1824,17 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     const rewrittenUses = await Promise.all(
       toolUses.map((u) => rewriteToolCall(u, ctx)),
     );
+
+    // Evidence lock: capture the FIRST plan-enforced product search this turn
+    // for answer workflows. Its query already names the family the customer
+    // asked about, so the forced-card fallback can reuse it instead of stale
+    // memory (the root of the "Savannah text, sneaker cards" contamination).
+    if (!turnEvidenceSearchInput && isAnswerWorkflow(ctx?.turnPlan)) {
+      const firstSearch = rewrittenUses.find((u) => u && u.name === "search_products" && u.input);
+      if (firstSearch) {
+        turnEvidenceSearchInput = { query: firstSearch.input.query || "", filters: { ...(firstSearch.input.filters || {}) } };
+      }
+    }
 
     const results = await Promise.all(
       rewrittenUses.map((u) => {
@@ -2243,12 +2262,23 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   if (planNeedsSearch && !productSearchAttempted) {
     console.log(`[chat] turn-plan(${ctx.turnPlan.workflow}): searchRequired but model did not search — forcing plan-driven search`);
   }
+  // Answer workflows: the forced-card fallback must search the CURRENT turn's
+  // family (from the captured evidence query or the latest message), never the
+  // stale-memory scope. Otherwise a prior Disney/sneakers turn turns this
+  // forced search into query="sneakers" and the cards diverge from the answer.
+  const answerWorkflowTurn = isAnswerWorkflow(ctx?.turnPlan);
+  const forcedSearchInput = answerWorkflowTurn
+    ? buildAnswerWorkflowForcedSearch({ ctx, capturedInput: turnEvidenceSearchInput })
+    : scopedProductSearchInput(ctx);
+  if (answerWorkflowTurn) {
+    console.log(`[chat] turn-plan(${ctx.turnPlan.workflow}): forced-card search locked to current-turn evidence query="${String(forcedSearchInput.input?.query || "").slice(0, 50)}" (no stale memory)`);
+  }
   const ensuredCards = await ensureProductTurnCards({
     ctx,
     allProductPool,
     dispatchTool,
     extractProductCards: (n, r) => extractProductCards(n, r, ctx),
-    searchInput: scopedProductSearchInput(ctx),
+    searchInput: forcedSearchInput,
     shouldAttach: productTurnWantsCards || planNeedsSearch,
     allowRelaxedNoMatch: isCompoundPolicyProductQuestion(ctx.latestUserMessage),
     reason: planNeedsSearch && !productTurnWantsCards ? "plan-search-required" : "pre-display",
@@ -2890,6 +2920,24 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       fullResponseText = "Here's an option that might work — let me know if you'd like to look at something different.";
     }
 
+
+    // Product/text alignment (answer workflows). Text and cards must come from
+    // the SAME current-turn evidence. If the answer names a family the
+    // displayed cards don't represent (stale-memory contamination — text
+    // "Savannah", cards Danika/Kinsley sneakers), recover the named family from
+    // the turn evidence or suppress the mismatched cards.
+    if (cards && cards.length > 0 && isAnswerWorkflow(ctx?.turnPlan)) {
+      const aligned = alignCardsToAnswerText({
+        text: fullResponseText,
+        cards,
+        evidencePool: Array.from(allProductPool.values()),
+        namedFamilyHint: familyFromQuery(turnEvidenceSearchInput?.query),
+      });
+      if (aligned.changed) {
+        console.log(`[chat] turn-plan(${ctx.turnPlan.workflow}): card/text alignment ${aligned.reason} — ${cards.length}→${aligned.cards.length} card(s)`);
+        cards = aligned.cards;
+      }
+    }
 
     if (cards && cards.length > 0) {
       const { products: deduped, categoryCounts, genderCounts } = prepareProductCardsForTurn(cards);
