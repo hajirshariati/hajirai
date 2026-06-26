@@ -826,6 +826,22 @@ function vizError(host,cta,msg){
 function ctaHtml(linkCTA){
 return '<a class="ai-chat-cta-btn" style="display:block;margin-top:12px;padding:14px 16px;background:var(--ai-chat-primary,#2d6b4f);color:#fff;border-radius:10px;text-decoration:none;text-align:center;font-size:14px;font-weight:600;line-height:1.3" href="'+esc(linkCTA.url)+'" target="_blank" rel="noopener">'+esc(linkCTA.label||'Visit Support Hub')+' &rarr;</a>';
 }
+// Central support-chat opener. Prefer a live-chat provider (Zendesk, Intercom,
+// Gorgias) and only fall back to the Support Hub URL when none is present.
+// Every support path — the dead-end button and the handoff support_cta — calls
+// this so they all behave identically.
+function openSupportChat(fallbackUrl){
+  var url=fallbackUrl||SUPPORT_URL||'';
+  if(typeof window.zE==='function'){toggle(false);try{window.zE('webWidget','show');window.zE('webWidget','open');return}catch(e){}}
+  if(typeof window.Intercom==='function'){try{window.Intercom('show');return}catch(e){}}
+  if(typeof window.GorgiasChat!=='undefined'&&window.GorgiasChat&&typeof window.GorgiasChat.open==='function'){try{window.GorgiasChat.open();return}catch(e){}}
+  if(url)window.open(url,'_blank','noopener');
+}
+// Handoff support CTA rendered as a BUTTON (not an anchor) so the click opens
+// live chat via openSupportChat rather than navigating to the Support Hub URL.
+function supportCtaHtml(s){
+return '<button type="button" class="ai-chat-cta-btn ai-chat-support-cta" data-support-cta="1" data-fallback="'+esc(s.fallbackUrl||'')+'" style="display:block;width:100%;margin-top:12px;padding:14px 16px;background:var(--ai-chat-primary,#2d6b4f);color:#fff;border:none;border-radius:10px;text-align:center;font-size:14px;font-weight:600;line-height:1.3;cursor:pointer;font-family:inherit">'+esc(s.label||'Chat with Aetrex Support')+'</button>';
+}
 
 function appendMsg(role,content,products){
 var isU=role==='user';
@@ -1023,14 +1039,14 @@ showHighTraffic();
 function handleSSE(response){
 var reader=response.body.getReader();
 var decoder=new TextDecoder();
-var buf='',full='',prods=[],msgDiv=null,buffSugg=[],buffChoices=[],linkCTA=null,fitReport=null,vizCta=null;
+var buf='',full='',prods=[],msgDiv=null,buffSugg=[],buffChoices=[],linkCTA=null,fitReport=null,vizCta=null,supportCta=null;
 function proc(chunk){
 buf+=chunk;var lines=buf.split('\n');buf=lines.pop()||'';
 for(var i=0;i<lines.length;i++){
 var line=lines[i].trim();
 if(!line.startsWith('data: '))continue;
 var data=line.slice(6);
-if(data==='[DONE]'){finish(full,prods,msgDiv,buffSugg,linkCTA,fitReport,buffChoices,vizCta);return true}
+if(data==='[DONE]'){finish(full,prods,msgDiv,buffSugg,linkCTA,fitReport,buffChoices,vizCta,supportCta);return true}
 try{
 var p=JSON.parse(data);
 if(p.type==='text'||p.type==='content_block_delta'){
@@ -1042,6 +1058,9 @@ if(p.type==='products'&&p.products){
 }
 if(p.type==='link'&&p.url){
   linkCTA={url:p.url,label:p.label||'Visit Support Hub'};
+}
+if(p.type==='support_cta'){
+  supportCta={label:p.label||'Chat with Aetrex Support',fallbackUrl:p.fallbackUrl||SUPPORT_URL||''};
 }
 if(p.type==='choices'&&p.options&&p.options.length){
   buffChoices=p.options;
@@ -1073,14 +1092,14 @@ if(p.type==='action'&&p.action==='show_dead_end'){
 if(p.type==='visualize_cta'&&p.productHandle){
   vizCta={productHandle:p.productHandle,productTitle:p.productTitle||'',styleContext:p.styleContext||'',label:p.label||'Visualize My Look'};
 }
-if(p.type==='done'){finish(full,prods,msgDiv,buffSugg,linkCTA,fitReport,buffChoices,vizCta);return true}
+if(p.type==='done'){finish(full,prods,msgDiv,buffSugg,linkCTA,fitReport,buffChoices,vizCta,supportCta);return true}
 if(p.type==='error'){
   showStreamError(p.message||'I\'m sorry, I\'m having trouble right now. Please try again in a moment.');
   return true;
 }
 }catch(e){}
 }return false}
-function read(){reader.read().then(function(r){if(r.done){if(full)finish(full,prods,msgDiv,buffSugg,linkCTA,fitReport,buffChoices,vizCta);else showStreamError('I\'m having trouble right now. Please try again.');return}var done=proc(decoder.decode(r.value,{stream:true}));if(!done)read()}).catch(function(e){if(e.name!=='AbortError'){if(full)finish(full,prods,msgDiv,buffSugg,linkCTA,fitReport,buffChoices,vizCta);else showStreamError('Connection lost. Please try again.')}})}
+function read(){reader.read().then(function(r){if(r.done){if(full)finish(full,prods,msgDiv,buffSugg,linkCTA,fitReport,buffChoices,vizCta,supportCta);else showStreamError('I\'m having trouble right now. Please try again.');return}var done=proc(decoder.decode(r.value,{stream:true}));if(!done)read()}).catch(function(e){if(e.name!=='AbortError'){if(full)finish(full,prods,msgDiv,buffSugg,linkCTA,fitReport,buffChoices,vizCta,supportCta);else showStreamError('Connection lost. Please try again.')}})}
 read();
 }
 
@@ -1149,7 +1168,7 @@ function stripDanglingMd(s){
   }).join('\n');
   return s.replace(/[ \t]{2,}/g,' ').replace(/[ \t]+([.,!?;:])/g,'$1').replace(/([—–-])\s+([.,!?;:])/g,'$2').trim();
 }
-function finish(text,prods,md2,sugg,linkCTA,fitReport,sseChoices,vizCta){clearWatchdog();
+function finish(text,prods,md2,sugg,linkCTA,fitReport,sseChoices,vizCta,supportCta){clearWatchdog();
 typingEl.classList.remove('visible');isStreaming=false;sendBtn.disabled=false;
 errorRetryCount=0;
 var mDiv=md2;
@@ -1191,6 +1210,10 @@ if(choices.length>0&&mDiv){
 if(linkCTA&&linkCTA.url&&mDiv){
   var lb=$('.ai-chat-msg-bubble',mDiv);
   if(lb)lb.insertAdjacentHTML('beforeend',ctaHtml(linkCTA));
+}
+if(supportCta&&mDiv){
+  var scb=$('.ai-chat-msg-bubble',mDiv);
+  if(scb)scb.insertAdjacentHTML('beforeend',supportCtaHtml(supportCta));
 }
 if(fitReport&&fitReport.size&&mDiv){
   var frb=$('.ai-chat-msg-bubble',mDiv);
@@ -1284,15 +1307,14 @@ if(retryBtn){
 }
 var btn=e.target.closest('[data-add-to-cart]');
 if(btn){e.preventDefault();var vid=btn.getAttribute('data-add-to-cart');btn.disabled=true;btn.textContent='Adding...';addToCart(vid,1).then(function(){btn.textContent='Added!';setTimeout(function(){btn.textContent='Add to Cart';btn.disabled=false},2000)}).catch(function(){btn.textContent='Error';btn.disabled=false});return}
+// Handoff support CTA button → live chat (Zendesk/Intercom/Gorgias), Support
+// Hub URL only as fallback.
+var supportCtaBtn=e.target.closest('[data-support-cta]');
+if(supportCtaBtn){e.preventDefault();openSupportChat(supportCtaBtn.getAttribute('data-fallback'));return;}
 var deadEnd=e.target.closest('[data-dead-end]');
 if(deadEnd){
   var action=deadEnd.getAttribute('data-dead-end');
-  if(action==='support'){
-    if(SUPPORT_URL){window.open(SUPPORT_URL,'_blank','noopener');}
-    else if(typeof window.zE==='function'){toggle(false);window.zE('webWidget','show');window.zE('webWidget','open');}
-    else if(typeof window.Intercom==='function'){window.Intercom('show');}
-    else if(typeof window.GorgiasChat!=='undefined'&&window.GorgiasChat.open){window.GorgiasChat.open();}
-  }
+  if(action==='support'){openSupportChat(SUPPORT_URL);}
   if(action==='new-chat'){clearChat();inputEl.disabled=false;inputEl.placeholder=IPLACE;sendBtn.disabled=false}
   return;
 }

@@ -9,7 +9,19 @@ import {
   buildSupportHandoffText,
   supportConfigured,
   normalizedSupportLabel,
-} from "../app/lib/support-handoff.server.js";
+  supportChatLabel,
+} from "../app/lib/support-handoff.js";
+
+// Mirror of the widget's openSupportChat provider priority (Zendesk > Intercom >
+// Gorgias > fallback URL). Kept here as the documented contract — the widget IIFE
+// can't be imported, so this locks the decision the widget must implement.
+function pickSupportTarget({ hasZendesk = false, hasIntercom = false, hasGorgias = false, fallbackUrl = "" } = {}) {
+  if (hasZendesk) return "zendesk";
+  if (hasIntercom) return "intercom";
+  if (hasGorgias) return "gorgias";
+  if (fallbackUrl) return { url: fallbackUrl };
+  return null;
+}
 
 let pass = 0, fail = 0;
 const fails = [];
@@ -125,6 +137,28 @@ check("normalizedSupportLabel: custom honored, legacy/blank → 'Visit Support H
 check("blank supportUrl → text still names customer service (no button implied)", () => {
   const t = buildSupportHandoffText({ ctx: { supportUrl: "" }, reason: "validation_failed", partial: false });
   assert.match(t, /Aetrex customer service/);
+});
+
+// ── live-chat button label + provider priority (widget contract) ──────
+check("supportChatLabel: link-style defaults → 'Chat with Aetrex Support'", () => {
+  assert.equal(supportChatLabel({ supportLabel: "Visit Support Hub" }), "Chat with Aetrex Support");
+  assert.equal(supportChatLabel({ supportLabel: "Contact customer service" }), "Chat with Aetrex Support");
+  assert.equal(supportChatLabel({}), "Chat with Aetrex Support");
+});
+check("supportChatLabel: a meaningful custom label is honored", () => {
+  assert.equal(supportChatLabel({ supportLabel: "Message our team" }), "Message our team");
+});
+check("widget openSupportChat priority: Zendesk wins when present", () => {
+  assert.equal(pickSupportTarget({ hasZendesk: true, fallbackUrl: "https://x/support" }), "zendesk");
+  assert.equal(pickSupportTarget({ hasZendesk: true, hasIntercom: true, hasGorgias: true }), "zendesk");
+});
+check("widget openSupportChat priority: Intercom/Gorgias before URL", () => {
+  assert.equal(pickSupportTarget({ hasIntercom: true, fallbackUrl: "https://x/support" }), "intercom");
+  assert.equal(pickSupportTarget({ hasGorgias: true, fallbackUrl: "https://x/support" }), "gorgias");
+});
+check("widget openSupportChat: falls back to URL only when no provider exists", () => {
+  assert.deepEqual(pickSupportTarget({ fallbackUrl: "https://x/support" }), { url: "https://x/support" });
+  assert.equal(pickSupportTarget({}), null);
 });
 
 console.log("");

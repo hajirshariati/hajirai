@@ -61,6 +61,16 @@ export function normalizedSupportLabel(ctx) {
   return "Visit Support Hub";
 }
 
+// Label for the LIVE-CHAT handoff button (a button that opens Zendesk/Intercom/
+// Gorgias, falling back to the Support Hub URL). Honors a meaningful custom
+// label, but replaces the link-style defaults with a chat-oriented one.
+export function supportChatLabel(ctx) {
+  const raw = String(ctx?.supportLabel || "").trim();
+  const linkDefaults = new Set(["Contact customer service", "Visit Support Hub"]);
+  if (raw && !linkDefaults.has(raw)) return raw;
+  return "Chat with Aetrex Support";
+}
+
 // Workflows where a question-shaped reply is the bot DOING ITS JOB (asking which
 // product to size, etc.), not failing — never a handoff unless the customer
 // explicitly asked for a human (handled before this guard).

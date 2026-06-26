@@ -7,7 +7,7 @@ import { getActiveCampaigns, formatCampaignsForCS } from "../models/Campaign.ser
 import { buildSystemPrompt } from "../lib/chat-prompt.server";
 import { planTurn, buildTurnPlanPromptBlock, buildPlanClarifierRepair, planForcesProductDisplay, planRequiresSearch as planRequiresSearchFlag, clarifierGateDecision, isAnswerWorkflow } from "../lib/turn-plan.server";
 import { classifyAvailability, buildAvailabilityAnswer, AVAILABILITY_RESULT, resolveAvailabilityRequest, isAvailabilityFollowUp, familyOfTitle, collectFamilyColors, constraintIntent, priorAvailabilityMessage, variantDataDiagnostics, styleKeyOfTitle, styleNameOfTitle } from "../lib/availability-truth";
-import { detectSupportHandoffNeed, buildSupportHandoffText, supportConfigured, normalizedSupportLabel } from "../lib/support-handoff.server";
+import { detectSupportHandoffNeed, buildSupportHandoffText, supportConfigured, normalizedSupportLabel, supportChatLabel } from "../lib/support-handoff";
 import { retrieveRelevantChunks } from "../lib/knowledge-chunks.server";
 import { buildKidsCoveragePrompt } from "../lib/kids-coverage.server";
 import { analyzeCategoryIntent, cardMatchesActiveGroup, textIntentDivergesFromGroup, matchingGroupsForText } from "../lib/category-intent.server";
@@ -2079,6 +2079,10 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   }
 
   let supportCTA = null;
+  // Live-chat handoff CTA (rendered by the widget as a button that opens
+  // Zendesk/Intercom/Gorgias, Support Hub URL as fallback). Set by the handoff
+  // gate; emitted as an SSE support_cta event, never the plain link anchor.
+  let supportHandoffCta = null;
   if (fullResponseText && ctx.supportUrl) {
     const result = extractSupportCTA(fullResponseText, ctx.supportUrl, ctx.supportLabel);
     fullResponseText = result.text;
@@ -2702,23 +2706,29 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       qualitySignals,
       productSearchAttempted,
     });
+    // A handoff CTA opens LIVE CHAT (Zendesk/Intercom/Gorgias) via the widget's
+    // support_cta button — the Support Hub URL is only a fallback. So we emit a
+    // support_cta event, NOT the plain type:"link" anchor, and never the generic
+    // CTA. Gated on supportConfigured so a blank supportUrl ships no fake button.
     if (handoff.mode === "hard") {
       fullResponseText = buildSupportHandoffText({ ctx, reason: handoff.reason, partial: false });
       pool = [];
       availabilityPinnedCards = null;
       comparisonPinnedCards = null;
       genericCTA = null;
-      supportCTA = supportConfigured(ctx) ? { url: ctx.supportUrl, label: normalizedSupportLabel(ctx) } : null;
+      supportCTA = null;
+      supportHandoffCta = supportConfigured(ctx) ? { label: supportChatLabel(ctx), fallbackUrl: ctx.supportUrl } : null;
       qualitySignals.supportHandoffApplied = true;
-      console.log(`[handoff] mode=hard reason=${handoff.reason} support=${Boolean(supportCTA)} cards=0`);
+      console.log(`[handoff] mode=hard reason=${handoff.reason} support=${Boolean(supportHandoffCta)} cards=0`);
     } else if (handoff.mode === "soft") {
       const line = buildSupportHandoffText({ ctx, reason: handoff.reason, partial: true });
       if (!fullResponseText.includes(line)) fullResponseText = `${fullResponseText.trim()} ${line}`.trim();
       genericCTA = null;
-      supportCTA = supportConfigured(ctx) ? { url: ctx.supportUrl, label: normalizedSupportLabel(ctx) } : null;
+      supportCTA = null;
+      supportHandoffCta = supportConfigured(ctx) ? { label: supportChatLabel(ctx), fallbackUrl: ctx.supportUrl } : null;
       qualitySignals.supportHandoffApplied = true;
       const cardCount = (availabilityPinnedCards || comparisonPinnedCards || pool || []).length;
-      console.log(`[handoff] mode=soft reason=${handoff.reason} support=${Boolean(supportCTA)} cards=${cardCount}`);
+      console.log(`[handoff] mode=soft reason=${handoff.reason} support=${Boolean(supportHandoffCta)} cards=${cardCount}`);
     }
   }
 
@@ -2799,7 +2809,18 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     })));
   }
 
-  if (!supportCTA && genericCTA && ctx.turnPlan?.workflow !== "availability" && ctx.turnPlan?.workflow !== "comparison") {
+  // Handoff support CTA → live chat. A BUTTON, not an anchor: the widget calls
+  // openSupportChat(fallbackUrl) which prefers Zendesk/Intercom/Gorgias and only
+  // falls back to the Support Hub URL.
+  if (supportHandoffCta) {
+    controller.enqueue(encoder.encode(sseChunk({
+      type: "support_cta",
+      label: supportHandoffCta.label,
+      fallbackUrl: supportHandoffCta.fallbackUrl || "",
+    })));
+  }
+
+  if (!supportCTA && !supportHandoffCta && genericCTA && ctx.turnPlan?.workflow !== "availability" && ctx.turnPlan?.workflow !== "comparison") {
     outboundLinks.push({ url: genericCTA.url, label: genericCTA.label });
     controller.enqueue(encoder.encode(sseChunk({
       type: "link",
@@ -4851,8 +4872,11 @@ async function handleChatPost({ shop, sessionAccessToken, request, internal = fa
             if (cleanResult.needsSupportHandoff && !cleanResult.qualitySignals?.supportHandoffApplied) {
               const hasUrl = supportConfigured(ctx);
               cleanResult.fullResponseText = buildSupportHandoffText({ ctx, reason: "validation_failed", partial: false });
+              // Drop the buffered cards/links; emit empty products + a live-chat
+              // support_cta button (Zendesk/Intercom/Gorgias, Support Hub URL as
+              // fallback) — never the plain link anchor.
               attemptBuf = [encoder.encode(sseChunk({ type: "products", products: [] }))];
-              if (hasUrl) attemptBuf.push(encoder.encode(sseChunk({ type: "link", url: ctx.supportUrl, label: normalizedSupportLabel(ctx) })));
+              if (hasUrl) attemptBuf.push(encoder.encode(sseChunk({ type: "support_cta", label: supportChatLabel(ctx), fallbackUrl: ctx.supportUrl })));
               if (cleanResult.turnResult) cleanResult.turnResult.products = [];
               cleanResult.finalProductCards = [];
               console.log(`[handoff] mode=hard reason=validation_failed support=${hasUrl} cards=0`);
