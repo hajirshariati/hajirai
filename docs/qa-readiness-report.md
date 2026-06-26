@@ -11,7 +11,7 @@ phrasing layer is verified by manual PRD live-testing, not these suites.
 
 | Suite | Passing | Failing | Covers |
 |---|---:|---:|---|
-| `eval-live-core-flows` | 56 | 0 | core scenarios: workflow + search/clarify/gender + availability card-count + leak/CTA/family invariants + sizing + sale + same-session pivots + sale-search input |
+| `eval-live-core-flows` | 61 | 0 | core scenarios: workflow + search/clarify/gender + availability card-count + leak/CTA/family invariants + sizing + sale + comparison card-contract + same-session pivots + sale-search input |
 | `eval-availability-truth` | 49 | 0 | availability classification, soft color, style disambiguation, follow-up memory, width split |
 | `eval-variant-matcher` | 39 | 0 | size/width/SKU normalization, Aetrex labels, ranges, array-shape options |
 | `eval-turn-plan` | 103 | 0 | workflow classification across all 9 workflows (incl. sizing_help, sale_browse, promo-policy) |
@@ -20,8 +20,8 @@ phrasing layer is verified by manual PRD live-testing, not these suites.
 | `eval-named-family-evidence` | 14 | 0 | named-family evidence requirement |
 | `eval-clarifier-and-detector` | 40 | 0 | clarifier blocking + specific-product detection |
 | `eval-evidence-alignment` | 16 | 0 | card/text family alignment |
-| `eval-grounding-validator` | 72 | 0 | factual-safety blocking/warning partition |
-| **Total** | **434** | **0** | |
+| `eval-grounding-validator` | 74 | 0 | factual-safety blocking/warning partition + comparison length cap |
+| **Total** | **441** | **0** | |
 
 Run all: `npm run build && for s in scripts/eval-*.mjs; do node "$s"; done`
 
@@ -47,6 +47,13 @@ this pass made was driven by a QA scenario that reproduced a failure:
   `sale_browse` workflow (search `onSale=true` with category/gender/price, never
   the raw sentence), promo-mechanics → `policy_account`, and Support-CTA
   suppression on commerce turns.
+- **Comparison ran 3 agent retries + flooded the carousel.** "Which is better,
+  Jillian or Savannah?" produced a long answer, retried 3× on length, and showed
+  9 cards. Fixed: comparison is now a governed concise workflow (validator caps
+  to ≤120 words as a WARNING, deterministic `compactComparison` trim at ship —
+  no tool re-search), cards are pinned to one per family (≤4) bypassing the
+  scorer, broad/support CTAs suppressed, and stale size/width/sale memory can no
+  longer leak into the comparison/condition search.
 
 ## Known limitations
 

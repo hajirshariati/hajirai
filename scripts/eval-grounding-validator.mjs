@@ -725,4 +725,37 @@ test("Fix #3: a 1000-char comparison wall is rejected as too_long", () => {
   assert.ok(out.warnings.some((e) => e.kind === "too_long"));
 });
 
+test("workflow=comparison caps length even when 'compare' reads as a detail request", () => {
+  const pool = [{ title: "Jillian Braided Quarter Strap Sandal - Black", handle: "jillian-black-sc450w" }];
+  const wall = "The Jillian and the Savannah are both excellent supportive sandals with contoured footbeds. ".repeat(12);
+  // "Compare X and Y" matches DETAIL_REQUEST_RE, but the comparison CONTRACT
+  // still caps it — otherwise comparisons become review essays.
+  const out = validateGrounding({
+    text: wall,
+    pool,
+    userMessage: "Compare Jillian and Savannah for plantar fasciitis",
+    namedProductMentioned: true,
+    searchAttempted: true,
+    workflow: "comparison",
+  });
+  assert.ok(out.warnings.some((e) => e.kind === "too_long"), "long comparison should warn too_long");
+});
+
+test("workflow=comparison: a concise (<120 word) verdict does NOT warn too_long", () => {
+  const pool = [{ title: "Savannah Adjustable Quarter Strap Sandal - Champagne", handle: "sav-champ-sc450w" }];
+  const concise =
+    "For all-day walking I'd lean Savannah — it has a more active, supportive build. " +
+    "Jillian is prettier and fine for casual all-day wear, but Savannah is the safer pick " +
+    "if you'll be on your feet for hours. Choose Jillian if style matters most; Savannah if comfort mileage does.";
+  const out = validateGrounding({
+    text: concise,
+    pool,
+    userMessage: "Which is better for all-day walking, Jillian or Savannah?",
+    namedProductMentioned: true,
+    searchAttempted: true,
+    workflow: "comparison",
+  });
+  assert.ok(!out.warnings.some((e) => e.kind === "too_long"), "concise comparison must not warn too_long");
+});
+
 console.log("\nAll grounding-validator tests done.");

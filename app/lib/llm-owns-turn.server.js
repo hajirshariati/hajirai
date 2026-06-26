@@ -214,12 +214,31 @@ function shortenToBudget(text, maxChars = SHORTEN_CHARS) {
   if (!out) out = t.slice(0, maxChars).replace(/\s+\S*$/, "").trim();
   return out;
 }
-function applyLengthCap(result, warnings) {
+// Deterministic comparison compaction: keep whole sentences up to ~120 words /
+// 700 chars. This is the cheap, no-model path the contract calls for — when a
+// comparison draft is too long we trim it here instead of re-running the agent.
+function compactComparison(text) {
+  const t = String(text || "").trim();
+  const words = t.split(/\s+/).filter(Boolean);
+  if (words.length <= 120 && t.length <= 700) return t;
+  const sentences = t.split(/(?<=[.!?])\s+/);
+  let out = "";
+  for (const s of sentences) {
+    const candidate = out ? out + " " + s : s;
+    if (out && (candidate.split(/\s+/).filter(Boolean).length > 120 || candidate.length > 700)) break;
+    out = candidate;
+  }
+  if (!out) out = words.slice(0, 120).join(" ");
+  return out.trim();
+}
+function applyLengthCap(result, warnings, workflow = "") {
   const tooLong = Array.isArray(warnings) && warnings.some((w) => w.kind === "too_long");
   if (!tooLong || !result?.fullResponseText) return result;
-  const trimmed = shortenToBudget(result.fullResponseText);
+  const trimmed = workflow === "comparison"
+    ? compactComparison(result.fullResponseText)
+    : shortenToBudget(result.fullResponseText);
   if (trimmed.length < result.fullResponseText.length) {
-    console.log(`[grounding-retry] length cap: trimmed ${result.fullResponseText.length}→${trimmed.length} chars`);
+    console.log(`[grounding-retry] length cap (${workflow || "retail"}): trimmed ${result.fullResponseText.length}→${trimmed.length} chars`);
     return { ...result, fullResponseText: trimmed };
   }
   return result;
@@ -352,13 +371,13 @@ export async function runWithGroundingRetry({
           `[grounding-retry] recovered substantial draft (${bestSubstantial.len} chars) over fragment (${text.trim().length} chars)`,
         );
         return {
-          ...applyLengthCap(bestSubstantial.result, lastWarnings),
+          ...applyLengthCap(bestSubstantial.result, lastWarnings, planWorkflow),
           totalUsage: { ...accUsage },
           validation: { ok: true, errors: [], attempts: attempt + 1, recoveredSubstantial: true },
         };
       }
       return {
-        ...applyLengthCap(result, validation.warnings),
+        ...applyLengthCap(result, validation.warnings, planWorkflow),
         totalUsage: { ...accUsage },
         validation: { ok: true, errors: [], attempts: attempt + 1 },
       };
@@ -412,7 +431,7 @@ export async function runWithGroundingRetry({
       `[grounding-retry] exhausted; shipping recovered substantial answer (${bestSubstantial.len} chars)`,
     );
     return {
-      ...applyLengthCap(bestSubstantial.result, lastWarnings),
+      ...applyLengthCap(bestSubstantial.result, lastWarnings, planWorkflow),
       totalUsage: { ...accUsage },
       validation: { ok: false, errors: lastErrors, attempts: attempt + 1, recoveredSubstantial: true },
     };
@@ -435,7 +454,7 @@ export async function runWithGroundingRetry({
         `substituting honest evidence-grounded line (pool=${lastPool.length})`,
     );
     return {
-      ...applyLengthCap(last, lastWarnings),
+      ...applyLengthCap(last, lastWarnings, planWorkflow),
       fullResponseText: honest,
       totalUsage: { ...accUsage },
       validation: { ok: false, errors: lastErrors, attempts: attempt + 1, answerWorkflowExhaustion: true },
@@ -446,7 +465,7 @@ export async function runWithGroundingRetry({
   // NOT a deterministic "couldn't verify / tell me more" ask. The handle and
   // internal-language scrubs in emit-finalize remain as the final safety net.
   return {
-    ...applyLengthCap(last, lastWarnings),
+    ...applyLengthCap(last, lastWarnings, planWorkflow),
     totalUsage: { ...accUsage },
     validation: { ok: false, errors: lastErrors, attempts: attempt + 1 },
   };

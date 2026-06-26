@@ -233,8 +233,12 @@ export function scopedProductSearchInput(ctx = {}) {
   const gender = scope.gender || latest.gender;
   const category = scope.category || latest.category;
   const color = scope.color || latest.color;
-  const size = scope.size || latest.size;
-  const width = scope.width || latest.width;
+  // MEMORY HYGIENE: size/width are variant-level constraints from a prior
+  // availability turn. They must NOT silently filter a later browse/condition/
+  // comparison search — only honor them when the LATEST message restates one.
+  // (Availability turns resolve size/width on their own deterministic path.)
+  const size = latest.size || null;
+  const width = latest.width || null;
   const condition = scope.condition || latest.condition;
   const filters = {};
   if (gender) filters.gender = gender;

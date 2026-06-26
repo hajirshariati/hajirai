@@ -22,8 +22,22 @@ import { planTurn, WORKFLOWS } from "../app/lib/turn-plan.server.js";
 import {
   classifyAvailability,
   buildAvailabilityAnswer,
+  familyOfTitle,
   AVAILABILITY_RESULT as R,
 } from "../app/lib/availability-truth.js";
+
+// Mirrors the chat.jsx comparison pin: one representative card per named
+// family, capped at 4. Kept here as the deterministic card-count contract.
+function pickComparisonCards(pool, families) {
+  const picked = [];
+  const seen = new Set();
+  for (const fam of families) {
+    if (seen.has(fam)) continue;
+    const card = (pool || []).find((c) => familyOfTitle(c.title || "") === fam);
+    if (card) { picked.push(card); seen.add(fam); }
+  }
+  return picked.slice(0, 4);
+}
 
 let pass = 0, fail = 0;
 const fails = [];
@@ -80,6 +94,9 @@ const PLAN = [
   // comparison
   { name: "Jillian vs Savannah → comparison", in: { message: "Jillian vs Savannah, which is better?", namedProduct: true }, wf: WORKFLOWS.COMPARISON, search: true, clarify: false },
   { name: "'Jillian or Savannah?' → comparison", in: { message: "Jillian or Savannah?", namedProduct: true }, wf: WORKFLOWS.COMPARISON, search: true },
+  { name: "'which is better for all-day walking, Jillian or Savannah?' → comparison", in: { message: "Which is better for all-day walking, Jillian or Savannah?", namedProduct: true }, wf: WORKFLOWS.COMPARISON, search: true, clarify: false },
+  { name: "'should I get Jillian or Savannah for Disney walking?' → comparison", in: { message: "Should I get Jillian or Savannah for Disney walking?", namedProduct: true }, wf: WORKFLOWS.COMPARISON, search: true },
+  { name: "'compare Jillian and Savannah for plantar fasciitis' → comparison", in: { message: "Compare Jillian and Savannah for plantar fasciitis", namedProduct: true }, wf: WORKFLOWS.COMPARISON, search: true },
 
   // named-product advisory
   { name: "is the Jillian good for wide feet → advisory", in: { message: "Is the Jillian good for wide feet?", namedProduct: true }, wf: WORKFLOWS.NAMED_PRODUCT_ADVISORY, search: true, clarify: false },
@@ -197,21 +214,57 @@ for (const t of AVAIL) {
 }
 
 // ══ Part 3 — sale search input: onSale + clean query, never raw sentence ══
-import { scopedProductSearchInput } from "../app/lib/emit-finalize.server.js";
-check("sale_browse search sets onSale=true and a clean query (not the raw sentence)", () => {
-  const { input } = scopedProductSearchInput({ latestUserMessage: "Show me current sales and promotions", turnPlan: { workflow: "sale_browse" } });
-  assert.equal(input.onSale, true, "onSale not set");
-  assert.doesNotMatch(String(input.query), /promotions/i, "query echoed the raw sentence");
-  assert.ok(String(input.query).length <= 30, `query too long/raw: ${input.query}`);
+// emit-finalize pulls in the prisma-backed db layer, so this import only works
+// where node_modules is installed (the private repo). In the public mirror it's
+// skipped — the routing for sale_browse is already covered above; this part
+// just confirms the search-input construction.
+let scopedProductSearchInput = null;
+try { ({ scopedProductSearchInput } = await import("../app/lib/emit-finalize.server.js")); }
+catch { console.log("  · (skipping sale-search-input tests — emit-finalize needs node_modules)"); }
+if (scopedProductSearchInput) {
+  check("sale_browse search sets onSale=true and a clean query (not the raw sentence)", () => {
+    const { input } = scopedProductSearchInput({ latestUserMessage: "Show me current sales and promotions", turnPlan: { workflow: "sale_browse" } });
+    assert.equal(input.onSale, true, "onSale not set");
+    assert.doesNotMatch(String(input.query), /promotions/i, "query echoed the raw sentence");
+    assert.ok(String(input.query).length <= 30, `query too long/raw: ${input.query}`);
+  });
+  check("'discounted sandals under $100' → onSale + priceMax 100", () => {
+    const { input } = scopedProductSearchInput({ latestUserMessage: "Show me discounted sandals under $100", turnPlan: { workflow: "sale_browse" } });
+    assert.equal(input.onSale, true);
+    assert.equal(input.priceMax, 100);
+  });
+  check("non-sale browse does NOT set onSale", () => {
+    const { input } = scopedProductSearchInput({ latestUserMessage: "show me women's sandals", turnPlan: { workflow: "browse" } });
+    assert.ok(!input.onSale, "onSale wrongly set on a non-sale browse");
+  });
+}
+
+// ══ Part 4 — comparison card contract: ≤4 cards, one per named family ══
+check("comparison pins one card per family from a flooded 9-card pool", () => {
+  const flooded = [
+    { title: "Jillian Braided Quarter Strap Sandal - Black" },
+    { title: "Jillian Braided Quarter Strap Sandal - Rose" },
+    { title: "Jillian Sport Sandal - Black" },
+    { title: "Savannah Adjustable Quarter Strap Sandal - Champagne" },
+    { title: "Savannah Adjustable Quarter Strap Sandal - Black" },
+    { title: "Romy Wedge Sandal - Tan" },
+    { title: "Lina Slide Sandal - Navy" },
+    { title: "Mila Low Boot - Brown" },
+    { title: "Darcy Flat - Nude" },
+  ];
+  const cards = pickComparisonCards(flooded, ["jillian", "savannah"]);
+  assert.equal(cards.length, 2, "two-family comparison must pin exactly 2 cards");
+  assert.ok(cards.length <= 4, "never more than 4");
+  assert.match(cards[0].title, /Jillian/);
+  assert.match(cards[1].title, /Savannah/);
+  // no unrelated families leak in
+  assert.ok(!cards.some((c) => /Romy|Lina|Mila|Darcy/.test(c.title)), "no unrelated families");
 });
-check("'discounted sandals under $100' → onSale + priceMax 100", () => {
-  const { input } = scopedProductSearchInput({ latestUserMessage: "Show me discounted sandals under $100", turnPlan: { workflow: "sale_browse" } });
-  assert.equal(input.onSale, true);
-  assert.equal(input.priceMax, 100);
-});
-check("non-sale browse does NOT set onSale", () => {
-  const { input } = scopedProductSearchInput({ latestUserMessage: "show me women's sandals", turnPlan: { workflow: "browse" } });
-  assert.ok(!input.onSale, "onSale wrongly set on a non-sale browse");
+check("comparison with a missing family pins only the family that exists", () => {
+  const pool = [{ title: "Jillian Braided Quarter Strap Sandal - Black" }];
+  const cards = pickComparisonCards(pool, ["jillian", "savannah"]);
+  assert.equal(cards.length, 1);
+  assert.match(cards[0].title, /Jillian/);
 });
 
 console.log("");

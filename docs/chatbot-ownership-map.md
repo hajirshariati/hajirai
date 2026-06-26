@@ -12,6 +12,7 @@ to make it; everyone downstream may clean for safety but may not re-decide.**
 |---|---|---|
 | **Workflow** (which kind of turn this is) | **TurnPlan** (`app/lib/turn-plan.server.js`, `planTurn`) | Classifies every turn into one of 9 workflows: `policy_account`, `availability`, `comparison`, `named_product_advisory`, `condition_recommendation`, `sale_browse`, `sizing_help`, `browse`, `clarification`. Also owns `searchRequired`, `clarificationAllowed`, `productDisplayPolicy`, `gender`. |
 | **Exact product / color / size / width availability** | **Availability Truth** (`app/lib/availability-truth.js`) | For `workflow=availability` only. Resolves family → style → variant truth and produces AVAILABLE / UNAVAILABLE / UNKNOWN / NOT_FOUND / DISAMBIGUATION, the answer **text**, and the **cards**. Its output is authoritative for that turn. |
+| **Comparison cards** | **Comparison pin** (`chat.jsx`, `comparisonPinnedCards`) | For `workflow=comparison`: the LLM owns the verdict text; the code pins ONE representative card per named family (max 4), bypassing the scorer so a two-product comparison shows ~2 cards, never a flooded carousel. |
 | **Advisory / sales language** | **LLM** | Owns the persuasive, advisory, and conversational phrasing for non-availability turns (browse, comparison, advisory, condition, clarification). Never owns a hard availability yes/no. |
 | **Factual safety** | **Grounding validator** (`app/lib/grounding-validator.server.js`) | Blocks ungrounded claims (sizes/colors/stock/policy facts not present in the evidence pool) and non-answers on answer-workflows, forcing a synthesis retry. Owns "is this claim supported by what the model actually saw." |
 | **Final safety cleanup** | **Response contract / post-processing** (`response-contract.server.js`, the in-loop guards) | May trim banned phrasing, strip a lineup-promise sentence, suppress a misleading CTA, clear stale cards. **Never selects products** and never overrides an owner's decision. |
@@ -56,6 +57,19 @@ to make it; everyone downstream may clean for safety but may not re-decide.**
 7. **Shopping a sale is commerce, not support.** "What's on sale" → `sale_browse`
    (search `onSale=true`, show discounted cards, never a Support Hub CTA). Only
    promo *mechanics* ("military discount?", "promo code?") are `policy_account`.
+
+8. **Comparison is a governed CONCISE workflow.** ≤120 words, answer-first
+   ("Pick X for Y. Choose Z if A."), ≤3 facts/side, no essay. The validator caps
+   length even when "compare/vs" reads as a detail request; `too_long` stays a
+   WARNING (never a blocking retry) and is fixed by the deterministic
+   `compactComparison` trim at ship time — no tool re-search. Cards: ≤4, one per
+   named family. No broad "View All" CTA — the cards ARE the comparison.
+
+9. **Memory hygiene.** Variant-level (`size`/`width`) and sale (`onSale`)
+   constraints are turn-ephemeral: a prior availability/sale turn's values never
+   silently filter a later browse/condition/comparison search. They apply only
+   when the latest message restates them (availability resolves them on its own
+   deterministic path).
 
 ## Turn invariant log
 

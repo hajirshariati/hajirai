@@ -2110,8 +2110,8 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   // Commerce turns never punt to Support. A sale-browse turn that wrongly
   // produced "Visit Support Hub" (Failure B) must show sale products, not a
   // support link.
-  if (supportCTA && ctx?.turnPlan?.workflow === "sale_browse") {
-    console.log(`[chat] support CTA suppressed: sale_browse is a commerce turn (show sale products, not Support)`);
+  if (supportCTA && (ctx?.turnPlan?.workflow === "sale_browse" || ctx?.turnPlan?.workflow === "comparison")) {
+    console.log(`[chat] support CTA suppressed: ${ctx.turnPlan.workflow} is a commerce turn (show products, not Support)`);
     supportCTA = null;
   }
 
@@ -2342,6 +2342,10 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   // turn: the EXACT, authoritative final card list. When non-null it wins over
   // every downstream card guard/scorer and is emitted verbatim.
   let availabilityPinnedCards = null;
+  // Set by the workflow=comparison block: ONE representative card per named
+  // family (max 4). Like availabilityPinnedCards, it wins over the scorer so a
+  // two-product comparison never floods the carousel with 9 cards.
+  let comparisonPinnedCards = null;
   // Ownership instrumentation (see docs/chatbot-ownership-map.md). answerOwner
   // is who produced the customer-facing TEXT; ownedTextSnapshot is that text
   // captured BEFORE the safety-cleanup pipeline runs, so the turn-invariant log
@@ -2526,6 +2530,39 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       console.error("[availability-truth] failed (non-fatal):", avErr?.message || avErr);
     }
   }
+
+  // workflow=comparison: pin ONE representative card per named family (max 4).
+  // The LLM owns the comparison TEXT; we own the CARDS so a two-product
+  // comparison shows ~2 cards (Jillian + Savannah), never the 9-10 card pool the
+  // scorer would otherwise surface. Bypasses the scorer like availability.
+  if (ctx.turnPlan?.workflow === "comparison" && !availabilityPinnedCards) {
+    try {
+      const fams = Array.isArray(ctx.turnPlan.namedFamilies) ? ctx.turnPlan.namedFamilies : [];
+      if (fams.length >= 1) {
+        const candidates = [pool, Array.from(allProductPool.values())];
+        const picked = [];
+        const seenFam = new Set();
+        for (const fam of fams) {
+          if (seenFam.has(fam)) continue;
+          let card = null;
+          for (const src of candidates) {
+            card = (src || []).find((c) => titleStyleFamily(c.title || "").toLowerCase() === fam);
+            if (card) break;
+          }
+          if (card) { picked.push(card); seenFam.add(fam); }
+        }
+        if (picked.length > 0) {
+          comparisonPinnedCards = picked.slice(0, 4);
+          console.log(`[comparison] pinnedFinalCards=${comparisonPinnedCards.length} families=[${fams.join(",")}]`);
+        } else {
+          console.log(`[comparison] no family cards found in pool for [${fams.join(",")}] — leaving scorer cards`);
+        }
+      }
+    } catch (cmpErr) {
+      console.error("[comparison] pin failed (non-fatal):", cmpErr?.message || cmpErr);
+    }
+  }
+
   if (ensuredCards.diagnostics?.exactNoMatch && pool.length === 0) {
     const exactNoMatch = buildCodeOwnedExactNoMatchText({ ctx });
     if (exactNoMatch.text) {
@@ -2723,7 +2760,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     })));
   }
 
-  if (!supportCTA && genericCTA && ctx.turnPlan?.workflow !== "availability") {
+  if (!supportCTA && genericCTA && ctx.turnPlan?.workflow !== "availability" && ctx.turnPlan?.workflow !== "comparison") {
     outboundLinks.push({ url: genericCTA.url, label: genericCTA.label });
     controller.enqueue(encoder.encode(sseChunk({
       type: "link",
@@ -2800,6 +2837,17 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     // its product page) is the answer; a broad "View All …" link would make a
     // precise yes/no/unknown look like browse mode.
     console.log(`[cta] ${ctx.shop} broad CTA suppressed: availability turn (pinned cards)`);
+  } else if (comparisonPinnedCards) {
+    // Comparison owns the final cards: one representative per named family.
+    // Emit verbatim, bypass the scorer. No broad "View All" CTA — the two cards
+    // ARE the comparison.
+    const { products: deduped } = prepareProductCardsForTurn(comparisonPinnedCards);
+    finalProductCards = deduped;
+    console.log(`[comparison] finalCards=${deduped.length}`);
+    if (deduped.length > 0) {
+      controller.enqueue(encoder.encode(sseChunk({ type: "products", products: deduped })));
+    }
+    console.log(`[cta] ${ctx.shop} broad CTA suppressed: comparison turn (pinned cards)`);
   } else if (pool.length > 0 && fullResponseText && !suppressCardsForChips) {
     const textLower = fullResponseText.toLowerCase();
     const saysNoMatch = detectAiNoMatchPhrasing(fullResponseText);
@@ -3341,20 +3389,27 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   // downstream mutator violated the do-not-mutate rule — logged as VIOLATION.
   {
     const workflow = ctx?.turnPlan?.workflow || "-";
-    const pinnedCount = availabilityPinnedCards ? availabilityPinnedCards.length : null;
+    const pinned = availabilityPinnedCards || comparisonPinnedCards;
+    const pinnedCount = pinned ? pinned.length : null;
     const finalCount = Array.isArray(finalProductCards) ? finalProductCards.length : 0;
-    const cardOwner = availabilityPinnedCards != null ? "availability-truth" : finalCount > 0 ? "scorer" : "none";
+    const cardOwner = availabilityPinnedCards != null ? "availability-truth"
+      : comparisonPinnedCards != null ? "comparison"
+      : finalCount > 0 ? "scorer" : "none";
     const textCleanupChanged = ownedTextSnapshot != null && ownedTextSnapshot !== fullResponseText;
     console.log(
       `[turn-invariant] workflow=${workflow} answerOwner=${answerOwner} cardOwner=${cardOwner} ` +
       `pinnedCards=${pinnedCount == null ? "-" : pinnedCount} finalCards=${finalCount} ` +
       `textCleanupChanged=${textCleanupChanged ? "yes" : "no"}`,
     );
-    if (workflow === "availability" && pinnedCount != null && finalCount !== pinnedCount) {
+    if ((workflow === "availability" || workflow === "comparison") && pinnedCount != null && finalCount !== pinnedCount) {
       console.warn(
-        `[turn-invariant] VIOLATION availability pinned=${pinnedCount} but final=${finalCount} ` +
-        `— a downstream mutator changed Availability Truth's authoritative cards`,
+        `[turn-invariant] VIOLATION ${workflow} pinned=${pinnedCount} but final=${finalCount} ` +
+        `— a downstream mutator changed the pinned cards`,
       );
+    }
+    // Two-family comparison must never flood the carousel.
+    if (workflow === "comparison" && finalCount > 4) {
+      console.warn(`[turn-invariant] VIOLATION comparison finalCards=${finalCount} > 4 — carousel flooded`);
     }
   }
 

@@ -299,7 +299,10 @@ export function planTurn({
       answerRequirements: reqs({ answerFirst: true, concise: true, recommendOne: true }),
       gender: genderFor(condition || useCase),
       directives: [
-        "Look up both products this turn, then give a concise direct verdict (recommend one) with the key tradeoff. Show both cards.",
+        "COMPARISON CONTRACT — keep it SHORT (max ~120 words, under 5 sentences). " +
+          "First sentence must answer directly: lean one product for the stated need and say why. " +
+          "Structure: \"Pick X for Y. Choose Z if A. Here's why…\". At most 3 short facts per side. " +
+          "No long paragraphs, no review-style essay. Show one card per product.",
       ],
     });
   }

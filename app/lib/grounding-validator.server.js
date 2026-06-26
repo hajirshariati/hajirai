@@ -817,19 +817,30 @@ export function validateGrounding({ text, pool = [], categoryGenderMap = null, u
     // unless the customer asked for depth (comparison, reviews, specs,
     // policy, "explain", "in detail", etc.). Capped on BOTH words and raw
     // characters — 160 words still overflows the narrow widget visually.
-    if (isProductTurn && !wantsDetail) {
+    // Comparison is a GOVERNED concise workflow: even though "compare/vs"
+    // reads as a detail request, the contract caps it at ~120 words so it never
+    // becomes a review essay. (A plain product turn uses the retail cap unless
+    // the customer asked for depth.)
+    const isComparison = workflow === "comparison";
+    if (isProductTurn && (!wantsDetail || isComparison)) {
       const words = retailWordCount(text);
       const chars = text.trim().length;
-      if (words > MAX_RETAIL_WORDS || chars > MAX_RETAIL_CHARS) {
+      const maxWords = isComparison ? 120 : MAX_RETAIL_WORDS;
+      const maxChars = isComparison ? 700 : MAX_RETAIL_CHARS;
+      if (words > maxWords || chars > maxChars) {
         errors.push({
           kind: "too_long",
           claim: `${words} words / ${chars} chars`,
-          message:
-            `Your draft is ${words} words (${chars} characters) — too long for ` +
-            `the chat widget. Rewrite it as a concise retail sales answer: answer ` +
-            `directly in the first sentence, give one honest tradeoff, then one ` +
-            `best next step. Keep it under 5 sentences and under ${MAX_RETAIL_CHARS} ` +
-            `characters. Do NOT remove necessary caveats.`,
+          message: isComparison
+            ? `Your comparison draft is ${words} words — too long. Keep it under 120 ` +
+              `words and 5 sentences: first sentence picks one product for the stated ` +
+              `need and says why; then one short "choose the other if…"; at most 3 facts ` +
+              `per side. No essay. Do NOT remove necessary caveats.`
+            : `Your draft is ${words} words (${chars} characters) — too long for ` +
+              `the chat widget. Rewrite it as a concise retail sales answer: answer ` +
+              `directly in the first sentence, give one honest tradeoff, then one ` +
+              `best next step. Keep it under 5 sentences and under ${MAX_RETAIL_CHARS} ` +
+              `characters. Do NOT remove necessary caveats.`,
         });
       }
     }
