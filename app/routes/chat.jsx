@@ -6,6 +6,7 @@ import { getCatalogCategories, getAllCatalogCategories, getCategoryGenderAvailab
 import { getActiveCampaigns, formatCampaignsForCS } from "../models/Campaign.server";
 import { buildSystemPrompt } from "../lib/chat-prompt.server";
 import { planTurn, buildTurnPlanPromptBlock, buildPlanClarifierRepair, planForcesProductDisplay, planRequiresSearch as planRequiresSearchFlag, clarifierGateDecision, isAnswerWorkflow } from "../lib/turn-plan.server";
+import { classifyAvailability, buildAvailabilityAnswer, AVAILABILITY_RESULT, resolveAvailabilityRequest, isAvailabilityFollowUp } from "../lib/availability-truth";
 import { retrieveRelevantChunks } from "../lib/knowledge-chunks.server";
 import { buildKidsCoveragePrompt } from "../lib/kids-coverage.server";
 import { analyzeCategoryIntent, cardMatchesActiveGroup, textIntentDivergesFromGroup, matchingGroupsForText } from "../lib/category-intent.server";
@@ -2328,6 +2329,48 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       pool = merged;
     }
   }
+
+  // ── Availability Truth ──────────────────────────────────────────────
+  // workflow=availability: answer from product/variant truth, not a generic
+  // search. Resolve the named family + color/size/width from the LATEST
+  // message (deictic follow-ups inherit the focus product), classify against
+  // real variant inventory, then OWN the answer text and restrict the cards to
+  // the named family only. Best-effort: any failure leaves the model's reply.
+  if (ctx.turnPlan?.workflow === "availability") {
+    try {
+      const fams = Array.isArray(ctx.turnPlan.namedFamilies) ? ctx.turnPlan.namedFamilies : [];
+      const latestC = extractUserConstraints(ctx.latestUserMessage || "");
+      const { family, color: reqColor, size: reqSize, width: reqWidth } = resolveAvailabilityRequest({
+        namedFamilies: fams,
+        latestConstraints: latestC,
+        focusProduct: ctx.focusProduct,
+        isFollowUp: isAvailabilityFollowUp(ctx.latestUserMessage || ""),
+      });
+      if (family) {
+        const famProducts = await prisma.product.findMany({
+          where: { shop: ctx.shop, NOT: { status: { in: ["DRAFT", "ARCHIVED"] } }, title: { contains: family, mode: "insensitive" } },
+          include: { variants: true },
+          take: 50,
+        });
+        const verdict = classifyAvailability({ products: famProducts, family, color: reqColor, size: reqSize, width: reqWidth });
+        console.log(
+          `[availability-truth] family=${family} color=${reqColor || "-"} size=${reqSize || "-"} width=${reqWidth || "-"} ` +
+          `result=${verdict.result} reason=${verdict.reason || "-"}`,
+        );
+        fullResponseText = buildAvailabilityAnswer(verdict);
+        if (verdict.result === AVAILABILITY_RESULT.NOT_FOUND) {
+          pool = [];
+          console.log(`[availability-truth] display=none (not found)`);
+        } else {
+          const famCards = pool.filter((c) => titleStyleFamily(c.title || "").toLowerCase() === family);
+          if (famCards.length > 0) pool = famCards.slice(0, 1);
+          console.log(`[availability-truth] display=family-only cards=${pool.length}`);
+        }
+      }
+    } catch (avErr) {
+      console.error("[availability-truth] failed (non-fatal):", avErr?.message || avErr);
+    }
+  }
   if (ensuredCards.diagnostics?.exactNoMatch && pool.length === 0) {
     const exactNoMatch = buildCodeOwnedExactNoMatchText({ ctx });
     if (exactNoMatch.text) {
@@ -3952,6 +3995,9 @@ async function handleChatPost({ shop, sessionAccessToken, request, internal = fa
             // uses this so the named product is searched BEFORE alternatives.
             turnPlan.namedFamilies = namedFamilies;
             ctx.turnPlan = turnPlan;
+            // Expose the anchored focus product so the availability-truth flow
+            // can inherit family/color on a deictic follow-up ("what about 9?").
+            ctx.focusProduct = focusProduct || null;
             const planBlock = buildTurnPlanPromptBlock(turnPlan);
             if (planBlock) {
               systemPrompt += "\n\n" + planBlock + "\n";
