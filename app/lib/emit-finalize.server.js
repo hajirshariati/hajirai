@@ -312,10 +312,18 @@ function escapeReLocal(s) {
 // from the evidence pool when we have it; otherwise suppress the mismatched
 // cards so the answer stands alone (never show the wrong product).
 //
-// Conservative: only acts when the text names a SPECIFIC family. A generic
-// condition_recommendation answer that names no product is left untouched.
+// Conservative: only acts when a SPECIFIC family is referenced. A generic
+// condition_recommendation answer naming no product is left untouched.
+//
+// RECOVER BEFORE SUPPRESS: when the cards don't represent a referenced family,
+// recover that family from the turn evidence and PREPEND it. For advisory/
+// comparison/condition (keepAlternatives), the original cards follow as
+// relevant alternatives; for availability (show only the named product) the
+// recovered family replaces them. Suppression is the last resort, only when
+// the referenced family can't be surfaced from the evidence at all.
+//
 // Returns { cards, changed, reason }.
-export function alignCardsToAnswerText({ text = "", cards = [], evidencePool = [], namedFamilyHint = "" } = {}) {
+export function alignCardsToAnswerText({ text = "", cards = [], evidencePool = [], namedFamilyHint = "", namedFamilies = [], keepAlternatives = false, cap = 6 } = {}) {
   if (!Array.isArray(cards) || cards.length === 0) return { cards, changed: false, reason: "no-cards" };
   const lc = String(text || "").toLowerCase();
   if (!lc.trim()) return { cards, changed: false, reason: "no-text" };
@@ -323,24 +331,35 @@ export function alignCardsToAnswerText({ text = "", cards = [], evidencePool = [
   const familyOf = (c) => titleStyleFamily(String(c?.title || "")).toLowerCase();
   const inText = (fam) => Boolean(fam) && fam.length >= 4 && new RegExp(`\\b${escapeReLocal(fam)}\\b`).test(lc);
 
-  // Aligned: at least one displayed card's family appears in the answer text.
-  const displayedFamilies = cards.map(familyOf).filter(Boolean);
-  if (displayedFamilies.some(inText)) return { cards, changed: false, reason: "aligned" };
-
-  // Does the text actually name a family? Prefer the hint (the family the model
-  // searched), else any evidence-pool family present in the text.
-  const hint = String(namedFamilyHint || "").toLowerCase();
-  const evidenceFamilies = (evidencePool || []).map(familyOf).filter(Boolean);
-  const textNamesFamily = inText(hint) || evidenceFamilies.some(inText);
-  if (!textNamesFamily) return { cards, changed: false, reason: "text-names-no-family" };
-
-  // The text names a family the displayed cards don't represent. Recover it
-  // from the evidence pool if present; else suppress the mismatched cards.
-  const recovered = (evidencePool || []).filter((c) => {
+  // Families this turn references: the explicitly named families (from the
+  // latest message), the captured-search hint, and any evidence family the
+  // answer text mentions by name.
+  const referenced = new Set(
+    [...(namedFamilies || []), namedFamilyHint]
+      .map((s) => String(s || "").toLowerCase())
+      .filter((s) => s.length >= 4),
+  );
+  for (const c of evidencePool || []) {
     const f = familyOf(c);
-    return inText(f) || (hint && f === hint);
-  });
-  if (recovered.length > 0) return { cards: recovered, changed: true, reason: "replaced-with-text-family" };
+    if (inText(f)) referenced.add(f);
+  }
+  if (referenced.size === 0) return { cards, changed: false, reason: "text-names-no-family" };
+
+  // Aligned: a displayed card already belongs to a referenced family.
+  if (cards.map(familyOf).some((f) => referenced.has(f))) return { cards, changed: false, reason: "aligned" };
+
+  // Mismatch. Recover referenced-family cards from the evidence.
+  const recovered = (evidencePool || []).filter((c) => referenced.has(familyOf(c)));
+  if (recovered.length > 0) {
+    const ordered = keepAlternatives ? [...recovered, ...cards] : recovered;
+    const seen = new Set();
+    const merged = [];
+    for (const c of ordered) {
+      const key = String(c?.handle || c?.title || "").toLowerCase();
+      if (key && !seen.has(key)) { seen.add(key); merged.push(c); }
+    }
+    return { cards: merged.slice(0, cap), changed: true, reason: keepAlternatives ? "recovered-prepend" : "recovered-replace" };
+  }
   return { cards: [], changed: true, reason: "suppressed-mismatch" };
 }
 

@@ -785,6 +785,19 @@ const SPECIFIC_PRODUCT_STOPWORDS = new Set([
   "paris", "london", "rome", "milan", "berlin", "tokyo", "york", "boston",
   "chicago", "miami", "vegas", "angeles", "francisco", "seattle", "denver",
   "atlanta", "dallas", "houston", "phoenix", "disney", "disneyland", "disneyworld",
+  // Medical conditions / anatomy. The catalog carries condition-named SKUs
+  // ("Men Plantar Fasciitis Kit"), so "plantar" became a false "family" — a
+  // PF question ("I have plantar fasciitis…") wrongly resolved as a named
+  // product. None of these are product family names.
+  "plantar", "fasciitis", "bunion", "bunions", "neuroma", "metatarsal",
+  "metatarsalgia", "sesamoid", "capsulitis", "achilles", "neuropathy",
+  "neuropathic", "diabetic", "diabetes", "overpronation", "overpronate",
+  "supination", "supinate", "sesamoiditis", "tendonitis", "tendinitis",
+  "heel", "heels", "fallen", "fasciitisis", "swelling", "swell", "swollen",
+  "pain", "painful", "ache", "aches", "aching", "fatigue", "kit", "kits",
+  // Occasion / descriptor words customers use that are not product names.
+  "wedding", "dinner", "party", "vacation", "cute", "dressy", "comfy",
+  "something", "anything", "recommend", "recommendation", "suggest",
 ]);
 
 function firstMeaningfulToken(title) {
@@ -861,8 +874,13 @@ export async function detectSpecificProduct(shop, message, { _testFacts } = {}) 
 // condition questions. Matches a message token against the FIRST meaningful
 // token of any catalog title (brand/color/category/etc. are stopwords, so a
 // bare "black" or "sandal" never counts). Returns boolean.
-export async function mentionsCatalogProductFamily(shop, message, { _testFacts } = {}) {
-  if (!shop || !message || typeof message !== "string") return false;
+// Return EVERY catalog product family the message names, in message order
+// (deduped). "Jillian or Savannah?" → ["jillian", "savannah"]. Generic
+// category/color/condition words are stopwords, so "sandals"/"black"/"plantar"
+// never count. This is the authoritative current-turn named-family list the
+// evidence lock uses to force a named-family search before alternatives.
+export async function extractCatalogProductFamilies(shop, message, { _testFacts } = {}) {
+  if (!shop || !message || typeof message !== "string") return [];
   const lcText = message.toLowerCase();
   let facts;
   if (Array.isArray(_testFacts)) {
@@ -874,20 +892,30 @@ export async function mentionsCatalogProductFamily(shop, message, { _testFacts }
       take: 1000,
     });
   }
-  if (!facts || facts.length === 0) return false;
+  if (!facts || facts.length === 0) return [];
 
   const families = new Set();
   for (const f of facts) {
     const tok = firstMeaningfulToken(f.title);
     if (tok) families.add(tok);
   }
+  const out = [];
+  const seen = new Set();
   const msgTokens = lcText
     .split(/[^a-z0-9]+/)
     .filter((t) => t && t.length >= 4 && !SPECIFIC_PRODUCT_STOPWORDS.has(t));
   for (const t of msgTokens) {
-    if (families.has(t)) return true;
+    if (families.has(t) && !seen.has(t)) {
+      seen.add(t);
+      out.push(t);
+    }
   }
-  return false;
+  return out;
+}
+
+export async function mentionsCatalogProductFamily(shop, message, { _testFacts } = {}) {
+  const fams = await extractCatalogProductFamilies(shop, message, { _testFacts });
+  return fams.length > 0;
 }
 
 // Permissive named-product resolver for similar-product turns.

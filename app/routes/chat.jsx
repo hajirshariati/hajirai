@@ -43,7 +43,7 @@ import { fetchYotpoLoyalty } from "../lib/yotpo-loyalty.server";
 import { buildRecommenderTools } from "../lib/recommender-tools.server";
 import { maybeRunOrthoticFlow } from "../lib/orthotic-flow-gate.server";
 import { classifyOrthoticTurn, shouldRunOrthoticClassifier } from "../lib/orthotic-classifier.server";
-import { resolveCatalogTurn, buildResolverStatePromptBlock, extractUserConstraints, detectSpecificProduct, mentionsCatalogProductFamily } from "../lib/catalog-resolver.server";
+import { resolveCatalogTurn, buildResolverStatePromptBlock, extractUserConstraints, detectSpecificProduct, mentionsCatalogProductFamily, extractCatalogProductFamilies } from "../lib/catalog-resolver.server";
 import { getCatalogFacetIndex } from "../lib/catalog-facts.server";
 import { catalogScopedNavigationQuestionVerdict, umbrellaCategoryTermsFromGroups } from "../lib/catalog-matcher.server";
 import { buildSessionMemory, detectClarifyingQuestionType, memorySummary, buildSessionMemoryPromptBlock } from "../lib/session-memory.server";
@@ -2285,6 +2285,49 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   });
   if (ensuredCards.searchAttempted) productSearchAttempted = true;
   let pool = ensuredCards.products;
+
+  // Required named-family evidence (#2/#3/#4). For answer workflows where the
+  // customer NAMED product families (Jillian, Savannah), those families MUST be
+  // in the evidence — even when the model only searched alternatives ("dressy
+  // wedding arch support"). Search each missing family and PREPEND its cards so
+  // the answer text (which names Jillian) and the displayed cards stay locked
+  // to the same families. This is what prevents the alignment validator from
+  // suppressing 8→0 when the named product exists in the catalog.
+  if (answerWorkflowTurn && Array.isArray(ctx.turnPlan?.namedFamilies) && ctx.turnPlan.namedFamilies.length > 0) {
+    const poolFamilies = () => new Set(Array.from(allProductPool.values()).map((c) => titleStyleFamily(c.title || "").toLowerCase()));
+    const namedCards = [];
+    for (const fam of ctx.turnPlan.namedFamilies) {
+      const have = poolFamilies().has(fam);
+      if (!have) {
+        try {
+          const famInput = { query: fam, filters: ctx.turnPlan.gender ? { gender: ctx.turnPlan.gender } : {}, limit: 6 };
+          const r = await dispatchTool("search_products", famInput, ctx);
+          const famCards = extractProductCards("search_products", r, ctx).filter((c) => titleStyleFamily(c.title || "").toLowerCase() === fam);
+          console.log(`[chat] turn-plan(${ctx.turnPlan.workflow}): forced named-family search "${fam}" → ${famCards.length} card(s)`);
+          for (const c of famCards) {
+            const key = c.handle || c.title;
+            if (key && !allProductPool.has(key)) allProductPool.set(key, c);
+          }
+          if (famCards.length) productSearchAttempted = true;
+        } catch (e) {
+          console.error(`[chat] named-family search failed for "${fam}":`, e?.message || e);
+        }
+      }
+      for (const c of Array.from(allProductPool.values())) {
+        if (titleStyleFamily(c.title || "").toLowerCase() === fam) namedCards.push(c);
+      }
+    }
+    // Prepend named-family cards (named first, alternatives after), deduped.
+    if (namedCards.length) {
+      const seen = new Set();
+      const merged = [];
+      for (const c of [...namedCards, ...pool]) {
+        const key = String(c.handle || c.title || "").toLowerCase();
+        if (key && !seen.has(key)) { seen.add(key); merged.push(c); }
+      }
+      pool = merged;
+    }
+  }
   if (ensuredCards.diagnostics?.exactNoMatch && pool.length === 0) {
     const exactNoMatch = buildCodeOwnedExactNoMatchText({ ctx });
     if (exactNoMatch.text) {
@@ -2932,6 +2975,11 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
         cards,
         evidencePool: Array.from(allProductPool.values()),
         namedFamilyHint: familyFromQuery(turnEvidenceSearchInput?.query),
+        namedFamilies: ctx.turnPlan?.namedFamilies || [],
+        // Availability shows only the named product; advisory/comparison/
+        // condition keep relevant alternatives after the named family.
+        keepAlternatives: ctx.turnPlan.workflow !== "availability",
+        cap: ctx.productCardCap || 6,
       });
       if (aligned.changed) {
         console.log(`[chat] turn-plan(${ctx.turnPlan.workflow}): card/text alignment ${aligned.reason} — ${cards.length}→${aligned.cards.length} card(s)`);
@@ -3875,12 +3923,19 @@ async function handleChatPost({ shop, sessionAccessToken, request, internal = fa
             // focusProduct from a PRIOR card must NOT make a fresh
             // condition/use-case turn ("I have PF, need walking sandals")
             // misclassify as named_product_advisory.
-            let messageNamesProduct = false;
+            // Named families come from the LATEST message only (generic
+            // category/color/condition words are stopwords). A deictic
+            // ("this/it/that one") + a focusProduct also counts as named.
+            let namedFamilies = [];
             try {
-              messageNamesProduct = await mentionsCatalogProductFamily(shop, latestUserMessage);
+              namedFamilies = await extractCatalogProductFamilies(shop, latestUserMessage);
             } catch { /* family lookup best-effort */ }
             const deicticRef = /\b(this one|that one|these|those|\bit\b|\bthis\b|\bthat\b)\b/i.test(latestUserMessage);
-            const planNamedProduct = messageNamesProduct || (deicticRef && Boolean(focusProduct));
+            const deicticFamily = deicticRef && focusProduct
+              ? String(focusProduct.title || "").toLowerCase().split(/[^a-z0-9]+/).filter(Boolean).find((t) => t.length >= 4) || null
+              : null;
+            if (deicticFamily && !namedFamilies.includes(deicticFamily)) namedFamilies = [...namedFamilies, deicticFamily];
+            const planNamedProduct = namedFamilies.length > 0;
             turnPlan = planTurn({
               message: latestUserMessage,
               attrs: {
@@ -3893,6 +3948,9 @@ async function handleChatPost({ shop, sessionAccessToken, request, internal = fa
               hasPriorCards: Array.isArray(priorProductCards) && priorProductCards.length > 0,
               primaryGender: "women",
             });
+            // The named families this turn must search — the evidence lock
+            // uses this so the named product is searched BEFORE alternatives.
+            turnPlan.namedFamilies = namedFamilies;
             ctx.turnPlan = turnPlan;
             const planBlock = buildTurnPlanPromptBlock(turnPlan);
             if (planBlock) {
@@ -3900,7 +3958,7 @@ async function handleChatPost({ shop, sessionAccessToken, request, internal = fa
               console.log(
                 `[chat] turn-plan workflow=${turnPlan.workflow} search=${turnPlan.searchRequired} ` +
                 `clarify=${turnPlan.clarificationAllowed} display=${turnPlan.productDisplayPolicy} ` +
-                `gender=${turnPlan.gender || "-"} named=${planNamedProduct}`,
+                `gender=${turnPlan.gender || "-"} named=${planNamedProduct} families=[${namedFamilies.join(",")}]`,
               );
             }
           } catch (planErr) {
