@@ -239,6 +239,28 @@ export function resolveAvailabilityRequest({ message = "", priorMessage = "", na
   return { family, color, size, width };
 }
 
+// Pull the customer-facing text out of a conversation message (string content
+// or Anthropic content blocks). Tool-result/array blocks with no text → "".
+function messageText(m) {
+  if (typeof m?.content === "string") return m.content;
+  if (Array.isArray(m?.content)) return m.content.filter((b) => b?.type === "text" && b.text).map((b) => b.text).join(" ");
+  return "";
+}
+
+// The most recent PRIOR user message that looks like an availability question
+// (names a size/width/color) — the one a follow-up ("what about size 9?")
+// should inherit from. Scans backwards so intervening non-availability turns
+// don't hide it; the current message (last user turn) is excluded.
+export function priorAvailabilityMessage(messages = [], knownColors = []) {
+  const users = (Array.isArray(messages) ? messages : []).filter((m) => m?.role === "user").map(messageText).filter(Boolean);
+  const priors = users.slice(0, -1);
+  for (let i = priors.length - 1; i >= 0; i--) {
+    const c = parseAvailabilityConstraints(priors[i], knownColors);
+    if (c.size || c.width || c.color) return priors[i];
+  }
+  return priors[priors.length - 1] || "";
+}
+
 const FOLLOWUP_RE = /\b(this one|that one|these|those|\bit\b|\bthis\b|\bthat\b|what\s+about|how\s+about|and\s+in\b|do\s+they\s+have)\b/i;
 export function isAvailabilityFollowUp(message) {
   return FOLLOWUP_RE.test(String(message || ""));

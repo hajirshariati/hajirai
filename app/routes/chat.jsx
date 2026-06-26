@@ -6,7 +6,7 @@ import { getCatalogCategories, getAllCatalogCategories, getCategoryGenderAvailab
 import { getActiveCampaigns, formatCampaignsForCS } from "../models/Campaign.server";
 import { buildSystemPrompt } from "../lib/chat-prompt.server";
 import { planTurn, buildTurnPlanPromptBlock, buildPlanClarifierRepair, planForcesProductDisplay, planRequiresSearch as planRequiresSearchFlag, clarifierGateDecision, isAnswerWorkflow } from "../lib/turn-plan.server";
-import { classifyAvailability, buildAvailabilityAnswer, AVAILABILITY_RESULT, resolveAvailabilityRequest, isAvailabilityFollowUp, familyOfTitle, collectFamilyColors, constraintIntent } from "../lib/availability-truth";
+import { classifyAvailability, buildAvailabilityAnswer, AVAILABILITY_RESULT, resolveAvailabilityRequest, isAvailabilityFollowUp, familyOfTitle, collectFamilyColors, constraintIntent, priorAvailabilityMessage } from "../lib/availability-truth";
 import { retrieveRelevantChunks } from "../lib/knowledge-chunks.server";
 import { buildKidsCoveragePrompt } from "../lib/kids-coverage.server";
 import { analyzeCategoryIntent, cardMatchesActiveGroup, textIntentDivergesFromGroup, matchingGroupsForText } from "../lib/category-intent.server";
@@ -2341,13 +2341,6 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       const fams = Array.isArray(ctx.turnPlan.namedFamilies) ? ctx.turnPlan.namedFamilies : [];
       const latestMsg = ctx.latestUserMessage || "";
       const isFollowUp = isAvailabilityFollowUp(latestMsg);
-      // The most recent PRIOR user message — for follow-ups ("what about 9?")
-      // to inherit the family/color/width of the prior availability question.
-      const priorUserMsg = (Array.isArray(ctx.messages) ? ctx.messages : [])
-        .filter((mm) => mm?.role === "user" && typeof mm.content === "string")
-        .map((mm) => mm.content)
-        .slice(0, -1)
-        .pop() || "";
 
       // Resolve the family token first (cheap) so we can fetch its products and
       // mine their colors for the parser.
@@ -2361,6 +2354,9 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
           take: 50,
         });
         const knownColors = collectFamilyColors(famProducts);
+        // Most recent prior availability question — a size-only follow-up
+        // ("what about size 9?") inherits its color/width.
+        const priorUserMsg = isFollowUp ? priorAvailabilityMessage(ctx.messages, knownColors) : "";
         const req = resolveAvailabilityRequest({
           message: latestMsg,
           priorMessage: priorUserMsg,
@@ -2570,7 +2566,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     })));
   }
 
-  if (!supportCTA && genericCTA) {
+  if (!supportCTA && genericCTA && ctx.turnPlan?.workflow !== "availability") {
     outboundLinks.push({ url: genericCTA.url, label: genericCTA.label });
     controller.enqueue(encoder.encode(sseChunk({
       type: "link",
@@ -3099,7 +3095,12 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       // configured collectionLinks mapping. Matching prefers an exact
       // category+gender rule, then falls back to a gender-agnostic rule for the
       // same category. No mapping → no CTA (avoids 404s).
-      const collection = extractCollectionCTA(fullResponseText);
+      // Exact-availability turns must NOT show a broad "View All Women's
+      // Sandals" collection/auto-search CTA — that makes a precise yes/no/
+      // unknown answer look like browse mode. The family card (+ its product
+      // page) is the answer; no broad collection link.
+      const isAvailabilityTurn = ctx.turnPlan?.workflow === "availability";
+      const collection = isAvailabilityTurn ? { cta: null } : extractCollectionCTA(fullResponseText);
       if (collection.cta) {
         outboundLinks.push({ url: collection.cta.url, label: collection.cta.label });
         controller.enqueue(encoder.encode(sseChunk({
@@ -3107,6 +3108,8 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
           url: collection.cta.url,
           label: collection.cta.label,
         })));
+      } else if (isAvailabilityTurn) {
+        console.log(`[cta] ${ctx.shop} broad CTA suppressed: availability turn (family-only display)`);
       } else if (isKnowledgeQuestionLocal(ctx?.latestUserMessage)) {
         // Knowledge-turn auto-search CTA suppression. Live trace
         // 2026-06-08: customer asked "what other tech do you have?",

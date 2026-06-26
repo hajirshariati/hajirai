@@ -205,6 +205,62 @@ check("requested size present but unparsed → UNKNOWN (not AVAILABLE)", () => {
   assert.equal(v.reason, "unparsed_requested_constraints");
 });
 
+// ── #1 width inherited on a size-only follow-up (real message array) ──
+import { priorAvailabilityMessage } from "../app/lib/availability-truth.js";
+check("priorAvailabilityMessage finds the prior availability question", () => {
+  const messages = [
+    { role: "user", content: "Do you have Savannah in champagne size 7 wide?" },
+    { role: "assistant", content: "I can find the Savannah in Champagne…" },
+    { role: "user", content: "What about size 9?" },
+  ];
+  assert.match(priorAvailabilityMessage(messages, ["champagne"]), /champagne size 7 wide/);
+});
+check("'what about size 9?' inherits champagne + wide from the conversation", () => {
+  const messages = [
+    { role: "user", content: "Do you have Savannah in champagne size 7 wide?" },
+    { role: "assistant", content: "…" },
+    { role: "user", content: "What about size 9?" },
+  ];
+  const knownColors = ["champagne"];
+  const req = resolveAvailabilityRequest({
+    message: "What about size 9?",
+    priorMessage: priorAvailabilityMessage(messages, knownColors),
+    namedFamilies: [],
+    focusProduct: { title: "Savannah Adjustable Quarter Strap Sandal - Champagne" },
+    isFollowUp: true,
+    knownColors,
+  });
+  assert.equal(req.family, "savannah");
+  assert.equal(req.color, "champagne");
+  assert.equal(req.size, "9");
+  assert.equal(req.width, "wide"); // inherited from the prior availability turn
+});
+check("priorAvailabilityMessage handles content blocks + ignores tool results", () => {
+  const messages = [
+    { role: "user", content: [{ type: "text", text: "Do you have Jillian in black size 8 wide?" }] },
+    { role: "user", content: [{ type: "tool_result", tool_use_id: "x", content: "[]" }] },
+    { role: "user", content: "What about size 9?" },
+  ];
+  assert.match(priorAvailabilityMessage(messages), /black size 8 wide/);
+});
+
+// ── #3 UNKNOWN wording is explicit about the data limit + names size/width ──
+check("UNKNOWN no_variant_inventory text says can't verify + names size/width", () => {
+  const v = classify("savannah", "champagne", "7", "wide");
+  assert.equal(v.result, R.UNKNOWN);
+  const txt = buildAvailabilityAnswer(v);
+  assert.match(txt, /can't verify size 7 wide/);
+  assert.match(txt, /product page/);
+  assert.doesNotMatch(txt, /^yes —/i);
+});
+
+// ── #4 unavailable color → the verdict carries ONLY the named family ──
+check("Jillian in pink → product is Jillian (never an alternative family)", () => {
+  const v = classify("jillian", "pink");
+  assert.equal(v.result, R.UNAVAILABLE);
+  assert.match(v.product.title, /Jillian/);
+});
+
 console.log("");
 if (fail === 0) {
   console.log(`PASS  ${pass} passed, 0 failed`);
