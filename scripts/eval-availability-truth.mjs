@@ -21,11 +21,13 @@ function check(name, fn) {
   catch (err) { console.log(`  ✗ ${name} — ${err.message}`); fails.push({ name, err }); fail++; }
 }
 
-// REAL Shopify shape: optionsJson is JSON.stringify(selectedOptions) — an
-// ARRAY of { name, value }. (The earlier object-shape fixtures hid the bug.)
+// REAL Aetrex/Shopify shape: optionsJson is JSON.stringify(selectedOptions) —
+// an ARRAY of { name, value } — and Size values carry a "US" unit, e.g.
+// "8 US" or the range "9 - 9.5 US". `size` here may be a number/string ("8")
+// or a raw label ("9 - 9.5"). Width is only added when given.
 const variant = (size, color, qty, width) => {
   const opts = [{ name: "Color", value: color }];
-  if (size != null) opts.push({ name: "Size", value: String(size) });
+  if (size != null) opts.push({ name: "Size", value: `${size} US` });
   if (width) opts.push({ name: "Width", value: width === "wide" ? "Wide" : width === "narrow" ? "Narrow" : "Medium" });
   return { sku: `${color}-${size}${width || ""}`, inventoryQty: qty, optionsJson: JSON.stringify(opts) };
 };
@@ -35,21 +37,32 @@ const JILLIAN_BLACK = {
   handle: "jillian-black", title: "Jillian Braided Quarter Strap Sandal - Black",
   variants: [variant(7, "Black", 3), variant(8, "Black", 5), variant(9, "Black", 0)],
 };
+// Jillian comes in ROSE, not Pink — the soft-color path should surface it.
+const JILLIAN_ROSE = {
+  handle: "jillian-rose", title: "Jillian Braided Quarter Strap Sandal - Rose",
+  variants: [variant(7, "Rose", 2), variant(8, "Rose", 3)],
+};
 const JILLIAN_NAVY = {
   handle: "jillian-navy", title: "Jillian Braided Quarter Strap Sandal - Navy",
   variants: [variant(7, "Navy", 2), variant(8, "Navy", 4)],
 };
-// Savannah Champagne: variants carry NO size data (untracked) → UNKNOWN.
+// Savannah Champagne: REAL sizes (incl a "9 - 9.5 US" range label), NO Width
+// option — exactly the live shape that broke before.
 const SAVANNAH_CHAMPAGNE = {
   handle: "savannah-champ", title: "Savannah Adjustable Quarter Strap Sandal - Champagne",
-  variants: [{ sku: "champ", inventoryQty: null, optionsJson: JSON.stringify([{ name: "Color", value: "Champagne" }]) }],
+  variants: [variant(7, "Champagne", 4), variant("9 - 9.5", "Champagne", 2)],
 };
 const SAVANNAH_BLACK = {
   handle: "savannah-black", title: "Savannah Adjustable Quarter Strap Sandal - Black",
   variants: [variant(7, "Black", 4), variant(8, "Black", 2)],
 };
+// Untracked / no-size product for the genuine no_variant_inventory case.
+const LINA_NAVY = {
+  handle: "lina-navy", title: "Lina Slide Sandal - Navy",
+  variants: [{ sku: "lina", inventoryQty: null, optionsJson: JSON.stringify([{ name: "Color", value: "Navy" }]) }],
+};
 const ROMY = { handle: "romy", title: "Romy Wedge Sandal - Tan", variants: [variant(8, "Tan", 5)] };
-const CATALOG = [JILLIAN_BLACK, JILLIAN_NAVY, SAVANNAH_CHAMPAGNE, SAVANNAH_BLACK, ROMY];
+const CATALOG = [JILLIAN_BLACK, JILLIAN_ROSE, JILLIAN_NAVY, SAVANNAH_CHAMPAGNE, SAVANNAH_BLACK, LINA_NAVY, ROMY];
 
 const classify = (family, color, size, width) => classifyAvailability({ products: CATALOG, family, color, size, width });
 
@@ -67,33 +80,58 @@ check("Jillian black size 9 (OOS) → UNAVAILABLE", () => {
 check("Jillian size 8.5 (not carried, sizes known) → UNAVAILABLE", () => {
   assert.equal(classify("jillian", null, "8.5").result, R.UNAVAILABLE);
 });
-check("Jillian in pink (color not carried) → UNAVAILABLE", () => {
+// ── #2 soft color: "Jillian in pink" surfaces Rose, never denies it ──
+check("Jillian in pink → AVAILABLE soft-color, matchedColor=rose", () => {
   const v = classify("jillian", "pink");
-  assert.equal(v.result, R.UNAVAILABLE);
-  assert.equal(v.reason, "color_not_carried");
+  assert.equal(v.result, R.AVAILABLE);
+  assert.equal(v.softColor, true);
+  assert.equal(v.matchedColor, "rose");
+  const txt = buildAvailabilityAnswer(v);
+  assert.match(txt, /don't see a color called Pink/i);
+  assert.match(txt, /available in Rose/i);
+  assert.doesNotMatch(txt, /available in Pink/i);
 });
 check("Jillian in black (color only, in stock) → AVAILABLE", () => {
   assert.equal(classify("jillian", "black").result, R.AVAILABLE);
 });
-check("Savannah champagne size 7 wide (no variant data) → UNKNOWN", () => {
+// ── #1 Aetrex size labels: "7 US" and ranges parse + match ──
+check("Savannah champagne size 7 (label '7 US') → AVAILABLE", () => {
+  assert.equal(classify("savannah", "champagne", "7").result, R.AVAILABLE);
+});
+check("Savannah champagne size 9 (range '9 - 9.5 US') → AVAILABLE", () => {
+  assert.equal(classify("savannah", "champagne", "9").result, R.AVAILABLE);
+});
+check("Savannah champagne size 9.5 (range '9 - 9.5 US') → AVAILABLE", () => {
+  assert.equal(classify("savannah", "champagne", "9.5").result, R.AVAILABLE);
+});
+check("Jillian black size 8 (label '8 US') → AVAILABLE", () => {
+  assert.equal(classify("jillian", "black", "8").result, R.AVAILABLE);
+});
+// ── #4 width split: size exists, width not a tracked option ──
+check("Savannah champagne size 7 wide → UNKNOWN width_not_in_options + names size 7", () => {
   const v = classify("savannah", "champagne", "7", "wide");
   assert.equal(v.result, R.UNKNOWN);
-  assert.equal(v.reason, "no_variant_inventory");
+  assert.equal(v.reason, "width_not_in_options");
+  assert.equal(v.sizeAvailable, true);
   const txt = buildAvailabilityAnswer(v);
-  assert.match(txt, /I can find the Savannah in Champagne/);
-  assert.match(txt, /can't verify size 7 wide/);
-  assert.match(txt, /product page/);
+  assert.match(txt, /I can find the Savannah in Champagne in size 7/);
+  assert.match(txt, /don't see Wide listed as a separate width option/i);
 });
-check("Savannah black size 7 → AVAILABLE (different color has data)", () => {
+check("Savannah champagne size 6 wide (size not carried) → UNAVAILABLE names size", () => {
+  const v = classify("savannah", "champagne", "6", "wide");
+  assert.equal(v.result, R.UNAVAILABLE);
+  assert.match(buildAvailabilityAnswer(v), /not seeing the Savannah in Champagne in size 6/i);
+});
+check("Savannah black size 7 → AVAILABLE", () => {
   assert.equal(classify("savannah", "black", "7").result, R.AVAILABLE);
 });
-check("Is Savannah available in champagne (color only, untracked=available) → AVAILABLE", () => {
-  // untracked inventory (qty null) is treated as available
+check("Is Savannah available in champagne (color only) → AVAILABLE", () => {
   assert.equal(classify("savannah", "champagne").result, R.AVAILABLE);
 });
-check("Savannah in wide (width only, no width data on champagne/black) → UNAVAILABLE or UNKNOWN", () => {
-  const v = classify("savannah", null, null, "wide");
-  assert.ok([R.UNAVAILABLE, R.UNKNOWN].includes(v.result));
+check("genuine no-size product (Lina) size 8 → UNKNOWN no_variant_inventory", () => {
+  const v = classify("lina", "navy", "8");
+  assert.equal(v.result, R.UNKNOWN);
+  assert.equal(v.reason, "no_variant_inventory");
 });
 check("Tamara (not in catalog) → NOT_FOUND", () => {
   const v = classify("tamara", "black", "8");
@@ -249,20 +287,25 @@ check("priorAvailabilityMessage handles content blocks + ignores tool results", 
 });
 
 // ── #3 UNKNOWN wording is explicit about the data limit + names size/width ──
-check("UNKNOWN no_variant_inventory text says can't verify + names size/width", () => {
-  const v = classify("savannah", "champagne", "7", "wide");
+check("UNKNOWN no_variant_inventory (no size data) text says can't verify + product page", () => {
+  const v = classify("lina", "navy", "7"); // Lina has no size variants at all
   assert.equal(v.result, R.UNKNOWN);
+  assert.equal(v.reason, "no_variant_inventory");
   const txt = buildAvailabilityAnswer(v);
-  assert.match(txt, /can't verify size 7 wide/);
+  assert.match(txt, /can't verify size 7/);
   assert.match(txt, /product page/);
   assert.doesNotMatch(txt, /^yes —/i);
 });
 
-// ── #4 unavailable color → the verdict carries ONLY the named family ──
-check("Jillian in pink → product is Jillian (never an alternative family)", () => {
+// ── verdict carries ONLY the named family (never an alternative) ──
+check("Jillian soft-color verdict product is a Jillian (Rose), never another family", () => {
   const v = classify("jillian", "pink");
-  assert.equal(v.result, R.UNAVAILABLE);
   assert.match(v.product.title, /Jillian/);
+});
+check("color with NO family alias (e.g. orange) not carried → UNAVAILABLE color_not_carried", () => {
+  const v = classify("jillian", "orange");
+  assert.equal(v.result, R.UNAVAILABLE);
+  assert.equal(v.reason, "color_not_carried");
 });
 
 // ── Shopify selectedOptions ARRAY shape (the real sync) reads correctly ──

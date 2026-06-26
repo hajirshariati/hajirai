@@ -156,10 +156,12 @@ export function planTurn({
     });
   }
 
-  // 2. Availability — size / color / stock for a product in context.
-  // Force a fresh product/variant lookup; never answer from prior cards
-  // alone; never suppress the card on an availability question.
-  if (hasProductContext && SIZE_COLOR_STOCK_RE.test(m)) {
+  // 2. Availability — size / color / stock for a product in context, OR a
+  // size/stock FOLLOW-UP after products were shown ("what about size 9?" with
+  // prior cards). The latter has no named product in the message but is clearly
+  // an availability question, so it must not fall through to clarification.
+  // Force a fresh product/variant lookup; never answer from prior cards alone.
+  if (SIZE_COLOR_STOCK_RE.test(m) && (hasProductContext || hasPriorCards)) {
     return finalize({
       workflow: WORKFLOWS.AVAILABILITY,
       requiredEvidence: ["variant_facts"],

@@ -76,9 +76,14 @@ export function normalizeVariantSize(raw) {
   if (raw == null) return null;
   let s = String(raw).trim().toLowerCase();
   if (!s) return null;
-  s = s.replace(/^size\s+/i, "");
+  // Aetrex labels carry a "US" unit ("8 US") and sometimes a range
+  // ("9 - 9.5 US"); strip the unit, normalize a range to its FIRST size
+  // (callers needing the full range use expandVariantSizes).
+  s = s.replace(/\bus\b/gi, " ").replace(/^size\s+/i, "");
   // Unicode half + fraction-y forms.
-  s = s.replace(/\s*½/g, ".5").replace(/\s+1\/2/g, ".5");
+  s = s.replace(/\s*½/g, ".5").replace(/\s+1\/2/g, ".5").trim();
+  const range = s.match(/^(\d{1,2}(?:\.\d)?)\s*[-–—]\s*\d/);
+  if (range) return range[1];
   // Strip combined width suffix "11W" / "10.5n".
   const m = s.match(/^(\d{1,2}(?:\.\d)?)\s*[wnm](?:\b|$)/i);
   if (m) return m[1];
@@ -88,6 +93,29 @@ export function normalizeVariantSize(raw) {
   if (/^\d{1,2}(?:\.\d)?$/.test(s)) return s;
   // Non-numeric size (rare — e.g. "S/M") → preserve as-is, lowercased.
   return s || null;
+}
+
+// Expand a variant Size label into the SET of normalized sizes it covers.
+// "8 US" → ["8"]; "9 - 9.5 US" → ["9","9.5"]; "7.5 - 8 US" → ["7.5","8"].
+export function expandVariantSizes(raw) {
+  if (raw == null) return [];
+  let s = String(raw).trim().toLowerCase();
+  if (!s) return [];
+  s = s.replace(/\bus\b/gi, " ").replace(/^size\s+/i, "").replace(/\s*½/g, ".5").replace(/\s+1\/2/g, ".5").trim();
+  s = s.replace(/\s*(wide|narrow|medium|regular|standard)\s*$/i, "").trim();
+  const range = s.match(/^(\d{1,2}(?:\.\d)?)\s*[-–—]\s*(\d{1,2}(?:\.\d)?)/);
+  if (range) {
+    let lo = parseFloat(range[1]);
+    let hi = parseFloat(range[2]);
+    if (Number.isFinite(lo) && Number.isFinite(hi)) {
+      if (hi < lo) { const t = lo; lo = hi; hi = t; }
+      const out = [];
+      for (let x = lo; x <= hi + 1e-9; x += 0.5) out.push(x % 1 === 0 ? String(x) : x.toFixed(1));
+      return out;
+    }
+  }
+  const one = normalizeVariantSize(s);
+  return one ? [one] : [];
 }
 
 // Normalize a width signal to {wide, narrow, medium}.
@@ -143,8 +171,7 @@ export function variantSatisfiesScope(variant, scope = {}) {
     if (vSku !== canonical.sku) return false;
   }
   if (canonical.size) {
-    const vSize = normalizeVariantSize(readVariantOption(variant, "Size"));
-    if (vSize !== canonical.size) return false;
+    if (!expandVariantSizes(readVariantOption(variant, "Size")).includes(canonical.size)) return false;
   }
   if (canonical.width) {
     const vWidth = normalizeVariantWidth(readVariantOption(variant, "Width")) ||
@@ -169,7 +196,7 @@ export function findVariantSatisfying(product, scope = {}) {
   // (a) Right size+width exists but is OOS → "back in stock alert" path.
   for (const v of variants) {
     const ok =
-      (!canonical.size || normalizeVariantSize(readVariantOption(v, "Size")) === canonical.size) &&
+      (!canonical.size || expandVariantSizes(readVariantOption(v, "Size")).includes(canonical.size)) &&
       (!canonical.width || (() => {
         const w = normalizeVariantWidth(readVariantOption(v, "Width")) ||
                   normalizeVariantWidth(readVariantOption(v, "Fit"));
@@ -197,8 +224,7 @@ export function inStockSizes(product, { width = null } = {}) {
                      normalizeVariantWidth(readVariantOption(v, "Fit"));
       if (vWidth && vWidth !== wantedWidth) continue;
     }
-    const s = normalizeVariantSize(readVariantOption(v, "Size"));
-    if (s) out.add(s);
+    for (const s of expandVariantSizes(readVariantOption(v, "Size"))) out.add(s);
   }
   return Array.from(out).sort((a, b) => parseFloat(a) - parseFloat(b));
 }
@@ -210,8 +236,7 @@ export function inStockWidths(product, { size = null } = {}) {
   for (const v of variants) {
     if (!variantIsAvailable(v)) continue;
     if (wantedSize) {
-      const vSize = normalizeVariantSize(readVariantOption(v, "Size"));
-      if (vSize !== wantedSize) continue;
+      if (!expandVariantSizes(readVariantOption(v, "Size")).includes(wantedSize)) continue;
     }
     const w = normalizeVariantWidth(readVariantOption(v, "Width")) ||
               normalizeVariantWidth(readVariantOption(v, "Fit"));

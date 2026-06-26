@@ -2343,9 +2343,20 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       const isFollowUp = isAvailabilityFollowUp(latestMsg);
 
       // Resolve the family token first (cheap) so we can fetch its products and
-      // mine their colors for the parser.
+      // mine their colors for the parser. A follow-up ("what about size 9?")
+      // inherits the family from the focus product, or from the prior
+      // availability message in the conversation when no card is anchored.
       let family = fams[0] || null;
       if (!family && isFollowUp && ctx.focusProduct) family = familyOfTitle(ctx.focusProduct.title || "");
+      if (!family && isFollowUp) {
+        const prior = priorAvailabilityMessage(ctx.messages, []);
+        if (prior) {
+          try {
+            const priorFams = await extractCatalogProductFamilies(shop, prior);
+            family = priorFams[0] || null;
+          } catch { /* best-effort */ }
+        }
+      }
 
       if (family) {
         const famProducts = await prisma.product.findMany({

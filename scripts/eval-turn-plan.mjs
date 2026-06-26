@@ -55,6 +55,14 @@ scenario("availability without product context falls to browse (no product to lo
   { workflow: W.BROWSE });
 scenario("size question on a named product", { message: "what size should I get in the Savannah?", namedProduct: true },
   { workflow: W.AVAILABILITY, searchRequired: true });
+// Size/stock FOLLOW-UP after products were shown — no named product in the
+// message, but prior cards → availability, not clarification.
+scenario("'what about size 9?' after products → availability (not clarification)", { message: "What about size 9?", hasPriorCards: true },
+  { workflow: W.AVAILABILITY, searchRequired: true });
+scenario("'do you have it in wide?' follow-up → availability", { message: "do you have it in wide?", hasPriorCards: true, focusProduct: "savannah" },
+  { workflow: W.AVAILABILITY });
+scenario("bare 'what about size 9?' with NO prior cards stays non-availability", { message: "What about size 9?" },
+  { workflow: W.CLARIFICATION });
 
 // ── 3. comparison ─────────────────────────────────────────────────
 scenario("Jillian vs Savannah", { message: "Which is better for all-day walking, Jillian or Savannah?", namedProduct: true },

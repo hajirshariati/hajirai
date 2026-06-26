@@ -53,12 +53,43 @@ function normalizeVariantSize(raw) {
   if (raw == null) return null;
   let s = String(raw).trim().toLowerCase();
   if (!s) return null;
-  s = s.replace(/^size\s+/i, "").replace(/\s*½/g, ".5").replace(/\s+1\/2/g, ".5");
+  // Aetrex labels carry a "US" suffix ("8 US") and sometimes a range
+  // ("9 - 9.5 US") — strip the unit; for a range, normalize to the FIRST size
+  // (callers that need the whole range use expandVariantSizes).
+  s = s.replace(/\bus\b/gi, " ").replace(/^size\s+/i, "").replace(/\s*½/g, ".5").replace(/\s+1\/2/g, ".5").trim();
+  const range = s.match(/^(\d{1,2}(?:\.\d)?)\s*[-–—]\s*\d/);
+  if (range) return range[1];
   const m = s.match(/^(\d{1,2}(?:\.\d)?)\s*[wnm](?:\b|$)/i);
   if (m) return m[1];
   s = s.replace(/\s*(wide|narrow|medium|regular|standard)\s*$/i, "").trim();
   if (/^\d{1,2}(?:\.\d)?$/.test(s)) return s;
   return s || null;
+}
+// Expand a variant Size label into the SET of normalized sizes it covers. A
+// plain "8 US" → ["8"]; a range "9 - 9.5 US" → ["9","9.5"]; "7.5 - 8 US" →
+// ["7.5","8"]. Availability matching uses this so a request for "9" matches a
+// "9 - 9.5 US" variant.
+function expandVariantSizes(raw) {
+  if (raw == null) return [];
+  let s = String(raw).trim().toLowerCase();
+  if (!s) return [];
+  s = s.replace(/\bus\b/gi, " ").replace(/^size\s+/i, "").replace(/\s*½/g, ".5").replace(/\s+1\/2/g, ".5").trim();
+  s = s.replace(/\s*(wide|narrow|medium|regular|standard)\s*$/i, "").trim();
+  const range = s.match(/^(\d{1,2}(?:\.\d)?)\s*[-–—]\s*(\d{1,2}(?:\.\d)?)/);
+  if (range) {
+    let lo = parseFloat(range[1]);
+    let hi = parseFloat(range[2]);
+    if (Number.isFinite(lo) && Number.isFinite(hi)) {
+      if (hi < lo) { const t = lo; lo = hi; hi = t; }
+      const out = [];
+      for (let x = lo; x <= hi + 1e-9; x += 0.5) {
+        out.push(x % 1 === 0 ? String(x) : x.toFixed(1));
+      }
+      return out;
+    }
+  }
+  const one = normalizeVariantSize(s);
+  return one ? [one] : [];
 }
 function normalizeVariantWidth(raw) {
   if (raw == null) return null;
@@ -86,8 +117,7 @@ function inStockSizes(product, { width = null } = {}) {
       const vWidth = normalizeVariantWidth(readVariantOption(v, "Width")) || normalizeVariantWidth(readVariantOption(v, "Fit"));
       if (vWidth && vWidth !== wantedWidth) continue;
     }
-    const s = normalizeVariantSize(readVariantOption(v, "Size"));
-    if (s) out.add(s);
+    for (const s of expandVariantSizes(readVariantOption(v, "Size"))) out.add(s);
   }
   return Array.from(out);
 }
@@ -98,8 +128,7 @@ function inStockWidths(product, { size = null } = {}) {
   for (const v of variants) {
     if (!variantIsAvailable(v)) continue;
     if (wantedSize) {
-      const vSize = normalizeVariantSize(readVariantOption(v, "Size"));
-      if (vSize !== wantedSize) continue;
+      if (!expandVariantSizes(readVariantOption(v, "Size")).includes(wantedSize)) continue;
     }
     const w = normalizeVariantWidth(readVariantOption(v, "Width")) || normalizeVariantWidth(readVariantOption(v, "Fit"));
     if (w) out.add(w);
@@ -110,6 +139,16 @@ function isSizeAvailable(product, size, { width = null } = {}) {
   const canonicalSize = normalizeVariantSize(size);
   if (!canonicalSize) return false;
   return inStockSizes(product, { width }).includes(canonicalSize);
+}
+// Does ANY variant of the product expose a width option at all? widths=[]
+// everywhere means width simply isn't tracked in selectedOptions — a "size 7
+// wide" request can't be width-verified even if size 7 exists.
+function productHasWidthData(product) {
+  for (const v of product?.variants || []) {
+    const w = normalizeVariantWidth(readVariantOption(v, "Width")) || normalizeVariantWidth(readVariantOption(v, "Fit"));
+    if (w) return true;
+  }
+  return false;
 }
 
 export const AVAILABILITY_RESULT = {
@@ -303,6 +342,41 @@ function productMatchesColor(product, color) {
   }
   return String(product?.title || "").toLowerCase().includes(want);
 }
+
+// Soft color families — a shopper word maps to close catalog colors so we
+// surface the real product instead of falsely denying it ("pink" → Rose).
+// champagne intentionally has NO family (it stays exact).
+const COLOR_FAMILIES = [
+  ["pink", "rose", "blush", "mauve", "fuchsia", "magenta", "rosegold", "rose gold"],
+  ["grey", "gray", "charcoal", "slate", "graphite", "pewter", "smoke"],
+  ["tan", "beige", "nude", "sand", "khaki", "camel", "stone", "taupe"],
+  ["brown", "chocolate", "cognac", "espresso", "mocha", "chestnut"],
+  ["navy", "blue", "denim", "indigo", "cobalt"],
+  ["white", "ivory", "cream", "off-white", "off white", "bone"],
+  ["red", "burgundy", "wine", "maroon", "crimson"],
+  ["gold", "bronze", "copper", "metallic"],
+  ["green", "olive", "sage", "mint", "emerald"],
+  ["purple", "plum", "eggplant", "lavender", "violet"],
+  ["black", "noir", "onyx"],
+];
+function colorFamilyOf(color) {
+  const w = String(color || "").toLowerCase().trim();
+  for (const fam of COLOR_FAMILIES) if (fam.includes(w)) return fam;
+  return null;
+}
+// If reqColor isn't carried but a close same-family color is, return that
+// catalog color so we say "I don't see Pink, but it's available in Rose".
+function softColorMatch(reqColor, products) {
+  const fam = colorFamilyOf(reqColor);
+  if (!fam) return null;
+  for (const p of products) {
+    for (const c of productColors(p)) {
+      const cw = c.toLowerCase().trim();
+      if (cw !== String(reqColor).toLowerCase().trim() && fam.includes(cw)) return { product: p, matchedColor: cw };
+    }
+  }
+  return null;
+}
 function productHasInStockVariant(product) {
   return (product?.variants || []).some((v) => {
     const q = v?.inventoryQty;
@@ -373,24 +447,55 @@ export function classifyAvailability({ products = [], family = "", color = null,
     return { result: AVAILABILITY_RESULT.UNKNOWN, product: cands[0], family: fam, color: reqColor, size: sz, width: wd, reason: "unparsed_requested_constraints" };
   }
 
-  // Color filter — the family exists; is the requested color carried?
+  // Verdict builder — every return carries the resolved fields + soft-color.
+  let softColor = false;
+  let matchedColor = null;
+  const mk = (result, product, reason, extra = {}) => ({
+    result, product: product || null, family: fam, color: reqColor, size: sz, width: wd,
+    softColor, matchedColor, reason, ...extra,
+  });
+
+  // Color filter — the family exists; is the requested color carried? If not,
+  // try a soft color-family match (pink → Rose) before denying it.
   let candidates = famProducts;
   if (reqColor) {
     const colorMatched = famProducts.filter((p) => productMatchesColor(p, reqColor));
-    if (colorMatched.length === 0) {
-      return { result: AVAILABILITY_RESULT.UNAVAILABLE, product: famProducts[0], family: fam, color: reqColor, size: sz, width: wd, reason: "color_not_carried" };
+    if (colorMatched.length > 0) {
+      candidates = colorMatched;
+    } else {
+      const soft = softColorMatch(reqColor, famProducts);
+      if (soft) {
+        softColor = true;
+        matchedColor = soft.matchedColor;
+        candidates = famProducts.filter((p) => productMatchesColor(p, soft.matchedColor));
+      } else {
+        return mk(AVAILABILITY_RESULT.UNAVAILABLE, famProducts[0], "color_not_carried");
+      }
     }
-    candidates = colorMatched;
   }
 
   // Color/family only (no size/width) — is any candidate in stock?
   if (!sz && !wd) {
     const available = candidates.some(productHasInStockVariant);
-    return {
-      result: available ? AVAILABILITY_RESULT.AVAILABLE : AVAILABILITY_RESULT.UNAVAILABLE,
-      product: candidates[0], family: fam, color: reqColor, size: sz, width: wd,
-      reason: available ? null : "out_of_stock",
-    };
+    return mk(
+      available ? AVAILABILITY_RESULT.AVAILABLE : AVAILABILITY_RESULT.UNAVAILABLE,
+      candidates[0],
+      available ? (softColor ? "soft_color_match" : null) : "out_of_stock",
+    );
+  }
+
+  // Width requested but the family has NO width option anywhere → width can't
+  // be verified. Split the answer: confirm the SIZE if it exists, but be honest
+  // that width isn't a tracked option.
+  if (wd && !candidates.some(productHasWidthData)) {
+    const sizeOk = sz ? candidates.some((p) => isSizeAvailable(p, sz)) : true;
+    if (sizeOk) {
+      return mk(AVAILABILITY_RESULT.UNKNOWN, candidates[0], "width_not_in_options", { sizeAvailable: Boolean(sz) });
+    }
+    const anySizes = candidates.some((p) => inStockSizes(p).length > 0);
+    return anySizes
+      ? mk(AVAILABILITY_RESULT.UNAVAILABLE, candidates[0], "size_not_carried")
+      : mk(AVAILABILITY_RESULT.UNKNOWN, candidates[0], "no_variant_inventory");
   }
 
   // Size/width — find a satisfying in-stock variant across the candidates.
@@ -398,18 +503,15 @@ export function classifyAvailability({ products = [], family = "", color = null,
     const okSize = sz ? isSizeAvailable(p, sz, { width: wd }) : true;
     const okWidth = wd && !sz ? inStockWidths(p).includes(wd) : true;
     if (okSize && okWidth) {
-      return { result: AVAILABILITY_RESULT.AVAILABLE, product: p, family: fam, color: reqColor, size: sz, width: wd, reason: null };
+      return mk(AVAILABILITY_RESULT.AVAILABLE, p, softColor ? "soft_color_match" : null);
     }
   }
   // Not found in stock. UNKNOWN when NO variant inventory is exposed at all
-  // (untracked / unsynced) — we genuinely can't verify; UNAVAILABLE when the
-  // product DOES expose sizes/widths but the requested combo isn't among them.
+  // (untracked / unsynced); UNAVAILABLE when sizes/widths ARE known but the
+  // requested combo isn't among them.
   const anyVariantData = candidates.some((p) => inStockSizes(p).length > 0 || inStockWidths(p).length > 0);
-  const product = candidates[0];
-  if (!anyVariantData) {
-    return { result: AVAILABILITY_RESULT.UNKNOWN, product, family: fam, color: reqColor, size: sz, width: wd, reason: "no_variant_inventory" };
-  }
-  return { result: AVAILABILITY_RESULT.UNAVAILABLE, product, family: fam, color: reqColor, size: sz, width: wd, reason: "variant_not_carried" };
+  if (!anyVariantData) return mk(AVAILABILITY_RESULT.UNKNOWN, candidates[0], "no_variant_inventory");
+  return mk(AVAILABILITY_RESULT.UNAVAILABLE, candidates[0], "variant_not_carried");
 }
 
 function titleCase(s) {
@@ -437,11 +539,39 @@ function sizeWidthPhrase({ size, width }) {
 // no "tell me more", no alternatives.
 export function buildAvailabilityAnswer(verdict) {
   const name = familyName(verdict);
+
+  // Soft color match: requested color isn't carried, but a same-family catalog
+  // color is. Never claim the literal requested color — surface the real one.
+  if (verdict.softColor && verdict.matchedColor && verdict.result === AVAILABILITY_RESULT.AVAILABLE) {
+    const got = titleCase(verdict.matchedColor);
+    const sizePart = verdict.size ? ` in size ${verdict.size}` : "";
+    return `I don't see a color called ${titleCase(verdict.color)}, but the ${name} is available in ${got}${sizePart}.`;
+  }
+
+  // Width requested but not a tracked option: confirm the size, be honest
+  // about width.
+  if (verdict.reason === "width_not_in_options") {
+    if (verdict.sizeAvailable && verdict.size) {
+      return (
+        `I can find the ${name}${verdict.color ? ` in ${titleCase(verdict.color)}` : ""} in size ${verdict.size}, ` +
+        `but I don't see ${titleCase(verdict.width || "that")} listed as a separate width option in the data.`
+      );
+    }
+    return (
+      `I can find the ${name}${verdict.color ? ` in ${titleCase(verdict.color)}` : ""}, but I don't see ` +
+      `${titleCase(verdict.width || "that width")} listed as a separate width option in the data.`
+    );
+  }
+
   const combo = comboPhrase(verdict);
   switch (verdict.result) {
     case AVAILABILITY_RESULT.AVAILABLE:
       return `Yes — the ${name} is available${combo ? ` in ${combo}` : ""}.`;
     case AVAILABILITY_RESULT.UNAVAILABLE:
+      // "size not carried" → name the size plainly.
+      if (verdict.reason === "size_not_carried" && verdict.size) {
+        return `I'm not seeing the ${name}${verdict.color ? ` in ${titleCase(verdict.color)}` : ""} in size ${verdict.size}.`;
+      }
       return `I'm not seeing the ${name} available${combo ? ` in ${combo}` : ""} right now.`;
     case AVAILABILITY_RESULT.UNKNOWN:
       return (
