@@ -2286,6 +2286,10 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   });
   if (ensuredCards.searchAttempted) productSearchAttempted = true;
   let pool = ensuredCards.products;
+  // Set by the workflow=availability block when Availability Truth owns the
+  // turn: the EXACT, authoritative final card list. When non-null it wins over
+  // every downstream card guard/scorer and is emitted verbatim.
+  let availabilityPinnedCards = null;
 
   // Required named-family evidence (#2/#3/#4). For answer workflows where the
   // customer NAMED product families (Jillian, Savannah), those families MUST be
@@ -2342,23 +2346,41 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       const latestMsg = ctx.latestUserMessage || "";
       const isFollowUp = isAvailabilityFollowUp(latestMsg);
 
-      // Resolve the family token first (cheap) so we can fetch its products and
-      // mine their colors for the parser. A follow-up ("what about size 9?")
-      // inherits the family from the focus product, or from the prior
-      // availability message in the conversation when no card is anchored.
+      // Resolve the family token. Sources, in priority order — session memory is
+      // NEVER consulted (it leaks unrelated prior turns, e.g. a stale "pink"
+      // into a Savannah turn):
+      //   1. TurnPlan.namedFamilies (the model named a family THIS turn)
+      //   2. the PRIOR availability question ("what about size 9?" refers back
+      //      to "Savannah champagne size 7 wide", not to an old focus card)
+      //   3. the focus product / most-recent displayed card (only as fallback)
       let family = fams[0] || null;
+      const priorAvailMsg = !family && isFollowUp ? priorAvailabilityMessage(ctx.messages, []) : "";
+      if (!family && isFollowUp && priorAvailMsg) {
+        try {
+          const priorFams = await extractCatalogProductFamilies(shop, priorAvailMsg);
+          family = priorFams[0] || null;
+        } catch { /* best-effort */ }
+      }
       if (!family && isFollowUp && ctx.focusProduct) family = familyOfTitle(ctx.focusProduct.title || "");
-      if (!family && isFollowUp) {
-        const prior = priorAvailabilityMessage(ctx.messages, []);
-        if (prior) {
-          try {
-            const priorFams = await extractCatalogProductFamilies(shop, prior);
-            family = priorFams[0] || null;
-          } catch { /* best-effort */ }
+      // Last resort: the dominant family among the most-recently displayed cards.
+      if (!family && isFollowUp && Array.isArray(ctx.priorProductCards) && ctx.priorProductCards.length > 0) {
+        const counts = new Map();
+        for (const c of ctx.priorProductCards) {
+          const f = familyOfTitle(c?.title || "");
+          if (f) counts.set(f, (counts.get(f) || 0) + 1);
         }
+        family = [...counts.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] || null;
+      }
+      if (!family) {
+        console.log(`[availability-truth] no family resolved (named=${fams.length} followUp=${isFollowUp}) — leaving model answer`);
       }
 
       if (family) {
+        // Only trust the focus product when it belongs to the resolved family —
+        // a leftover focus card from an unrelated earlier turn (Jillian) must
+        // never inject its color/size into a different family's turn (Savannah).
+        const consistentFocus =
+          ctx.focusProduct && familyOfTitle(ctx.focusProduct.title || "") === family ? ctx.focusProduct : null;
         const famProducts = await prisma.product.findMany({
           where: { shop: ctx.shop, NOT: { status: { in: ["DRAFT", "ARCHIVED"] } }, title: { contains: family, mode: "insensitive" } },
           include: { variants: true },
@@ -2372,7 +2394,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
           message: latestMsg,
           priorMessage: priorUserMsg,
           namedFamilies: fams,
-          focusProduct: ctx.focusProduct,
+          focusProduct: consistentFocus,
           isFollowUp,
           knownColors,
         });
@@ -2395,7 +2417,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
         // follow-up) and the prior focus product's style key, so "Jillian" with
         // multiple styles asks which, and a follow-up inherits the focus style.
         const styleQuery = `${latestMsg} ${isFollowUp ? priorUserMsg : ""}`;
-        const focusStyleKey = isFollowUp && ctx.focusProduct ? styleKeyOfTitle(ctx.focusProduct.title || "") : null;
+        const focusStyleKey = isFollowUp && consistentFocus ? styleKeyOfTitle(consistentFocus.title || "") : null;
         const verdict = classifyAvailability({ products: famProducts, family, color: req.color, size: req.size, width: req.width, unverifiedConstraints: unverified, styleQuery, focusStyleKey });
         console.log(
           `[availability-truth] family=${family} color=${req.color || "-"} size=${req.size || "-"} width=${req.width || "-"} ` +
@@ -2434,6 +2456,12 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
           if (famCards.length > 0) pool = famCards.slice(0, 1);
           console.log(`[availability-truth] display=family-only cards=${pool.length}`);
         }
+        // PIN the Availability Truth card selection as authoritative. From here
+        // on these are the final cards — no downstream response-contract,
+        // cleanup, group guard, scorer, or LLM buffer flush may drop them. The
+        // final card emitter reads availabilityPinnedCards and bypasses scoring.
+        availabilityPinnedCards = pool.slice();
+        console.log(`[availability-truth] pinnedFinalCards=${availabilityPinnedCards.length}`);
       }
     } catch (avErr) {
       console.error("[availability-truth] failed (non-fatal):", avErr?.message || avErr);
@@ -2668,7 +2696,28 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     }
   }
 
-  if (pool.length > 0 && fullResponseText && !suppressCardsForChips) {
+  if (availabilityPinnedCards) {
+    // Availability Truth owns the final cards. Emit them verbatim — bypass the
+    // scorer, group guards, alignment, and chip-suppression entirely. This is
+    // the ONLY thing allowed to set finalProductCards on an availability turn.
+    const { products: deduped } = prepareProductCardsForTurn(availabilityPinnedCards);
+    finalProductCards = deduped;
+    console.log(`[availability-truth] finalCards=${deduped.length}`);
+    if (deduped.length > 0) {
+      controller.enqueue(encoder.encode(sseChunk({ type: "products", products: deduped })));
+      if (deduped.length === 1) {
+        const vizEvent = buildVisualizeCtaEvent({ config: ctx.shopConfig, product: deduped[0], messages: ctx.messages });
+        if (vizEvent) {
+          controller.enqueue(encoder.encode(sseChunk(vizEvent)));
+          console.log(`[chat] ${ctx.shop} visualize_cta emitted for "${vizEvent.productTitle}"`);
+        }
+      }
+    }
+    // No collection/auto-search CTA on availability turns — the family card (and
+    // its product page) is the answer; a broad "View All …" link would make a
+    // precise yes/no/unknown look like browse mode.
+    console.log(`[cta] ${ctx.shop} broad CTA suppressed: availability turn (pinned cards)`);
+  } else if (pool.length > 0 && fullResponseText && !suppressCardsForChips) {
     const textLower = fullResponseText.toLowerCase();
     const saysNoMatch = detectAiNoMatchPhrasing(fullResponseText);
 

@@ -406,6 +406,35 @@ check("single-style family (CATALOG Jillian = Braided only) still resolves, no d
   assert.equal(v.result, R.AVAILABLE);
 });
 
+// ── Bug: same-session memory pollution — a follow-up must inherit from the
+// PRIOR availability turn, never a stale earlier family/color ──────────
+check("3-turn sequence: Jillian pink → Savannah champ 7 wide → 'what about 9' stays Savannah/champagne/wide", () => {
+  const messages = [
+    { role: "user", content: "Do you have Jillian in pink?" },
+    { role: "assistant", content: "I don't see Pink, but the Jillian comes in Rose." },
+    { role: "user", content: "Do you have Savannah in champagne size 7 wide?" },
+    { role: "assistant", content: "I can find the Savannah in Champagne in size 7…" },
+    { role: "user", content: "What about size 9?" },
+  ];
+  const knownColors = ["champagne"];
+  // The prior availability message must be the SAVANNAH turn, not the Jillian one.
+  const prior = priorAvailabilityMessage(messages, knownColors);
+  assert.match(prior, /Savannah in champagne size 7 wide/);
+  assert.doesNotMatch(prior, /Jillian/i);
+  const req = resolveAvailabilityRequest({
+    message: "What about size 9?",
+    priorMessage: prior,
+    namedFamilies: [],
+    focusProduct: { title: "Savannah Adjustable Quarter Strap Sandal - Champagne" }, // consistent focus
+    isFollowUp: true,
+    knownColors,
+  });
+  assert.equal(req.family, "savannah"); // NOT jillian
+  assert.equal(req.color, "champagne"); // NOT pink/rose
+  assert.equal(req.size, "9");
+  assert.equal(req.width, "wide");
+});
+
 console.log("");
 if (fail === 0) {
   console.log(`PASS  ${pass} passed, 0 failed`);
