@@ -45,6 +45,34 @@ export function buildPriorEvidenceAvailabilityText(items, askedLabel, isColor) {
   return `Yes — ${joinNames(ok)} ${okVerb} ${askedLabel}. I'm not seeing ${joinNames(no)} ${askedLabel} in the current catalog.`;
 }
 
+// Join colors with "and" (available list) or "or" (missing list), title-cased.
+function joinColors(colors, conj) {
+  const a = (colors || []).map(titleCaseWord).filter(Boolean);
+  if (a.length === 0) return "";
+  if (a.length === 1) return a[0];
+  if (a.length === 2) return `${a[0]} ${conj} ${a[1]}`;
+  return `${a.slice(0, -1).join(", ")}, ${conj} ${a[a.length - 1]}`;
+}
+
+// Deterministic answer for a MULTI-COLOR prior_evidence follow-up ("do either of
+// those come in champagne or rose?"). For each prior family we know which of the
+// requested colors it has and which it doesn't. Names every requested color
+// honestly per family. perFamily: [{ name, available: [colors], missing: [colors] }]
+export function buildPriorEvidenceMultiColorText(perFamily) {
+  const sentences = (perFamily || []).map(({ name, available, missing }) => {
+    const has = available || [];
+    const lacks = missing || [];
+    if (has.length > 0 && lacks.length === 0) {
+      return `${name} comes in ${joinColors(has, "and")}.`;
+    }
+    if (has.length > 0 && lacks.length > 0) {
+      return `${name} comes in ${joinColors(has, "and")}, but I'm not seeing ${joinColors(lacks, "or")}.`;
+    }
+    return `${name} does not come in ${joinColors(lacks, "or")}.`;
+  });
+  return sentences.join(" ");
+}
+
 // The constraint label for the asked dimension ("in Black" / "in size 8" /
 // "in wide"). reqColor wins, then the asked size/width on THIS message, then an
 // inherited size/width.

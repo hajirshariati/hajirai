@@ -84,7 +84,7 @@ function expectedAvailabilityCards(v) {
 const PLAN = [
   // policy / account
   { name: "return policy → policy_account, no search", in: { message: "What's your return policy?" }, wf: WORKFLOWS.POLICY_ACCOUNT, search: false, clarify: false },
-  { name: "where is my order → policy_account", in: { message: "Where is my order #1234?" }, wf: WORKFLOWS.POLICY_ACCOUNT, search: false },
+  { name: "where is my order → customer_service (order issue, no search)", in: { message: "Where is my order #1234?" }, wf: WORKFLOWS.CUSTOMER_SERVICE, search: false },
   { name: "do you offer exchanges → policy_account", in: { message: "Do you offer exchanges?" }, wf: WORKFLOWS.POLICY_ACCOUNT, search: false },
   { name: "shipping cost → policy_account", in: { message: "How much is shipping?" }, wf: WORKFLOWS.POLICY_ACCOUNT, search: false },
 

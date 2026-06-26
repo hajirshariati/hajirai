@@ -14,7 +14,7 @@ phrasing layer is verified by manual PRD live-testing, not these suites.
 | `eval-live-core-flows` | 66 | 0 | core scenarios: workflow + search/clarify/gender + availability card-count + leak/CTA/family invariants + sizing + sale + comparison card-contract (incl. pin-miss→text-only + cardOwner invariant) + same-session pivots + sale-search input |
 | `eval-availability-truth` | 51 | 0 | availability classification, soft color, style disambiguation, follow-up memory (incl. color-only follow-up size inheritance), width split |
 | `eval-variant-matcher` | 39 | 0 | size/width/SKU normalization, Aetrex labels, ranges, array-shape options |
-| `eval-turn-plan` | 119 | 0 | workflow classification across all 12 workflows (incl. prior_evidence_availability, multi_recommendation, compatibility, sizing_help, sale_browse; comparison outranks multi_recommendation for two named families) |
+| `eval-turn-plan` | 127 | 0 | workflow classification across all 13 workflows (incl. customer_service, prior_evidence_availability, multi_recommendation, compatibility, sizing_help, sale_browse; comparison outranks multi_recommendation for two named families) |
 | `eval-turn-plan-gates` | 26 | 0 | executable gate deciders (search/display/clarifier) |
 | `eval-turn-plan-failures` | 19 | 0 | regression cases from prior PRD failures |
 | `eval-named-family-evidence` | 14 | 0 | named-family evidence requirement |
@@ -23,8 +23,9 @@ phrasing layer is verified by manual PRD live-testing, not these suites.
 | `eval-grounding-validator` | 74 | 0 | factual-safety blocking/warning partition + comparison length cap |
 | `eval-support-handoff` | 23 | 0 | customer-service handoff: explicit human, dead-end, partial, validation-failed; never on successful turns |
 | `eval-constraint-plan` | 15 | 0 | ConstraintPlan: multi-recommendation slots, compatibility, category-noun exclusion, kids gender, structured constraints |
-| `eval-prior-evidence` | 13 | 0 | prior_evidence_availability: deterministic per-item answer text, asked-constraint label, cardOwner≠scorer invariant, no-stray-card invariant |
-| **Total** | **519** | **0** | |
+| `eval-prior-evidence` | 16 | 0 | prior_evidence_availability: deterministic per-item answer text, multi-color parse + per-family per-color answer, asked-constraint label, cardOwner≠scorer invariant, no-stray-card invariant |
+| `eval-evidence-select` | 5 | 0 | condition/advisory deterministic 2-3 card selection: caps at 3, prefers LLM-named families, distinct families, never scorer |
+| **Total** | **535** | **0** | |
 
 Run all: `npm run build && for s in scripts/eval-*.mjs; do node "$s"; done`
 
@@ -79,6 +80,27 @@ this pass made was driven by a QA scenario that reproduced a failure:
   paths behave identically. (Helper renamed `support-handoff.server.js` →
   `support-handoff.js` so the route imports it without tripping React Router's
   server-only-module resolver.)
+
+- **Three production-quality gaps on the prior-evidence / handoff / advisory
+  surface.** (1) *Multi-color prior-evidence follow-up.* "Do either of those come
+  in champagne or rose?" only checked the first color. `parseRequestedColors`
+  now returns every requested color, and the prior-evidence handler checks each
+  prior family against each color, answering honestly per family ("Tamara does
+  not come in Champagne or Rose. Savannah comes in Champagne, but I'm not seeing
+  Rose."); cards remain a subset of prior families. (2) *Order/account issues
+  route before browse.* "I need help with an order that says delivered but I
+  didn't get it" planned as `browse` with no CTA (the old `POLICY_RE` missed
+  "delivered" and bare "order"). New `customer_service` workflow (a dedicated
+  `CUSTOMER_SERVICE_RE` for missing/late/wrong/damaged delivery, refund/return/
+  exchange/cancel requests, order lookups, payment/account issues) routes BEFORE
+  policy/browse: no search, no cards, and chat.jsx deterministically attaches the
+  live-chat CTA. Informational policy questions stay `policy_account`.
+  (3) *Condition recommendations are deterministically selected, not scorer-owned.*
+  `condition_recommendation` was shipping 6 scorer cards (`cardOwner=scorer`).
+  Now `selectEvidenceCards` pins 2-3 distinct-family cards from the model's
+  evidence — preferring the families it named — so `cardOwner=evidence-plan` and
+  text/cards align. Locked by `eval-prior-evidence` (multi-color), `eval-turn-plan`
+  (customer_service routing), and `eval-evidence-select` (2-3 selection).
 
 - **Prior-evidence follow-up has a real card owner.** PRD: after a turn showed 3
   evidence-plan products (Tamara/Danika/Mandy), "are the come in black?" routed to

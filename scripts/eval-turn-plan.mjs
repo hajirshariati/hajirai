@@ -35,13 +35,31 @@ const W = WORKFLOWS;
 // ── 1. policy / order / account ───────────────────────────────────
 scenario("return policy", { message: "What is your return policy if they don't work for my feet?" },
   { workflow: W.POLICY_ACCOUNT, searchRequired: false, clarificationAllowed: false, productDisplayPolicy: "suppress" });
-scenario("order status", { message: "Where is my order? I ordered last week." },
-  { workflow: W.POLICY_ACCOUNT, searchRequired: false, productDisplayPolicy: "suppress" });
 scenario("refund question", { message: "Can I get a refund if the size is wrong?" },
   { workflow: W.POLICY_ACCOUNT, searchRequired: false });
 scenario("shipping time", { message: "How long does shipping take to California?" },
   { workflow: W.POLICY_ACCOUNT, searchRequired: false });
 scenario("exchange", { message: "Do you do exchanges for a different size?" },
+  { workflow: W.POLICY_ACCOUNT });
+
+// ── 1a. customer-service ISSUES (order/delivery/refund/account) → human handoff,
+// no search, no cards. Routed BEFORE browse so an order problem never searches.
+scenario("'order says delivered but I didn't get it' → customer_service", { message: "I need help with an order that says delivered but I didn't get it." },
+  { workflow: W.CUSTOMER_SERVICE, searchRequired: false, clarificationAllowed: false, productDisplayPolicy: "suppress" });
+scenario("'my package never arrived' → customer_service", { message: "my package never arrived" },
+  { workflow: W.CUSTOMER_SERVICE, searchRequired: false, productDisplayPolicy: "suppress" });
+scenario("'I got the wrong item' → customer_service", { message: "I got the wrong item" },
+  { workflow: W.CUSTOMER_SERVICE, searchRequired: false });
+scenario("'where is my order?' → customer_service", { message: "Where is my order? I ordered last week." },
+  { workflow: W.CUSTOMER_SERVICE, searchRequired: false, productDisplayPolicy: "suppress" });
+scenario("'I want a refund' → customer_service", { message: "I want a refund" },
+  { workflow: W.CUSTOMER_SERVICE, searchRequired: false });
+scenario("'I was double-charged' → customer_service", { message: "I think I was double-charged for my order" },
+  { workflow: W.CUSTOMER_SERVICE, searchRequired: false });
+// Informational policy questions still answer from knowledge (NOT customer_service).
+scenario("'what's your return policy?' stays policy_account", { message: "What is your return policy?" },
+  { workflow: W.POLICY_ACCOUNT });
+scenario("'how long does shipping take?' stays policy_account", { message: "How long does shipping take to California?" },
   { workflow: W.POLICY_ACCOUNT });
 
 // ── 2. availability (size / color / stock) ────────────────────────
@@ -132,6 +150,9 @@ scenario("'and in champagne?' after a comparison pair → prior_evidence_availab
   { workflow: W.PRIOR_EVIDENCE_AVAILABILITY });
 scenario("'are the ones you showed available in 9?' → prior_evidence_availability",
   { message: "are the ones you showed available in 9?", priorCardFamilies: ["jillian", "savannah"], hasPriorCards: true },
+  { workflow: W.PRIOR_EVIDENCE_AVAILABILITY });
+scenario("'Do either of those come in champagne or rose?' (multi-color) → prior_evidence_availability",
+  { message: "Do either of those come in champagne or rose?", priorCardFamilies: ["tamara", "savannah"], hasPriorCards: true },
   { workflow: W.PRIOR_EVIDENCE_AVAILABILITY });
 // A SINGLE prior family resolves fine on the normal availability path.
 scenario("'do they come in black?' with ONE prior family stays normal availability",
@@ -228,16 +249,16 @@ scenario("explicit women keeps women", { message: "women's sandals for plantar f
 // ══════════════════════════════════════════════════════════════════
 
 // ── 1b. policy / order / account variants ─────────────────────────
-scenario("track my order", { message: "track my order please" },
-  { workflow: W.POLICY_ACCOUNT, searchRequired: false, productDisplayPolicy: "suppress" });
-scenario("return these", { message: "I want to return these, they pinch." },
-  { workflow: W.POLICY_ACCOUNT, productDisplayPolicy: "suppress" });
+scenario("track my order → customer_service", { message: "track my order please" },
+  { workflow: W.CUSTOMER_SERVICE, searchRequired: false, productDisplayPolicy: "suppress" });
+scenario("return these → customer_service", { message: "I want to return these, they pinch." },
+  { workflow: W.CUSTOMER_SERVICE, productDisplayPolicy: "suppress" });
 scenario("free shipping", { message: "Do you offer free shipping?" },
   { workflow: W.POLICY_ACCOUNT, searchRequired: false });
-scenario("reset password", { message: "How do I reset my password?" },
-  { workflow: W.POLICY_ACCOUNT });
-scenario("cancel order", { message: "Can I cancel my order?" },
-  { workflow: W.POLICY_ACCOUNT });
+scenario("reset password → customer_service", { message: "How do I reset my password?" },
+  { workflow: W.CUSTOMER_SERVICE });
+scenario("cancel order → customer_service", { message: "Can I cancel my order?" },
+  { workflow: W.CUSTOMER_SERVICE });
 scenario("warranty on shoes (policy beats browse)", { message: "what's your warranty on these shoes?" },
   { workflow: W.POLICY_ACCOUNT, productDisplayPolicy: "suppress" });
 scenario("invoice", { message: "Can you resend my receipt?" },
@@ -324,8 +345,8 @@ scenario("husband+wife conflict stays ambiguous", { message: "sandals for my hus
   { workflow: W.CONDITION_RECOMMENDATION, gender: "women" }); // conflict → null stated → defaults to primary line
 
 // ── Extra real-world phrasings to clear the ≥75 bar ───────────────
-scenario("where is my order number", { message: "where is my order #1234?" },
-  { workflow: W.POLICY_ACCOUNT, searchRequired: false });
+scenario("where is my order number → customer_service", { message: "where is my order #1234?" },
+  { workflow: W.CUSTOMER_SERVICE, searchRequired: false });
 scenario("returns after 30 days", { message: "do you accept returns after 30 days?" },
   { workflow: W.POLICY_ACCOUNT });
 scenario("Savannah in stock", { message: "is the Savannah in stock?", namedProduct: true },

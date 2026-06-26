@@ -7,10 +7,12 @@
 import assert from "node:assert/strict";
 import {
   buildPriorEvidenceAvailabilityText,
+  buildPriorEvidenceMultiColorText,
   askedConstraintLabel,
   priorEvidenceCardOwnerViolation,
   priorEvidenceStrayCards,
 } from "../app/lib/prior-evidence.js";
+import { parseRequestedColors } from "../app/lib/availability-truth.js";
 
 let pass = 0, fail = 0;
 function check(name, fn) {
@@ -60,6 +62,28 @@ check("size constraint → 'are available in size 8' verb", () => {
     "in size 8", false,
   );
   assert.equal(txt, "Yes — both are available in size 8.");
+});
+
+// ── multi-color follow-up ("do either of those come in champagne or rose?") ──
+check("parseRequestedColors finds every requested color, in order", () => {
+  assert.deepEqual(parseRequestedColors("Do either of those come in champagne or rose?", ["champagne", "rose"]), ["champagne", "rose"]);
+  assert.deepEqual(parseRequestedColors("black or navy?", []), ["black", "navy"]);
+  assert.deepEqual(parseRequestedColors("pink/rose", []), ["pink", "rose"]);
+  assert.deepEqual(parseRequestedColors("tan or taupe", []), ["tan", "taupe"]);
+});
+check("multi-color answer names each requested color honestly per family", () => {
+  // Tamara has neither; Savannah has champagne but not rose (the PRD example).
+  const txt = buildPriorEvidenceMultiColorText([
+    { name: "Tamara", available: [], missing: ["champagne", "rose"] },
+    { name: "Savannah", available: ["champagne"], missing: ["rose"] },
+  ]);
+  assert.equal(txt, "Tamara does not come in Champagne or Rose. Savannah comes in Champagne, but I'm not seeing Rose.");
+});
+check("multi-color: a family with both colors lists both with 'and'", () => {
+  const txt = buildPriorEvidenceMultiColorText([
+    { name: "Savannah", available: ["champagne", "rose"], missing: [] },
+  ]);
+  assert.equal(txt, "Savannah comes in Champagne and Rose.");
 });
 
 // ── asked-constraint label ──

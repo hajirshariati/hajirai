@@ -144,8 +144,8 @@ endToEnd("condition rec + vague stall with no products is flagged",
   { workflow: W.CONDITION_RECOMMENDATION, searchRequired: true, forcesDisplay: true, clarifier: "block_no_products" });
 
 endToEnd("policy turn never forces display or search",
-  { message: "Where is my order?" },
-  "Let me check — what's your order number?", false,
+  { message: "What is your return policy?" },
+  "We accept returns within 30 days.", false,
   { workflow: W.POLICY_ACCOUNT, searchRequired: false, forcesDisplay: false });
 
 console.log("");

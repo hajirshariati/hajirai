@@ -26,6 +26,7 @@ import { isCompatibilityAsk, isMultiRecommendationAsk } from "./constraint-plan.
 
 export const WORKFLOWS = {
   POLICY_ACCOUNT: "policy_account",
+  CUSTOMER_SERVICE: "customer_service",
   AVAILABILITY: "availability",
   PRIOR_EVIDENCE_AVAILABILITY: "prior_evidence_availability",
   COMPARISON: "comparison",
@@ -41,6 +42,38 @@ export const WORKFLOWS = {
 
 const POLICY_RE =
   /\b(return|returns|refund|exchange(?:s|d)?|warranty|guarantee|ship(?:ping|ped)?|delivery|deliver|track(?:ing)?|order\s+status|my\s+order|where\s+is\s+my|cancel(?:lation)?|account|sign\s+in|log\s+in|password|invoice|receipt)\b/i;
+
+// CUSTOMER SERVICE — a problem/issue with a specific order, shipment, delivery,
+// payment, or account that needs a HUMAN (not a policy FAQ answer). These get a
+// live-chat handoff, never a product search or cards. Distinct from POLICY_RE,
+// which answers an informational policy question ("what's your return policy?")
+// from knowledge. The signals here are an ACTION/PROBLEM, not a question about
+// the rules: missing/late/wrong/damaged delivery, an explicit refund/return/
+// exchange/cancel request, an order lookup, or an account-access issue.
+const CUSTOMER_SERVICE_RE = new RegExp(
+  // delivery / package problems
+  "\\b(?:says?|marked|shows?)\\s+delivered\\b" + "|" +
+  "\\b(?:never|didn'?t|did\\s+not|hasn'?t|has\\s+not|not)\\s+(?:get|got|receive[d]?|arrive[d]?|come|deliver(?:ed)?|show(?:n|\\s+up)?)\\b" + "|" +
+  "\\b(?:missing|lost|stolen|late|delayed|wrong|damaged|defective|broken|torn|ripped)\\s+(?:package|parcel|order|item|shipment|delivery|product|shoe|pair)s?\\b" + "|" +
+  "\\b(?:package|parcel|order|shipment|delivery)\\s+(?:never|hasn'?t|has\\s+not|didn'?t|did\\s+not|isn'?t|is\\s+not)\\b" + "|" +
+  "\\bwrong\\s+(?:item|size|color|colour|product|pair|order)\\b" + "|" +
+  "\\b(?:received|got|sent\\s+me)\\s+the\\s+wrong\\b" + "|" +
+  // explicit action requests on an order
+  "\\b(?:i\\s+(?:want|need|'?d\\s+like|would\\s+like)\\s+to|how\\s+do\\s+i|can\\s+i|help\\s+me)\\s+(?:return|refund|exchange|cancel|replace)\\b" + "|" +
+  "\\b(?:i\\s+(?:want|need|'?d\\s+like|would\\s+like))\\s+(?:a\\s+)?refund\\b" + "|" +
+  "\\b(?:return|exchange|cancel|replace)\\s+(?:my|this|these|the|an?)\\s+(?:order|item|pair|purchase|shoe)s?\\b" + "|" +
+  // order lookup / problem with order
+  "\\bwhere'?s?\\s+my\\s+(?:order|package|stuff|shipment)\\b" + "|" +
+  "\\bwhere\\s+is\\s+my\\s+(?:order|package|shipment|delivery)\\b" + "|" +
+  "\\btrack\\s+(?:my\\s+)?(?:order|package|shipment)\\b" + "|" +
+  "\\border\\s+(?:status|number|#|problem|issue)\\b" + "|" +
+  "\\b(?:problem|issue|help|trouble|wrong)\\s+with\\s+(?:my|an|this|the)\\s+(?:order|delivery|package|shipment|payment|account|return|refund)\\b" + "|" +
+  // payment / account access issues
+  "\\b(?:charged|double[-\\s]?charged|overcharged|charged\\s+twice)\\b" + "|" +
+  "\\b(?:can'?t|cannot|unable\\s+to)\\s+(?:log\\s+in|sign\\s+in|access\\s+my\\s+account|reset\\s+my\\s+password)\\b" + "|" +
+  "\\b(?:reset|forgot)\\s+my\\s+password\\b|\\block(?:ed)?\\s+out\\s+of\\s+my\\s+account\\b",
+  "i",
+);
 
 // Promo / discount MECHANICS — code eligibility, special discounts, stacking.
 // These are answered from policy/promotion knowledge, NOT a product search.
@@ -200,6 +233,25 @@ export function planTurn({
   // where a default is allowed (advisory/condition/comparison-on-condition).
   const statedGender = resolveStatedGender(m, attrs);
   const genderFor = (allowDefault) => statedGender || (allowDefault ? primaryGender : null);
+
+  // 0. Customer-service ISSUE — a problem with a specific order / shipment /
+  // delivery / payment / account that needs a HUMAN. Routed BEFORE policy and
+  // browse so "an order that says delivered but I didn't get it" never falls
+  // through to a product search. No search, no cards — emit the live-chat CTA.
+  if (CUSTOMER_SERVICE_RE.test(m)) {
+    return finalize({
+      workflow: WORKFLOWS.CUSTOMER_SERVICE,
+      requiredEvidence: ["policy_or_order_data"],
+      searchRequired: false,
+      clarificationAllowed: false,
+      productDisplayPolicy: "suppress",
+      answerRequirements: reqs({ answerFirst: true, concise: true }),
+      gender: null,
+      directives: [
+        "This is a customer-service issue with a specific order, shipment, delivery, payment, or account — it needs a human. Reply with ONE friendly, specific sentence acknowledging the problem and saying our customer service team can look it up and help. Do NOT search the catalog, do NOT show product cards, and do NOT invent order details. A live-chat button is attached for you.",
+      ],
+    });
+  }
 
   // 1. Policy / order / account — never a product turn.
   if (POLICY_RE.test(m)) {
@@ -417,12 +469,15 @@ export function planTurn({
       productDisplayPolicy: "show",
       answerRequirements: reqs({ answerFirst: true, concise: true }),
       gender: genderFor(true),
-      directives: genderUnstated
-        ? [
-            `Gender is unstated — default to the ${primaryGender}'s line and SEARCH now. Do NOT ask "men's or women's?" first.`,
-            "Show relevant products, then offer gender refinement as a soft next step (e.g. a Men's chip).",
-          ]
-        : ["Search the stated gender's line and show relevant products."],
+      directives: [
+        "Recommend 2-3 specific products (not a long list) and name each one you show. The displayed cards are exactly the products you name — never reference a product you aren't showing.",
+        ...(genderUnstated
+          ? [
+              `Gender is unstated — default to the ${primaryGender}'s line and SEARCH now. Do NOT ask "men's or women's?" first.`,
+              "Offer gender refinement as a soft next step (e.g. a Men's chip).",
+            ]
+          : ["Search the stated gender's line and show the 2-3 best matches."]),
+      ],
     });
   }
 

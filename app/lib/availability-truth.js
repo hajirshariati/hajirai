@@ -293,6 +293,26 @@ export function parseAvailabilityConstraints(message, knownColors = []) {
   return { color, size, width };
 }
 
+// Parse ALL distinct colors requested in one message ("champagne or rose",
+// "pink/rose", "black or navy", "tan or taupe"). Returns them in the order they
+// appear, deduped. Used by prior_evidence_availability so a multi-color
+// follow-up checks EVERY requested color per prior family, not just the first.
+export function parseRequestedColors(message, knownColors = []) {
+  const m = String(message || "").toLowerCase();
+  const colorList = [...(knownColors || []).map((c) => String(c).toLowerCase()), ...BUILTIN_COLORS];
+  const hits = [];
+  const seen = new Set();
+  for (const c of colorList) {
+    if (!c || seen.has(c)) continue;
+    const mm = m.match(new RegExp(`\\b${escapeRe(c)}\\b`));
+    if (mm) { hits.push({ color: c, idx: mm.index }); seen.add(c); }
+  }
+  hits.sort((a, b) => a.idx - b.idx);
+  const found = [];
+  for (const h of hits) if (!found.includes(h.color)) found.push(h.color);
+  return found;
+}
+
 // Resolve the availability REQUEST from CURRENT-turn signals only. Constraints
 // are parsed from the latest message (with the family's knownColors). A deictic
 // / "what about" follow-up that names no new family inherits family + color

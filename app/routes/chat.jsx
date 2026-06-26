@@ -6,10 +6,11 @@ import { getCatalogCategories, getAllCatalogCategories, getCategoryGenderAvailab
 import { getActiveCampaigns, formatCampaignsForCS } from "../models/Campaign.server";
 import { buildSystemPrompt } from "../lib/chat-prompt.server";
 import { planTurn, buildTurnPlanPromptBlock, buildPlanClarifierRepair, planForcesProductDisplay, planRequiresSearch as planRequiresSearchFlag, clarifierGateDecision, isAnswerWorkflow } from "../lib/turn-plan.server";
-import { classifyAvailability, buildAvailabilityAnswer, AVAILABILITY_RESULT, resolveAvailabilityRequest, isAvailabilityFollowUp, familyOfTitle, collectFamilyColors, constraintIntent, parseAvailabilityConstraints, priorAvailabilityMessage, priorAvailabilityConstraints, variantDataDiagnostics, styleKeyOfTitle, styleNameOfTitle } from "../lib/availability-truth";
+import { classifyAvailability, buildAvailabilityAnswer, AVAILABILITY_RESULT, resolveAvailabilityRequest, isAvailabilityFollowUp, familyOfTitle, collectFamilyColors, constraintIntent, parseAvailabilityConstraints, parseRequestedColors, priorAvailabilityMessage, priorAvailabilityConstraints, variantDataDiagnostics, styleKeyOfTitle, styleNameOfTitle } from "../lib/availability-truth";
 import { detectSupportHandoffNeed, buildSupportHandoffText, supportConfigured, normalizedSupportLabel, supportChatLabel } from "../lib/support-handoff";
 import { extractConstraintPlan } from "../lib/constraint-plan";
-import { buildPriorEvidenceAvailabilityText, askedConstraintLabel, titleCaseWord } from "../lib/prior-evidence";
+import { buildPriorEvidenceAvailabilityText, buildPriorEvidenceMultiColorText, askedConstraintLabel, titleCaseWord } from "../lib/prior-evidence";
+import { selectEvidenceCards } from "../lib/evidence-select";
 import { retrieveRelevantChunks } from "../lib/knowledge-chunks.server";
 import { buildKidsCoveragePrompt } from "../lib/kids-coverage.server";
 import { analyzeCategoryIntent, cardMatchesActiveGroup, textIntentDivergesFromGroup, matchingGroupsForText } from "../lib/category-intent.server";
@@ -2520,50 +2521,81 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       }
       const unionColorList = Array.from(unionColors);
       // The NEW constraint the customer asked about THIS turn (color/size/width),
-      // plus any size/width inherited from earlier availability turns.
+      // plus any size/width inherited from earlier availability turns. A turn can
+      // request MULTIPLE colors ("champagne or rose") — check every one per family.
       const asked = parseAvailabilityConstraints(latestMsg, unionColorList);
+      const reqColors = parseRequestedColors(latestMsg, unionColorList);
       const priorInherit = priorAvailabilityConstraints(ctx.messages, unionColorList);
-      const reqColor = asked.color || null;
       const reqSize = asked.size || priorInherit.size || null;
       const reqWidth = asked.width || priorInherit.width || null;
-      const askedLabel = askedConstraintLabel({
-        reqColor,
-        askedSize: asked.size,
-        askedWidth: asked.width,
-        inheritedSize: priorInherit.size,
-        inheritedWidth: priorInherit.width,
-      });
+      const multiColor = reqColors.length >= 2;
 
-      const items = []; // { name, ok }
+      // Resolve one variant card for a family in a specific color (scoped
+      // per-family search, never a broad scorer search). Falls back to the prior
+      // card. effColor lets a soft-match surface the real variant ("pink"→Rose).
+      const findFamilyColorCard = async (family, effColor) => {
+        try {
+          const filters = {};
+          if (effColor) filters.color = effColor;
+          const cands = extractProductCards("search_products", await dispatchTool("search_products", { query: family, filters, limit: 4 }, ctx), ctx);
+          const sameFam = (cands || []).filter((c) => titleStyleFamily(c.title || "").toLowerCase() === family);
+          return (effColor ? sameFam.find((c) => String(c.title || "").toLowerCase().includes(String(effColor).toLowerCase())) : null)
+            || sameFam[0] || null;
+        } catch (e) { console.warn(`[prior-evidence] remap search failed for "${family}":`, e?.message || e); return null; }
+      };
+
       const pickedCards = [];
       const seenHandles = new Set();
-      for (const family of famOrder) {
-        const famProducts = famProductsMap.get(family) || [];
-        const displayName = styleNameOfTitle(famPriorCard.get(family)?.title || "") || titleCaseWord(family);
-        const verdict = classifyAvailability({ products: famProducts, family, color: reqColor, size: reqSize, width: reqWidth });
-        const ok = verdict.result === AVAILABILITY_RESULT.AVAILABLE;
-        // Use the catalog's actual color (soft-match: "pink" → "Rose") for the
-        // card lookup so we surface the real variant the customer can buy.
-        const effColor = verdict.matchedColor || reqColor;
-        let card = null;
-        if (ok) {
-          // Scoped per-family remap search (NOT a broad scorer search): find this
-          // family's card in the requested color. Fall back to the prior card.
-          try {
-            const filters = {};
-            if (effColor) filters.color = effColor;
-            const cands = extractProductCards("search_products", await dispatchTool("search_products", { query: family, filters, limit: 4 }, ctx), ctx);
-            const sameFam = (cands || []).filter((c) => titleStyleFamily(c.title || "").toLowerCase() === family);
-            card = (effColor ? sameFam.find((c) => String(c.title || "").toLowerCase().includes(String(effColor).toLowerCase())) : null)
-              || sameFam[0] || null;
-          } catch (e) { console.warn(`[prior-evidence] remap search failed for "${family}":`, e?.message || e); }
-          if (!card) card = famPriorCard.get(family) || null;
-          if (card) {
-            const key = String(card.handle || card.title || "").toLowerCase();
-            if (key && !seenHandles.has(key)) { pickedCards.push(card); seenHandles.add(key); }
+      const pushCard = (card) => {
+        if (!card) return;
+        const key = String(card.handle || card.title || "").toLowerCase();
+        if (key && !seenHandles.has(key)) { pickedCards.push(card); seenHandles.add(key); }
+      };
+
+      let items = null;       // single-constraint path: [{ name, ok }]
+      let perFamily = null;   // multi-color path: [{ name, available:[], missing:[] }]
+
+      if (multiColor) {
+        perFamily = [];
+        for (const family of famOrder) {
+          const famProducts = famProductsMap.get(family) || [];
+          const displayName = styleNameOfTitle(famPriorCard.get(family)?.title || "") || titleCaseWord(family);
+          const available = [];
+          const missing = [];
+          let firstCard = null;
+          for (const color of reqColors) {
+            const verdict = classifyAvailability({ products: famProducts, family, color, size: reqSize, width: reqWidth });
+            if (verdict.result === AVAILABILITY_RESULT.AVAILABLE) {
+              available.push(color);
+              if (!firstCard) firstCard = await findFamilyColorCard(family, verdict.matchedColor || color);
+            } else {
+              missing.push(color);
+            }
           }
+          // Show one card per family that matches ANY requested color.
+          if (available.length > 0) pushCard(firstCard || famPriorCard.get(family) || null);
+          perFamily.push({ name: displayName, available, missing });
         }
-        items.push({ name: displayName, ok });
+        fullResponseText = buildPriorEvidenceMultiColorText(perFamily);
+      } else {
+        const reqColor = asked.color || null;
+        const askedLabel = askedConstraintLabel({
+          reqColor,
+          askedSize: asked.size,
+          askedWidth: asked.width,
+          inheritedSize: priorInherit.size,
+          inheritedWidth: priorInherit.width,
+        });
+        items = [];
+        for (const family of famOrder) {
+          const famProducts = famProductsMap.get(family) || [];
+          const displayName = styleNameOfTitle(famPriorCard.get(family)?.title || "") || titleCaseWord(family);
+          const verdict = classifyAvailability({ products: famProducts, family, color: reqColor, size: reqSize, width: reqWidth });
+          const ok = verdict.result === AVAILABILITY_RESULT.AVAILABLE;
+          if (ok) pushCard((await findFamilyColorCard(family, verdict.matchedColor || reqColor)) || famPriorCard.get(family) || null);
+          items.push({ name: displayName, ok });
+        }
+        fullResponseText = buildPriorEvidenceAvailabilityText(items, askedLabel, Boolean(reqColor));
       }
       // Seed the evidence pool with the prior + remapped cards so the grounding
       // validator sees the product names in the deterministic answer as grounded.
@@ -2573,11 +2605,10 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
         if (key && !allProductPool.has(key)) allProductPool.set(key, c);
       }
       priorEvidencePinnedCards = pickedCards;
-      fullResponseText = buildPriorEvidenceAvailabilityText(items, askedLabel, Boolean(reqColor));
       answerOwner = "prior-evidence";
       console.log(
-        `[prior-evidence] families=[${famOrder.join(",")}] asked=${askedLabel} ` +
-        `available=[${items.filter((i) => i.ok).map((i) => i.name).join(",")}] cards=${pickedCards.length}`,
+        `[prior-evidence] families=[${famOrder.join(",")}] colors=[${reqColors.join(",")}]` +
+        `${multiColor ? " multi-color" : ""} cards=${pickedCards.length}`,
       );
     } catch (peErr) {
       console.error("[prior-evidence] failed (non-fatal):", peErr?.message || peErr);
@@ -2864,6 +2895,39 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     }
   }
 
+  // ── Condition / advisory recommendation: deterministic 2-3 card selection ──
+  // A condition_recommendation turn ("comfortable shoes for standing all day",
+  // "plantar fasciitis walking", "cute but supportive for a wedding") must NOT
+  // hand 6 scorer-ranked cards to the carousel. Pick 2-3 distinct-family cards
+  // from THIS turn's evidence pool — preferring the ones the LLM actually named
+  // in its text — and pin them (cardOwner=evidence-plan), so text and cards stay
+  // aligned and the scorer never takes over. Skipped on a rewrite-only retry.
+  if (
+    ctx.turnPlan?.workflow === "condition_recommendation" &&
+    !availabilityPinnedCards && !comparisonPinnedCards && !evidencePinnedCards && !priorEvidencePinnedCards &&
+    !rewriteOnlyRetry
+  ) {
+    try {
+      const candidates = Array.isArray(pool) ? pool : [];
+      if (candidates.length > 0) {
+        // Prefer LLM-named cards; backfill to up to 3 distinct families.
+        const picked = selectEvidenceCards(candidates, fullResponseText, {
+          cap: 3,
+          familyOf: (t) => titleStyleFamily(t || "").toLowerCase(),
+        });
+        if (picked.length > 0) {
+          evidencePinnedCards = picked;
+          // Deterministic fallback so a validator exhaustion keeps these cards
+          // instead of handing off (mirrors multi_recommendation).
+          evidenceFallbackText = buildMultiRecoFallbackText(picked.map((c) => ({ card: c, category: null })));
+          console.log(`[evidence-plan] condition_recommendation pinnedFinalCards=${picked.length} (pool=${candidates.length})`);
+        }
+      }
+    } catch (crErr) {
+      console.error("[evidence-plan] condition_recommendation failed (non-fatal):", crErr?.message || crErr);
+    }
+  }
+
   // REWRITE-ONLY RETRY restoration net. If the prior attempt owned its cards but
   // this tools-off rewrite couldn't re-derive them (nothing searched), restore
   // the carried cards + owner directly. This is the last guard that stops the
@@ -3004,6 +3068,26 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     }
   }
 
+  // ── Customer-service handoff (deterministic) ──────────────────────────
+  // workflow=customer_service: an order/shipment/delivery/payment/account ISSUE
+  // that needs a human. No product cards (suppress the pool), and ALWAYS attach
+  // the live-chat CTA when support is configured — the LLM owns the friendly
+  // acknowledgement text. This is a deterministic CTA, not the dead-end gate.
+  if (ctx.turnPlan?.workflow === "customer_service") {
+    pool = [];
+    availabilityPinnedCards = null;
+    comparisonPinnedCards = null;
+    evidencePinnedCards = null;
+    priorEvidencePinnedCards = null;
+    genericCTA = null;
+    supportCTA = null;
+    supportHandoffCta = supportConfigured(ctx)
+      ? { label: supportChatLabel(ctx), fallbackUrl: ctx.supportUrl }
+      : null;
+    qualitySignals.supportHandoffApplied = true;
+    console.log(`[customer-service] handoff support=${Boolean(supportHandoffCta)} cards=0`);
+  }
+
   // ── Support-handoff safety gate ───────────────────────────────────────
   // FINAL gate (not a random text scrubber): when the bot genuinely can't
   // finish — explicit human request, dead-end "I can't verify" with no cards,
@@ -3012,7 +3096,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   // handled in the LLM-owns runner where the validation result is known. NEVER
   // fires on a successful product/sale/comparison turn or a normal clarification
   // (the detector excludes those).
-  {
+  if (ctx.turnPlan?.workflow !== "customer_service") {
     const handoffPool = availabilityPinnedCards || comparisonPinnedCards || evidencePinnedCards || priorEvidencePinnedCards || pool;
     const handoff = detectSupportHandoffNeed({
       text: fullResponseText,
