@@ -14,7 +14,7 @@ phrasing layer is verified by manual PRD live-testing, not these suites.
 | `eval-live-core-flows` | 64 | 0 | core scenarios: workflow + search/clarify/gender + availability card-count + leak/CTA/family invariants + sizing + sale + comparison card-contract + same-session pivots + sale-search input |
 | `eval-availability-truth` | 49 | 0 | availability classification, soft color, style disambiguation, follow-up memory, width split |
 | `eval-variant-matcher` | 39 | 0 | size/width/SKU normalization, Aetrex labels, ranges, array-shape options |
-| `eval-turn-plan` | 103 | 0 | workflow classification across all 9 workflows (incl. sizing_help, sale_browse, promo-policy) |
+| `eval-turn-plan` | 108 | 0 | workflow classification across all 11 workflows (incl. multi_recommendation, compatibility, sizing_help, sale_browse) |
 | `eval-turn-plan-gates` | 26 | 0 | executable gate deciders (search/display/clarifier) |
 | `eval-turn-plan-failures` | 19 | 0 | regression cases from prior PRD failures |
 | `eval-named-family-evidence` | 14 | 0 | named-family evidence requirement |
@@ -22,7 +22,8 @@ phrasing layer is verified by manual PRD live-testing, not these suites.
 | `eval-evidence-alignment` | 19 | 0 | card/text family alignment |
 | `eval-grounding-validator` | 74 | 0 | factual-safety blocking/warning partition + comparison length cap |
 | `eval-support-handoff` | 23 | 0 | customer-service handoff: explicit human, dead-end, partial, validation-failed; never on successful turns |
-| **Total** | **470** | **0** | |
+| `eval-constraint-plan` | 15 | 0 | ConstraintPlan: multi-recommendation slots, compatibility, category-noun exclusion, kids gender, structured constraints |
+| **Total** | **490** | **0** | |
 
 Run all: `npm run build && for s in scripts/eval-*.mjs; do node "$s"; done`
 
@@ -78,6 +79,15 @@ this pass made was driven by a QA scenario that reproduced a failure:
   `support-handoff.js` so the route imports it without tripping React Router's
   server-only-module resolver.)
 
+- **Complex mixed requests were flattened into one broad search.** Added a
+  ConstraintPlan/EvidencePlan layer (`constraint-plan.js`): multi-category asks
+  ("one sandal, one sneaker, one slipper for heel pain") → `multi_recommendation`
+  with one slot per category, each searched separately, one card pinned per slot;
+  orthotic-fits-shoe questions → `compatibility` (answer from product + orthotic
+  knowledge, only the named card, no random orthotic browse). Category nouns are
+  never product families; kids never falls back to adult; condition/multi cards
+  survive the scorer/alignment (no 5→0 wipe on category-level language).
+
 ## Known limitations
 
 1. **LLM phrasing is not unit-tested.** Advisory/sales language quality
@@ -112,7 +122,7 @@ From `docs/legacy-removal-plan.md` — none removed yet:
 ## Production readiness estimate
 
 **Ready for continued PRD soak / supervised live use.** The deterministic core
-(routing, availability truth, factual safety, card ownership, support handoff) is green at 470/0
+(routing, availability truth, factual safety, card ownership, support handoff) is green at 490/0
 and instrumented with the `[turn-invariant]` log + VIOLATION check for live
 monitoring. The remaining risk is concentrated in (a) LLM phrasing quality
 (monitored manually) and (b) legacy code that is inert on PRD but not yet

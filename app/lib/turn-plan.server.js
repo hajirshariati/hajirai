@@ -1,6 +1,7 @@
 // =====================================================================
 // TurnPlan — the single front-of-turn brain.
 // =====================================================================
+import { isCompatibilityAsk, isMultiRecommendationAsk } from "./constraint-plan.js";
 //
 // Deterministically classifies a customer turn into ONE workflow and emits
 // a plan that governs the whole turn: what evidence is required, whether a
@@ -29,6 +30,8 @@ export const WORKFLOWS = {
   COMPARISON: "comparison",
   NAMED_PRODUCT_ADVISORY: "named_product_advisory",
   CONDITION_RECOMMENDATION: "condition_recommendation",
+  MULTI_RECOMMENDATION: "multi_recommendation",
+  COMPATIBILITY: "compatibility",
   SALE_BROWSE: "sale_browse",
   SIZING_HELP: "sizing_help",
   BROWSE: "browse",
@@ -262,6 +265,44 @@ export function planTurn({
     });
   }
 
+  // 1d. Orthotic COMPATIBILITY ("can I put orthotics inside the Jillian?"). A
+  // direct yes/no about whether an insert fits a shoe — answered from the named
+  // product's facts + orthotic knowledge. NOT a browse, NOT a stock check; never
+  // surface random orthotic cards unless the customer asks to shop orthotics.
+  if (isCompatibilityAsk(m)) {
+    return finalize({
+      workflow: WORKFLOWS.COMPATIBILITY,
+      requiredEvidence: ["product_facts", "orthotic_knowledge"],
+      searchRequired: true,
+      clarificationAllowed: false,
+      productDisplayPolicy: hasNamed ? "show_focused" : "suppress",
+      answerRequirements: reqs({ answerFirst: true, concise: true }),
+      gender: genderFor(true),
+      directives: [
+        "Answer the compatibility question DIRECTLY (can the orthotic/insole go inside this shoe) from the named product's facts plus orthotic knowledge — e.g. removable footbed = yes, fixed = limited. Show ONLY the named product's card if any. Do NOT search for or show random orthotic products unless the customer explicitly asked to shop orthotics.",
+      ],
+    });
+  }
+
+  // 1e. MULTI-recommendation ("one sandal, one sneaker, and one slipper for heel
+  // pain"). The turn carries 2+ distinct categories — it must be decomposed into
+  // one slot per category and answered with ONE pick each, not a single broad
+  // search that floods the carousel. The ConstraintPlan layer builds the slots.
+  if (isMultiRecommendationAsk(m)) {
+    return finalize({
+      workflow: WORKFLOWS.MULTI_RECOMMENDATION,
+      requiredEvidence: ["product_facts"],
+      searchRequired: true,
+      clarificationAllowed: false,
+      productDisplayPolicy: "show",
+      answerRequirements: reqs({ answerFirst: true, concise: true }),
+      gender: genderFor(true),
+      directives: [
+        "The customer asked for MULTIPLE distinct categories. Recommend exactly ONE best product per category, one short line each, then show one card per category. Never flood the carousel or merge them into a single broad list.",
+      ],
+    });
+  }
+
   // 2. Availability — size / color / stock for a product in context, OR a
   // size/stock FOLLOW-UP after products were shown ("what about size 9?" with
   // prior cards). The latter has no named product in the message but is clearly
@@ -438,6 +479,8 @@ export const ANSWER_WORKFLOWS = new Set([
   WORKFLOWS.COMPARISON,
   WORKFLOWS.NAMED_PRODUCT_ADVISORY,
   WORKFLOWS.CONDITION_RECOMMENDATION,
+  WORKFLOWS.MULTI_RECOMMENDATION,
+  WORKFLOWS.COMPATIBILITY,
 ]);
 
 export function isAnswerWorkflow(plan) {

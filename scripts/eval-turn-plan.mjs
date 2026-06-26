@@ -87,6 +87,18 @@ scenario("'show me discounted sandals under $100' → sale_browse", { message: "
 scenario("'any deals?' → sale_browse", { message: "Any deals?" },
   { workflow: W.SALE_BROWSE, searchRequired: true });
 
+// ── multi_recommendation + compatibility (ConstraintPlan workflows) ──
+scenario("'one sandal, one sneaker, and one slipper for heel pain' → multi_recommendation", { message: "Give me one sandal, one sneaker, and one slipper for heel pain" },
+  { workflow: W.MULTI_RECOMMENDATION, searchRequired: true, productDisplayPolicy: "show" });
+scenario("'orthotics AND supportive sandals for flat feet' → multi_recommendation", { message: "I need orthotics AND supportive sandals for my flat feet — what should I buy?" },
+  { workflow: W.MULTI_RECOMMENDATION, searchRequired: true });
+scenario("'can I put orthotics inside the Jillian sandal?' → compatibility", { message: "Can I put orthotics inside the Jillian sandal?", namedProduct: true },
+  { workflow: W.COMPATIBILITY, searchRequired: true, productDisplayPolicy: "show_focused" });
+scenario("compatibility with no named product → suppress cards", { message: "Can I put my orthotics inside these?" },
+  { workflow: W.COMPATIBILITY, productDisplayPolicy: "suppress" });
+scenario("single-category condition stays condition_recommendation (not multi)", { message: "what supportive sandals do you recommend for plantar fasciitis?" },
+  { workflow: W.CONDITION_RECOMMENDATION });
+
 // ── promo MECHANICS → policy, never a product search ──
 scenario("'do you have a military discount?' → policy_account, no cards", { message: "Do you have a military discount?" },
   { workflow: W.POLICY_ACCOUNT, searchRequired: false, productDisplayPolicy: "suppress" });

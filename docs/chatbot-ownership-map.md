@@ -10,7 +10,8 @@ to make it; everyone downstream may clean for safety but may not re-decide.**
 
 | Concern | Owner | Notes |
 |---|---|---|
-| **Workflow** (which kind of turn this is) | **TurnPlan** (`app/lib/turn-plan.server.js`, `planTurn`) | Classifies every turn into one of 9 workflows: `policy_account`, `availability`, `comparison`, `named_product_advisory`, `condition_recommendation`, `sale_browse`, `sizing_help`, `browse`, `clarification`. Also owns `searchRequired`, `clarificationAllowed`, `productDisplayPolicy`, `gender`. |
+| **Workflow** (which kind of turn this is) | **TurnPlan** (`app/lib/turn-plan.server.js`, `planTurn`) | Classifies every turn into one of 11 workflows: `policy_account`, `availability`, `comparison`, `named_product_advisory`, `condition_recommendation`, `multi_recommendation`, `compatibility`, `sale_browse`, `sizing_help`, `browse`, `clarification`. Also owns `searchRequired`, `clarificationAllowed`, `productDisplayPolicy`, `gender`. |
+| **Constraint decomposition** | **ConstraintPlan / EvidencePlan** (`app/lib/constraint-plan.js`) | The structured layer between TurnPlan and search. `extractConstraintPlan` decomposes the latest message into askType + productFamilies + categories + conditions + useCases + constraints + **slots** (one per category for a multi-recommendation). Category nouns (sandal, sneaker, …) are NEVER product families. chat.jsx searches each slot deterministically and pins one card per slot (`evidencePinnedCards`). |
 | **Exact product / color / size / width availability** | **Availability Truth** (`app/lib/availability-truth.js`) | For `workflow=availability` only. Resolves family → style → variant truth and produces AVAILABLE / UNAVAILABLE / UNKNOWN / NOT_FOUND / DISAMBIGUATION, the answer **text**, and the **cards**. Its output is authoritative for that turn. |
 | **Comparison cards** | **Comparison pin** (`chat.jsx`, `comparisonPinnedCards`) | For `workflow=comparison`: the LLM owns the verdict text; the code pins ONE representative card per named family (max 4), bypassing the scorer so a two-product comparison shows ~2 cards, never a flooded carousel. |
 | **Advisory / sales language** | **LLM** | Owns the persuasive, advisory, and conversational phrasing for non-availability turns (browse, comparison, advisory, condition, clarification). Never owns a hard availability yes/no. |
@@ -90,6 +91,18 @@ to make it; everyone downstream may clean for safety but may not re-decide.**
    silently filter a later browse/condition/comparison search. They apply only
    when the latest message restates them (availability resolves them on its own
    deterministic path).
+
+12. **Complex asks are DECOMPOSED, not flattened.** A request spanning multiple
+    categories ("one sandal, one sneaker, one slipper for heel pain") →
+    `multi_recommendation`: one slot per category, each searched separately, one
+    card pinned per slot (`evidencePinnedCards` → cardOwner=evidence-plan). An
+    orthotic-fits-shoe question ("can I put orthotics in the Jillian?") →
+    `compatibility`: answered from product + orthotic knowledge, only the named
+    product's card shown, never a random orthotic browse. Category nouns
+    (sandal/sneaker/slipper/…) are categories, never product families. For
+    `condition_recommendation`/`multi_recommendation`, current-turn evidence
+    cards survive the scorer/alignment — alignment removes hard contradictions
+    only, never a 5→0 wipe on category-level answer language.
 
 ## Turn invariant log
 

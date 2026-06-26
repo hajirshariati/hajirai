@@ -8,6 +8,7 @@ import { buildSystemPrompt } from "../lib/chat-prompt.server";
 import { planTurn, buildTurnPlanPromptBlock, buildPlanClarifierRepair, planForcesProductDisplay, planRequiresSearch as planRequiresSearchFlag, clarifierGateDecision, isAnswerWorkflow } from "../lib/turn-plan.server";
 import { classifyAvailability, buildAvailabilityAnswer, AVAILABILITY_RESULT, resolveAvailabilityRequest, isAvailabilityFollowUp, familyOfTitle, collectFamilyColors, constraintIntent, priorAvailabilityMessage, variantDataDiagnostics, styleKeyOfTitle, styleNameOfTitle } from "../lib/availability-truth";
 import { detectSupportHandoffNeed, buildSupportHandoffText, supportConfigured, normalizedSupportLabel, supportChatLabel } from "../lib/support-handoff";
+import { extractConstraintPlan } from "../lib/constraint-plan";
 import { retrieveRelevantChunks } from "../lib/knowledge-chunks.server";
 import { buildKidsCoveragePrompt } from "../lib/kids-coverage.server";
 import { analyzeCategoryIntent, cardMatchesActiveGroup, textIntentDivergesFromGroup, matchingGroupsForText } from "../lib/category-intent.server";
@@ -2351,6 +2352,10 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   // family (max 4). Like availabilityPinnedCards, it wins over the scorer so a
   // two-product comparison never floods the carousel with 9 cards.
   let comparisonPinnedCards = null;
+  // Set by the EvidencePlan block (multi_recommendation / compatibility): the
+  // exact cards selected by deterministic per-slot search. Wins over the scorer
+  // so condition/multi answers keep their current-turn evidence cards.
+  let evidencePinnedCards = null;
   // Ownership instrumentation (see docs/chatbot-ownership-map.md). answerOwner
   // is who produced the customer-facing TEXT; ownedTextSnapshot is that text
   // captured BEFORE the safety-cleanup pipeline runs, so the turn-invariant log
@@ -2565,6 +2570,70 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       }
     } catch (cmpErr) {
       console.error("[comparison] pin failed (non-fatal):", cmpErr?.message || cmpErr);
+    }
+  }
+
+  // ── EvidencePlan: multi_recommendation + compatibility ────────────────
+  // A complex ask is decomposed into slots (one per category) and each slot is
+  // searched DETERMINISTICALLY; we pin one best card per slot so the carousel
+  // shows exactly N cards (never a flood) and the LLM's text answers concisely.
+  if (ctx.turnPlan?.workflow === "multi_recommendation" && !availabilityPinnedCards && !comparisonPinnedCards) {
+    try {
+      const cplan = extractConstraintPlan({
+        message: ctx.latestUserMessage || "",
+        catalogCategories: ctx.catalogCategories || [],
+        namedFamilies: Array.isArray(ctx.turnPlan.namedFamilies) ? ctx.turnPlan.namedFamilies : [],
+      });
+      const gender = ctx.turnPlan.gender === "men" || ctx.turnPlan.gender === "women" ? ctx.turnPlan.gender : (cplan.constraints.gender || null);
+      const picked = [];
+      const seenHandles = new Set();
+      for (const slot of cplan.slots) {
+        const filters = {};
+        if (gender && gender !== "kids") filters.gender = gender;
+        if (slot.category) filters.category = slot.category;
+        if (slot.constraints?.color) filters.color = slot.constraints.color;
+        const input = { query: slot.query, filters, limit: 4 };
+        if (slot.constraints?.priceMax) input.priceMax = slot.constraints.priceMax;
+        let cards = [];
+        try { cards = extractProductCards("search_products", await dispatchTool("search_products", input, ctx), ctx); }
+        catch (e) { console.warn(`[evidence-plan] slot "${slot.category}" search failed: ${e?.message || e}`); }
+        const best = (cards || []).find((c) => c?.handle && !seenHandles.has(c.handle));
+        if (best) { picked.push(best); seenHandles.add(best.handle); }
+        console.log(`[evidence-plan] slot=${slot.category} query="${slot.query}" → ${cards?.length || 0} hit(s), picked=${best ? best.handle : "-"}`);
+      }
+      if (picked.length > 0) {
+        evidencePinnedCards = picked;
+        console.log(`[evidence-plan] multi_recommendation pinnedFinalCards=${picked.length} slots=${cplan.slots.length}`);
+      } else {
+        console.log(`[evidence-plan] multi_recommendation: no slot cards found — leaving scorer cards`);
+      }
+    } catch (mrErr) {
+      console.error("[evidence-plan] multi_recommendation failed (non-fatal):", mrErr?.message || mrErr);
+    }
+  }
+
+  // Compatibility: pin ONLY the named product's card (if shown at all). Never
+  // surface random orthotic products — the answer is text from product +
+  // orthotic knowledge.
+  if (ctx.turnPlan?.workflow === "compatibility" && !availabilityPinnedCards && !comparisonPinnedCards && !evidencePinnedCards) {
+    try {
+      const fams = Array.isArray(ctx.turnPlan.namedFamilies) ? ctx.turnPlan.namedFamilies : [];
+      if (fams.length > 0) {
+        const candidates = [pool, Array.from(allProductPool.values())];
+        let card = null;
+        for (const src of candidates) {
+          card = (src || []).find((c) => titleStyleFamily(c.title || "").toLowerCase() === fams[0]);
+          if (card) break;
+        }
+        evidencePinnedCards = card ? [card] : [];
+        console.log(`[evidence-plan] compatibility family=${fams[0]} pinnedFinalCards=${evidencePinnedCards.length}`);
+      } else {
+        // No named product → text-only compatibility answer, no random cards.
+        evidencePinnedCards = [];
+        console.log(`[evidence-plan] compatibility: no named product — text-only, cards=0`);
+      }
+    } catch (compatErr) {
+      console.error("[evidence-plan] compatibility failed (non-fatal):", compatErr?.message || compatErr);
     }
   }
 
@@ -2820,7 +2889,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     })));
   }
 
-  if (!supportCTA && !supportHandoffCta && genericCTA && ctx.turnPlan?.workflow !== "availability" && ctx.turnPlan?.workflow !== "comparison") {
+  if (!supportCTA && !supportHandoffCta && genericCTA && !evidencePinnedCards && ctx.turnPlan?.workflow !== "availability" && ctx.turnPlan?.workflow !== "comparison") {
     outboundLinks.push({ url: genericCTA.url, label: genericCTA.label });
     controller.enqueue(encoder.encode(sseChunk({
       type: "link",
@@ -2908,6 +2977,17 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       controller.enqueue(encoder.encode(sseChunk({ type: "products", products: deduped })));
     }
     console.log(`[cta] ${ctx.shop} broad CTA suppressed: comparison turn (pinned cards)`);
+  } else if (evidencePinnedCards) {
+    // EvidencePlan owns the final cards (multi_recommendation = one per slot;
+    // compatibility = the named product only). Emit verbatim, bypass the scorer
+    // and alignment so category-level answer language can't wipe them.
+    const { products: deduped } = prepareProductCardsForTurn(evidencePinnedCards);
+    finalProductCards = deduped;
+    console.log(`[evidence-plan] finalCards=${deduped.length}`);
+    if (deduped.length > 0) {
+      controller.enqueue(encoder.encode(sseChunk({ type: "products", products: deduped })));
+    }
+    console.log(`[cta] ${ctx.shop} broad CTA suppressed: ${ctx.turnPlan.workflow} turn (pinned evidence)`);
   } else if (pool.length > 0 && fullResponseText && !suppressCardsForChips) {
     const textLower = fullResponseText.toLowerCase();
     const saysNoMatch = detectAiNoMatchPhrasing(fullResponseText);
@@ -3333,8 +3413,18 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
         cap: ctx.productCardCap || 6,
       });
       if (aligned.changed) {
-        console.log(`[chat] turn-plan(${ctx.turnPlan.workflow}): card/text alignment ${aligned.reason} — ${cards.length}→${aligned.cards.length} card(s)`);
-        cards = aligned.cards;
+        const condMulti = ctx.turnPlan.workflow === "condition_recommendation" || ctx.turnPlan.workflow === "multi_recommendation";
+        if (aligned.cards.length === 0 && cards.length > 0 && condMulti) {
+          // Requirement #6: a condition/multi answer using CATEGORY-level
+          // language ("supportive sandals") must NOT wipe all current-turn
+          // cards. Alignment removes hard contradictions only — never a 5→0 wipe
+          // on vocabulary. Keep the top current-turn cards.
+          console.log(`[chat] turn-plan(${ctx.turnPlan.workflow}): alignment would wipe ${cards.length}→0 on category-level language — keeping top current-turn card(s)`);
+          cards = cards.slice(0, ctx.productCardCap || 6);
+        } else {
+          console.log(`[chat] turn-plan(${ctx.turnPlan.workflow}): card/text alignment ${aligned.reason} — ${cards.length}→${aligned.cards.length} card(s)`);
+          cards = aligned.cards;
+        }
       }
     }
 
@@ -3449,11 +3539,12 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   // downstream mutator violated the do-not-mutate rule — logged as VIOLATION.
   {
     const workflow = ctx?.turnPlan?.workflow || "-";
-    const pinned = availabilityPinnedCards || comparisonPinnedCards;
+    const pinned = availabilityPinnedCards || comparisonPinnedCards || evidencePinnedCards;
     const pinnedCount = pinned ? pinned.length : null;
     const finalCount = Array.isArray(finalProductCards) ? finalProductCards.length : 0;
     const cardOwner = availabilityPinnedCards != null ? "availability-truth"
       : comparisonPinnedCards != null ? "comparison"
+      : evidencePinnedCards != null ? "evidence-plan"
       : finalCount > 0 ? "scorer" : "none";
     const textCleanupChanged = ownedTextSnapshot != null && ownedTextSnapshot !== fullResponseText;
     console.log(
