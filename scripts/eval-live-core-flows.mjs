@@ -98,6 +98,22 @@ const PLAN = [
   { name: "men's sneakers browse → men", in: { message: "do you have men's sneakers?" }, wf: WORKFLOWS.BROWSE, search: true, gender: "men" },
   { name: "bare 'do you have shoes?' → browse, MAY clarify", in: { message: "do you have shoes?" }, wf: WORKFLOWS.BROWSE, search: true, clarify: true },
 
+  // sizing help (Failure A) — generic sizing must NOT search or show cards
+  { name: "generic 'help choosing the right size' → sizing_help, no search", in: { message: "I need help choosing the right size" }, wf: WORKFLOWS.SIZING_HELP, search: false },
+  { name: "'what size should I get?' no context → sizing_help, no search", in: { message: "What size should I get?" }, wf: WORKFLOWS.SIZING_HELP, search: false },
+  { name: "'do these run true to size?' no context → sizing_help", in: { message: "Do these run true to size?" }, wf: WORKFLOWS.SIZING_HELP, search: false },
+  { name: "'what size should I get in Jillian?' → advisory, search", in: { message: "What size should I get in Jillian?", namedProduct: true }, wf: WORKFLOWS.NAMED_PRODUCT_ADVISORY, search: true },
+  { name: "sizing after a shown product (focus) → advisory", in: { message: "What size should I get?", focusProduct: { title: "Savannah Sandal - Champagne" } }, wf: WORKFLOWS.NAMED_PRODUCT_ADVISORY, search: true },
+
+  // sale browse (Failure B) — shopping a sale is commerce, not support
+  { name: "'show me current sales and promotions' → sale_browse, search", in: { message: "Show me current sales and promotions" }, wf: WORKFLOWS.SALE_BROWSE, search: true },
+  { name: "'what's on sale?' → sale_browse", in: { message: "What's on sale?" }, wf: WORKFLOWS.SALE_BROWSE, search: true },
+  { name: "'women's sneakers on sale' → sale_browse women", in: { message: "Show me women's sneakers on sale" }, wf: WORKFLOWS.SALE_BROWSE, search: true, gender: "women" },
+  { name: "'discounted sandals under $100' → sale_browse", in: { message: "Show me discounted sandals under $100" }, wf: WORKFLOWS.SALE_BROWSE, search: true },
+  // promo mechanics → policy, no search/cards
+  { name: "'military discount?' → policy_account, no search", in: { message: "Do you have a military discount?" }, wf: WORKFLOWS.POLICY_ACCOUNT, search: false },
+  { name: "'promo code on sale sandals?' → policy_account, no search", in: { message: "Can I use a promo code on sale sandals?" }, wf: WORKFLOWS.POLICY_ACCOUNT, search: false },
+
   // clarification / non-product / bad input
   { name: "'hi' → clarification, no search", in: { message: "hi" }, wf: WORKFLOWS.CLARIFICATION, search: false },
   { name: "'help' → clarification", in: { message: "help" }, wf: WORKFLOWS.CLARIFICATION, search: false },
@@ -179,6 +195,24 @@ for (const t of AVAIL) {
     if (v.product) assertMentionsFamily(v.product.title, t.family, `${t.name} (verdict product family)`);
   });
 }
+
+// ══ Part 3 — sale search input: onSale + clean query, never raw sentence ══
+import { scopedProductSearchInput } from "../app/lib/emit-finalize.server.js";
+check("sale_browse search sets onSale=true and a clean query (not the raw sentence)", () => {
+  const { input } = scopedProductSearchInput({ latestUserMessage: "Show me current sales and promotions", turnPlan: { workflow: "sale_browse" } });
+  assert.equal(input.onSale, true, "onSale not set");
+  assert.doesNotMatch(String(input.query), /promotions/i, "query echoed the raw sentence");
+  assert.ok(String(input.query).length <= 30, `query too long/raw: ${input.query}`);
+});
+check("'discounted sandals under $100' → onSale + priceMax 100", () => {
+  const { input } = scopedProductSearchInput({ latestUserMessage: "Show me discounted sandals under $100", turnPlan: { workflow: "sale_browse" } });
+  assert.equal(input.onSale, true);
+  assert.equal(input.priceMax, 100);
+});
+check("non-sale browse does NOT set onSale", () => {
+  const { input } = scopedProductSearchInput({ latestUserMessage: "show me women's sandals", turnPlan: { workflow: "browse" } });
+  assert.ok(!input.onSale, "onSale wrongly set on a non-sale browse");
+});
 
 console.log("");
 if (fail === 0) {

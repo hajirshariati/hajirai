@@ -243,14 +243,30 @@ export function scopedProductSearchInput(ctx = {}) {
   if (size) filters.size = size;
   if (width) filters.width = width;
 
-  const query = [color, condition, category]
-    .filter(Boolean)
-    .join(" ")
-    .trim() || latestMsg.slice(0, 160).trim() || "shoes";
+  // Sale browse: search DISCOUNTED products. Set onSale + a clean query
+  // (category or "sale") — NEVER the raw sentence ("Show me current sales and
+  // promotions"), which returns garbage. Honor a price cap if present.
+  const saleIntent =
+    ctx?.turnPlan?.workflow === "sale_browse" ||
+    /\b(on\s+sale|what'?s\s+on\s+sale|clearance|markdown[s]?|discount(?:ed)?|deal[s]?)\b/i.test(latestMsg);
+  const priceCap = latestMsg.match(/\b(?:under|below|less\s+than|up\s+to)\s+\$?\s*(\d{2,4})\b/i);
+
+  const input = { filters, limit: 6 };
+  if (saleIntent) {
+    input.onSale = true;
+    filters.onSale = true;
+    input.query = [color, category].filter(Boolean).join(" ").trim() || "sale";
+  } else {
+    input.query = [color, condition, category].filter(Boolean).join(" ").trim() || latestMsg.slice(0, 160).trim() || "shoes";
+  }
+  if (priceCap) {
+    const max = Number(priceCap[1]);
+    if (Number.isFinite(max)) { input.priceMax = max; filters.priceMax = max; }
+  }
 
   return {
-    input: { query, filters, limit: 6 },
-    scope: { gender, category, color, size, width, condition },
+    input,
+    scope: { gender, category, color, size, width, condition, onSale: saleIntent || undefined, priceMax: priceCap ? Number(priceCap[1]) : undefined },
   };
 }
 

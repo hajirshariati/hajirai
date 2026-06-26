@@ -184,10 +184,12 @@ check("B: Savannah availability is its own turn (availability, family query, no 
   assert.equal(out.input.filters.category, undefined);
 });
 // C. Jillian sizing — no stale black / PF, no fragment.
-check("C: Jillian sizing turn is availability, no stale color leaks into forced search", () => {
+check("C: Jillian sizing turn is advisory, no stale color leaks into forced search", () => {
   const msg = "I usually wear size 8.5 but my feet swell in hot weather. What size should I get in Jillian?";
   const plan = planTurn({ message: msg, namedProduct: true });
-  assert.equal(plan.workflow, W.AVAILABILITY); // sizing on a named product
+  // "what size should I GET" on a named product is a fit/sizing ADVICE turn —
+  // an answer workflow that focuses the product (not an availability stock check).
+  assert.equal(plan.workflow, W.NAMED_PRODUCT_ADVISORY);
   const out = buildAnswerWorkflowForcedSearch({ ctx: { ...contaminatedCtx(msg, "women"), turnPlan: plan }, capturedInput: { query: "Jillian" } });
   assert.notEqual(out.input.filters.color, "black", "stale black not applied");
   assert.equal(out.input.filters.category, undefined, "stale category not applied");

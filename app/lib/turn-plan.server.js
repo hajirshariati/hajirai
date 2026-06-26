@@ -29,12 +29,50 @@ export const WORKFLOWS = {
   COMPARISON: "comparison",
   NAMED_PRODUCT_ADVISORY: "named_product_advisory",
   CONDITION_RECOMMENDATION: "condition_recommendation",
+  SALE_BROWSE: "sale_browse",
+  SIZING_HELP: "sizing_help",
   BROWSE: "browse",
   CLARIFICATION: "clarification",
 };
 
 const POLICY_RE =
   /\b(return|returns|refund|exchange(?:s|d)?|warranty|guarantee|ship(?:ping|ped)?|delivery|deliver|track(?:ing)?|order\s+status|my\s+order|where\s+is\s+my|cancel(?:lation)?|account|sign\s+in|log\s+in|password|invoice|receipt)\b/i;
+
+// Promo / discount MECHANICS — code eligibility, special discounts, stacking.
+// These are answered from policy/promotion knowledge, NOT a product search.
+// (Shopping a sale — "what's on sale" — is SALE_BROWSE, handled separately.)
+const PROMO_POLICY_RE = new RegExp(
+  "\\b(?:promo|discount|coupon|voucher)\\s*code[s]?\\b" + "|" +
+  "\\bcode[s]?\\s+(?:for|to\\s+use|work)\\b" + "|" +
+  "\\b(?:military|veteran|teacher|student|nurse|first[-\\s]?responder|senior|healthcare)\\s+discount\\b" + "|" +
+  "\\b(?:stack|combine|apply)\\s+(?:a\\s+)?(?:discount|code|coupon|promo)s?\\b" + "|" +
+  "\\bdo\\s+you\\s+(?:have|offer)\\s+(?:a\\s+)?(?:promo|discount|coupon)\\b",
+  "i",
+);
+
+// Shopping a SALE — the customer wants to SEE discounted products. This is a
+// commerce turn (search onSale), never a support/policy punt.
+const SALE_BROWSE_RE = new RegExp(
+  "\\bon\\s+sale\\b|\\bwhat'?s\\s+on\\s+sale\\b|\\bcurrent\\s+(?:sale|promotion|deal)s?\\b" + "|" +
+  "\\b(?:show|see|browse|find|any|got)\\b[^.?!\\n]{0,30}\\b(?:sale[s]?|deal[s]?|discount(?:ed)?|clearance|markdown[s]?|promotion[s]?|specials?)\\b" + "|" +
+  "\\b(?:sale|discount(?:ed)?|clearance|markdown[s]?)\\s+(?:item|style|product|shoe|sandal|sneaker|boot|wedge|flat|heel)s?\\b" + "|" +
+  "\\bclearance\\b|\\bmarkdown[s]?\\b|\\bwhat\\s+deals\\b|\\bany\\s+deals\\b|\\bon\\s+clearance\\b",
+  "i",
+);
+
+// Sizing / fit ADVICE — "what size should I get", not "what sizes are in stock".
+// The (?:should|do|would|am)\s+i / to\s+(get|buy…) subject distinguishes a fit
+// question from an availability question ("what sizes do you have").
+const SIZING_HELP_RE = new RegExp(
+  "\\b(?:what|which)\\s+size\\s+(?:should\\s+i|do\\s+i|would\\s+i|am\\s+i|to\\s+(?:get|buy|order|wear|pick|choose))\\b" + "|" +
+  "\\bhelp\\s+(?:me\\s+)?(?:choos(?:e|ing)|pick(?:ing)?|find(?:ing)?)[^.?!\\n]{0,20}\\bsize\\b" + "|" +
+  "\\b(?:choos(?:e|ing)|pick(?:ing)?|find(?:ing)?)\\s+(?:the\\s+)?(?:right\\s+|correct\\s+|my\\s+)?size\\b" + "|" +
+  "\\bhow\\s+do\\s+i\\s+know\\s+my\\b[^.?!\\n]{0,20}\\bsize\\b" + "|" +
+  "\\bwhat'?s\\s+my\\b[^.?!\\n]{0,15}\\bsize\\b" + "|" +
+  "\\b(?:run[s]?\\s+true\\s+to\\s+size|true\\s+to\\s+size|run[s]?\\s+(?:small|large|big))\\b" + "|" +
+  "\\bsize\\s+recommendation\\b|\\bhelp\\s+(?:me\\s+)?with\\s+(?:my\\s+)?siz(?:e|ing)\\b",
+  "i",
+);
 
 // Size / color / stock — the availability shape. ("what colors" is included
 // here too; it's a variant-data question, answered from the product.)
@@ -171,6 +209,59 @@ export function planTurn({
     });
   }
 
+  // 1b. Promo / discount MECHANICS (codes, military/teacher discount, stacking)
+  // → answered from policy/promotion knowledge, never a product search. Checked
+  // before SALE_BROWSE so "do you have a promo code?" doesn't trigger a search.
+  if (PROMO_POLICY_RE.test(m)) {
+    return finalize({
+      workflow: WORKFLOWS.POLICY_ACCOUNT,
+      requiredEvidence: ["policy_or_order_data"],
+      searchRequired: false,
+      clarificationAllowed: false,
+      productDisplayPolicy: "suppress",
+      answerRequirements: reqs({ answerFirst: true, concise: true }),
+      gender: null,
+      directives: [
+        "Answer the promo/discount-code question from active promotion knowledge or policy docs. If no active code exists, say codes are verified at checkout. Do NOT search the catalog or show product cards unless the customer ALSO explicitly asked to shop sale items.",
+      ],
+    });
+  }
+
+  // 1c. Sizing / fit ADVICE. Generic ("what size should I get?") with NO product
+  // context is a clarification — must NOT search or show cards. WITH a product in
+  // context (named or focus), it's a sizing question about THAT product — search
+  // and focus it, answer from its fit/variant/review data. Placed before
+  // availability so "what size should I get in Jillian" routes to advice, not a
+  // stock check.
+  if (SIZING_HELP_RE.test(m)) {
+    if (hasProductContext) {
+      return finalize({
+        workflow: WORKFLOWS.NAMED_PRODUCT_ADVISORY,
+        requiredEvidence: ["product_facts"],
+        searchRequired: true,
+        clarificationAllowed: false,
+        productDisplayPolicy: "show_focused",
+        answerRequirements: reqs({ answerFirst: true, concise: true, honestTradeoff: true }),
+        gender: genderFor(true),
+        directives: [
+          "Answer the sizing/fit question for the product in context from its real fit/variant/review data — show ONLY that product's card. Do not browse other products.",
+        ],
+      });
+    }
+    return finalize({
+      workflow: WORKFLOWS.SIZING_HELP,
+      requiredEvidence: ["none"],
+      searchRequired: false,
+      clarificationAllowed: true,
+      productDisplayPolicy: "suppress",
+      answerRequirements: reqs({ concise: true }),
+      gender: null,
+      directives: [
+        "Ask which product or category they're sizing, their usual size, width, and any fit issues (e.g. wide feet, high arch). Do NOT search the catalog or show any product cards or collection links.",
+      ],
+    });
+  }
+
   // 2. Availability — size / color / stock for a product in context, OR a
   // size/stock FOLLOW-UP after products were shown ("what about size 9?" with
   // prior cards). The latter has no named product in the message but is clearly
@@ -247,6 +338,25 @@ export function planTurn({
             "Show relevant products, then offer gender refinement as a soft next step (e.g. a Men's chip).",
           ]
         : ["Search the stated gender's line and show relevant products."],
+    });
+  }
+
+  // 5b. Sale browse — the customer wants to SEE discounted products. A commerce
+  // turn: search onSale with whatever category/gender constraints are present,
+  // never a raw-sentence query, never a support punt. Placed before plain
+  // browse so "what's on sale" routes here.
+  if (SALE_BROWSE_RE.test(m)) {
+    return finalize({
+      workflow: WORKFLOWS.SALE_BROWSE,
+      requiredEvidence: ["product_facts"],
+      searchRequired: true,
+      clarificationAllowed: false,
+      productDisplayPolicy: "show",
+      answerRequirements: reqs({ concise: true }),
+      gender: genderFor(true),
+      directives: [
+        "Search the catalog for DISCOUNTED products (onSale=true), filtered by any stated category/gender, and show them. If active promo knowledge exists, mention it briefly; otherwise note codes are verified at checkout — but STILL show the sale products. Never say you can't access sales, and never link to Support.",
+      ],
     });
   }
 

@@ -10,7 +10,7 @@ to make it; everyone downstream may clean for safety but may not re-decide.**
 
 | Concern | Owner | Notes |
 |---|---|---|
-| **Workflow** (which kind of turn this is) | **TurnPlan** (`app/lib/turn-plan.server.js`, `planTurn`) | Classifies every turn into one of 7 workflows: `policy_account`, `availability`, `comparison`, `named_product_advisory`, `condition_recommendation`, `browse`, `clarification`. Also owns `searchRequired`, `clarificationAllowed`, `productDisplayPolicy`, `gender`. |
+| **Workflow** (which kind of turn this is) | **TurnPlan** (`app/lib/turn-plan.server.js`, `planTurn`) | Classifies every turn into one of 9 workflows: `policy_account`, `availability`, `comparison`, `named_product_advisory`, `condition_recommendation`, `sale_browse`, `sizing_help`, `browse`, `clarification`. Also owns `searchRequired`, `clarificationAllowed`, `productDisplayPolicy`, `gender`. |
 | **Exact product / color / size / width availability** | **Availability Truth** (`app/lib/availability-truth.js`) | For `workflow=availability` only. Resolves family → style → variant truth and produces AVAILABLE / UNAVAILABLE / UNKNOWN / NOT_FOUND / DISAMBIGUATION, the answer **text**, and the **cards**. Its output is authoritative for that turn. |
 | **Advisory / sales language** | **LLM** | Owns the persuasive, advisory, and conversational phrasing for non-availability turns (browse, comparison, advisory, condition, clarification). Never owns a hard availability yes/no. |
 | **Factual safety** | **Grounding validator** (`app/lib/grounding-validator.server.js`) | Blocks ungrounded claims (sizes/colors/stock/policy facts not present in the evidence pool) and non-answers on answer-workflows, forcing a synthesis retry. Owns "is this claim supported by what the model actually saw." |
@@ -38,6 +38,24 @@ to make it; everyone downstream may clean for safety but may not re-decide.**
 
 4. **Workflow is decided once.** TurnPlan decides the workflow before synthesis;
    downstream code reads `ctx.turnPlan.workflow` but never reclassifies.
+
+5. **No forced search from a raw non-product sentence.** A plan-driven forced
+   card search (`chat.jsx`, `forcedSearchAllowed`) may run ONLY when the plan is
+   a concrete commerce workflow AND the turn carries a concrete constraint
+   (named product / focus / category / color / condition / sale / price). It is
+   refused outright for `clarification` / `sizing_help` / `policy_account`, and
+   whenever the assistant's own answer is a clarifying question. This is what
+   stops "I need help choosing the right size" from force-searching the sentence
+   and surfacing a random product.
+
+6. **Sizing advice vs stock check.** "What size should I *get*?" is sizing
+   advice (`sizing_help` with no product context → ask; `named_product_advisory`
+   with a product → answer from fit/review data). "What sizes do you *have*?" is
+   `availability`. Generic sizing never shows cards.
+
+7. **Shopping a sale is commerce, not support.** "What's on sale" → `sale_browse`
+   (search `onSale=true`, show discounted cards, never a Support Hub CTA). Only
+   promo *mechanics* ("military discount?", "promo code?") are `policy_account`.
 
 ## Turn invariant log
 

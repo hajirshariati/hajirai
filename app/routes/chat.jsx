@@ -1383,6 +1383,43 @@ async function runPolicyTurnDispatch({ ctx, controller, encoder, retrievedChunks
 }
 
 
+// Does THIS turn carry a concrete commerce constraint a product search can use
+// (named product / focus / category / color / condition / sale / price cap)?
+// A forced card search must NOT run from a raw non-product sentence with none of
+// these — that's what surfaced "Mila Low Boot" under a generic sizing question.
+function turnHasConcreteCommerceConstraint(ctx) {
+  const plan = ctx?.turnPlan || {};
+  if (Array.isArray(plan.namedFamilies) && plan.namedFamilies.length > 0) return true;
+  if (ctx?.focusProduct) return true;
+  const msg = String(ctx?.latestUserMessage || "");
+  if (!msg.trim()) return false;
+  // sale / discount / price
+  if (/\b(on\s+sale|sale|deals?|discount(?:ed)?|clearance|markdown[s]?|promo(?:tion)?s?|cheap(?:er)?|under\s+\$?\d|below\s+\$?\d|less\s+than\s+\$?\d)\b/i.test(msg)) return true;
+  // color
+  if (/\b(black|white|ivory|cream|navy|blue|red|burgundy|pink|blush|rose|coral|green|olive|tan|beige|nude|taupe|brown|cognac|bronze|gold|silver|grey|gray|charcoal|champagne|purple|plum|yellow|orange)\b/i.test(msg)) return true;
+  // condition / use-case
+  if (/\b(plantar|fasciitis|arch|heel|bunion|neuroma|diabetic|neuropathy|overpronation|flat\s+feet|high\s+arch|standing|walking|running|work|travel|wedding|nursing)\b/i.test(msg)) return true;
+  // catalog category (merchant-configured) OR generic footwear category words
+  const cats = Array.isArray(ctx?.catalogCategories) ? ctx.catalogCategories : [];
+  for (const c of cats) {
+    const norm = String(c || "").trim().toLowerCase().replace(/s$/, "");
+    if (norm.length >= 3) { try { if (new RegExp(`\\b${norm}s?\\b`, "i").test(msg)) return true; } catch { /* skip */ } }
+  }
+  if (/\b(sandals?|sneakers?|boots?|shoes?|footwear|wedges?|flats?|heels?|slides?|loafers?|mules?|clogs?|slippers?|sock[s]?|orthotic[s]?|insole[s]?)\b/i.test(msg)) return true;
+  return false;
+}
+
+// The forced-card-search gate (the most important invariant): a plan-driven
+// forced search may run ONLY for a concrete commerce workflow WITH a concrete
+// constraint, and never when the assistant's own answer is a clarifying
+// question. Refuses for clarification / sizing_help / policy_account outright.
+function forcedSearchAllowed({ ctx, text }) {
+  const wf = ctx?.turnPlan?.workflow;
+  if (wf === "clarification" || wf === "sizing_help" || wf === "policy_account") return false;
+  if (text && looksLikeClarifyingQuestion(text)) return false;
+  return turnHasConcreteCommerceConstraint(ctx);
+}
+
 function shouldAttachProductCardsForTurn({ text, ctx, recommenderAskedForMoreInfo, orderTrackingTurn }) {
   const latest = ctx?.latestUserMessage || "";
   // Order-status / tracking / returns turns are answered in text (order
@@ -2070,6 +2107,13 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       }
     }
   }
+  // Commerce turns never punt to Support. A sale-browse turn that wrongly
+  // produced "Visit Support Hub" (Failure B) must show sale products, not a
+  // support link.
+  if (supportCTA && ctx?.turnPlan?.workflow === "sale_browse") {
+    console.log(`[chat] support CTA suppressed: sale_browse is a commerce turn (show sale products, not Support)`);
+    supportCTA = null;
+  }
 
   // Recovery hop — if the AI shipped pitch text without ever calling
   // search_products, but the customer's history mentions a condition
@@ -2259,7 +2303,15 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   // force the scoped plan-driven search (ensureProductTurnCards runs it when
   // shouldAttach is true and the pool is empty). This makes searchRequired
   // deterministic instead of the old warning-only missing_product_lookup.
-  const planNeedsSearch = planRequiresSearchFlag(ctx?.turnPlan);
+  // INVARIANT: never force a card search from a raw non-product sentence. A
+  // plan-driven forced search runs only for a concrete commerce workflow WITH a
+  // concrete constraint and when the answer isn't a clarifying question.
+  const planNeedsSearchRaw = planRequiresSearchFlag(ctx?.turnPlan);
+  const forcedOk = forcedSearchAllowed({ ctx, text: fullResponseText });
+  const planNeedsSearch = planNeedsSearchRaw && forcedOk;
+  if (planNeedsSearchRaw && !forcedOk) {
+    console.log(`[chat] turn-plan(${ctx?.turnPlan?.workflow}): forced search REFUSED — no concrete commerce constraint or clarifying answer (no raw-sentence search)`);
+  }
   if (planNeedsSearch && !productSearchAttempted) {
     console.log(`[chat] turn-plan(${ctx.turnPlan.workflow}): searchRequired but model did not search — forcing plan-driven search`);
   }
@@ -2574,6 +2626,25 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     }
   }
 
+
+  // Clarification card-wipe guard (Failure A). If the assistant's answer is a
+  // clarification asking for product/category/size info, it must ship with NO
+  // product cards and NO CTAs — UNLESS the plan explicitly pinned a product
+  // (availability pinned cards, or a focused product-display policy). This stops
+  // a "tell me which product and your usual size" reply from carrying a random
+  // browse card + "View All Women's Boots".
+  {
+    const planPinnedProduct = availabilityPinnedCards != null || planForcesProductDisplay(ctx?.turnPlan);
+    const wf = ctx?.turnPlan?.workflow;
+    const suppressByPlan = ctx?.turnPlan?.productDisplayPolicy === "suppress" || wf === "clarification" || wf === "sizing_help";
+    const clarifyingAnswer = looksLikeClarifyingQuestion(fullResponseText);
+    if (!planPinnedProduct && (suppressByPlan || clarifyingAnswer) && pool.length > 0) {
+      console.log(`[chat] clarification card-wipe: workflow=${wf} clarifyingAnswer=${clarifyingAnswer} — dropping ${pool.length} card(s) + CTAs (no pinned product)`);
+      pool = [];
+      supportCTA = null;
+      genericCTA = null;
+    }
+  }
 
   console.log(`[chat] emit textLen=${fullResponseText.length} poolSize=${pool.length} searchAttempted=${productSearchAttempted}`);
 

@@ -53,8 +53,47 @@ scenario("is it in stock (focus product)", { message: "Is it in stock in a size 
   { workflow: W.AVAILABILITY, productDisplayPolicy: "show_availability" });
 scenario("availability without product context falls to browse (no product to look up)", { message: "what sizes do you carry?" },
   { workflow: W.BROWSE });
-scenario("size question on a named product", { message: "what size should I get in the Savannah?", namedProduct: true },
+// "What size should I GET in X" is a fit/sizing ADVICE question about a named
+// product — focus it and answer from fit/variant/review data (advisory), NOT a
+// stock check (availability). Stock questions use "what sizes do you HAVE".
+scenario("sizing advice on a named product → named_product_advisory", { message: "what size should I get in the Savannah?", namedProduct: true },
+  { workflow: W.NAMED_PRODUCT_ADVISORY, searchRequired: true });
+scenario("stock question on a named product → availability", { message: "what sizes do you have in the Savannah?", namedProduct: true },
   { workflow: W.AVAILABILITY, searchRequired: true });
+
+// ── sizing_help (Failure A): generic sizing must NOT search or show cards ──
+scenario("generic 'help choosing the right size' → sizing_help, no search/cards", { message: "I need help choosing the right size" },
+  { workflow: W.SIZING_HELP, searchRequired: false, productDisplayPolicy: "suppress" });
+scenario("'what size should I get?' no context → sizing_help", { message: "What size should I get?" },
+  { workflow: W.SIZING_HELP, searchRequired: false, productDisplayPolicy: "suppress" });
+scenario("'help me pick my size' → sizing_help", { message: "Help me pick my size" },
+  { workflow: W.SIZING_HELP, searchRequired: false });
+scenario("'how do I know my Aetrex size?' → sizing_help", { message: "How do I know my Aetrex size?" },
+  { workflow: W.SIZING_HELP, searchRequired: false });
+scenario("'do these run true to size?' no context → sizing_help", { message: "Do these run true to size?" },
+  { workflow: W.SIZING_HELP, searchRequired: false });
+scenario("sizing with focus product → advisory (focus that product)", { message: "What size should I get?", focusProduct: { title: "Savannah Sandal - Champagne" } },
+  { workflow: W.NAMED_PRODUCT_ADVISORY, searchRequired: true, productDisplayPolicy: "show_focused" });
+
+// ── sale_browse (Failure B): shopping a sale is commerce, not support ──
+scenario("'show me current sales and promotions' → sale_browse", { message: "Show me current sales and promotions" },
+  { workflow: W.SALE_BROWSE, searchRequired: true, productDisplayPolicy: "show" });
+scenario("'what's on sale?' → sale_browse", { message: "What's on sale?" },
+  { workflow: W.SALE_BROWSE, searchRequired: true });
+scenario("'show me women's sneakers on sale' → sale_browse women", { message: "Show me women's sneakers on sale" },
+  { workflow: W.SALE_BROWSE, searchRequired: true, gender: "women" });
+scenario("'show me discounted sandals under $100' → sale_browse", { message: "Show me discounted sandals under $100" },
+  { workflow: W.SALE_BROWSE, searchRequired: true });
+scenario("'any deals?' → sale_browse", { message: "Any deals?" },
+  { workflow: W.SALE_BROWSE, searchRequired: true });
+
+// ── promo MECHANICS → policy, never a product search ──
+scenario("'do you have a military discount?' → policy_account, no cards", { message: "Do you have a military discount?" },
+  { workflow: W.POLICY_ACCOUNT, searchRequired: false, productDisplayPolicy: "suppress" });
+scenario("'can I use a promo code on sale sandals?' → policy_account", { message: "Can I use a promo code on sale sandals?" },
+  { workflow: W.POLICY_ACCOUNT, searchRequired: false });
+scenario("'can I stack discounts?' → policy_account", { message: "Can I stack discounts?" },
+  { workflow: W.POLICY_ACCOUNT, searchRequired: false });
 // Size/stock FOLLOW-UP after products were shown — no named product in the
 // message, but prior cards → availability, not clarification.
 scenario("'what about size 9?' after products → availability (not clarification)", { message: "What about size 9?", hasPriorCards: true },

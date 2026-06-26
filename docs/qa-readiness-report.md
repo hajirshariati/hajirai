@@ -11,17 +11,17 @@ phrasing layer is verified by manual PRD live-testing, not these suites.
 
 | Suite | Passing | Failing | Covers |
 |---|---:|---:|---|
-| `eval-live-core-flows` | 42 | 0 | 50 core scenarios: workflow + search/clarify/gender + availability card-count + leak/CTA/family invariants + same-session pivots |
+| `eval-live-core-flows` | 56 | 0 | core scenarios: workflow + search/clarify/gender + availability card-count + leak/CTA/family invariants + sizing + sale + same-session pivots + sale-search input |
 | `eval-availability-truth` | 49 | 0 | availability classification, soft color, style disambiguation, follow-up memory, width split |
 | `eval-variant-matcher` | 39 | 0 | size/width/SKU normalization, Aetrex labels, ranges, array-shape options |
-| `eval-turn-plan` | 88 | 0 | workflow classification across all 7 workflows |
+| `eval-turn-plan` | 103 | 0 | workflow classification across all 9 workflows (incl. sizing_help, sale_browse, promo-policy) |
 | `eval-turn-plan-gates` | 26 | 0 | executable gate deciders (search/display/clarifier) |
 | `eval-turn-plan-failures` | 19 | 0 | regression cases from prior PRD failures |
 | `eval-named-family-evidence` | 14 | 0 | named-family evidence requirement |
 | `eval-clarifier-and-detector` | 40 | 0 | clarifier blocking + specific-product detection |
 | `eval-evidence-alignment` | 16 | 0 | card/text family alignment |
 | `eval-grounding-validator` | 72 | 0 | factual-safety blocking/warning partition |
-| **Total** | **405** | **0** | |
+| **Total** | **434** | **0** | |
 
 Run all: `npm run build && for s in scripts/eval-*.mjs; do node "$s"; done`
 
@@ -35,6 +35,18 @@ this pass made was driven by a QA scenario that reproduced a failure:
   availability block never ran (even though `resolveAvailabilityRequest` already
   handled it). Fixed in `turn-plan.server.js` (`FOLLOWUP_AVAIL_RE`, gated to ≤5
   words + product context). Locked by `eval-live-core-flows`.
+- **Failure A — generic sizing showed a random product.** "I need help choosing
+  the right size" planned as `browse`/`searchRequired`, and the forced-search
+  layer searched the raw sentence → random "Mila Low Boot" + "View All Women's
+  Boots". Fixed with a `sizing_help` workflow (no search, no cards), the
+  `forcedSearchAllowed` invariant (no forced search without a concrete
+  constraint or when the answer is a clarifying question), and a clarification
+  card-wipe guard. Sizing on a named/focus product → `named_product_advisory`.
+- **Failure B — "show me current sales" gave a support answer.** Planned as
+  `browse` and raw-searched → 0 cards + Support Hub CTA. Fixed with a
+  `sale_browse` workflow (search `onSale=true` with category/gender/price, never
+  the raw sentence), promo-mechanics → `policy_account`, and Support-CTA
+  suppression on commerce turns.
 
 ## Known limitations
 
