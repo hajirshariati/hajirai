@@ -6,7 +6,7 @@ import { getCatalogCategories, getAllCatalogCategories, getCategoryGenderAvailab
 import { getActiveCampaigns, formatCampaignsForCS } from "../models/Campaign.server";
 import { buildSystemPrompt } from "../lib/chat-prompt.server";
 import { planTurn, buildTurnPlanPromptBlock, buildPlanClarifierRepair, planForcesProductDisplay, planRequiresSearch as planRequiresSearchFlag, clarifierGateDecision, isAnswerWorkflow } from "../lib/turn-plan.server";
-import { classifyAvailability, buildAvailabilityAnswer, AVAILABILITY_RESULT, resolveAvailabilityRequest, isAvailabilityFollowUp } from "../lib/availability-truth";
+import { classifyAvailability, buildAvailabilityAnswer, AVAILABILITY_RESULT, resolveAvailabilityRequest, isAvailabilityFollowUp, familyOfTitle, collectFamilyColors, constraintIntent } from "../lib/availability-truth";
 import { retrieveRelevantChunks } from "../lib/knowledge-chunks.server";
 import { buildKidsCoveragePrompt } from "../lib/kids-coverage.server";
 import { analyzeCategoryIntent, cardMatchesActiveGroup, textIntentDivergesFromGroup, matchingGroupsForText } from "../lib/category-intent.server";
@@ -2339,22 +2339,48 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   if (ctx.turnPlan?.workflow === "availability") {
     try {
       const fams = Array.isArray(ctx.turnPlan.namedFamilies) ? ctx.turnPlan.namedFamilies : [];
-      const latestC = extractUserConstraints(ctx.latestUserMessage || "");
-      const { family, color: reqColor, size: reqSize, width: reqWidth } = resolveAvailabilityRequest({
-        namedFamilies: fams,
-        latestConstraints: latestC,
-        focusProduct: ctx.focusProduct,
-        isFollowUp: isAvailabilityFollowUp(ctx.latestUserMessage || ""),
-      });
+      const latestMsg = ctx.latestUserMessage || "";
+      const isFollowUp = isAvailabilityFollowUp(latestMsg);
+      // The most recent PRIOR user message — for follow-ups ("what about 9?")
+      // to inherit the family/color/width of the prior availability question.
+      const priorUserMsg = (Array.isArray(ctx.messages) ? ctx.messages : [])
+        .filter((mm) => mm?.role === "user" && typeof mm.content === "string")
+        .map((mm) => mm.content)
+        .slice(0, -1)
+        .pop() || "";
+
+      // Resolve the family token first (cheap) so we can fetch its products and
+      // mine their colors for the parser.
+      let family = fams[0] || null;
+      if (!family && isFollowUp && ctx.focusProduct) family = familyOfTitle(ctx.focusProduct.title || "");
+
       if (family) {
         const famProducts = await prisma.product.findMany({
           where: { shop: ctx.shop, NOT: { status: { in: ["DRAFT", "ARCHIVED"] } }, title: { contains: family, mode: "insensitive" } },
           include: { variants: true },
           take: 50,
         });
-        const verdict = classifyAvailability({ products: famProducts, family, color: reqColor, size: reqSize, width: reqWidth });
+        const knownColors = collectFamilyColors(famProducts);
+        const req = resolveAvailabilityRequest({
+          message: latestMsg,
+          priorMessage: priorUserMsg,
+          namedFamilies: fams,
+          focusProduct: ctx.focusProduct,
+          isFollowUp,
+          knownColors,
+        });
+        // B. If the customer's text requested a constraint we couldn't parse,
+        // never claim AVAILABLE — force UNKNOWN.
+        const intent = constraintIntent(latestMsg, knownColors);
+        const priorIntent = isFollowUp ? constraintIntent(priorUserMsg, knownColors) : { color: false, size: false, width: false };
+        const unverified = [];
+        if ((intent.color || (isFollowUp && priorIntent.color)) && !req.color) unverified.push("color");
+        if ((intent.size || (isFollowUp && priorIntent.size)) && !req.size) unverified.push("size");
+        if ((intent.width || (isFollowUp && priorIntent.width)) && !req.width) unverified.push("width");
+
+        const verdict = classifyAvailability({ products: famProducts, family, color: req.color, size: req.size, width: req.width, unverifiedConstraints: unverified });
         console.log(
-          `[availability-truth] family=${family} color=${reqColor || "-"} size=${reqSize || "-"} width=${reqWidth || "-"} ` +
+          `[availability-truth] family=${family} color=${req.color || "-"} size=${req.size || "-"} width=${req.width || "-"} ` +
           `result=${verdict.result} reason=${verdict.reason || "-"}`,
         );
         fullResponseText = buildAvailabilityAnswer(verdict);

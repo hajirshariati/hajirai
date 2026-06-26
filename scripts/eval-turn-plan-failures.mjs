@@ -156,6 +156,22 @@ check("exhaustion line for availability is honest about unknown, names product",
   assert.doesNotMatch(txt, /take a look — these are the closest/i);
 });
 
+// ── browse gender enforcement (no men from account on no-gender browse) ──
+check("browse forces women onto a search that came in as men (account leak)", () => {
+  const plan = planTurn({ message: "Show me cute black sandals under $100" });
+  assert.equal(plan.workflow, W.BROWSE);
+  assert.equal(plan.gender, "women");
+  const out = enforceTurnPlanOnToolCall(searchCall({ gender: "men", category: "sandals", color: "black" }), { turnPlan: plan }, searchCall({ category: "sandals" }));
+  assert.equal(out.input.filters.gender, "women", "account-leaked men overridden to women");
+  assert.equal(out.input.filters.category, "sandals", "browse keeps category (only gender is forced)");
+});
+check("browse keeps stated men", () => {
+  const plan = planTurn({ message: "Show me black sandals for men" });
+  assert.equal(plan.gender, "men");
+  const out = enforceTurnPlanOnToolCall(searchCall({ gender: "men" }), { turnPlan: plan }, searchCall({}));
+  assert.equal(out.input.filters.gender, "men");
+});
+
 console.log("");
 if (fail === 0) {
   console.log(`PASS  ${pass} passed, 0 failed`);

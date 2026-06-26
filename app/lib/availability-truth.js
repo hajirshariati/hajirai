@@ -125,28 +125,121 @@ export function familyOfTitle(title) {
   return "";
 }
 
-// Resolve the availability REQUEST from current-turn signals only. Constraints
-// come from the LATEST message (passed in pre-extracted); a deictic / "what
-// about" follow-up inherits the family — and unstated color — from the
-// anchored focus product. Stale session memory is NEVER consulted, so a prior
-// Disney/sneakers or black/under-$100 turn can't leak in.
-export function resolveAvailabilityRequest({ namedFamilies = [], latestConstraints = {}, focusProduct = null, isFollowUp = false } = {}) {
-  let family = (namedFamilies && namedFamilies[0]) || null;
-  let color = latestConstraints.color || null;
-  const size = latestConstraints.size || null;
-  let width = latestConstraints.width || null;
-  if (focusProduct && isFollowUp) {
-    const focusFam = familyOfTitle(focusProduct.title || "");
-    if (!family && focusFam) family = focusFam;
-    if (family && family === focusFam) {
-      const focusColor = String(focusProduct.title || "").split(/\s[-–—]\s/).slice(1).join(" ").trim().toLowerCase();
-      if (!color && focusColor) color = focusColor;
+// Built-in footwear colors so champagne/bronze/taupe parse even when the
+// merchant color lexicon misses them. The caller also passes knownColors
+// (colors mined from the named family's product titles/variants) — so a color
+// that only appears in the catalog ("Savannah ... Champagne") still counts.
+const BUILTIN_COLORS = [
+  "black", "white", "ivory", "cream", "off-white", "off white", "bone",
+  "navy", "blue", "denim", "teal", "turquoise",
+  "red", "burgundy", "wine", "maroon", "pink", "blush", "rose", "fuchsia", "coral",
+  "green", "olive", "sage", "mint",
+  "tan", "beige", "nude", "taupe", "khaki", "sand", "stone",
+  "brown", "chocolate", "cognac", "espresso", "mocha", "camel", "chestnut",
+  "bronze", "copper", "gold", "silver", "pewter", "metallic",
+  "grey", "gray", "charcoal", "smoke", "graphite", "slate",
+  "champagne", "blush", "mauve", "lavender", "purple", "eggplant", "plum",
+  "yellow", "mustard", "orange", "cognac", "leopard", "snake", "floral",
+];
+function escapeRe(s) { return String(s).replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
+
+// The color a product title ends with ("Savannah ... - Champagne" → "champagne").
+export function colorFromTitle(title) {
+  const parts = String(title || "").split(/\s[-–—]\s/);
+  if (parts.length < 2) return "";
+  return parts[parts.length - 1].trim().toLowerCase();
+}
+
+// Loose intent: did the customer's message MENTION a color / size / width at
+// all? Used to refuse a false AVAILABLE when a requested constraint couldn't be
+// normalized ("size 7 wide" present but unparsed → UNKNOWN, not AVAILABLE).
+const SIZE_INTENT_RE = /\b(?:size\s+\d|in\s+(?:an?\s+)?\d{1,2}(?:\.5)?\b|\b\d{1,2}(?:\.5)?\s*(?:wide|narrow|medium|w|n|m)\b|\bsize\b|what\s+about\s+(?:an?\s+)?\d)/i;
+const WIDTH_INTENT_RE = /\b(wide|narrow|medium|extra[-\s]?wide|x-?wide|xw|\bw\b|\bn\b|\bm\b)\b/i;
+export function constraintIntent(message, knownColors = []) {
+  const m = String(message || "").toLowerCase();
+  const colorList = [...BUILTIN_COLORS, ...(knownColors || []).map((c) => String(c).toLowerCase())];
+  const color = colorList.some((c) => new RegExp(`\\b${escapeRe(c)}\\b`).test(m));
+  const size = SIZE_INTENT_RE.test(m);
+  // width intent only if a real width word appears in a size/width context
+  const width = /\b(extra[-\s]?wide|x-?wide|xw|wide|narrow)\b/i.test(m) || /\b\d{1,2}(?:\.5)?\s*(?:wide|narrow|w|n)\b/i.test(m);
+  return { color, size, width };
+}
+
+// Parse color / size / width directly from the raw message. Robust to the
+// phrasings customers actually use ("in black size 8", "in an 8", "what about
+// 9", "7 wide", "size 8.5"). Returns normalized values (size as a string like
+// "8" / "8.5"; width as wide|narrow|medium).
+export function parseAvailabilityConstraints(message, knownColors = []) {
+  const m = String(message || "").toLowerCase();
+
+  // Color: first builtin/known color that appears as a whole word.
+  let color = null;
+  const colorList = [...(knownColors || []).map((c) => String(c).toLowerCase()), ...BUILTIN_COLORS];
+  for (const c of colorList) {
+    if (c && new RegExp(`\\b${escapeRe(c)}\\b`).test(m)) { color = c; break; }
+  }
+
+  // Width.
+  let width = null;
+  if (/\b(extra[-\s]?wide|x-?wide|xw)\b/i.test(m)) width = "wide";
+  else if (/\bwide\b/i.test(m)) width = "wide";
+  else if (/\bnarrow\b/i.test(m)) width = "narrow";
+  else if (/\b(medium|regular|standard)\s+width\b/i.test(m)) width = "medium";
+
+  // Size: try size-context patterns, in priority order. Range 4–14 keeps real
+  // shoe sizes and rejects "$100" / "10 miles" (those aren't size-context).
+  let size = null;
+  const sizePatterns = [
+    /\bsize\s+(\d{1,2}(?:\.5)?)\b/i,
+    /\bwhat\s+about\s+(?:an?\s+|a\s+)?(\d{1,2}(?:\.5)?)\b/i,
+    /\b(?:in|get|wear|do\s+you\s+have|they\s+have|have)\s+(?:an?\s+|a\s+)?(\d{1,2}(?:\.5)?)\b/i,
+    /\b(\d{1,2}(?:\.5)?)\s*(?:wide|narrow|medium|w|n|m)\b/i,
+  ];
+  for (const re of sizePatterns) {
+    const mm = m.match(re);
+    if (mm) {
+      const n = parseFloat(mm[1]);
+      if (n >= 4 && n <= 14) { size = mm[1].replace(/^(\d+)$/, "$1"); break; }
     }
   }
+  // "7 wide" already captured size via the width-context pattern; if width is
+  // set but size still null, also peel a bare "N wide".
+  if (!size && width) {
+    const mm = m.match(/\b(\d{1,2}(?:\.5)?)\s*(?:wide|narrow|w|n)\b/i);
+    if (mm) { const n = parseFloat(mm[1]); if (n >= 4 && n <= 14) size = mm[1]; }
+  }
+
+  return { color, size, width };
+}
+
+// Resolve the availability REQUEST from CURRENT-turn signals only. Constraints
+// are parsed from the latest message (with the family's knownColors). A deictic
+// / "what about" follow-up that names no new family inherits family + color
+// from the focus product, and inherits color/size/width it didn't restate from
+// the PRIOR availability message. Stale session memory is NEVER consulted.
+export function resolveAvailabilityRequest({ message = "", priorMessage = "", namedFamilies = [], focusProduct = null, isFollowUp = false, knownColors = [] } = {}) {
+  const cur = parseAvailabilityConstraints(message, knownColors);
+
+  let family = (namedFamilies && namedFamilies[0]) || null;
+  if (!family && isFollowUp && focusProduct) family = familyOfTitle(focusProduct.title || "");
+
+  let color = cur.color;
+  let size = cur.size;
+  let width = cur.width;
+
+  if (isFollowUp && family) {
+    const prior = parseAvailabilityConstraints(priorMessage, knownColors);
+    const focusColor = focusProduct ? colorFromTitle(focusProduct.title || "") : "";
+    // New explicit value replaces prior; otherwise inherit prior availability.
+    if (!color) color = focusColor || prior.color || null;
+    if (!size) size = prior.size || null;
+    if (!width) width = prior.width || null;
+  }
+
   return { family, color, size, width };
 }
 
-const FOLLOWUP_RE = /\b(this one|that one|these|those|\bit\b|\bthis\b|\bthat\b|what\s+about|how\s+about)\b/i;
+const FOLLOWUP_RE = /\b(this one|that one|these|those|\bit\b|\bthis\b|\bthat\b|what\s+about|how\s+about|and\s+in\b|do\s+they\s+have)\b/i;
 export function isAvailabilityFollowUp(message) {
   return FOLLOWUP_RE.test(String(message || ""));
 }
@@ -189,10 +282,21 @@ function productHasInStockVariant(product) {
   });
 }
 
+// All colors carried by a set of products (titles + variant Color options).
+// The caller passes the named family's products so the parser can recognize a
+// catalog-only color ("champagne") the merchant lexicon misses.
+export function collectFamilyColors(products = []) {
+  const set = new Set();
+  for (const p of products || []) for (const c of productColors(p)) if (c) set.add(c);
+  return Array.from(set);
+}
+
 // Classify availability for a single family request. `products` is the set of
 // catalog products (any family) — we filter to the named family ourselves so
-// the caller can pass a broad fetch.
-export function classifyAvailability({ products = [], family = "", color = null, size = null, width = null } = {}) {
+// the caller can pass a broad fetch. `unverifiedConstraints` is a list of
+// constraint names the customer DID request in text but we couldn't normalize
+// — when the product exists, that forces UNKNOWN (never a false AVAILABLE).
+export function classifyAvailability({ products = [], family = "", color = null, size = null, width = null, unverifiedConstraints = [] } = {}) {
   const fam = String(family || "").toLowerCase();
   const reqColor = color ? String(color).toLowerCase().trim() : null;
   const sz = normalizeVariantSize(size);
@@ -201,6 +305,17 @@ export function classifyAvailability({ products = [], family = "", color = null,
   const famProducts = (products || []).filter((p) => familyOfTitle(p?.title || "") === fam);
   if (famProducts.length === 0) {
     return { result: AVAILABILITY_RESULT.NOT_FOUND, product: null, family: fam, color: reqColor, size: sz, width: wd, reason: "family_not_found" };
+  }
+
+  // B. The customer asked for a size/width/color we couldn't parse — the family
+  // exists but we can't verify the exact combo. Never claim AVAILABLE.
+  if (Array.isArray(unverifiedConstraints) && unverifiedConstraints.length > 0) {
+    let cands = famProducts;
+    if (reqColor) {
+      const cm = famProducts.filter((p) => productMatchesColor(p, reqColor));
+      if (cm.length > 0) cands = cm;
+    }
+    return { result: AVAILABILITY_RESULT.UNKNOWN, product: cands[0], family: fam, color: reqColor, size: sz, width: wd, reason: "unparsed_requested_constraints" };
   }
 
   // Color filter — the family exists; is the requested color carried?

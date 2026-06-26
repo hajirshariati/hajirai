@@ -101,6 +101,16 @@ scenario("specific browse does not ask gender", { message: "show me women's snea
   { workflow: W.BROWSE, clarificationAllowed: false });
 scenario("looking for clogs", { message: "I'm looking for some clogs" },
   { workflow: W.BROWSE, searchRequired: true });
+// Browse gender default — primary line (women) when no gender stated; never
+// inferred from a logged-in account. Stated gender still wins.
+scenario("cute black sandals under $100 → women default", { message: "Show me cute black sandals under $100" },
+  { workflow: W.BROWSE, gender: "women" });
+scenario("black sandals for my husband → men", { message: "Show me black sandals for my husband" },
+  { workflow: W.BROWSE, gender: "men" });
+scenario("black sandals for men → men", { message: "Show me black sandals for men" },
+  { workflow: W.BROWSE, gender: "men" });
+scenario("black sandals for women → women", { message: "Show me black sandals for women" },
+  { workflow: W.BROWSE, gender: "women" });
 
 // ── 7. clarification / no-data ────────────────────────────────────
 scenario("vague hello", { message: "hi there" },

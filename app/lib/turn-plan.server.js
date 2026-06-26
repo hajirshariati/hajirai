@@ -244,7 +244,10 @@ export function planTurn({
       clarificationAllowed: genderUnstated && /\b(shoes?|footwear)\b/i.test(m) && words(m) <= 6,
       productDisplayPolicy: "show",
       answerRequirements: reqs({ concise: true }),
-      gender: genderFor(false),
+      // Default to the primary line (women) when the customer states no gender
+      // — never infer men from a logged-in account/name. A stated men/women (or
+      // husband/wife/etc.) still wins via resolveStatedGender.
+      gender: genderFor(true),
       directives: ["Search and show matching products with a short framing sentence."],
     });
   }

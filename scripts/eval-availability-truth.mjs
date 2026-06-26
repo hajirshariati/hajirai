@@ -111,50 +111,98 @@ check("verdict.product is the named family product (for card display)", () => {
   assert.equal(v.product.handle, "jillian-black");
 });
 
-// ── #8 same-session request resolution (no stale leakage) ─────────────
-check("B after Disney: Savannah availability ignores stale category/sneakers", () => {
-  // Prior turn was Disney sneakers; latest names Savannah champagne 7 wide.
+// ── A. constraint parsing straight from the message ───────────────────
+import { parseAvailabilityConstraints, constraintIntent } from "../app/lib/availability-truth.js";
+const parse = (msg, known = []) => parseAvailabilityConstraints(msg, known);
+check("'Savannah in champagne size 7 wide' parses champagne/7/wide", () => {
+  const c = parse("Do you have Savannah in champagne size 7 wide?", ["champagne"]);
+  assert.equal(c.color, "champagne"); assert.equal(c.size, "7"); assert.equal(c.width, "wide");
+});
+check("'Jillian in black size 8' parses black/8", () => {
+  const c = parse("Do you have Jillian in black size 8?");
+  assert.equal(c.color, "black"); assert.equal(c.size, "8"); assert.equal(c.width, null);
+});
+check("'Jillian in pink' parses pink, no size", () => {
+  const c = parse("Do you have Jillian in pink?");
+  assert.equal(c.color, "pink"); assert.equal(c.size, null);
+});
+check("'in an 8' / 'do you have a 9' parse the size", () => {
+  assert.equal(parse("Do you have it in an 8?").size, "8");
+  assert.equal(parse("do you have a 9?").size, "9");
+  assert.equal(parse("size 8.5").size, "8.5");
+});
+check("'7 wide' parses size 7 + width wide", () => {
+  const c = parse("do you have a 7 wide?");
+  assert.equal(c.size, "7"); assert.equal(c.width, "wide");
+});
+check("champagne counts even when only in catalog (knownColors)", () => {
+  assert.equal(parse("is it available in champagne?", ["champagne"]).color, "champagne");
+});
+check("'under $100' / '10 miles' are NOT parsed as sizes", () => {
+  assert.equal(parse("cute black sandals under $100").size, null);
+  assert.equal(parse("walking 10 miles a day").size, null);
+});
+check("constraintIntent flags requested size/width/color", () => {
+  const i = constraintIntent("Savannah in champagne size 7 wide", ["champagne"]);
+  assert.equal(i.color, true); assert.equal(i.size, true); assert.equal(i.width, true);
+});
+
+// ── C. follow-up state inheritance from the prior message ─────────────
+check("'what about size 9?' after Savannah champagne 7 wide → savannah/champagne/9/wide", () => {
   const req = resolveAvailabilityRequest({
-    namedFamilies: ["savannah"],
-    latestConstraints: { color: "champagne", size: "7", width: "wide" },
-    focusProduct: { title: "Carly Sparkle Sneaker - Black" }, // stale Disney anchor
-    isFollowUp: isAvailabilityFollowUp("Do you have Savannah in champagne size 7 wide?"),
+    message: "What about size 9?",
+    priorMessage: "Do you have Savannah in champagne size 7 wide?",
+    namedFamilies: [],
+    focusProduct: { title: "Savannah Adjustable Quarter Strap Sandal - Champagne" },
+    isFollowUp: true,
+    knownColors: ["champagne"],
   });
-  assert.equal(req.family, "savannah");        // NOT carly/sneaker
-  assert.equal(req.color, "champagne");        // NOT stale black
+  assert.equal(req.family, "savannah");
+  assert.equal(req.color, "champagne"); // inherited from focus/prior
+  assert.equal(req.size, "9");          // new size overrides prior 7
+  assert.equal(req.width, "wide");      // inherited prior width
+});
+check("'and in black?' after Jillian size 8 → jillian/black/8", () => {
+  const req = resolveAvailabilityRequest({
+    message: "And in black?",
+    priorMessage: "Do you have Jillian in size 8?",
+    namedFamilies: [],
+    focusProduct: { title: "Jillian Braided Quarter Strap Sandal - Navy" },
+    isFollowUp: true,
+  });
+  assert.equal(req.family, "jillian");
+  assert.equal(req.color, "black"); // new color replaces prior/focus navy
+  assert.equal(req.size, "8");      // inherited prior size
+});
+check("fresh named question does NOT inherit from a stale focus", () => {
+  const req = resolveAvailabilityRequest({
+    message: "Do you have Savannah in champagne size 7 wide?",
+    priorMessage: "Show me cute black sandals under $100",
+    namedFamilies: ["savannah"],
+    focusProduct: { title: "Some Sandal - Black" },
+    isFollowUp: false,
+    knownColors: ["champagne"],
+  });
+  assert.equal(req.family, "savannah");
+  assert.equal(req.color, "champagne"); // NOT inherited black
   assert.equal(req.size, "7");
   assert.equal(req.width, "wide");
 });
-check("'what about size 9?' follow-up keeps Jillian + black, overrides size", () => {
-  assert.equal(isAvailabilityFollowUp("What about size 9?"), true);
+check("non-follow-up with no named family does not guess a family", () => {
   const req = resolveAvailabilityRequest({
-    namedFamilies: [], // the follow-up names no family
-    latestConstraints: { size: "9" },
-    focusProduct: { title: "Jillian Braided Quarter Strap Sandal - Black" },
-    isFollowUp: true,
-  });
-  assert.equal(req.family, "jillian");   // inherited from focus
-  assert.equal(req.color, "black");      // inherited prior color
-  assert.equal(req.size, "9");           // new size from latest
-});
-check("Savannah availability after 'cute black sandals under $100' does NOT inherit black", () => {
-  const req = resolveAvailabilityRequest({
-    namedFamilies: ["savannah"],
-    latestConstraints: { color: "champagne", size: "7", width: "wide" },
-    focusProduct: null,
-    isFollowUp: false, // fresh named question, not a follow-up
-  });
-  assert.equal(req.family, "savannah");
-  assert.equal(req.color, "champagne");  // NOT inherited black/under-$100
-});
-check("non-follow-up does not inherit family from a stale focus", () => {
-  const req = resolveAvailabilityRequest({
+    message: "what size?",
     namedFamilies: [],
-    latestConstraints: { size: "7" },
     focusProduct: { title: "Jillian Braided Quarter Strap Sandal - Black" },
     isFollowUp: false,
   });
-  assert.equal(req.family, null); // no family named, not a follow-up → don't guess
+  assert.equal(req.family, null);
+});
+
+// ── B. unparsed requested constraint → UNKNOWN, never false AVAILABLE ──
+check("requested size present but unparsed → UNKNOWN (not AVAILABLE)", () => {
+  const v = classifyAvailability({ products: CATALOG, family: "jillian", color: "black", size: null, width: null, unverifiedConstraints: ["size"] });
+  assert.equal(v.result, R.UNKNOWN);
+  assert.equal(v.reason, "unparsed_requested_constraints");
 });
 
 console.log("");

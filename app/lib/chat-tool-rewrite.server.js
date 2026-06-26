@@ -891,7 +891,13 @@ const KIDS_GENDER_TOKENS = new Set(["kids", "kid", "boys", "boy", "girls", "girl
 
 export function enforceTurnPlanOnToolCall(toolCall, ctx, original) {
   const plan = ctx?.turnPlan;
-  if (!plan || !PLAN_ANSWER_WORKFLOWS.has(plan.workflow)) return toolCall;
+  if (!plan) return toolCall;
+  const isAnswerWf = PLAN_ANSWER_WORKFLOWS.has(plan.workflow);
+  const isBrowse = plan.workflow === "browse";
+  // Gender authority applies to answer workflows AND browse (so a logged-in
+  // account/name can't push a no-gender "cute black sandals" turn to men's).
+  // The category/variant logic below is answer-workflow only.
+  if (!isAnswerWf && !isBrowse) return toolCall;
   if (toolCall.name !== "search_products" && toolCall.name !== "find_similar_products") return toolCall;
 
   const filters = { ...(toolCall.input?.filters || {}) };
@@ -906,6 +912,10 @@ export function enforceTurnPlanOnToolCall(toolCall, ctx, original) {
       filters.gender = plan.gender;
       changed = true;
     }
+  }
+  if (isBrowse) {
+    if (!changed) return toolCall;
+    return { ...toolCall, input: { ...toolCall.input, filters } };
   }
 
   // 2. Availability must preserve the variant constraints the customer named.
