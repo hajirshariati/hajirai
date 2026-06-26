@@ -214,31 +214,48 @@ function shortenToBudget(text, maxChars = SHORTEN_CHARS) {
   if (!out) out = t.slice(0, maxChars).replace(/\s+\S*$/, "").trim();
   return out;
 }
-// Deterministic comparison compaction: keep whole sentences up to ~120 words /
-// 700 chars. This is the cheap, no-model path the contract calls for — when a
-// comparison draft is too long we trim it here instead of re-running the agent.
-function compactComparison(text) {
+// Deterministic comparison compaction (no model call): a chat-bubble comparison
+// is AT MOST 4 sentences and <=110 words — first sentence picks one, second is
+// the tradeoff, third is when to choose the other, optional fourth. We keep the
+// first <=4 sentences, then drop trailing sentences (and finally hard-truncate a
+// single runaway sentence) until <=110 words. ALWAYS applied to comparison —
+// 646-687 char drafts were shipping because they slipped under the 700-char cap.
+const COMPARISON_MAX_WORDS = 110;
+const COMPARISON_MAX_SENTENCES = 4;
+function wordCount(s) { return String(s || "").trim().split(/\s+/).filter(Boolean).length; }
+export function compactComparison(text) {
   const t = String(text || "").trim();
-  const words = t.split(/\s+/).filter(Boolean);
-  if (words.length <= 120 && t.length <= 700) return t;
-  const sentences = t.split(/(?<=[.!?])\s+/);
-  let out = "";
-  for (const s of sentences) {
-    const candidate = out ? out + " " + s : s;
-    if (out && (candidate.split(/\s+/).filter(Boolean).length > 120 || candidate.length > 700)) break;
-    out = candidate;
+  if (!t) return t;
+  let sentences = t.split(/(?<=[.!?])\s+/).filter(Boolean).slice(0, COMPARISON_MAX_SENTENCES);
+  let out = sentences.join(" ").trim();
+  while (sentences.length > 1 && wordCount(out) > COMPARISON_MAX_WORDS) {
+    sentences = sentences.slice(0, -1);
+    out = sentences.join(" ").trim();
   }
-  if (!out) out = words.slice(0, 120).join(" ");
-  return out.trim();
+  if (wordCount(out) > COMPARISON_MAX_WORDS) {
+    const w = out.split(/\s+/).filter(Boolean).slice(0, COMPARISON_MAX_WORDS);
+    out = w.join(" ").replace(/[\s,;:]+$/, "");
+    if (!/[.!?]$/.test(out)) out += ".";
+  }
+  return out;
 }
 function applyLengthCap(result, warnings, workflow = "") {
+  if (!result?.fullResponseText) return result;
+  // Comparison: ALWAYS compact to the bubble shape, regardless of whether the
+  // validator flagged too_long (a 687-char draft is still too long for a bubble).
+  if (workflow === "comparison") {
+    const trimmed = compactComparison(result.fullResponseText);
+    if (trimmed.length < result.fullResponseText.length) {
+      console.log(`[grounding-retry] comparison compact: ${result.fullResponseText.length}→${trimmed.length} chars (${wordCount(trimmed)} words)`);
+      return { ...result, fullResponseText: trimmed };
+    }
+    return result;
+  }
   const tooLong = Array.isArray(warnings) && warnings.some((w) => w.kind === "too_long");
-  if (!tooLong || !result?.fullResponseText) return result;
-  const trimmed = workflow === "comparison"
-    ? compactComparison(result.fullResponseText)
-    : shortenToBudget(result.fullResponseText);
+  if (!tooLong) return result;
+  const trimmed = shortenToBudget(result.fullResponseText);
   if (trimmed.length < result.fullResponseText.length) {
-    console.log(`[grounding-retry] length cap (${workflow || "retail"}): trimmed ${result.fullResponseText.length}→${trimmed.length} chars`);
+    console.log(`[grounding-retry] length cap (retail): trimmed ${result.fullResponseText.length}→${trimmed.length} chars`);
     return { ...result, fullResponseText: trimmed };
   }
   return result;
@@ -328,9 +345,15 @@ export async function runWithGroundingRetry({
     // `attempt` lets the caller route models per attempt — e.g. run
     // attempt 0 on Haiku and escalate retries to Sonnet so a validator
     // rejection gets the stronger model for the correction.
-    const result = await runLoop({ messages: messages.slice(), attempt, rewriteOnly: nextRewriteOnly });
+    const thisAttemptRewriteOnly = nextRewriteOnly;
+    const result = await runLoop({ messages: messages.slice(), attempt, rewriteOnly: thisAttemptRewriteOnly });
     last = result;
     mergeUsage(result?.totalUsage);
+    // INVARIANT: a comparison turn must not exceed attempt 1 with tools on. A
+    // retry (attempt>0) that re-ran search instead of rewriting is a violation.
+    if (planWorkflow === "comparison" && attempt > 0 && !thisAttemptRewriteOnly) {
+      console.warn(`[grounding-retry] VIOLATION comparison attempt=${attempt + 1} re-ran tools (expected rewrite-only)`);
+    }
     const text = result?.fullResponseText || "";
     const pool = gatherPoolFromResult(result, messages);
     const validation = validateGrounding({
@@ -399,6 +422,11 @@ export async function runWithGroundingRetry({
     nextRewriteOnly =
       (validation.errors.length > 0 && validation.errors.every((e) => REWRITE_ONLY_KINDS.has(e.kind))) ||
       (onlyAnswerNonAnswer && pool.length > 0);
+    // COMPARISON: both products' facts are already in the pool — a retry must
+    // NEVER re-run tools/search. Force rewrite-only so the correction is a cheap
+    // tools-off rewrite from existing evidence (invariant: comparison attempts
+    // beyond the first are always rewrite-only).
+    if (planWorkflow === "comparison") nextRewriteOnly = true;
 
     // Hand the errors back to the model. The retry instruction is
     // appended as a NEW user turn so the model treats it as a

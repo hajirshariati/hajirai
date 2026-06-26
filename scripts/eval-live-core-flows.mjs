@@ -19,6 +19,7 @@
 
 import assert from "node:assert/strict";
 import { planTurn, WORKFLOWS } from "../app/lib/turn-plan.server.js";
+import { compactComparison } from "../app/lib/llm-owns-turn.server.js";
 import {
   classifyAvailability,
   buildAvailabilityAnswer,
@@ -265,6 +266,35 @@ check("comparison with a missing family pins only the family that exists", () =>
   const cards = pickComparisonCards(pool, ["jillian", "savannah"]);
   assert.equal(cards.length, 1);
   assert.match(cards[0].title, /Jillian/);
+});
+
+// ── comparison compaction: <=4 sentences, <=110 words, deterministic ──
+const WORDS = (s) => String(s).trim().split(/\s+/).filter(Boolean).length;
+const SENTS = (s) => String(s).trim().split(/(?<=[.!?])\s+/).filter(Boolean).length;
+check("compactComparison caps a long draft to <=4 sentences and <=110 words", () => {
+  const draft =
+    "For all-day walking I would lean Savannah because it has a more active, supportive build with a contoured footbed and adjustable straps. " +
+    "Jillian is prettier and very comfortable for casual all-day wear around town. " +
+    "But Savannah is the safer choice if you will be on your feet for many hours. " +
+    "If style matters most choose Jillian. If comfort mileage matters most choose Savannah. " +
+    "Either way both are solid Aetrex picks with quality materials.";
+  const out = compactComparison(draft);
+  assert.ok(SENTS(out) <= 4, `sentences=${SENTS(out)}`);
+  assert.ok(WORDS(out) <= 110, `words=${WORDS(out)}`);
+  assert.ok(out.length < draft.length, "should have trimmed");
+});
+check("compactComparison leaves an already-concise verdict unchanged", () => {
+  const concise =
+    "For all-day walking I'd lean Savannah — more active, supportive build. " +
+    "Jillian is prettier and fine for casual wear, but Savannah wins for hours on your feet. " +
+    "Choose Jillian for style, Savannah for comfort mileage.";
+  assert.equal(compactComparison(concise), concise);
+  assert.ok(WORDS(concise) <= 110);
+});
+check("compactComparison hard-caps a single runaway sentence at 110 words", () => {
+  const runaway = "Savannah " + "very ".repeat(200) + "supportive.";
+  const out = compactComparison(runaway);
+  assert.ok(WORDS(out) <= 110, `words=${WORDS(out)}`);
 });
 
 console.log("");

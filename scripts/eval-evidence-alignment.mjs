@@ -195,6 +195,47 @@ check("C: Jillian sizing turn is advisory, no stale color leaks into forced sear
   assert.equal(out.input.filters.category, undefined, "stale category not applied");
 });
 
+// ── condition/advisory forced search builds a STRUCTURED query (not raw) ──
+const conditionCtx = (msg) => ({
+  latestUserMessage: msg,
+  turnPlan: { workflow: "condition_recommendation", gender: "women" },
+  // Deliberately stale memory — must NOT leak into the structured search.
+  sessionMemory: { explicit: { category: "sneakers", size: "9", width: "wide", onSale: true } },
+  resolverState: { matched_constraints: { category: "sneakers", size: "9", width: "wide" } },
+  sessionGender: "women",
+});
+check("condition: 'supportive sandals for vacation walking, cute' → structured query + category", () => {
+  const msg = "I need supportive sandals for vacation walking, but I also want something cute. What would you pick?";
+  const out = buildAnswerWorkflowForcedSearch({ ctx: conditionCtx(msg), capturedInput: null });
+  const q = String(out.input.query).toLowerCase();
+  assert.match(q, /supportive/);
+  assert.match(q, /cute/);
+  assert.match(q, /walking/);
+  assert.match(q, /sandals/);
+  assert.notEqual(q, msg.toLowerCase(), "must NOT raw-query the whole sentence");
+  assert.ok(q.length < 40, `query should be compact, got: ${q}`);
+  assert.equal(out.input.filters.category, "sandals");
+  assert.equal(out.input.filters.gender, "women");
+});
+check("condition: no stale sale/size/width leaks into the forced search", () => {
+  const out = buildAnswerWorkflowForcedSearch({ ctx: conditionCtx("I need supportive sandals for walking"), capturedInput: null });
+  assert.ok(!out.input.onSale, "stale onSale leaked");
+  assert.equal(out.input.filters.size, undefined, "stale size leaked");
+  assert.equal(out.input.filters.width, undefined, "stale width leaked");
+  assert.notEqual(out.input.filters.category, "sneakers", "stale sneakers category leaked");
+});
+check("condition: 'cute shoes for standing all day at a wedding' → structured comfort query", () => {
+  const msg = "I need cute shoes for standing all day at a wedding";
+  const out = buildAnswerWorkflowForcedSearch({ ctx: conditionCtx(msg), capturedInput: null });
+  const q = String(out.input.query).toLowerCase();
+  assert.match(q, /cute/);
+  assert.notEqual(q, msg.toLowerCase(), "must NOT raw-query the whole sentence");
+  assert.ok(q.length < 40, `query should be compact, got: ${q}`);
+  // a structured comfort/occasion/category term should surface (wedding→dress,
+  // shoes→footwear, etc.) — never the raw sentence.
+  assert.ok(/standing|wedding|dress|shoes|footwear|sandal|loafer|comfort/.test(q), `expected a structured term, got: ${q}`);
+});
+
 console.log("");
 if (fail === 0) {
   console.log(`PASS  ${pass} passed, 0 failed`);

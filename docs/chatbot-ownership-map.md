@@ -58,12 +58,22 @@ to make it; everyone downstream may clean for safety but may not re-decide.**
    (search `onSale=true`, show discounted cards, never a Support Hub CTA). Only
    promo *mechanics* ("military discount?", "promo code?") are `policy_account`.
 
-8. **Comparison is a governed CONCISE workflow.** ≤120 words, answer-first
-   ("Pick X for Y. Choose Z if A."), ≤3 facts/side, no essay. The validator caps
-   length even when "compare/vs" reads as a detail request; `too_long` stays a
-   WARNING (never a blocking retry) and is fixed by the deterministic
-   `compactComparison` trim at ship time — no tool re-search. Cards: ≤4, one per
-   named family. No broad "View All" CTA — the cards ARE the comparison.
+8. **Comparison is a governed CONCISE workflow.** Bubble shape: ≤4 sentences,
+   ≤110 words, answer-first ("Pick X for Y. Choose Z if A."). `compactComparison`
+   is applied **deterministically to every comparison answer at ship time** (not
+   gated on a `too_long` warning) — first ≤4 sentences, then drop trailing
+   sentences / hard-truncate to ≤110 words. **Retries never re-run tools:** both
+   products' facts are already pooled, so any comparison retry is forced
+   rewrite-only (tools off); a comparison attempt >1 that searched logs a
+   `[grounding-retry] VIOLATION`. Cards: ≤4, one per named family. No broad "View
+   All" CTA — the cards ARE the comparison.
+
+10. **Condition / advisory forced search is STRUCTURED, never the raw sentence.**
+    With no named family, `buildAnswerWorkflowForcedSearch` assembles the query
+    from the latest message's constraints — support + style adjective + use-case
+    + condition + category (e.g. "supportive cute walking sandals", category=
+    sandals) — instead of raw-querying the whole sentence. Stale memory
+    (size/width/onSale/category) never leaks in.
 
 9. **Memory hygiene.** Variant-level (`size`/`width`) and sale (`onSale`)
    constraints are turn-ephemeral: a prior availability/sale turn's values never

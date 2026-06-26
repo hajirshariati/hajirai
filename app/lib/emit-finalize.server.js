@@ -301,14 +301,34 @@ export function buildAnswerWorkflowForcedSearch({ ctx = {}, capturedInput = null
   // them in text and the customer checks the card.
   if (latest.color) filters.color = latest.color;
 
-  // Query: the captured family search (best — names the family), else the raw
-  // latest message (which contains the family name), else "shoes".
   const capturedQuery = capturedInput?.query ? String(capturedInput.query).trim() : "";
-  const query = capturedQuery || latestMsg.slice(0, 160).trim() || "shoes";
+  let query;
+  let category = null;
+  if (capturedQuery) {
+    // Family-named workflow (comparison / named-product advisory): the captured
+    // family search owns the query — it already names the family.
+    query = capturedQuery;
+  } else {
+    // Condition / advisory with NO named family: build a STRUCTURED query from
+    // the LATEST message's constraints — support + style adjective + use-case +
+    // condition + category — instead of raw-querying the whole sentence. e.g.
+    // "I need supportive sandals for vacation walking, but cute" →
+    // "supportive cute walking sandals", category=sandals. Apply the category
+    // as a real filter (the log showed category=- because it never was).
+    const support = /\b(supportive|support|arch\s*support|cushion(?:ed|ing)?|stability|orthopedic|comfort(?:able)?)\b/i.test(latestMsg) ? "supportive" : "";
+    const styleMatch = latestMsg.match(/\b(cute|stylish|dressy|elegant|chic|pretty|fashionable|sporty|casual|sleek|classy|trendy)\b/i);
+    const style = styleMatch ? styleMatch[1].toLowerCase() : "";
+    const structuredQuery = [support, style, latest.useCase, latest.condition, latest.category]
+      .filter(Boolean)
+      .join(" ")
+      .trim();
+    if (latest.category) { category = latest.category; filters.category = latest.category; }
+    query = structuredQuery || latestMsg.slice(0, 160).trim() || "shoes";
+  }
 
   return {
     input: { query, filters, limit: 6 },
-    scope: { gender, color: latest.color, size: latest.size, width: latest.width },
+    scope: { gender, category, color: latest.color, useCase: latest.useCase || null },
   };
 }
 
