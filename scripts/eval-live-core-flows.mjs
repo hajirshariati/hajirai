@@ -272,6 +272,31 @@ check("comparison with a missing family pins only the family that exists", () =>
   assert.equal(cards.length, 1);
   assert.match(cards[0].title, /Jillian/);
 });
+// NEW CONTRACT: a comparison turn NEVER falls back to generic scorer cards.
+// When the pin finds NO named-family card, the turn ships text-only (0 pinned
+// cards) rather than letting the scorer flood the carousel with unrelated
+// products. (chat.jsx sets comparisonPinnedCards=[] in this case.)
+check("comparison pin total miss → 0 cards (text-only, scorer suppressed)", () => {
+  const unrelated = [
+    { title: "Romy Wedge Sandal - Tan" },
+    { title: "Lina Slide Sandal - Navy" },
+    { title: "Mila Low Boot - Brown" },
+  ];
+  const cards = pickComparisonCards(unrelated, ["jillian", "savannah"]);
+  assert.equal(cards.length, 0, "no named family in pool → pin 0 cards, never scorer cards");
+});
+// The card-owner invariant (mirrors the chat.jsx turn-invariant check): on a
+// comparison turn with cards shown, the owner MUST be the comparison pin —
+// cardOwner=scorer is a contract violation.
+function comparisonCardOwnerViolation({ workflow, finalCards, cardOwner }) {
+  return workflow === "comparison" && finalCards > 0 && cardOwner !== "comparison";
+}
+check("invariant: comparison + finalCards>0 + cardOwner=scorer is a VIOLATION", () => {
+  assert.equal(comparisonCardOwnerViolation({ workflow: "comparison", finalCards: 3, cardOwner: "scorer" }), true);
+  assert.equal(comparisonCardOwnerViolation({ workflow: "comparison", finalCards: 2, cardOwner: "comparison" }), false);
+  assert.equal(comparisonCardOwnerViolation({ workflow: "comparison", finalCards: 0, cardOwner: "none" }), false, "text-only comparison is fine");
+  assert.equal(comparisonCardOwnerViolation({ workflow: "browse", finalCards: 3, cardOwner: "scorer" }), false, "scorer is fine on non-comparison turns");
+});
 
 // ── comparison compaction: <=4 sentences, <=110 words, deterministic ──
 const WORDS = (s) => String(s).trim().split(/\s+/).filter(Boolean).length;

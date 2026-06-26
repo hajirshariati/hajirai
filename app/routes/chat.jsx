@@ -2345,11 +2345,28 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   // INVARIANT: never force a card search from a raw non-product sentence. A
   // plan-driven forced search runs only for a concrete commerce workflow WITH a
   // concrete constraint and when the answer isn't a clarifying question.
+  // REWRITE-ONLY RETRY. When runWithGroundingRetry forces a tools-off rewrite
+  // (comparison / evidence-plan, or a style-only fix), the cards were already
+  // chosen on a prior attempt and are authoritative. A rewrite-only pass must
+  // NOT search again and must NOT let the scorer re-pick — it only rewrites the
+  // TEXT from existing evidence. We carry the prior attempt's pinned cards +
+  // owner so the same cards survive the retry (no scorer takeover).
+  const rewriteOnlyRetry = ctx?.rewriteOnlyRetry === true;
+  const carriedCards =
+    rewriteOnlyRetry && Array.isArray(ctx?.carriedCards) && ctx.carriedCards.length > 0
+      ? ctx.carriedCards
+      : null;
+  const carriedCardOwner = carriedCards ? (ctx?.carriedCardOwner || null) : null;
+
   const planNeedsSearchRaw = planRequiresSearchFlag(ctx?.turnPlan);
   const forcedOk = forcedSearchAllowed({ ctx, text: fullResponseText });
-  const planNeedsSearch = planNeedsSearchRaw && forcedOk;
+  // Rewrite-only retries never force a plan-driven search.
+  const planNeedsSearch = planNeedsSearchRaw && forcedOk && !rewriteOnlyRetry;
   if (planNeedsSearchRaw && !forcedOk) {
     console.log(`[chat] turn-plan(${ctx?.turnPlan?.workflow}): forced search REFUSED — no concrete commerce constraint or clarifying answer (no raw-sentence search)`);
+  }
+  if (rewriteOnlyRetry && planNeedsSearchRaw) {
+    console.log(`[chat] turn-plan(${ctx?.turnPlan?.workflow}): rewrite-only retry — skipping plan-driven forced search (reuse prior evidence)`);
   }
   if (planNeedsSearch && !productSearchAttempted) {
     console.log(`[chat] turn-plan(${ctx.turnPlan.workflow}): searchRequired but model did not search — forcing plan-driven search`);
@@ -2371,12 +2388,25 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     dispatchTool,
     extractProductCards: (n, r) => extractProductCards(n, r, ctx),
     searchInput: forcedSearchInput,
-    shouldAttach: productTurnWantsCards || planNeedsSearch,
+    // Rewrite-only retries never search — reuse the prior attempt's evidence.
+    shouldAttach: (productTurnWantsCards || planNeedsSearch) && !rewriteOnlyRetry,
     allowRelaxedNoMatch: isCompoundPolicyProductQuestion(ctx.latestUserMessage),
     reason: planNeedsSearch && !productTurnWantsCards ? "plan-search-required" : "pre-display",
   });
   if (ensuredCards.searchAttempted) productSearchAttempted = true;
   let pool = ensuredCards.products;
+  // Rewrite-only retry: seed the pool (and evidence map) with the prior
+  // attempt's cards so the deterministic pin blocks below re-find their
+  // family/slot cards instead of coming up empty and ceding to the scorer.
+  if (rewriteOnlyRetry && carriedCards) {
+    const seen = new Set((pool || []).map((c) => String(c.handle || c.title || "").toLowerCase()));
+    for (const c of carriedCards) {
+      const key = String(c.handle || c.title || "").toLowerCase();
+      if (key && !seen.has(key)) { pool.push(c); seen.add(key); }
+      if (key && !allProductPool.has(key)) allProductPool.set(key, c);
+    }
+    console.log(`[rewrite-only] seeded pool with ${carriedCards.length} prior card(s) owner=${carriedCardOwner || "-"}`);
+  }
   // Set by the workflow=availability block when Availability Truth owns the
   // turn: the EXACT, authoritative final card list. When non-null it wins over
   // every downstream card guard/scorer and is emitted verbatim.
@@ -2400,6 +2430,10 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   // captured BEFORE the safety-cleanup pipeline runs, so the turn-invariant log
   // can report whether cleanup changed it. Default: the LLM owns the answer.
   let answerOwner = "llm";
+  // The final card owner for this turn (availability-truth | comparison |
+  // evidence-plan | scorer | none), computed at the turn-invariant log and
+  // returned so the retry orchestrator can carry it into a rewrite-only retry.
+  let resolvedCardOwner = "none";
   let ownedTextSnapshot = null;
 
   // Required named-family evidence (#2/#3/#4). For answer workflows where the
@@ -2600,31 +2634,57 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   // The LLM owns the comparison TEXT; we own the CARDS so a two-product
   // comparison shows ~2 cards (Jillian + Savannah), never the 9-10 card pool the
   // scorer would otherwise surface. Bypasses the scorer like availability.
-  if (ctx.turnPlan?.workflow === "comparison" && !availabilityPinnedCards) {
+  if (ctx.turnPlan?.workflow === "comparison" && !availabilityPinnedCards && !comparisonPinnedCards) {
     try {
       const fams = Array.isArray(ctx.turnPlan.namedFamilies) ? ctx.turnPlan.namedFamilies : [];
-      if (fams.length >= 1) {
-        const candidates = [pool, Array.from(allProductPool.values())];
-        const picked = [];
-        const seenFam = new Set();
-        for (const fam of fams) {
-          if (seenFam.has(fam)) continue;
-          let card = null;
-          for (const src of candidates) {
-            card = (src || []).find((c) => titleStyleFamily(c.title || "").toLowerCase() === fam);
-            if (card) break;
-          }
-          if (card) { picked.push(card); seenFam.add(fam); }
+      const findFamilyCard = (fam) => {
+        for (const src of [pool, Array.from(allProductPool.values())]) {
+          const c = (src || []).find((x) => titleStyleFamily(x.title || "").toLowerCase() === fam);
+          if (c) return c;
         }
-        if (picked.length > 0) {
-          comparisonPinnedCards = picked.slice(0, 4);
-          console.log(`[comparison] pinnedFinalCards=${comparisonPinnedCards.length} families=[${fams.join(",")}]`);
-        } else {
-          console.log(`[comparison] no family cards found in pool for [${fams.join(",")}] — leaving scorer cards`);
+        return null;
+      };
+      const picked = [];
+      const seenFam = new Set();
+      const missing = [];
+      for (const fam of fams) {
+        if (seenFam.has(fam)) continue;
+        const card = findFamilyCard(fam);
+        if (card) { picked.push(card); seenFam.add(fam); }
+        else missing.push(fam);
+      }
+      // Deterministic per-family fallback: when an exact family lookup misses,
+      // search for THAT family independently and pin its card. Never the scorer.
+      // Skipped on a rewrite-only retry (no searching — carried cards stand in).
+      if (missing.length > 0 && !rewriteOnlyRetry) {
+        for (const fam of missing) {
+          if (seenFam.has(fam)) continue;
+          try {
+            const cards = extractProductCards("search_products", await dispatchTool("search_products", { query: fam, filters: {}, limit: 4 }, ctx), ctx);
+            const card = (cards || []).find((c) => titleStyleFamily(c.title || "").toLowerCase() === fam) || (cards || [])[0] || null;
+            if (card) {
+              picked.push(card); seenFam.add(fam);
+              const key = String(card.handle || card.title || "").toLowerCase();
+              if (key && !allProductPool.has(key)) allProductPool.set(key, card);
+            }
+          } catch (e) { console.warn(`[comparison] family fallback search failed for "${fam}":`, e?.message || e); }
         }
       }
+      const stillMissing = fams.filter((f) => !seenFam.has(f));
+      // A comparison turn NEVER falls back to generic scorer cards. Pin the
+      // families we found (one each, max 4); if NONE were found, ship text-only
+      // (empty pinned array) so the scorer is suppressed rather than flooding the
+      // carousel with unrelated products.
+      comparisonPinnedCards = picked.slice(0, 4);
+      console.log(
+        `[comparison] pinnedFinalCards=${comparisonPinnedCards.length} families=[${fams.join(",")}]` +
+        (stillMissing.length ? ` missing=[${stillMissing.join(",")}] (scorer suppressed)` : "") +
+        (rewriteOnlyRetry ? " rewrite-only" : ""),
+      );
     } catch (cmpErr) {
       console.error("[comparison] pin failed (non-fatal):", cmpErr?.message || cmpErr);
+      // Even on error, never let the scorer own a comparison turn.
+      if (!comparisonPinnedCards) comparisonPinnedCards = [];
     }
   }
 
@@ -2632,7 +2692,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   // A complex ask is decomposed into slots (one per category) and each slot is
   // searched DETERMINISTICALLY; we pin one best card per slot so the carousel
   // shows exactly N cards (never a flood) and the LLM's text answers concisely.
-  if (ctx.turnPlan?.workflow === "multi_recommendation" && !availabilityPinnedCards && !comparisonPinnedCards) {
+  if (ctx.turnPlan?.workflow === "multi_recommendation" && !availabilityPinnedCards && !comparisonPinnedCards && !rewriteOnlyRetry) {
     try {
       const cplan = extractConstraintPlan({
         message: ctx.latestUserMessage || "",
@@ -2674,7 +2734,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   // Compatibility: pin ONLY the named product's card (if shown at all). Never
   // surface random orthotic products — the answer is text from product +
   // orthotic knowledge.
-  if (ctx.turnPlan?.workflow === "compatibility" && !availabilityPinnedCards && !comparisonPinnedCards && !evidencePinnedCards) {
+  if (ctx.turnPlan?.workflow === "compatibility" && !availabilityPinnedCards && !comparisonPinnedCards && !evidencePinnedCards && !rewriteOnlyRetry) {
     try {
       const fams = Array.isArray(ctx.turnPlan.namedFamilies) ? ctx.turnPlan.namedFamilies : [];
       if (fams.length > 0) {
@@ -2696,6 +2756,25 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       }
     } catch (compatErr) {
       console.error("[evidence-plan] compatibility failed (non-fatal):", compatErr?.message || compatErr);
+    }
+  }
+
+  // REWRITE-ONLY RETRY restoration net. If the prior attempt owned its cards but
+  // this tools-off rewrite couldn't re-derive them (nothing searched), restore
+  // the carried cards + owner directly. This is the last guard that stops the
+  // scorer from taking over a comparison / evidence-plan / availability turn on a
+  // text-only retry.
+  if (rewriteOnlyRetry && carriedCards && !availabilityPinnedCards && !comparisonPinnedCards && !evidencePinnedCards) {
+    if (carriedCardOwner === "comparison") comparisonPinnedCards = carriedCards.slice(0, 4);
+    else if (carriedCardOwner === "evidence-plan") {
+      evidencePinnedCards = carriedCards.slice();
+      // Restore the deterministic fallback so a rewrite-only evidence-plan retry
+      // that still can't pass the validator ships the fallback + keeps cards.
+      if (!evidenceFallbackText && ctx?.carriedEvidenceFallbackText) evidenceFallbackText = ctx.carriedEvidenceFallbackText;
+    }
+    else if (carriedCardOwner === "availability-truth") availabilityPinnedCards = carriedCards.slice();
+    if (comparisonPinnedCards || evidencePinnedCards || availabilityPinnedCards) {
+      console.log(`[rewrite-only] restored ${carriedCards.length} pinned card(s) owner=${carriedCardOwner} from prior attempt — scorer suppressed`);
     }
   }
 
@@ -3610,6 +3689,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       : comparisonPinnedCards != null ? "comparison"
       : evidencePinnedCards != null ? "evidence-plan"
       : finalCount > 0 ? "scorer" : "none";
+    resolvedCardOwner = cardOwner;
     const textCleanupChanged = ownedTextSnapshot != null && ownedTextSnapshot !== fullResponseText;
     console.log(
       `[turn-invariant] workflow=${workflow} answerOwner=${answerOwner} cardOwner=${cardOwner} ` +
@@ -3625,6 +3705,15 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     // Two-family comparison must never flood the carousel.
     if (workflow === "comparison" && finalCount > 4) {
       console.warn(`[turn-invariant] VIOLATION comparison finalCards=${finalCount} > 4 — carousel flooded`);
+    }
+    // Comparison cards are owned by the comparison pin — the scorer must NEVER
+    // own a comparison turn that ships cards. (cardOwner=scorer here means the
+    // pin missed and the retry/finalization leaked scorer cards.)
+    if (workflow === "comparison" && finalCount > 0 && cardOwner !== "comparison") {
+      console.warn(
+        `[turn-invariant] VIOLATION comparison cardOwner=${cardOwner} (expected comparison) ` +
+        `finalCards=${finalCount} — scorer/other took over a comparison turn`,
+      );
     }
   }
 
@@ -3674,12 +3763,12 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     // pool and burned 3 retries (~35s) on an answer that was grounded
     // all along.
     evidencePool: Array.from(allProductPool.values()),
-    // EvidencePlan ownership: when the multi_recommendation / compatibility block
-    // pinned cards this turn, cardOwner is "evidence-plan" and evidenceFallbackText
-    // is a deterministic concise line. The grounding runner uses these to (a) run
-    // any validator retry rewrite-only and (b) ship the deterministic fallback —
-    // keeping the pinned cards — instead of a support handoff that drops them.
-    cardOwner: evidencePinnedCards != null ? "evidence-plan" : null,
+    // Card ownership for this turn (availability-truth | comparison |
+    // evidence-plan | scorer | none). The grounding runner carries this + the
+    // final cards into a rewrite-only retry so a comparison/evidence/availability
+    // turn keeps the SAME cards + owner and the scorer never takes over. For
+    // evidence-plan it also drives the deterministic-fallback path.
+    cardOwner: resolvedCardOwner,
     evidenceFallbackText,
   };
 }
@@ -4960,7 +5049,7 @@ async function handleChatPost({ shop, sessionAccessToken, request, internal = fa
             // this, a failed attempt's text would stream to the widget
             // and the retry's text would stream again (duplicate reply).
             let attemptBuf = [];
-            const runLoopOnce = async ({ messages: msgs, attempt = 0, rewriteOnly = false }) => {
+            const runLoopOnce = async ({ messages: msgs, attempt = 0, rewriteOnly = false, carriedCards = null, carriedCardOwner = null, carriedEvidenceFallbackText = null }) => {
               attemptBuf = [];
               const turnModel = pickModel(attempt);
               if (turnModel !== sonnetModelForClean) {
@@ -4972,7 +5061,10 @@ async function handleChatPost({ shop, sessionAccessToken, request, internal = fa
                 systemPrompt,
                 promptStableLength,
                 messages: msgs.slice(),
-                ctx: { ...ctx },
+                // Rewrite-only retries reuse the prior attempt's cards (no
+                // re-search). Carry them + the owner so the pin blocks restore
+                // them and the scorer never takes over the turn.
+                ctx: { ...ctx, rewriteOnlyRetry: rewriteOnly, carriedCards, carriedCardOwner, carriedEvidenceFallbackText },
                 controller: { enqueue: (c) => attemptBuf.push(c) },
                 encoder,
                 forceNoTools: rewriteOnly,

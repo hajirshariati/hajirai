@@ -346,7 +346,24 @@ export async function runWithGroundingRetry({
     // attempt 0 on Haiku and escalate retries to Sonnet so a validator
     // rejection gets the stronger model for the correction.
     const thisAttemptRewriteOnly = nextRewriteOnly;
-    const result = await runLoop({ messages: messages.slice(), attempt, rewriteOnly: thisAttemptRewriteOnly });
+    // On a rewrite-only retry, carry the PRIOR attempt's final cards + owner so
+    // the loop reuses them (no re-search) and the scorer never takes over a
+    // comparison / evidence-plan / availability turn on a text-only rewrite.
+    const carriedCards = thisAttemptRewriteOnly
+      ? (last?.turnResult?.products || last?.finalProductCards || null)
+      : null;
+    const carriedCardOwner = thisAttemptRewriteOnly ? (last?.cardOwner || null) : null;
+    // Carry the evidence-plan deterministic fallback too, so a rewrite-only
+    // evidence-plan retry that exhausts still ships the fallback + keeps cards.
+    const carriedEvidenceFallbackText = thisAttemptRewriteOnly ? (last?.evidenceFallbackText || null) : null;
+    const result = await runLoop({
+      messages: messages.slice(),
+      attempt,
+      rewriteOnly: thisAttemptRewriteOnly,
+      carriedCards,
+      carriedCardOwner,
+      carriedEvidenceFallbackText,
+    });
     last = result;
     mergeUsage(result?.totalUsage);
     // INVARIANT: a comparison turn must not exceed attempt 1 with tools on. A

@@ -11,7 +11,7 @@ phrasing layer is verified by manual PRD live-testing, not these suites.
 
 | Suite | Passing | Failing | Covers |
 |---|---:|---:|---|
-| `eval-live-core-flows` | 64 | 0 | core scenarios: workflow + search/clarify/gender + availability card-count + leak/CTA/family invariants + sizing + sale + comparison card-contract + same-session pivots + sale-search input |
+| `eval-live-core-flows` | 66 | 0 | core scenarios: workflow + search/clarify/gender + availability card-count + leak/CTA/family invariants + sizing + sale + comparison card-contract (incl. pin-miss→text-only + cardOwner invariant) + same-session pivots + sale-search input |
 | `eval-availability-truth` | 51 | 0 | availability classification, soft color, style disambiguation, follow-up memory (incl. color-only follow-up size inheritance), width split |
 | `eval-variant-matcher` | 39 | 0 | size/width/SKU normalization, Aetrex labels, ranges, array-shape options |
 | `eval-turn-plan` | 112 | 0 | workflow classification across all 11 workflows (incl. multi_recommendation, compatibility, sizing_help, sale_browse; comparison outranks multi_recommendation for two named families) |
@@ -23,7 +23,7 @@ phrasing layer is verified by manual PRD live-testing, not these suites.
 | `eval-grounding-validator` | 74 | 0 | factual-safety blocking/warning partition + comparison length cap |
 | `eval-support-handoff` | 23 | 0 | customer-service handoff: explicit human, dead-end, partial, validation-failed; never on successful turns |
 | `eval-constraint-plan` | 15 | 0 | ConstraintPlan: multi-recommendation slots, compatibility, category-noun exclusion, kids gender, structured constraints |
-| **Total** | **497** | **0** | |
+| **Total** | **499** | **0** | |
 
 Run all: `npm run build && for s in scripts/eval-*.mjs; do node "$s"; done`
 
@@ -78,6 +78,24 @@ this pass made was driven by a QA scenario that reproduced a failure:
   paths behave identically. (Helper renamed `support-handoff.server.js` →
   `support-handoff.js` so the route imports it without tripping React Router's
   server-only-module resolver.)
+
+- **Retry/card-owner stability: rewrite-only retries no longer search or cede to
+  the scorer.** PRD showed a comparison turn that pinned 2 cards on attempt 0,
+  then on a rewrite-only retry re-triggered plan-driven forced search and ended
+  `cardOwner=scorer finalCards=3` — the retry/finalization had become a hidden
+  card owner. Fixed: (1) `runWithGroundingRetry` carries the prior attempt's
+  cards + `cardOwner` (+ evidence fallback) into a rewrite-only retry via
+  `ctx.rewriteOnlyRetry` / `ctx.carriedCards` / `ctx.carriedCardOwner`; (2)
+  chat.jsx skips the plan-driven forced search AND the evidence-plan/compat
+  per-slot searches on a rewrite-only retry, and a restoration net re-pins the
+  carried cards + owner so the scorer never takes over a comparison /
+  evidence-plan / availability turn; (3) the comparison pin now searches each
+  named family independently when the pool misses, and ships text-only
+  (`comparisonPinnedCards=[]`) rather than scorer cards if none are found; (4)
+  new invariant — `cardOwner=scorer` on a comparison turn with cards logs a
+  `[turn-invariant] VIOLATION`. Locked by `eval-llm-owns-turn` (comparison
+  rewrite-only carry) + `eval-live-core-flows` (pin-miss→text-only + owner
+  invariant).
 
 - **Stability pass: comparison vs multi, evidence-plan card survival, follow-up
   size inheritance.** Three PRD blockers fixed as one pass:

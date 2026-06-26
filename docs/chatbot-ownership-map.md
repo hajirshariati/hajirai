@@ -13,7 +13,7 @@ to make it; everyone downstream may clean for safety but may not re-decide.**
 | **Workflow** (which kind of turn this is) | **TurnPlan** (`app/lib/turn-plan.server.js`, `planTurn`) | Classifies every turn into one of 11 workflows: `policy_account`, `availability`, `comparison`, `named_product_advisory`, `condition_recommendation`, `multi_recommendation`, `compatibility`, `sale_browse`, `sizing_help`, `browse`, `clarification`. Also owns `searchRequired`, `clarificationAllowed`, `productDisplayPolicy`, `gender`. |
 | **Constraint decomposition** | **ConstraintPlan / EvidencePlan** (`app/lib/constraint-plan.js`) | The structured layer between TurnPlan and search. `extractConstraintPlan` decomposes the latest message into askType + productFamilies + categories + conditions + useCases + constraints + **slots** (one per category for a multi-recommendation). Category nouns (sandal, sneaker, …) are NEVER product families. chat.jsx searches each slot deterministically and pins one card per slot (`evidencePinnedCards`). |
 | **Exact product / color / size / width availability** | **Availability Truth** (`app/lib/availability-truth.js`) | For `workflow=availability` only. Resolves family → style → variant truth and produces AVAILABLE / UNAVAILABLE / UNKNOWN / NOT_FOUND / DISAMBIGUATION, the answer **text**, and the **cards**. Its output is authoritative for that turn. |
-| **Comparison cards** | **Comparison pin** (`chat.jsx`, `comparisonPinnedCards`) | For `workflow=comparison`: the LLM owns the verdict text; the code pins ONE representative card per named family (max 4), bypassing the scorer so a two-product comparison shows ~2 cards, never a flooded carousel. |
+| **Comparison cards** | **Comparison pin** (`chat.jsx`, `comparisonPinnedCards`) | For `workflow=comparison`: the LLM owns the verdict text; the code pins ONE representative card per named family (max 4), bypassing the scorer so a two-product comparison shows ~2 cards, never a flooded carousel. When the pool lacks a family card the pin searches for that family independently; if NONE are found it ships text-only (`comparisonPinnedCards=[]`) — **a comparison turn never falls back to scorer cards**. |
 | **Advisory / sales language** | **LLM** | Owns the persuasive, advisory, and conversational phrasing for non-availability turns (browse, comparison, advisory, condition, clarification). Never owns a hard availability yes/no. |
 | **Factual safety** | **Grounding validator** (`app/lib/grounding-validator.server.js`) | Blocks ungrounded claims (sizes/colors/stock/policy facts not present in the evidence pool) and non-answers on answer-workflows, forcing a synthesis retry. Owns "is this claim supported by what the model actually saw." |
 | **Final safety cleanup** | **Response contract / post-processing** (`response-contract.server.js`, the in-loop guards) | May trim banned phrasing, strip a lineup-promise sentence, suppress a misleading CTA, clear stale cards. **Never selects products** and never overrides an owner's decision. |
@@ -68,7 +68,19 @@ to make it; everyone downstream may clean for safety but may not re-decide.**
    products' facts are already pooled, so any comparison retry is forced
    rewrite-only (tools off); a comparison attempt >1 that searched logs a
    `[grounding-retry] VIOLATION`. Cards: ≤4, one per named family. No broad "View
-   All" CTA — the cards ARE the comparison.
+   All" CTA — the cards ARE the comparison. **cardOwner=scorer on a comparison
+   turn with cards is a VIOLATION** — the comparison pin is the only card owner.
+
+13. **Rewrite-only retries don't search and don't re-pick cards.** When the
+    runner forces a tools-off rewrite (`comparison` / `evidence-plan`, or a
+    style-only fix), it carries the prior attempt's final cards + `cardOwner`
+    into the retry (`ctx.rewriteOnlyRetry`, `ctx.carriedCards`,
+    `ctx.carriedCardOwner`). On that retry chat.jsx (a) skips the plan-driven
+    forced search and the evidence-plan / compatibility per-slot searches, and
+    (b) restores the carried pinned cards + owner so the scorer NEVER takes over
+    a comparison / evidence-plan / availability turn on a text-only rewrite.
+    Rewrite-only means exactly: rewrite from existing evidence, do not search
+    again.
 
 11. **Never dead-end — hand off.** When the bot can't confidently answer, it does
     NOT ship "I don't know / I can't verify / I'm not finding" or a weird generic

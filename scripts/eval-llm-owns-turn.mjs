@@ -273,6 +273,54 @@ test("max retries exhausted → returns last attempt with validation.ok=false", 
   assert.equal(calls, 3);
 });
 
+test("comparison retry is rewrite-only and carries prior cards + owner (no re-search, no scorer)", async () => {
+  // Attempt 0: comparison ships 2 pinned family cards but the validator rejects
+  // the draft. The retry MUST be rewrite-only (tools off) and MUST carry the
+  // prior cards + cardOwner so finalization restores them instead of letting the
+  // scorer (or a forced search) re-pick. Mirrors the chat.jsx carry plumbing.
+  const cmpCards = [
+    { handle: "jillian-sandal", title: "Jillian Sandal" },
+    { handle: "savannah-sandal", title: "Savannah Sandal" },
+  ];
+  const seenAttempts = [];
+  let calls = 0;
+  const runLoop = async ({ messages, attempt, rewriteOnly, carriedCards, carriedCardOwner }) => {
+    calls += 1;
+    seenAttempts.push({ attempt, rewriteOnly: !!rewriteOnly, carriedCount: carriedCards ? carriedCards.length : 0, carriedCardOwner: carriedCardOwner || null });
+    // On the rewrite-only retry, simulate chat.jsx restoring the carried cards.
+    const cards = rewriteOnly && carriedCards ? carriedCards : cmpCards;
+    const text = calls === 1
+      ? "The **Phantom Boot** wins." // ungrounded → validator rejects
+      : "Pick the **Jillian Sandal** for support; choose the **Savannah Sandal** for a dressier look.";
+    return {
+      fullResponseText: text,
+      finalProductCards: cards,
+      turnResult: { products: cards },
+      cardOwner: "comparison",
+      messages: (messages || []).concat([{
+        role: "user",
+        content: [{ type: "tool_result", tool_use_id: "t", content: [{ type: "text", text: JSON.stringify({ products: cmpCards }) }] }],
+      }]),
+    };
+  };
+  const out = await runWithGroundingRetry({
+    runLoop,
+    initialMessages: [{ role: "user", content: "Jillian or Savannah?" }],
+    maxRetries: 2,
+    turnPlan: { workflow: "comparison" },
+  });
+  // The retry (attempt 1) ran rewrite-only and received the carried cards/owner.
+  const retry = seenAttempts.find((a) => a.attempt === 1);
+  assert.ok(retry, "a retry happened");
+  assert.equal(retry.rewriteOnly, true, "comparison retry is rewrite-only (no re-search)");
+  assert.equal(retry.carriedCount, 2, "prior 2 cards carried into the retry");
+  assert.equal(retry.carriedCardOwner, "comparison", "comparison owner carried into the retry");
+  // Final result keeps the 2 comparison cards — scorer never took over.
+  const finalCards = out.turnResult?.products || out.finalProductCards || [];
+  assert.equal(finalCards.length, 2, "comparison keeps exactly 2 cards across the retry");
+  assert.equal(out.cardOwner, "comparison", "cardOwner stays comparison");
+});
+
 test("evidence-plan multi_recommendation: validator exhaustion never drops the 3 pinned cards", async () => {
   // The model keeps writing a multi-card answer the validator rejects (here an
   // ungrounded **Mirage Boot** the pool never contained — the "mismatch" that
