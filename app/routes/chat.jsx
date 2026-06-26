@@ -5,7 +5,7 @@ import { getAttributeMappings } from "../models/AttributeMapping.server";
 import { getCatalogCategories, getAllCatalogCategories, getCategoryGenderAvailability, getCategoryAttributeCoverage } from "../models/Product.server";
 import { getActiveCampaigns, formatCampaignsForCS } from "../models/Campaign.server";
 import { buildSystemPrompt } from "../lib/chat-prompt.server";
-import { planTurn, buildTurnPlanPromptBlock, buildPlanClarifierRepair, planForcesProductDisplay, planRequiresSearch as planRequiresSearchFlag, clarifierGateDecision } from "../lib/turn-plan.server";
+import { planTurn, buildTurnPlanPromptBlock, buildPlanClarifierRepair, planForcesProductDisplay, planRequiresSearch as planRequiresSearchFlag, clarifierGateDecision, isAnswerWorkflow } from "../lib/turn-plan.server";
 import { retrieveRelevantChunks } from "../lib/knowledge-chunks.server";
 import { buildKidsCoveragePrompt } from "../lib/kids-coverage.server";
 import { analyzeCategoryIntent, cardMatchesActiveGroup, textIntentDivergesFromGroup, matchingGroupsForText } from "../lib/category-intent.server";
@@ -2333,7 +2333,15 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   // before the deferred text emit, so the LLM-owns runner ships the repair.)
   {
     const clarGate = clarifierGateDecision(ctx?.turnPlan, fullResponseText, pool.length > 0);
-    if (clarGate.action === "repair") {
+    if (clarGate.action === "repair" && isAnswerWorkflow(ctx?.turnPlan)) {
+      // Answer workflow: do NOT swap in canned "here are some options" copy.
+      // Leave the stall so the grounding validator blocks it and the model
+      // synthesizes a real answer from evidence (with the honest exhaustion
+      // line as the floor). Per the contract, never ship a generic framing
+      // for availability/comparison/advisory/condition.
+      console.log(`[chat] turn-plan(${ctx.turnPlan.workflow}): disallowed clarifier on answer workflow — leaving for synthesis retry`);
+    } else if (clarGate.action === "repair") {
+      // Browse / non-answer workflow: a short product framing is acceptable.
       const repaired = buildPlanClarifierRepair(ctx.turnPlan);
       console.log(`[chat] turn-plan(${ctx.turnPlan.workflow}): repaired disallowed clarifier ("${fullResponseText.slice(0, 60).replace(/\s+/g, " ")}…") → product framing`);
       fullResponseText = repaired;
@@ -3813,10 +3821,18 @@ async function handleChatPost({ shop, sessionAccessToken, request, internal = fa
           // injected into the volatile prompt suffix so the model follows it.
           try {
             const clsAttrs = ctx.classifiedIntent?.attributes || {};
-            let planNamedProduct = Boolean(focusProduct);
+            // namedProduct is true ONLY when the LATEST message names a product
+            // family (Jillian/Savannah/…), or uses a deictic ("this/it/that
+            // one") AND a valid focusProduct is in context. A leftover
+            // focusProduct from a PRIOR card must NOT make a fresh
+            // condition/use-case turn ("I have PF, need walking sandals")
+            // misclassify as named_product_advisory.
+            let messageNamesProduct = false;
             try {
-              planNamedProduct = planNamedProduct || await mentionsCatalogProductFamily(shop, latestUserMessage);
+              messageNamesProduct = await mentionsCatalogProductFamily(shop, latestUserMessage);
             } catch { /* family lookup best-effort */ }
+            const deicticRef = /\b(this one|that one|these|those|\bit\b|\bthis\b|\bthat\b)\b/i.test(latestUserMessage);
+            const planNamedProduct = messageNamesProduct || (deicticRef && Boolean(focusProduct));
             turnPlan = planTurn({
               message: latestUserMessage,
               attrs: {
@@ -4336,6 +4352,7 @@ async function handleChatPost({ shop, sessionAccessToken, request, internal = fa
               categoryGenderMap: ctx.categoryGenderMap || null,
               userMessage: ctx.latestUserMessage || "",
               namedProductMentioned,
+              turnPlan: ctx.turnPlan || null,
               maxRetries: 2,
               onAttempt: ({ attempt, validation, textLen, poolSize }) => {
                 console.log(

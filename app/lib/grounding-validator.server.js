@@ -550,7 +550,24 @@ const BLOCKING_KINDS = new Set([
   "false_catalog_denial",
   "false_color_denial",
   "raw_handle_leak",
+  // Answer workflows (availability/comparison/named-product/condition) owe a
+  // real answer — a generic "take a look" or stock clarifier is a non-answer
+  // and forces a synthesis retry. Scoped to those workflows via the
+  // `workflow` arg, so plain browse turns are unaffected.
+  "answer_workflow_non_answer",
 ]);
+
+// Workflows that must answer (kept in sync with turn-plan ANSWER_WORKFLOWS).
+const ANSWER_WORKFLOW_NAMES = new Set([
+  "availability",
+  "comparison",
+  "named_product_advisory",
+  "condition_recommendation",
+]);
+
+// Stock clarifier stalls — a non-answer when the plan said act-don't-ask.
+const PLAN_CLARIFIER_RE =
+  /\b(men'?s?\s+or\s+women'?s?|women'?s?\s+or\s+men'?s?|are\s+you\s+shopping\s+for|what\s+(?:style|color|colou?r|budget|kind|type)\b[^.?!]*\?|tell\s+me\s+(?:a\s+(?:little|bit)\s+)?more)\b/i;
 
 function retailWordCount(text) {
   return String(text || "").trim().split(/\s+/).filter(Boolean).length;
@@ -563,7 +580,7 @@ function firstSentenceOf(text) {
   return (m ? m[0] : t).trim();
 }
 
-export function validateGrounding({ text, pool = [], categoryGenderMap = null, userMessage = "", namedProductMentioned = false, searchAttempted = false } = {}) {
+export function validateGrounding({ text, pool = [], categoryGenderMap = null, userMessage = "", namedProductMentioned = false, searchAttempted = false, workflow = "" } = {}) {
   const errors = [];
   if (!text || typeof text !== "string") return { ok: true, errors, warnings: [] };
 
@@ -832,6 +849,33 @@ export function validateGrounding({ text, pool = [], categoryGenderMap = null, u
           "give the best safe guidance: start with their usual size, factor in " +
           "swelling/adjustable straps, mention easy returns or how it runs, or " +
           "ask whether they prefer a snug or roomy fit.",
+      });
+    }
+  }
+
+  // Answer-workflow non-answer (BLOCKING). For availability / comparison /
+  // named-product / condition turns the customer is owed a real answer. A
+  // generic "take a look / closest matches" line, a stock clarifier
+  // ("men's or women's?", "tell me more", "what style/budget?"), or an empty
+  // reply is a non-answer — force a synthesis retry rather than ship it.
+  // Scoped to those workflows so plain browse/clarification turns are
+  // untouched. Availability yes/no answers are short but real, so a reply is
+  // only flagged when it MATCHES a fallback/clarifier shape, not merely short.
+  if (ANSWER_WORKFLOW_NAMES.has(workflow)) {
+    const t = text.trim();
+    const isFallback = GENERIC_FALLBACK_RE.test(t);
+    const isClarifierStall = PLAN_CLARIFIER_RE.test(t) && t.includes("?") && retailWordCount(t) <= 32;
+    if (isFallback || isClarifierStall) {
+      errors.push({
+        kind: "answer_workflow_non_answer",
+        claim: firstSentenceOf(t).slice(0, 80),
+        message:
+          `This is a ${workflow.replace(/_/g, " ")} turn — the customer is owed a direct answer, ` +
+          `but your draft is a generic "${isFallback ? "take a look / closest matches" : "clarifying question"}" non-answer. ` +
+          `Using the product evidence you have, answer the question directly: lead with the answer ` +
+          `(yes/no for availability; a clear pick + the key tradeoff for comparison/advisory; a real ` +
+          `recommendation for condition turns), then the cards follow. Do NOT ask men's-or-women's ` +
+          `(assume the default line and say so) and never reply with "take a look" or "closest matches".`,
       });
     }
   }

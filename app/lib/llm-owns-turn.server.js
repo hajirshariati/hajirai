@@ -28,6 +28,7 @@ import {
   validateGrounding,
   buildRetryInstruction,
 } from "./grounding-validator.server.js";
+import { isAnswerWorkflow, buildAnswerWorkflowExhaustionText } from "./turn-plan.server.js";
 
 export function isLlmOwnsTurnEnabled() {
   // Default ON since 2026-06-10 (pre-launch, no live customers — the
@@ -237,12 +238,18 @@ export async function runWithGroundingRetry({
   // True when the customer named a specific catalog product this turn — so
   // the validator can force a product lookup on value/fit/condition questions.
   namedProductMentioned = false,
+  // The TurnPlan for this turn. Drives the answer-workflow non-answer block
+  // (validator) and the honest exhaustion line (here) so availability /
+  // comparison / advisory / condition turns never ship a generic fallback.
+  turnPlan = null,
 } = {}) {
+  const planWorkflow = turnPlan?.workflow || "";
   let messages = (initialMessages || []).slice();
   let attempt = 0;
   let last = null;
   let lastErrors = [];
   let lastWarnings = [];
+  let lastPool = [];
   // Best substantial answer seen across attempts, for fragment recovery.
   // The grounding validator sometimes false-rejects a legitimate
   // product-feature phrase (prod 2026-06-24: "Built-in Aetrex Signature
@@ -313,6 +320,7 @@ export async function runWithGroundingRetry({
       userMessage,
       namedProductMentioned,
       searchAttempted: Boolean(result?.productSearchAttempted),
+      workflow: planWorkflow,
     });
 
     if (typeof onAttempt === "function") {
@@ -331,6 +339,7 @@ export async function runWithGroundingRetry({
 
     considerSubstantial(result, text, validation);
     lastWarnings = validation.warnings || [];
+    lastPool = pool;
 
     if (validation.ok) {
       // Don't ship a gutted fragment when an earlier attempt produced a
@@ -360,8 +369,16 @@ export async function runWithGroundingRetry({
 
     // If EVERY failure is style-only, the next attempt rewrites the draft
     // with tools disabled. If even one is a data failure, keep tools on.
-    nextRewriteOnly = validation.errors.length > 0
-      && validation.errors.every((e) => REWRITE_ONLY_KINDS.has(e.kind));
+    // Special case: an answer-workflow non-answer with products already in
+    // the pool is fixable by SYNTHESIZING from that evidence — rewrite-only
+    // (no expensive re-search). With an empty pool, keep tools on so the
+    // retry can search for the products it needs to answer.
+    const onlyAnswerNonAnswer =
+      validation.errors.length > 0 &&
+      validation.errors.every((e) => e.kind === "answer_workflow_non_answer");
+    nextRewriteOnly =
+      (validation.errors.length > 0 && validation.errors.every((e) => REWRITE_ONLY_KINDS.has(e.kind))) ||
+      (onlyAnswerNonAnswer && pool.length > 0);
 
     // Hand the errors back to the model. The retry instruction is
     // appended as a NEW user turn so the model treats it as a
@@ -397,6 +414,30 @@ export async function runWithGroundingRetry({
       ...applyLengthCap(bestSubstantial.result, lastWarnings),
       totalUsage: { ...accUsage },
       validation: { ok: false, errors: lastErrors, attempts: attempt + 1, recoveredSubstantial: true },
+    };
+  }
+
+  // Answer-workflow exhaustion guard. If, after all retries, an
+  // availability/comparison/advisory/condition turn STILL ended on a generic
+  // fallback or a stock clarifier, we refuse to ship "take a look / closest
+  // matches" or "men's or women's?". Substitute an honest, evidence-grounded
+  // line built from the plan + pool (names what we have, states the situation,
+  // invents nothing). A real synthesized answer was tried first on the retry.
+  if (
+    isAnswerWorkflow(turnPlan) &&
+    Array.isArray(lastErrors) &&
+    lastErrors.some((e) => e.kind === "answer_workflow_non_answer")
+  ) {
+    const honest = buildAnswerWorkflowExhaustionText(turnPlan, lastPool);
+    console.log(
+      `[grounding-retry] answer-workflow(${planWorkflow}) exhausted as a non-answer — ` +
+        `substituting honest evidence-grounded line (pool=${lastPool.length})`,
+    );
+    return {
+      ...applyLengthCap(last, lastWarnings),
+      fullResponseText: honest,
+      totalUsage: { ...accUsage },
+      validation: { ok: false, errors: lastErrors, attempts: attempt + 1, answerWorkflowExhaustion: true },
     };
   }
 

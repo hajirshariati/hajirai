@@ -853,7 +853,83 @@ export function injectDefaultGenderOnClearNeed(toolCall, ctx) {
   return { ...toolCall, input: { ...toolCall.input, filters: { ...filters, gender: "women" } } };
 }
 
+// ── enforceTurnPlanOnToolCall ───────────────────────────────────────
+// TurnPlan is authoritative for answer workflows. The pipeline above can
+// inject a stale gender (from session memory) or remap the category (from
+// an occasion/relevance heuristic) behind the plan's back — that ships
+// men's products on a women-default comparison, or loafers when the
+// customer named a sandal. This runs LAST and gives the plan the final
+// word for the four answer workflows:
+//   - gender: force the plan's gender (women/men) onto the search.
+//   - availability: never drop the color/size/width the customer named
+//     (restored from the model's ORIGINAL tool args if a rewrite dropped them).
+//   - comparison / named_product_advisory: drop any category that was
+//     INJECTED downstream (the named product owns the search, not an
+//     occasion remap).
+const PLAN_ANSWER_WORKFLOWS = new Set([
+  "comparison",
+  "named_product_advisory",
+  "availability",
+  "condition_recommendation",
+]);
+const KIDS_GENDER_TOKENS = new Set(["kids", "kid", "boys", "boy", "girls", "girl", "child", "children"]);
+
+export function enforceTurnPlanOnToolCall(toolCall, ctx, original) {
+  const plan = ctx?.turnPlan;
+  if (!plan || !PLAN_ANSWER_WORKFLOWS.has(plan.workflow)) return toolCall;
+  if (toolCall.name !== "search_products" && toolCall.name !== "find_similar_products") return toolCall;
+
+  const filters = { ...(toolCall.input?.filters || {}) };
+  const origFilters = original?.input?.filters || {};
+  let changed = false;
+
+  // 1. Plan gender is authoritative (don't clobber an explicit kids gender).
+  if (plan.gender === "women" || plan.gender === "men") {
+    const cur = String(filters.gender || "").toLowerCase().trim();
+    if (cur !== plan.gender && !KIDS_GENDER_TOKENS.has(cur)) {
+      console.log(`[chat] turn-plan(${plan.workflow}): forcing search gender=${plan.gender} (was ${cur || "-"})`);
+      filters.gender = plan.gender;
+      changed = true;
+    }
+  }
+
+  // 2. Availability must preserve the variant constraints the customer named.
+  if (plan.workflow === "availability") {
+    for (const k of ["color", "size", "width"]) {
+      if (origFilters[k] != null && filters[k] == null) {
+        console.log(`[chat] turn-plan(availability): restored dropped ${k} filter`);
+        filters[k] = origFilters[k];
+        changed = true;
+      }
+    }
+    // Gender on availability comes from the named product/family, not stale
+    // session memory. If the customer didn't state a gender (plan.gender is
+    // null) and a gender filter was INJECTED (the model didn't pass it),
+    // drop it — otherwise a leftover "men" from earlier in the session
+    // returns random men's products for a women's-product availability check.
+    if (!plan.gender && filters.gender != null && origFilters.gender == null) {
+      console.log(`[chat] turn-plan(availability): dropped injected gender="${filters.gender}" (family resolution owns gender, not stale memory)`);
+      delete filters.gender;
+      changed = true;
+    }
+  }
+
+  // 3. Comparison / named-product: the named product owns the search — drop a
+  // category the model didn't ask for (an occasion/relevance remap added it).
+  if (plan.workflow === "comparison" || plan.workflow === "named_product_advisory") {
+    if (filters.category != null && origFilters.category == null) {
+      console.log(`[chat] turn-plan(${plan.workflow}): dropped injected category remap (named product owns the search)`);
+      delete filters.category;
+      changed = true;
+    }
+  }
+
+  if (!changed) return toolCall;
+  return { ...toolCall, input: { ...toolCall.input, filters } };
+}
+
 export function rewriteToolCall(toolCall, ctx) {
+  const original = toolCall;
   let rewritten = toolCall;
   rewritten = forceComparisonLookup(rewritten, ctx);
   rewritten = redirectOrthoticSearchToRecommender(rewritten, ctx);
@@ -867,5 +943,8 @@ export function rewriteToolCall(toolCall, ctx) {
   // for explicit named-product lookups, overriding any category
   // injection (e.g. injectOccasionCategory) that may have added one.
   rewritten = relaxCategoryOnNamedProduct(rewritten, ctx);
+  // TurnPlan has the final word for answer workflows (gender / availability
+  // constraints / named-product category).
+  rewritten = enforceTurnPlanOnToolCall(rewritten, ctx, original);
   return rewritten;
 }

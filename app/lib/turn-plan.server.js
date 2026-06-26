@@ -296,6 +296,53 @@ const CLARIFIER_PATTERNS = [
 // ── Executable gate deciders ──────────────────────────────────────────
 // The chat route calls these so the gates and the eval test the SAME logic.
 
+// The four workflows that owe the customer a real ANSWER (not just cards or a
+// clarifier). A generic "take a look / closest matches" line — or a stock
+// clarifier — is a contract violation for these; it forces a synthesis retry.
+export const ANSWER_WORKFLOWS = new Set([
+  WORKFLOWS.AVAILABILITY,
+  WORKFLOWS.COMPARISON,
+  WORKFLOWS.NAMED_PRODUCT_ADVISORY,
+  WORKFLOWS.CONDITION_RECOMMENDATION,
+]);
+
+export function isAnswerWorkflow(plan) {
+  return Boolean(plan && ANSWER_WORKFLOWS.has(plan.workflow));
+}
+
+// Honest, evidence-grounded line used only at retry EXHAUSTION for an answer
+// workflow — when the model never produced a real answer and we refuse to
+// ship "take a look / closest matches". Names the products we DO have and
+// states the situation plainly; never fabricates specs. Better than a generic
+// non-answer, worse than a real synthesis (which the retry tries first).
+export function buildAnswerWorkflowExhaustionText(plan, pool = []) {
+  const titles = (Array.isArray(pool) ? pool : [])
+    .map((c) => String(c?.title || "").trim())
+    .filter(Boolean)
+    .slice(0, 3);
+  const g = plan?.gender === "men" || plan?.gender === "women" ? plan.gender : null;
+  const lineup = titles.length ? titles.join(titles.length === 2 ? " and " : ", ") : null;
+  switch (plan?.workflow) {
+    case WORKFLOWS.AVAILABILITY:
+      return lineup
+        ? `I can't confirm that exact size/color combination from the data I have right now — here's the ${titles[0]} so you can check current availability.`
+        : "I can't confirm that exact size/color from the data I have right now — let me know the product and I'll pull what's in stock.";
+    case WORKFLOWS.COMPARISON:
+      return lineup
+        ? `Here ${titles.length === 1 ? "is" : "are"} ${lineup} side by side — take a close look at each, and tell me what matters most (support, cushioning, dressiness) so I can call a winner.`
+        : "Tell me the two styles you're weighing and I'll compare them directly on support, cushioning, and fit.";
+    case WORKFLOWS.NAMED_PRODUCT_ADVISORY:
+      return lineup
+        ? `Here's the ${titles[0]}${g ? ` from our ${g}'s line` : ""} — happy to break down whether it fits your need; tell me a bit more about how you'll use it.`
+        : "Happy to weigh in — tell me the product and how you'll use it and I'll give you a straight take.";
+    case WORKFLOWS.CONDITION_RECOMMENDATION:
+    default:
+      return lineup
+        ? `Based on what you described, ${lineup} ${titles.length === 1 ? "is a" : "are"} solid${g ? ` ${g}'s` : ""} starting point — look for arch support and cushioning. Tell me more about fit or budget and I'll refine.`
+        : "Tell me a bit more — the condition, how long you're on your feet, any style preference — and I'll recommend supportive options.";
+  }
+}
+
 // Card-display authority: does the plan require products to be shown?
 // When true, the emit-finalize step must not suppress cards just because the
 // text is short or carries choice buttons.
