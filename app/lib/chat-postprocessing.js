@@ -1338,6 +1338,10 @@ export function detectFootwearOverElicitation({
   latestUserMessage,
   establishedGender,
   catalogProductTypes,
+  // Latest-turn scope (state hygiene). The force-search directive must reflect
+  // THIS turn — never fire off stale/session category on a new independent ask.
+  // isFollowUp=true means a deictic / prior-card reference (carry prior context).
+  isFollowUp = false,
 }) {
   if (!classifiedIntent || classifiedIntent.isFootwearRequest !== true) return null;
   if (!establishedGender) return null;
@@ -1388,10 +1392,22 @@ export function detectFootwearOverElicitation({
     }
   }
   if (!catMatch) return null;
+  // SOURCE TRACKING (fix 3 — over-elicitation must never fire off stale memory).
+  // catMatch is derived ONLY from the latest message: Path A is an exact chip
+  // match against `u`, Path B is a whole-token match in `u`, Path C is a generic
+  // shoes/footwear mention in `u`. None of the three reads session/classifier
+  // memory, so whenever catMatch is set the category signal IS this turn's →
+  // source="latest". (A stale `isFootwearRequest` flag alone can't reach here:
+  // catMatch stays null and we already returned above.) We surface the source
+  // for observability and keep the guard so the invariant is explicit: only fire
+  // when the signal is from THIS turn or a valid follow-up carrying prior cards.
   const cat = String(catMatch).toLowerCase();
+  const categorySource = "latest";
+  if (!isFollowUp && categorySource !== "latest") return null;
   return {
     gender: g,
     category: cat,
+    categorySource,
     directive:
       `\n\n=== URGENT TURN-SCOPED DIRECTIVE — FOOTWEAR SEARCH ===\n` +
       `THIS TURN ONLY. The customer's gender (${g}) and category (${cat}) are BOTH established. ` +

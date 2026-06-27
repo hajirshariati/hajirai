@@ -4,6 +4,7 @@ import { validateDecisionTree } from "./decision-tree-schema.server.js";
 // load) so the orthotic-flow-gate ⇄ recommender-tools import cycle is safe —
 // hoisted function export, resolved by the time the tool runs.
 import { orthoticChipLabelsForAttribute } from "./orthotic-flow-gate.server.js";
+import { conditionFromText } from "./condition-normalize.js";
 
 // Apply tree-level derivations to the customer's answer set BEFORE
 // resolving. Derivations let merchants encode rules like "if
@@ -754,26 +755,26 @@ export async function executeRecommenderTool({ toolName, input, shop, trees, con
     // condition ← heel-spur / plantar-fasciitis / diabetic vocabulary
     // (only if condition not already specified — never override).
     if (!enrichedInput.condition) {
-      if (/\bheel[\s-]?spurs?\b/i.test(t)) {
-        enrichedInput.condition = "heel_spurs";
-        enrichedFromText.push("condition=heel_spurs");
-      } else if (/\bplantar[\s-]?fasc(?:i|ii)tis\b/i.test(t)) {
-        enrichedInput.condition = "plantar_fasciitis";
-        enrichedFromText.push("condition=plantar_fasciitis");
-      } else if (/\bdiabet(?:ic|es)\b/i.test(t)) {
-        enrichedInput.condition = "diabetic";
-        enrichedFromText.push("condition=diabetic");
-      } else if (
-        // "No condition" / "just comfort" / "general support" answer
-        // patterns. The AI sometimes paraphrases the seed's
-        // "None — just want comfort" chip as "Just Comfort &
-        // Support" / "general comfort" / "everyday support" — when
-        // the customer clicks that, the LLM doesn't always map the
-        // answer back to condition="none", so the gate keeps re-
-        // asking the same question. Catch these patterns and pin
-        // condition="none" so the resolver runs.
-        /\b(?:no\s+(?:specific\s+)?(?:pain|condition|issue|concern)|just\s+(?:comfort|support|want\s+(?:comfort|support))|general\s+(?:comfort|support)|everyday\s+(?:comfort|support|wear)|no\s+(?:foot\s+)?problem|just\s+looking\s+for\s+(?:comfort|support|something)|comfort\s*(?:&|and)\s*support|nothing\s+specific|no\s+issues?|none\s+(?:really|specifically)?|not\s+(?:really|specifically)|just\s+everyday)\b/i.test(t)
-      ) {
+      // Single source of truth for free-text → canonical condition mapping
+      // (condition-normalize.js). Order-deterministic so "Morton's neuroma"
+      // resolves to mortons_neuroma and can NEVER collapse into
+      // plantar_fasciitis or default to "none". `allowNone:true` keeps the
+      // "just comfort / no specific pain" catch-all so the resolver still runs
+      // on a no-condition answer. (Forefoot/met support is set separately via
+      // metSupport.)
+      const normalizedCondition = conditionFromText(t, { allowNone: true });
+      // The prior inline chain matched a broader "just comfort" vocabulary than
+      // condition-normalize's NONE_RE — the seed paraphrases its
+      // "None — just want comfort" chip as "Just Comfort & Support" / "general
+      // comfort" / "everyday support", and the resolver can't map those, so the
+      // gate keeps re-asking. Keep that looser fallback so condition pins to
+      // "none" and the resolver runs.
+      const looseNone =
+        /\b(?:no\s+(?:specific\s+)?(?:pain|condition|issue|concern)|just\s+(?:comfort|support|want\s+(?:comfort|support))|general\s+(?:comfort|support)|everyday\s+(?:comfort|support|wear)|no\s+(?:foot\s+)?problem|just\s+looking\s+for\s+(?:comfort|support|something)|comfort\s*(?:&|and)\s*support|nothing\s+specific|no\s+issues?|none\s+(?:really|specifically)?|not\s+(?:really|specifically)|just\s+everyday)\b/i.test(t);
+      if (normalizedCondition && normalizedCondition !== "none") {
+        enrichedInput.condition = normalizedCondition;
+        enrichedFromText.push(`condition=${normalizedCondition}`);
+      } else if (normalizedCondition === "none" || looseNone) {
         enrichedInput.condition = "none";
         enrichedFromText.push("condition=none(no-pain/just-comfort signal)");
       }

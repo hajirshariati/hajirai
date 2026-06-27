@@ -757,7 +757,12 @@ const SPECIFIC_PRODUCT_STOPWORDS = new Set([
   ...Object.values(RESOLVER_COLOR_LEX),
   // genders
   ...Object.values(RESOLVER_GENDER_LEX),
-  // categories (singular & plural normalized)
+  // categories — BOTH the singular/plural surface forms (keys: "sneaker",
+  // "sandal", "loafer", "boot"…) and the normalized values ("sneakers",
+  // "sandals"…). A generic category word must NEVER read as a named product
+  // family, so "Show me one sandal and one sneaker" extracts no families and
+  // forces no named-family search (PRD 2026-06-27).
+  ...Object.keys(RESOLVER_CATEGORY_LEX),
   ...Object.values(RESOLVER_CATEGORY_LEX),
   // common product-title words
   "the", "and", "with", "for", "from", "shoe", "shoes", "footwear",

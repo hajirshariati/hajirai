@@ -60,6 +60,7 @@ import { executeRecommenderTool, normalizeUseCaseForTree } from "./recommender-t
 import { buildStorefrontSearchCTA } from "./storefront-search-cta.server.js";
 import { scrubInternalEnums } from "./chat-postprocessing.js";
 import { detectConversationGoal, detectTurnGoal, INFO_QUESTION_GOALS } from "./turn-intent.server.js";
+import { isShortAmbiguousReply } from "./turn-scope.js";
 
 // Format a recommender-returned product the same way chat-tools'
 // extractProductCards does. Inlined (rather than imported) to keep
@@ -809,6 +810,31 @@ export async function maybeRunOrthoticFlow({
   if (!last || last.role !== "user") return { handled: false };
   const rawUserText = typeof last.content === "string" ? last.content : "";
   if (!rawUserText.trim()) return { handled: false };
+
+  // SHORT / AMBIGUOUS REPLY GUARD (state hygiene). A content-free reply ("not
+  // sure", "maybe", "I don't know") is only meaningful as the answer to an
+  // ACTIVE question. If the immediately-prior assistant turn did NOT ask one
+  // (no chips, no scoping/clinical question), do NOT engage the finder or infer
+  // a clinical condition from it — defer to the LLM so it asks a clarifying
+  // question instead of guessing a path from "Not sure".
+  if (isShortAmbiguousReply(rawUserText)) {
+    const priorAssistant = [...messages].reverse().find(
+      (m) => m && m.role === "assistant" && typeof m.content === "string",
+    );
+    const priorText = priorAssistant ? priorAssistant.content : "";
+    const priorAskedQuestion =
+      /<<[^<>]+>>/.test(priorText) ||
+      (/\?/.test(priorText) &&
+        /\b(arch|condition|pain|orthotic|insole|met(?:atarsal)?|forefoot|heel|flat[\s-]?(?:feet|foot)|gender|men'?s|women'?s|use[\s-]?case|activity|kind|type|which|what)\b/i.test(
+          priorText,
+        ));
+    if (!priorAskedQuestion) {
+      console.log(
+        `[orthotic-flow] short-ambiguous reply ("${rawUserText.trim().slice(0, 30)}") with no pending question — deferring (no condition inference)`,
+      );
+      return { handled: false, case: "short_ambiguous_no_pending" };
+    }
+  }
 
   // COMPARISON / VALUE QUESTION — answer it, don't run the finder.
   // When the customer NAMES specific products and asks how they compare,

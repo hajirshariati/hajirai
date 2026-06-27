@@ -10,6 +10,7 @@ import { classifyAvailability, buildAvailabilityAnswer, AVAILABILITY_RESULT, res
 import { detectSupportHandoffNeed, buildSupportHandoffText, supportConfigured, normalizedSupportLabel, supportChatLabel } from "../lib/support-handoff";
 import { extractConstraintPlan } from "../lib/constraint-plan";
 import { detectProcessNarration, stripProcessNarration, buildSalesVoiceFallback, SALES_JUDGMENT_WORKFLOWS } from "../lib/sales-voice";
+import { classifyTurnScope, scopeAttributesToTurn, isShortAmbiguousReply } from "../lib/turn-scope";
 import { buildPriorEvidenceAvailabilityText, buildPriorEvidenceMultiColorText, askedConstraintLabel, titleCaseWord } from "../lib/prior-evidence";
 import { selectEvidenceCards } from "../lib/evidence-select";
 import { retrieveRelevantChunks } from "../lib/knowledge-chunks.server";
@@ -4779,6 +4780,46 @@ async function handleChatPost({ shop, sessionAccessToken, request, internal = fa
             }
           }
 
+          // ── Latest-turn scope (state hygiene) ───────────────────────────
+          // Decide whether THIS message is a FOLLOW_UP (deictic / prior-card
+          // reference) or a NEW_INDEPENDENT_ASK. On a new independent ask, drop
+          // the classifier's inherited category/color/condition that the latest
+          // message doesn't itself support — otherwise a fresh "vacation walking"
+          // turn answers the prior flat-feet/sneaker/black question. Mutating the
+          // shared classifier attrs means planTurn, the over-elicitation guard,
+          // the recommender gate, and search all read the SAME scoped facts.
+          {
+            const priorUserTurns =
+              messages.filter((m) => m?.role === "user").length - 1;
+            const priorCardCount = Array.isArray(priorProductCards) ? priorProductCards.length : 0;
+            const turnScope = classifyTurnScope(latestUserMessage, {
+              priorCardCount,
+              priorAttributes:
+                priorCardCount > 0 || priorUserTurns >= 1
+                  ? (ctx.classifiedIntent?.attributes || { _: true })
+                  : null,
+            });
+            ctx.turnScope = turnScope.scope;
+            ctx.turnIsFollowUp = turnScope.scope === "follow_up";
+            ctx.turnIsShortAmbiguous = isShortAmbiguousReply(latestUserMessage);
+            if (ctx.classifiedIntent?.attributes) {
+              const before = ctx.classifiedIntent.attributes;
+              const scoped = scopeAttributesToTurn(before, latestUserMessage, {
+                isFollowUp: ctx.turnIsFollowUp,
+              });
+              const wiped = Object.keys(scoped).filter(
+                (k) => before[k] != null && before[k] !== "" && (scoped[k] == null || scoped[k] === ""),
+              );
+              ctx.classifiedIntent.attributes = scoped;
+              if (wiped.length) {
+                console.log(
+                  `[turn-scope] ${shop} scope=${turnScope.scope} (${turnScope.reason}) ` +
+                  `wiped stale attrs=[${wiped.join(",")}] on a new independent ask`,
+                );
+              }
+            }
+          }
+
           // ── Central TurnPlan ────────────────────────────────────────────
           // Now that the classifier ran and gender is reconciled, classify
           // the turn into ONE workflow and store the plan on ctx so search,
@@ -5052,6 +5093,7 @@ async function handleChatPost({ shop, sessionAccessToken, request, internal = fa
                   messages.map((m) => (typeof m.content === "string" ? m.content : "")).join("\n"),
                 ),
               catalogProductTypes,
+              isFollowUp: ctx.turnIsFollowUp === true,
             });
             if (guard) {
               systemPrompt = systemPrompt + guard.directive;
