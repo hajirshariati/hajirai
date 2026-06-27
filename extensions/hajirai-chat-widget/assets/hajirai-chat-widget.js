@@ -800,12 +800,61 @@ function runVisualize(cta,card){
   host.setAttribute('role','status');host.setAttribute('aria-live','polite');host.setAttribute('aria-label','Creating your styling preview');
   host.style.cssText='flex:1 1 58%;min-width:0;align-self:flex-start;margin-left:10px';
   card.parentNode.insertBefore(host,card.nextSibling);
-  vizFetch(host,cta);
+  vizFetch(host,cta,card);
+}
+// A small, curated set of high-quality scene presets the shopper can pick to
+// RE-generate the SAME shoe in a different setting. Kept deliberately short —
+// these are settings the image model renders reliably well for footwear. The
+// label is what the shopper sees; ctx is the scene phrase fed as styleContext
+// (the existing /visualize endpoint already styles around whatever it's given).
+var VIZ_SCENES=[
+  {k:'beach',label:'Beach',ctx:'a sunny beach boardwalk by the ocean'},
+  {k:'city',label:'City',ctx:'a stylish downtown city sidewalk'},
+  {k:'park',label:'Park',ctx:'a green park pathway on a bright sunny day'},
+  {k:'evening',label:'Evening',ctx:'an elegant evening out at a chic venue'}
+];
+// After the first preview renders, drop a compact row of scene chips into the
+// EXISTING empty space under "View product" inside the card. Picking one
+// re-generates the same product in that setting. Injected once; never grows the
+// card beyond the space already there.
+function injectVizOptions(card,cta,host){
+  if(!card)return;
+  var info=card.querySelector('.ai-chat-product-info')||card;
+  if(info.querySelector('.ai-chat-viz-options'))return;
+  var wrap=document.createElement('div');
+  wrap.className='ai-chat-viz-options';
+  wrap.style.cssText='margin-top:8px;display:flex;flex-direction:column;gap:5px';
+  var lbl=document.createElement('div');
+  lbl.textContent='Try another setting';
+  lbl.style.cssText='font-size:11px;color:#8a8a8a;font-weight:600;letter-spacing:.01em';
+  wrap.appendChild(lbl);
+  var chips=document.createElement('div');
+  chips.style.cssText='display:flex;flex-wrap:wrap;gap:5px';
+  VIZ_SCENES.forEach(function(s){
+    var chip=document.createElement('button');
+    chip.type='button';
+    chip.className='ai-chat-viz-opt';
+    chip.setAttribute('data-scene',s.k);
+    chip.textContent=s.label;
+    chip.style.cssText='padding:5px 11px;border:1px solid rgba(45,107,79,.32);border-radius:14px;background:#fff;color:var(--ai-chat-primary,#2d6b4f);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;line-height:1.2';
+    chip.addEventListener('click',function(e){
+      if(e){e.preventDefault();e.stopPropagation();}
+      // Highlight the active scene; clear the others.
+      var kids=chips.children;
+      for(var i=0;i<kids.length;i++){kids[i].style.background='#fff';kids[i].style.color='var(--ai-chat-primary,#2d6b4f)';}
+      chip.style.background='var(--ai-chat-primary,#2d6b4f)';chip.style.color='#fff';
+      var c2={productHandle:cta.productHandle,productTitle:cta.productTitle||'',styleContext:s.ctx,label:cta.label||'Visualize My Look'};
+      vizFetch(host,c2,card);
+    });
+    chips.appendChild(chip);
+  });
+  wrap.appendChild(chips);
+  info.appendChild(wrap);
 }
 // Loading → fetch → result/error. Runs INDEPENDENTLY of the chat stream
 // (own fetch, no input lock), so the customer can keep chatting while
 // the preview renders. 60s ceiling so a hung provider can't spin forever.
-function vizFetch(host,cta){
+function vizFetch(host,cta,card){
   var steps=['Analyzing the product…','Composing the scene…','Styling the look…','Rendering your preview…'];
   var si=0;host.innerHTML=vizLoadingHtml(steps[0]);scrollBottom();
   var iv=setInterval(function(){si=Math.min(si+1,steps.length-1);var l=host.querySelector('.ai-chat-viz-step');if(l)l.textContent=steps[si]},2200);
@@ -815,13 +864,13 @@ function vizFetch(host,cta){
   if(ctrl)opts.signal=ctrl.signal;
   fetch(VISUALIZE_URL,opts)
     .then(function(r){return r.json().catch(function(){return{}})})
-    .then(function(d){clearInterval(iv);clearTimeout(to);if(d&&d.ok&&d.imageDataUrl){host.innerHTML=vizResultHtml(d.imageDataUrl)}else{vizError(host,cta,(d&&d.message)||'Could not create the preview right now.')}scrollBottom()})
-    .catch(function(e){clearInterval(iv);clearTimeout(to);vizError(host,cta,(e&&e.name==='AbortError')?'That took too long — please try again.':'Connection issue. Please try again.');scrollBottom()});
+    .then(function(d){clearInterval(iv);clearTimeout(to);if(d&&d.ok&&d.imageDataUrl){host.innerHTML=vizResultHtml(d.imageDataUrl);injectVizOptions(card,cta,host)}else{vizError(host,cta,(d&&d.message)||'Could not create the preview right now.',card)}scrollBottom()})
+    .catch(function(e){clearInterval(iv);clearTimeout(to);vizError(host,cta,(e&&e.name==='AbortError')?'That took too long — please try again.':'Connection issue. Please try again.',card);scrollBottom()});
 }
-function vizError(host,cta,msg){
+function vizError(host,cta,msg,card){
   host.innerHTML=vizErrorHtml(msg);
   var r=host.querySelector('.ai-chat-viz-retry');
-  if(r)r.addEventListener('click',function(){vizFetch(host,cta)});
+  if(r)r.addEventListener('click',function(){vizFetch(host,cta,card)});
 }
 function ctaHtml(linkCTA){
 return '<a class="ai-chat-cta-btn" style="display:block;margin-top:12px;padding:14px 16px;background:var(--ai-chat-primary,#2d6b4f);color:#fff;border-radius:10px;text-decoration:none;text-align:center;font-size:14px;font-weight:600;line-height:1.3" href="'+esc(linkCTA.url)+'" target="_blank" rel="noopener">'+esc(linkCTA.label||'Visit Support Hub')+' &rarr;</a>';
