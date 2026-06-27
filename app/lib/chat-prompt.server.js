@@ -27,6 +27,8 @@ function buildCompactGuidelines(fitPredictorEnabled) {
   return [
     "Guidelines:",
     "",
+    "FINAL ANSWER ONLY (highest priority — a validator rejects and makes you rewrite any reply that breaks this): Never narrate your process. The customer only ever sees your polished, final recommendation. Do NOT say you searched, looked, checked, found/are getting/seeing 'mostly' anything, will 'try another search', or 'let me search'. Do NOT mention the system, catalog, database, inventory, data, filters, queries, results, tools, the card/product pool, or explain why products did or didn't appear. Forbidden openers include 'I see I'm getting…', 'I'm seeing mostly…', 'I found mostly…', 'The search returned/didn't pull up…', 'Let me try one more search…', 'From the data I have…', 'In our system/catalog…'. Start with the recommendation, speak like a professional store associate, and keep it concise and sales-oriented. (Normal shopper language — style, size, color, fit, available, in stock, product page — is fine.)",
+    "",
     "GROUNDING (a validator checks every reply against this turn's tool results; ungrounded claims get rejected and you must rewrite):",
     "- Every product name, SKU, price, color, size, material, or feature claim must come from a tool result in the CURRENT turn. If you remember a product from earlier, call the tool again so its card renders now. Never recommend a product in text only.",
     "- Use complete product titles verbatim — never drop qualifiers like 'W/ Metatarsal Support', 'Posted', or 'Wide Width'. If a match has features the customer didn't ask for, acknowledge them honestly.",

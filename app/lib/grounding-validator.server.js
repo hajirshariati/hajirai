@@ -21,6 +21,12 @@
 //   { ok: true }                                   — text is grounded
 //   { ok: false, errors: [{kind, claim, ...}] }    — feed back to model
 
+import {
+  detectProcessNarration,
+  shouldBlockProcessNarration,
+  PROCESS_NARRATION_RETRY_INSTRUCTION,
+} from "./sales-voice.js";
+
 // Token-level family extractor (same as the old guard so behavior
 // matches the working parts of today's pipeline).
 const FAMILY_STOP_WORDS = new Set([
@@ -915,6 +921,22 @@ export function validateGrounding({ text, pool = [], categoryGenderMap = null, u
     }
   }
 
+  // SALES VOICE: the reply must read like a store associate, never narrate the
+  // retrieval process ("I see I'm getting mostly sneakers… let me try one more
+  // search", "I found results after filtering"). On sales-voiced workflows this
+  // is BLOCKING — force a rewrite before it ever reaches the customer.
+  const hasCards = Array.isArray(pool) && pool.length > 0;
+  if (shouldBlockProcessNarration(workflow, hasCards)) {
+    const narration = detectProcessNarration(text);
+    if (narration.hit) {
+      errors.push({
+        kind: "process_narration",
+        claim: String(narration.sentences[0] || "").slice(0, 80),
+        message: PROCESS_NARRATION_RETRY_INSTRUCTION,
+      });
+    }
+  }
+
   // Partition: only blocking (safety/factual) errors fail validation and
   // force a retry. Everything else is an observability warning — EXCEPT on
   // answer workflows, where a fragment, an unaddressed sizing question, or a
@@ -922,7 +944,9 @@ export function validateGrounding({ text, pool = [], categoryGenderMap = null, u
   // never be "ok" for "what size should I get in Jillian?").
   const isAnswerWf = ANSWER_WORKFLOW_NAMES.has(workflow);
   const isBlocking = (e) =>
-    BLOCKING_KINDS.has(e.kind) || (isAnswerWf && ANSWER_WORKFLOW_BLOCKING_KINDS.has(e.kind));
+    BLOCKING_KINDS.has(e.kind) ||
+    e.kind === "process_narration" ||
+    (isAnswerWf && ANSWER_WORKFLOW_BLOCKING_KINDS.has(e.kind));
   const blocking = errors.filter(isBlocking);
   const warnings = errors.filter((e) => !isBlocking(e));
   return { ok: blocking.length === 0, errors: blocking, warnings };
@@ -986,11 +1010,16 @@ export function buildRetryInstruction(errors = [], previousText = "", pool = [])
         "",
       ]
     : [];
-  // Style-only failures (length/answer-first) aren't "factual issues" —
-  // frame the intro to fit whichever kind of error we're handing back.
-  const STYLE_KINDS = new Set(["too_long", "answer_first", "raw_handle_leak"]);
+  // Style/voice-only failures (length/answer-first/process-narration) aren't
+  // "factual issues" — frame the intro to fit whichever kind of error we hand
+  // back. Process narration is a VOICE fix: the data is fine, only the phrasing
+  // leaked the retrieval process.
+  const STYLE_KINDS = new Set(["too_long", "answer_first", "raw_handle_leak", "process_narration"]);
   const allStyle = errors.every((e) => STYLE_KINDS.has(e.kind));
-  const intro = allStyle
+  const onlyNarration = errors.length > 0 && errors.every((e) => e.kind === "process_narration");
+  const intro = onlyNarration
+    ? "That draft narrated your process. Rewrite it as the polished, customer-facing answer:"
+    : allStyle
     ? "That draft needs to be reshaped before it can go to the customer:"
     : "That draft has factual issues that need correcting before it can go to the customer:";
   return [

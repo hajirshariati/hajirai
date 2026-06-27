@@ -338,7 +338,7 @@ export async function runWithGroundingRetry({
   // is wasted money/latency, so the next attempt runs tools-off. Data
   // failures (ungrounded name, wrong price, missing lookup, false denial)
   // still re-run tools so the model can fetch what it's missing.
-  const REWRITE_ONLY_KINDS = new Set(["too_long", "answer_first", "raw_handle_leak"]);
+  const REWRITE_ONLY_KINDS = new Set(["too_long", "answer_first", "raw_handle_leak", "process_narration"]);
   let nextRewriteOnly = false;
 
   while (attempt <= maxRetries) {

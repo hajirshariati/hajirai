@@ -9,6 +9,7 @@ import { planTurn, buildTurnPlanPromptBlock, buildPlanClarifierRepair, planForce
 import { classifyAvailability, buildAvailabilityAnswer, AVAILABILITY_RESULT, resolveAvailabilityRequest, isAvailabilityFollowUp, familyOfTitle, collectFamilyColors, constraintIntent, parseAvailabilityConstraints, parseRequestedColors, priorAvailabilityMessage, priorAvailabilityConstraints, variantDataDiagnostics, styleKeyOfTitle, styleNameOfTitle } from "../lib/availability-truth";
 import { detectSupportHandoffNeed, buildSupportHandoffText, supportConfigured, normalizedSupportLabel, supportChatLabel } from "../lib/support-handoff";
 import { extractConstraintPlan } from "../lib/constraint-plan";
+import { detectProcessNarration, stripProcessNarration, buildSalesVoiceFallback, SALES_JUDGMENT_WORKFLOWS } from "../lib/sales-voice";
 import { buildPriorEvidenceAvailabilityText, buildPriorEvidenceMultiColorText, askedConstraintLabel, titleCaseWord } from "../lib/prior-evidence";
 import { selectEvidenceCards } from "../lib/evidence-select";
 import { retrieveRelevantChunks } from "../lib/knowledge-chunks.server";
@@ -5238,7 +5239,14 @@ async function handleChatPost({ shop, sessionAccessToken, request, internal = fa
               String(process.env.HYBRID_MODEL_ROUTING || "").toLowerCase() !== "false";
             const turnStrategy = String(config.modelStrategy || "smart");
             const latestForRouting = String(body.message || "");
+            // Sales-judgment turns (condition/advisory/comparison/multi) need
+            // taste + the direct sales voice — the fast model tends to narrate
+            // its process here, which the validator then blocks (an extra retry).
+            // Route them straight to the stronger model on attempt 0. Simple
+            // browse/policy/availability stay on the fast model for cost.
+            const workflowNeedsStrongModel = SALES_JUDGMENT_WORKFLOWS.has(ctx?.turnPlan?.workflow || "");
             const needsStrongModel =
+              workflowNeedsStrongModel ||
               detectComparisonIntent(latestForRouting) ||
               /\b(?:vs\.?|versus|difference between|compare)\b/i.test(latestForRouting) ||
               // Review / fit / durability / value questions need a grounded
@@ -5371,6 +5379,32 @@ async function handleChatPost({ shop, sessionAccessToken, request, internal = fa
               if (cleanResult.turnResult) cleanResult.turnResult.products = [];
               cleanResult.finalProductCards = [];
               console.log(`[handoff] mode=hard reason=validation_failed support=${hasUrl} cards=0`);
+            }
+            // SALES VOICE — final emit scrub (backup to the validator block).
+            // If any process-narration sentence survived ("I see I'm getting
+            // mostly sneakers…", "let me try one more search"), remove only that
+            // sentence. If the scrub leaves a fragment, use a warm, sales-safe
+            // fallback (recommendation-first, never "I'm not finding a match").
+            {
+              const before = cleanResult.fullResponseText || "";
+              const narration = detectProcessNarration(before);
+              if (narration.hit) {
+                const wf = ctx?.turnPlan?.workflow || "";
+                const finalCardCount =
+                  cleanResult.turnResult?.products?.length
+                  || cleanResult.finalProductCards?.length
+                  || 0;
+                let scrubbed = stripProcessNarration(before);
+                if (scrubbed.trim().length < 40) {
+                  scrubbed = buildSalesVoiceFallback({ workflow: wf, hasCards: finalCardCount > 0 });
+                }
+                cleanResult.fullResponseText = scrubbed;
+                console.log(
+                  `[sales-voice] scrubbed process narration (${narration.sentences.length} sentence(s)) ` +
+                  `workflow=${wf} ${before.length}→${scrubbed.length} chars` +
+                  (scrubbed === buildSalesVoiceFallback({ workflow: wf, hasCards: finalCardCount > 0 }) ? " (fallback)" : ""),
+                );
+              }
             }
             // Emit the AUTHORITATIVE final text first (text emit was
             // deferred in runAgenticLoop). runWithGroundingRetry sets

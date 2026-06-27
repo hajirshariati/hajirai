@@ -20,12 +20,13 @@ phrasing layer is verified by manual PRD live-testing, not these suites.
 | `eval-named-family-evidence` | 14 | 0 | named-family evidence requirement |
 | `eval-clarifier-and-detector` | 41 | 0 | clarifier blocking + specific-product detection (generic words like "weather" never a family) |
 | `eval-evidence-alignment` | 19 | 0 | card/text family alignment |
-| `eval-grounding-validator` | 74 | 0 | factual-safety blocking/warning partition + comparison length cap |
+| `eval-grounding-validator` | 74 | 0 | factual-safety blocking/warning partition + comparison length cap + process-narration block |
 | `eval-support-handoff` | 23 | 0 | customer-service handoff: explicit human, dead-end, partial, validation-failed; never on successful turns |
 | `eval-constraint-plan` | 15 | 0 | ConstraintPlan: multi-recommendation slots, compatibility, category-noun exclusion, kids gender, structured constraints |
 | `eval-prior-evidence` | 16 | 0 | prior_evidence_availability: deterministic per-item answer text, multi-color parse + per-family per-color answer, asked-constraint label, cardOwner≠scorer invariant, no-stray-card invariant |
 | `eval-evidence-select` | 5 | 0 | condition/advisory deterministic 2-3 card selection: caps at 3, prefers LLM-named families, distinct families, never scorer |
-| **Total** | **535** | **0** | |
+| `eval-sales-voice` | 13 | 0 | no-process-narration guard: detector (catches retrieval narration, spares shopper words), BLOCKING on sales workflows, emit scrub + sales-safe fallback, Sonnet-first routing |
+| **Total** | **548** | **0** | |
 
 Run all: `npm run build && for s in scripts/eval-*.mjs; do node "$s"; done`
 
@@ -80,6 +81,24 @@ this pass made was driven by a QA scenario that reproduced a failure:
   paths behave identically. (Helper renamed `support-handoff.server.js` →
   `support-handoff.js` so the route imports it without tripping React Router's
   server-only-module resolver.)
+
+- **Sales voice — the bot narrated its retrieval process.** PRD: "I need
+  comfortable shoes for standing at work all day, but I want something nicer than
+  sneakers" got "I see I'm getting mostly sneakers in our system... Let me try one
+  more search." A customer-facing answer must read like a store associate, never
+  expose searches/tools/system/catalog/data/filters/results. Added a centralized
+  guard (`app/lib/sales-voice.js`): (1) a `detectProcessNarration` detector tuned
+  to catch retrieval narration while sparing normal shopper words (style, size,
+  available, product page); (2) it BLOCKS on sales-voiced workflows
+  (condition_recommendation, named_product_advisory, comparison, availability,
+  prior_evidence_availability, multi_recommendation-with-cards) → a rewrite-only
+  retry with the exact instruction "Rewrite this as a customer-facing retail
+  answer… Start with the recommendation"; (3) a final emit scrub backup removes
+  only the offending sentence and, if that leaves a fragment, ships a warm
+  sales-safe fallback (never "I'm not finding a clean match"); (4) a high-priority
+  "FINAL ANSWER ONLY" prompt section; (5) sales-judgment turns route to the
+  stronger model first. Locked by `eval-sales-voice` (incl. the three PRD failing
+  drafts).
 
 - **Three production-quality gaps on the prior-evidence / handoff / advisory
   surface.** (1) *Multi-color prior-evidence follow-up.* "Do either of those come

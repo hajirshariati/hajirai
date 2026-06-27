@@ -600,8 +600,8 @@ export function buildAnswerWorkflowExhaustionText(plan, pool = []) {
     case WORKFLOWS.AVAILABILITY:
     case WORKFLOWS.PRIOR_EVIDENCE_AVAILABILITY:
       return lineup
-        ? `I can't confirm that exact size/color combination from the data I have right now — here's the ${titles[0]} so you can check current availability.`
-        : "I can't confirm that exact size/color from the data I have right now — let me know the product and I'll pull what's in stock.";
+        ? `I can't confirm that exact size and color combination right now — here's the ${titles[0]} so you can check current availability.`
+        : "I can't confirm that exact size and color right now — let me know the product and I'll check what's in stock for you.";
     case WORKFLOWS.COMPARISON:
       return lineup
         ? `Here ${titles.length === 1 ? "is" : "are"} ${lineup} side by side — take a close look at each, and tell me what matters most (support, cushioning, dressiness) so I can call a winner.`
