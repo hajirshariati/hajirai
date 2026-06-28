@@ -121,12 +121,13 @@ test("layout is TWO COLUMNS: a narrow compact left rail + flexible hero column",
   assert.doesNotMatch(style, /minmax\(0,300px\)/, "the old 300px left column is gone");
 });
 
-test("columns are TOP-ALIGNED, NOT stretched (card keeps its compact height)", () => {
+test("desktop columns are EQUAL HEIGHT via grid stretch (right matches the left stack)", () => {
   const style = fnBody("injectVizStyleOnce");
-  assert.match(style, /\.ai-chat-viz-expanded\{[^}]*align-items:start/, "grid items top-aligned, not equal-height");
-  assert.doesNotMatch(style, /align-items:stretch/, "must NOT stretch the card to the image height");
-  // No height:100% pinning the card/preview to the row height anymore.
-  assert.doesNotMatch(style, /\.ai-chat-viz-controls\{[^}]*height:100%/, "left column is not forced to fill the row");
+  assert.match(style, /\.ai-chat-viz-expanded\{[^}]*align-items:stretch/, "grid items share the row → equal height");
+  // The right preview + image host fill the grid-row height so the result card
+  // can resolve height:100% against a definite height.
+  assert.match(style, /\.ai-chat-viz-preview\{[^}]*height:100%/, "right column fills the row height");
+  assert.match(style, /\.ai-chat-viz-image\{[^}]*height:100%/, "image host fills the row height");
 });
 
 test("the left product card is COMPACT (max 220px), not the hero", () => {
@@ -135,14 +136,32 @@ test("the left product card is COMPACT (max 220px), not the hero", () => {
   assert.doesNotMatch(style, /minmax\(220px,260px\)/, "the old stretch-column layout is gone");
 });
 
-test("the generated image is the HERO: stable 4/5 portrait ratio, object-fit:cover", () => {
+test("the right preview card FILLS the row height; image wrapper grows, caption pinned", () => {
   const style = fnBody("injectVizStyleOnce");
-  assert.match(style, /\.ai-chat-viz-result\{[^}]*aspect-ratio:4\/5/, "stable portrait ratio, not tied to left column height");
-  assert.match(style, /\.ai-chat-viz-result\{[^}]*min-height:420px/, "stays large");
-  assert.match(style, /\.ai-chat-viz-result\{[^}]*max-height:620px/, "bounded so it never gets absurd");
-  assert.match(style, /\.ai-chat-viz-result-img\{[^}]*object-fit:cover/, "generated image fills as the hero");
-  assert.match(style, /\.ai-chat-viz-result-img\{[^}]*flex:1 1 auto/, "image grows to fill");
-  assert.match(style, /\.ai-chat-viz-disclaimer\{[^}]*flex:0 0 auto/, "disclaimer pinned at the bottom, doesn't shrink the image");
+  // Desktop result fills the row (height:100%/min-height:100%), NOT a fixed ratio.
+  assert.match(style, /\.ai-chat-viz-result\{[^}]*height:100%/, "result card fills the grid row height");
+  assert.match(style, /\.ai-chat-viz-result\{[^}]*min-height:100%/, "never shorter than the row");
+  assert.match(style, /\.ai-chat-viz-result\{[^}]*display:flex[^}]*flex-direction:column/, "column: image area then caption");
+  // The image area is its own wrapper that grows (flex:1); caption is flex:0.
+  assert.match(style, /\.ai-chat-viz-result-imgwrap\{[^}]*flex:1 1 auto/, "image wrapper grows to fill");
+  assert.match(style, /\.ai-chat-viz-result-img\{[^}]*object-fit:cover/, "image covers the wrapper");
+  assert.match(style, /\.ai-chat-viz-result-img\{[^}]*object-position:center bottom/, "keep the shoe in frame when tall");
+  assert.match(style, /\.ai-chat-viz-disclaimer\{[^}]*flex:0 0 auto/, "caption pinned at the bottom, separate flex row");
+  // Desktop must NOT pin a fixed aspect ratio (that breaks equal-height stretch).
+  // aspect-ratio appears ONLY inside the mobile @media block, never in the base rule.
+  const desktopResult = (style.split("@media")[0].match(/\.ai-chat-viz-result\{[^}]*\}/) || [""])[0];
+  assert.doesNotMatch(desktopResult, /aspect-ratio/, "no fixed aspect ratio on the desktop result");
+});
+
+test("the caption lives OUTSIDE the image wrapper (never overlaid on the image)", () => {
+  const result = fnBody("vizResultHtml");
+  assert.match(result, /class="ai-chat-viz-result-imgwrap"><img class="ai-chat-viz-result-img"/, "image is inside its own wrapper");
+  // The image wrapper closes (/></div>) BEFORE the caption node — caption is a
+  // sibling, not nested in the image area. (Source is string-concatenated, so we
+  // check ordering rather than an adjacency regex.)
+  const closeIdx = result.indexOf("/></div>");
+  const discIdx = result.indexOf("ai-chat-viz-disclaimer");
+  assert.ok(closeIdx !== -1 && discIdx !== -1 && closeIdx < discIdx, "caption comes after the closed image wrapper");
 });
 
 test("the result/loading HTML uses the stable layout classes (not just inline styles)", () => {
@@ -151,7 +170,14 @@ test("the result/loading HTML uses the stable layout classes (not just inline st
   assert.match(result, /class="ai-chat-viz-result-img"/, "result image class");
   assert.match(result, /class="ai-chat-viz-disclaimer"/, "disclaimer class");
   const loading = fnBody("vizLoadingHtml");
-  assert.match(loading, /ai-chat-viz-result/, "loading reuses the result shell — same footprint, no giant gray block");
+  // Loading reuses the SAME result shell → same row-filling height, no jump when
+  // the image replaces the skeleton.
+  assert.match(loading, /ai-chat-viz-result/, "loading reuses the result shell — same height, no jump");
+});
+
+test("the settings panel is injected at host build (loading left stack is full height, no jump)", () => {
+  const run = fnBody("runVisualize");
+  assert.match(run, /injectVizOptions\(host,cta,card\)/, "Style the look panel injected before/at load, not only on success");
 });
 
 test("the left PRODUCT image is contain (never cropped) and compact (fixed height)", () => {
@@ -171,15 +197,18 @@ test("scene pills are QUIET small controls (~30px), not big CTA blocks", () => {
   assert.match(style, /\.ai-chat-viz-opt\{[^}]*font-size:12px!important/, "small label");
 });
 
-test("mobile stacks ONLY under 700px (card full-width, preview drops the max cap)", () => {
+test("mobile (<700px) stacks AND drops the forced equal-height (natural 4/5 ratio)", () => {
   const style = fnBody("injectVizStyleOnce");
-  assert.match(style, /@media \(max-width:699px\)\{\.ai-chat-viz-expanded\{grid-template-columns:1fr\}/, "single column only below 700px, valid @media syntax");
-  assert.match(style, /@media \(max-width:699px\)\{[^@]*\.ai-chat-viz-result\{min-height:320px;max-height:none\}/, "mobile preview keeps a floor but drops the desktop cap");
+  assert.match(style, /@media \(max-width:699px\)\{[^@]*\.ai-chat-viz-expanded\{grid-template-columns:1fr;align-items:start\}/, "single column, top-aligned below 700px");
+  // Equal-height is removed: preview/image/result no longer fill a row; the
+  // result uses a natural aspect ratio instead.
+  assert.match(style, /@media \(max-width:699px\)\{[^@]*\.ai-chat-viz-preview\{height:auto\}/, "preview no longer fills a row on mobile");
+  assert.match(style, /@media \(max-width:699px\)\{[^@]*\.ai-chat-viz-result\{height:auto;min-height:0;aspect-ratio:4\/5\}/, "mobile result uses a natural 4/5 ratio, not row height");
   assert.match(style, /@media \(max-width:699px\)\{[^@]*\.ai-chat-product-card\{max-width:100%!important\}/, "card may go full-width on mobile");
 });
 
 test("the widget carries a current build marker (so the live version is verifiable)", () => {
-  assert.match(SRC, /\[hajirai-widget\] build 2026-06-29 see-it-styled-singleflight/, "console build marker bumped for this change");
+  assert.match(SRC, /\[hajirai-widget\] build 2026-06-29 see-it-styled-equalheight/, "console build marker bumped for this change");
 });
 
 // ── PRD 2026-06-29: stability — single-flight, cancellation, no runaway repaint ──

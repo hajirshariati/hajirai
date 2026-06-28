@@ -4,7 +4,7 @@
 /* Build marker — bump on widget changes so a live deploy can be verified
    in DevTools console. If you don't see this line after `shopify app deploy`
    + hard refresh, the new bundle isn't live (stale checkout or CDN cache). */
-try{console.log('[hajirai-widget] build 2026-06-29 see-it-styled-singleflight');}catch(e){}
+try{console.log('[hajirai-widget] build 2026-06-29 see-it-styled-equalheight');}catch(e){}
 
 /* Visual config comes from theme editor (liquid-injected as window.__AI_CHAT_CONFIG).
    Chat server URL is handled internally via app proxy at /apps/hajirai/chat. */
@@ -739,10 +739,11 @@ function vizLoadingHtml(step){
 }
 function vizResultHtml(src){
   // Stable classes (not just inline styles) so the injected layout CSS controls
-  // the height/fill behavior: the image is the hero and fills the right column,
-  // the disclaimer stays pinned at the bottom.
+  // the height/fill behavior. The image lives in its OWN wrapper (flex:1) that
+  // grows to fill the card, with the caption a separate flex:0 row pinned at the
+  // bottom — the caption is never overlaid on the image.
   return '<div class="ai-chat-viz-result">'+
-    '<img class="ai-chat-viz-result-img" src="'+esc(src)+'" alt="AI style preview"/>'+
+    '<div class="ai-chat-viz-result-imgwrap"><img class="ai-chat-viz-result-img" src="'+esc(src)+'" alt="AI style preview"/></div>'+
     '<div class="ai-chat-viz-disclaimer">AI style preview. Product details may vary.</div>'+
   '</div>';
 }
@@ -815,14 +816,21 @@ function injectVizButton(card,cta){
 function injectVizStyleOnce(){
   if(document.getElementById('ai-chat-viz-layout-style'))return;
   var css=
-    // Two-column grid: a FIXED compact left rail (product reference + quiet
-    // scene controls) and a flexible right column where the generated image is
-    // the visual hero. align-items:start — the card is NEVER stretched to the
-    // image's height; each column sizes to its own content.
-    '.ai-chat-viz-expanded{display:grid;grid-template-columns:minmax(0,220px) minmax(0,1fr);gap:16px;align-items:start;width:100%;margin-top:10px;box-sizing:border-box}'+
-    '.ai-chat-viz-controls{display:flex;flex-direction:column;gap:10px;min-width:0;align-self:start}'+
-    '.ai-chat-viz-preview{min-width:0;align-self:start}'+
-    '.ai-chat-viz-image{min-width:0}'+
+    // Two-column grid: a compact left rail (product card + Style the look panel)
+    // and a flexible right column holding the generated image. align-items:stretch
+    // puts BOTH columns in the same grid row and makes the right preview match the
+    // FULL height of the left stack — if the product title wraps and the left grows,
+    // the image card grows to the same vertical line. The left stack drives the
+    // row height (the right column only fills it), so there's no empty area below
+    // the left column. Pure CSS — no ResizeObserver / JS height hack.
+    '.ai-chat-viz-expanded{display:grid;grid-template-columns:minmax(0,220px) minmax(0,1fr);gap:16px;align-items:stretch;width:100%;margin-top:10px;box-sizing:border-box}'+
+    // Left column: a vertical stack at natural content height, pinned to the top
+    // (extra row height, if any, stays below — content never stretches weirdly).
+    '.ai-chat-viz-controls{display:flex;flex-direction:column;gap:10px;min-width:0;justify-content:flex-start}'+
+    // Right column + image host both fill the grid-row height so the result card
+    // can resolve height:100% against a definite height.
+    '.ai-chat-viz-preview{min-width:0;height:100%}'+
+    '.ai-chat-viz-image{min-width:0;height:100%;min-height:260px;display:flex;flex-direction:column}'+
     // Compact product card — small reference content, NOT the hero. Vertical
     // block: image on top, info below. Image is a short fixed band so a tall
     // product photo can't blow the card up.
@@ -834,11 +842,15 @@ function injectVizStyleOnce(){
     '.ai-chat-viz-controls .ai-chat-product-title{font-size:14px!important;line-height:1.25!important}'+
     '.ai-chat-viz-controls .ai-chat-product-price{font-size:15px!important}'+
     '.ai-chat-viz-controls .ai-chat-product-cta{display:inline-flex!important;align-items:center;justify-content:center;align-self:flex-start!important;width:auto!important;margin-top:2px!important;padding:9px 14px!important;background:#000!important;color:#fff!important;border-radius:8px!important;font-size:13px!important;font-weight:600!important;text-decoration:none!important}'+
-    // Generated image = the hero. A stable 4/5 portrait ratio that is NOT tied
-    // to the left column's height; bounded so it stays large but never absurd.
-    // The image fills, the disclaimer is pinned at the bottom (never shrinks it).
-    '.ai-chat-viz-result{width:100%;aspect-ratio:4/5;min-height:420px;max-height:620px;display:flex;flex-direction:column;border:1px solid rgba(0,0,0,.08);border-radius:14px;overflow:hidden;background:#fff}'+
-    '.ai-chat-viz-result-img{flex:1 1 auto;width:100%;height:100%;min-height:0;object-fit:cover;display:block}'+
+    // Generated-image card = the hero. On desktop it FILLS the grid row height
+    // (height:100% resolves against the stretched .ai-chat-viz-image), so its
+    // bottom edge lands exactly at the bottom of the left Style-the-look panel.
+    // Column flex layout: image wrapper grows, disclaimer pinned at the bottom.
+    '.ai-chat-viz-result{width:100%;height:100%;min-height:100%;display:flex;flex-direction:column;border:1px solid rgba(0,0,0,.08);border-radius:14px;overflow:hidden;background:#fff}'+
+    // Image wrapper takes all space above the caption; image covers it. Bottom
+    // object-position keeps the shoe in frame when the row gets tall.
+    '.ai-chat-viz-result-imgwrap{flex:1 1 auto;min-height:0;width:100%;position:relative;overflow:hidden}'+
+    '.ai-chat-viz-result-img{width:100%;height:100%;object-fit:cover;object-position:center bottom;display:block}'+
     '.ai-chat-viz-disclaimer{flex:0 0 auto;padding:7px 10px;font-size:11px;color:#9a9a9a;text-align:center;line-height:1.35}'+
     // Quiet, Apple-style scene controls — small rounded pills, NOT CTA blocks.
     '.ai-chat-viz-options{padding:10px!important;gap:7px!important;border-radius:12px!important}'+
@@ -853,9 +865,16 @@ function injectVizStyleOnce(){
     '.ai-chat-viz-spin{width:16px;height:16px;border:2px solid var(--ai-chat-primary,#2d6b4f);border-top-color:transparent;border-radius:50%;display:inline-block;animation:aiChatVizSpin .8s linear infinite;flex:none}'+
     // Respect reduced-motion: stop the spinner from animating at all.
     '@media (prefers-reduced-motion:reduce){.ai-chat-viz-spin{animation:none!important}}'+
-    // Mobile/tablet (<700px): stack card → scene controls → hero image. The card
-    // may go full-width; the preview keeps its 4/5 ratio but drops the max cap.
-    '@media (max-width:699px){.ai-chat-viz-expanded{grid-template-columns:1fr}.ai-chat-viz-controls .ai-chat-product-card{max-width:100%!important}.ai-chat-viz-result{min-height:320px;max-height:none}}';
+    // Mobile/tablet (<700px): stack card → scene controls → image and DROP the
+    // equal-height behavior. Single column, top-aligned, and the preview uses a
+    // natural 4/5 aspect ratio instead of filling a (now non-existent) row.
+    '@media (max-width:699px){'+
+      '.ai-chat-viz-expanded{grid-template-columns:1fr;align-items:start}'+
+      '.ai-chat-viz-controls .ai-chat-product-card{max-width:100%!important}'+
+      '.ai-chat-viz-preview{height:auto}'+
+      '.ai-chat-viz-image{height:auto;min-height:0}'+
+      '.ai-chat-viz-result{height:auto;min-height:0;aspect-ratio:4/5}'+
+    '}';
   var st=document.createElement('style');
   st.id='ai-chat-viz-layout-style';
   st.textContent=css;
@@ -910,6 +929,11 @@ function runVisualize(cta,card){
   if(anchor&&anchor!==origContainer&&!anchor.querySelector('.ai-chat-product-card'))anchor.style.display='none';
   // Remember the host so a repeat CTA tap scrolls here instead of rebuilding.
   card._aiVizHost=host;
+  // Inject the "Style the look" panel NOW (not only after the first image) so the
+  // left column is at its full height (card + settings) during loading. That makes
+  // the stretched right card the right height from the start — the loading preview
+  // doesn't jump when the image arrives. The pills start disabled (vizFetch).
+  injectVizOptions(host,cta,card);
   vizFetch(host,cta,card);
 }
 // Fallback scene set when the server didn't send one (older config/cache).
