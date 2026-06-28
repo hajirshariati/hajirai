@@ -4,7 +4,7 @@
 /* Build marker — bump on widget changes so a live deploy can be verified
    in DevTools console. If you don't see this line after `shopify app deploy`
    + hard refresh, the new bundle isn't live (stale checkout or CDN cache). */
-try{console.log('[hajirai-widget] build 2026-06-29 see-it-styled-hero-image');}catch(e){}
+try{console.log('[hajirai-widget] build 2026-06-29 see-it-styled-singleflight');}catch(e){}
 
 /* Visual config comes from theme editor (liquid-injected as window.__AI_CHAT_CONFIG).
    Chat server URL is handled internally via app proxy at /apps/hajirai/chat. */
@@ -722,14 +722,17 @@ function vizSparkle(){return '<svg width="16" height="16" viewBox="0 0 24 24" fi
 function vizImageIcon(){return '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>';}
 function vizLoadingHtml(step){
   // Reuses the `.ai-chat-viz-result` shell so the loading state occupies the
-  // SAME desktop height as the finished image (no collapse, no layout jump).
-  // The shimmer area grows to fill via flex:1 1 auto.
+  // SAME footprint as the finished image (no collapse, no layout jump).
+  // IMPORTANT: the old full-card shimmer ran an infinite background-position
+  // animation across a large area — a heavy repaint loop that could peg the
+  // main thread and trigger "Page Unresponsive". This is now a STATIC fill with
+  // a single small spinner (`.ai-chat-viz-spin`, reduced-motion aware).
   return '<div class="ai-chat-viz-result ai-chat-viz-loading">'+
     '<div style="display:flex;align-items:center;gap:8px;padding:14px 14px 10px">'+
-      '<span style="width:14px;height:14px;border:2px solid var(--ai-chat-primary,#2d6b4f);border-top-color:transparent;border-radius:50%;display:inline-block;animation:aiChatVizSpin .8s linear infinite;flex:none"></span>'+
+      '<span class="ai-chat-viz-spin"></span>'+
       '<span class="ai-chat-viz-step" style="font-size:13px;color:#2d6b4f;font-weight:600">'+esc(step)+'</span>'+
     '</div>'+
-    '<div style="position:relative;flex:1 1 auto;min-height:200px;overflow:hidden;background:linear-gradient(90deg,#ececec 25%,#f6f6f6 37%,#ececec 63%);background-size:400% 100%;animation:aiChatViz 1.4s ease infinite">'+
+    '<div class="ai-chat-viz-loading-fill">'+
       '<span style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#b8b8b8;display:flex;flex-direction:column;align-items:center;gap:4px">'+vizImageIcon()+'<span style="font-size:11px;color:#a0a0a0">Creating your preview…</span></span>'+
     '</div>'+
   '</div>';
@@ -816,15 +819,15 @@ function injectVizStyleOnce(){
     // scene controls) and a flexible right column where the generated image is
     // the visual hero. align-items:start — the card is NEVER stretched to the
     // image's height; each column sizes to its own content.
-    '.ai-chat-viz-expanded{display:grid;grid-template-columns:240px minmax(0,1fr);gap:18px;align-items:start;width:100%;margin-top:10px;box-sizing:border-box}'+
+    '.ai-chat-viz-expanded{display:grid;grid-template-columns:minmax(0,220px) minmax(0,1fr);gap:16px;align-items:start;width:100%;margin-top:10px;box-sizing:border-box}'+
     '.ai-chat-viz-controls{display:flex;flex-direction:column;gap:10px;min-width:0;align-self:start}'+
     '.ai-chat-viz-preview{min-width:0;align-self:start}'+
     '.ai-chat-viz-image{min-width:0}'+
     // Compact product card — small reference content, NOT the hero. Vertical
     // block: image on top, info below. Image is a short fixed band so a tall
     // product photo can't blow the card up.
-    '.ai-chat-viz-controls .ai-chat-product-card{display:block!important;width:100%!important;max-width:240px!important;min-width:0!important;padding:0!important;margin:0!important;overflow:hidden!important;border:1px solid rgba(0,0,0,.08)!important;border-radius:12px!important;background:#fff!important}'+
-    '.ai-chat-viz-controls .ai-chat-product-img{width:100%!important;height:150px!important;aspect-ratio:auto!important;border-radius:0!important;overflow:hidden!important;background:#fff!important}'+
+    '.ai-chat-viz-controls .ai-chat-product-card{display:block!important;width:100%!important;max-width:220px!important;min-width:0!important;padding:0!important;margin:0!important;overflow:hidden!important;border:1px solid rgba(0,0,0,.08)!important;border-radius:12px!important;background:#fff!important}'+
+    '.ai-chat-viz-controls .ai-chat-product-img{width:100%!important;height:130px!important;aspect-ratio:auto!important;border-radius:0!important;overflow:hidden!important;background:#fff!important}'+
     // Product photos MUST be object-fit:contain — cover crops shoes and looks wrong.
     '.ai-chat-viz-controls .ai-chat-product-img img{width:100%!important;height:100%!important;object-fit:contain!important;display:block}'+
     '.ai-chat-viz-controls .ai-chat-product-info{box-sizing:border-box;padding:12px!important;display:flex!important;flex-direction:column!important;gap:6px!important}'+
@@ -842,7 +845,14 @@ function injectVizStyleOnce(){
     '.ai-chat-viz-options-title{font-size:12px!important;font-weight:700!important}'+
     '.ai-chat-viz-options-help{font-size:10.5px!important}'+
     '.ai-chat-viz-seg{gap:6px!important}'+
-    '.ai-chat-viz-opt{min-height:32px!important;padding:6px 10px!important;font-size:12px!important;border-radius:999px!important}'+
+    '.ai-chat-viz-opt{min-height:30px!important;padding:5px 10px!important;font-size:12px!important;border-radius:999px!important}'+
+    '.ai-chat-viz-opt[disabled]{opacity:.5!important;pointer-events:none!important;cursor:default!important}'+
+    // Lightweight loading: a STATIC soft fill (no full-card shimmer repaint loop
+    // that pegged the main thread / froze the page) plus one small spinner.
+    '.ai-chat-viz-loading-fill{position:relative;flex:1 1 auto;min-height:200px;overflow:hidden;background:#f4f4f5}'+
+    '.ai-chat-viz-spin{width:16px;height:16px;border:2px solid var(--ai-chat-primary,#2d6b4f);border-top-color:transparent;border-radius:50%;display:inline-block;animation:aiChatVizSpin .8s linear infinite;flex:none}'+
+    // Respect reduced-motion: stop the spinner from animating at all.
+    '@media (prefers-reduced-motion:reduce){.ai-chat-viz-spin{animation:none!important}}'+
     // Mobile/tablet (<700px): stack card → scene controls → hero image. The card
     // may go full-width; the preview keeps its 4/5 ratio but drops the max cap.
     '@media (max-width:699px){.ai-chat-viz-expanded{grid-template-columns:1fr}.ai-chat-viz-controls .ai-chat-product-card{max-width:100%!important}.ai-chat-viz-result{min-height:320px;max-height:none}}';
@@ -852,13 +862,23 @@ function injectVizStyleOnce(){
   (document.head||document.documentElement).appendChild(st);
 }
 function runVisualize(cta,card){
-  if(!cta||!cta.productHandle)return;
+  if(!cta||!cta.productHandle||!card)return;
+  // SINGLE-FLIGHT: a card visualizes at most once. If it's already loading or
+  // expanded (host built), a repeat CTA tap must NOT build a second host or
+  // start another request/timer/interval — just scroll to the existing preview.
+  // This is the main guard against stacked fetches and the runaway repaint loop
+  // that froze the page.
+  if(card._aiVizHost||card.dataset.vizState==='loading'||card.dataset.vizState==='ready'){
+    if(card._aiVizHost){try{card._aiVizHost.scrollIntoView({behavior:'smooth',block:'nearest'})}catch(e){scrollBottom()}}
+    return;
+  }
+  card.dataset.vizState='loading';
   injectVizStyleOnce();
   // HIDE the in-card CTA once tapped — in the expanded state the scene selector
   // replaces the need for a second "See It Styled" button.
   var viz=card&&card.querySelector('.ai-chat-viz-btn');
   if(viz)viz.style.display='none';
-  if(!card||!card.parentNode)return;
+  if(!card||!card.parentNode){card.dataset.vizState='';return;}
   // Build the two-column expanded layout, anchored OUTSIDE the products
   // container so the carousel/scroll CSS can't constrain it. The grid CSS above
   // owns the columns: left = controls (compact card at natural height + the
@@ -888,6 +908,8 @@ function runVisualize(cta,card){
   // Hide the now-empty products container(s) so they don't leave a blank gap.
   if(origContainer&&!origContainer.querySelector('.ai-chat-product-card'))origContainer.style.display='none';
   if(anchor&&anchor!==origContainer&&!anchor.querySelector('.ai-chat-product-card'))anchor.style.display='none';
+  // Remember the host so a repeat CTA tap scrolls here instead of rebuilding.
+  card._aiVizHost=host;
   vizFetch(host,cta,card);
 }
 // Fallback scene set when the server didn't send one (older config/cache).
@@ -937,7 +959,7 @@ function injectVizOptions(host,cta,card){
     chip.textContent=s.label;
     // Quiet, Apple-style pill — small (~32px) and fully rounded, not a CTA block.
     // Wraps cleanly. (The .ai-chat-viz-opt rule also enforces this with !important.)
-    chip.style.cssText='display:inline-flex;align-items:center;justify-content:center;min-height:32px;padding:6px 10px;border:1px solid #C9A76D;border-radius:999px;background:#fff;color:#8A6632;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;line-height:1.2;white-space:nowrap;box-sizing:border-box;transition:background .15s,color .15s';
+    chip.style.cssText='display:inline-flex;align-items:center;justify-content:center;min-height:30px;padding:5px 10px;border:1px solid #C9A76D;border-radius:999px;background:#fff;color:#8A6632;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;line-height:1.2;white-space:nowrap;box-sizing:border-box;transition:background .15s,color .15s';
     chip.addEventListener('click',function(e){
       if(e){e.preventDefault();e.stopPropagation();}
       var kids=seg.children;
@@ -951,22 +973,61 @@ function injectVizOptions(host,cta,card){
   wrap.appendChild(seg);
   mount.appendChild(wrap);
 }
+// Tear down any in-flight request/timers parked on a host (abort the fetch,
+// clear the step interval and the timeout). Idempotent.
+function vizFetchCleanup(host){
+  if(!host)return;
+  if(host._vizIv){clearInterval(host._vizIv);host._vizIv=null;}
+  if(host._vizTo){clearTimeout(host._vizTo);host._vizTo=null;}
+  if(host._vizAbort){try{host._vizAbort.abort()}catch(e){}host._vizAbort=null;}
+}
+// Enable/disable the scene pills while a request is in flight so repeated taps
+// can't queue stacked fetches.
+function vizSetSceneDisabled(host,disabled){
+  if(!host)return;
+  var opts=host.querySelectorAll('.ai-chat-viz-opt');
+  for(var i=0;i<opts.length;i++){opts[i].disabled=!!disabled;if(disabled)opts[i].setAttribute('disabled','disabled');else opts[i].removeAttribute('disabled');}
+}
 // Loading → fetch → result/error. Runs INDEPENDENTLY of the chat stream
 // (own fetch, no input lock), so the customer can keep chatting while
 // the preview renders. 60s ceiling so a hung provider can't spin forever.
+// Re-entrant by design (the scene pills re-call it): each call CANCELS the
+// previous request/timers for this host and tags itself with a request id so
+// only the latest response is allowed to render — no stacked fetches/timers.
 function vizFetch(host,cta,card){
+  if(!host)return;
+  // Cancel whatever was running for this host, then claim the latest request id.
+  vizFetchCleanup(host);
+  var reqId=(host._vizReqId=(host._vizReqId||0)+1);
+  if(card)card.dataset.vizState='loading';
+  vizSetSceneDisabled(host,true);
   var imgHost=vizImageHost(host);
   var steps=['Analyzing the product…','Composing the scene…','Styling the look…','Rendering your preview…'];
   var si=0;imgHost.innerHTML=vizLoadingHtml(steps[0]);scrollBottom();
-  var iv=setInterval(function(){si=Math.min(si+1,steps.length-1);var l=imgHost.querySelector('.ai-chat-viz-step');if(l)l.textContent=steps[si]},2200);
+  host._vizIv=setInterval(function(){si=Math.min(si+1,steps.length-1);var l=imgHost.querySelector('.ai-chat-viz-step');if(l)l.textContent=steps[si]},2200);
   var ctrl=(typeof AbortController!=='undefined')?new AbortController():null;
-  var to=setTimeout(function(){if(ctrl){try{ctrl.abort()}catch(e){}}},60000);
+  host._vizAbort=ctrl;
+  host._vizTo=setTimeout(function(){if(ctrl){try{ctrl.abort()}catch(e){}}},60000);
   var opts={method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({productHandle:cta.productHandle,styleContext:cta.styleContext||''})};
   if(ctrl)opts.signal=ctrl.signal;
   fetch(VISUALIZE_URL,opts)
     .then(function(r){return r.json().catch(function(){return{}})})
-    .then(function(d){clearInterval(iv);clearTimeout(to);if(d&&d.ok&&d.imageDataUrl){imgHost.innerHTML=vizResultHtml(d.imageDataUrl);injectVizOptions(host,cta,card)}else{vizError(host,cta,(d&&d.message)||'Could not create the preview right now.',card)}scrollBottom()})
-    .catch(function(e){clearInterval(iv);clearTimeout(to);vizError(host,cta,(e&&e.name==='AbortError')?'That took too long — please try again.':'Connection issue. Please try again.',card);scrollBottom()});
+    .then(function(d){
+      // Stale response — a newer request superseded this one; drop it silently.
+      if(reqId!==host._vizReqId)return;
+      vizFetchCleanup(host);vizSetSceneDisabled(host,false);
+      if(card)card.dataset.vizState='ready';
+      if(d&&d.ok&&d.imageDataUrl){imgHost.innerHTML=vizResultHtml(d.imageDataUrl);injectVizOptions(host,cta,card)}
+      else{vizError(host,cta,(d&&d.message)||'Could not create the preview right now.',card)}
+      scrollBottom();
+    })
+    .catch(function(e){
+      if(reqId!==host._vizReqId)return;
+      vizFetchCleanup(host);vizSetSceneDisabled(host,false);
+      if(card)card.dataset.vizState='ready';
+      vizError(host,cta,(e&&e.name==='AbortError')?'That took too long — please try again.':'Connection issue. Please try again.',card);
+      scrollBottom();
+    });
 }
 function vizError(host,cta,msg,card){
   var imgHost=vizImageHost(host);

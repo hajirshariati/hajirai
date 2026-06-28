@@ -112,11 +112,13 @@ test("the generated image renders in the right column, separate from the card", 
 // ── PRD 2026-06-29: hero-image layout — compact card left, big preview right ──
 // Direction: DON'T equalize column heights. The product card is small reference
 // content; the generated image is the hero with its own stable portrait ratio.
-test("layout is TWO COLUMNS: a FIXED compact left rail + flexible hero column", () => {
+test("layout is TWO COLUMNS: a narrow compact left rail + flexible hero column", () => {
   const style = fnBody("injectVizStyleOnce");
   assert.match(style, /\.ai-chat-viz-expanded\{display:grid/, "grid container");
-  // Fixed 240px left rail, right column fills the rest.
-  assert.match(style, /\.ai-chat-viz-expanded\{display:grid;grid-template-columns:240px minmax\(0,1fr\)/, "fixed compact left column, hero right fills");
+  // Narrow ~220px left rail (minmax can't be blown wide), right column fills.
+  assert.match(style, /\.ai-chat-viz-expanded\{display:grid;grid-template-columns:minmax\(0,220px\) minmax\(0,1fr\)/, "narrow compact left column, hero right fills");
+  assert.doesNotMatch(style, /grid-template-columns:240px/, "the old wider 240px left column is gone");
+  assert.doesNotMatch(style, /minmax\(0,300px\)/, "the old 300px left column is gone");
 });
 
 test("columns are TOP-ALIGNED, NOT stretched (card keeps its compact height)", () => {
@@ -127,9 +129,9 @@ test("columns are TOP-ALIGNED, NOT stretched (card keeps its compact height)", (
   assert.doesNotMatch(style, /\.ai-chat-viz-controls\{[^}]*height:100%/, "left column is not forced to fill the row");
 });
 
-test("the left product card is COMPACT (max 240px), not the hero", () => {
+test("the left product card is COMPACT (max 220px), not the hero", () => {
   const style = fnBody("injectVizStyleOnce");
-  assert.match(style, /\.ai-chat-viz-controls \.ai-chat-product-card\{[^}]*max-width:240px!important/, "card capped at 240px");
+  assert.match(style, /\.ai-chat-viz-controls \.ai-chat-product-card\{[^}]*max-width:220px!important/, "card capped at 220px");
   assert.doesNotMatch(style, /minmax\(220px,260px\)/, "the old stretch-column layout is gone");
 });
 
@@ -154,16 +156,17 @@ test("the result/loading HTML uses the stable layout classes (not just inline st
 
 test("the left PRODUCT image is contain (never cropped) and compact (fixed height)", () => {
   const style = fnBody("injectVizStyleOnce");
-  assert.match(style, /\.ai-chat-viz-controls \.ai-chat-product-img\{[^}]*height:150px!important/, "compact fixed-height card image");
+  assert.match(style, /\.ai-chat-viz-controls \.ai-chat-product-img\{[^}]*height:130px!important/, "compact fixed-height card image (~120-140px)");
   assert.match(style, /\.ai-chat-viz-controls \.ai-chat-product-img\{[^}]*aspect-ratio:auto!important/, "no forced square");
   assert.match(style, /\.ai-chat-viz-controls \.ai-chat-product-img img\{[^}]*object-fit:contain!important/, "product photos use contain — shoes never cropped");
   // The product image must NEVER be set to cover (crops the shoe).
   assert.doesNotMatch(style, /\.ai-chat-viz-controls \.ai-chat-product-img img\{[^}]*object-fit:cover/, "no cover on the product image");
 });
 
-test("scene pills are QUIET small controls (~32px), not big CTA blocks", () => {
+test("scene pills are QUIET small controls (~30px), not big CTA blocks", () => {
   const style = fnBody("injectVizStyleOnce");
-  assert.match(style, /\.ai-chat-viz-opt\{[^}]*min-height:32px!important/, "compact ~32px pill, not 40px+ CTA");
+  assert.match(style, /\.ai-chat-viz-opt\{[^}]*min-height:30px!important/, "compact ~30px pill, not 40px+ CTA");
+  assert.match(style, /\.ai-chat-viz-opt\{[^}]*padding:5px 10px!important/, "tight padding");
   assert.match(style, /\.ai-chat-viz-opt\{[^}]*border-radius:999px!important/, "fully rounded quiet pill");
   assert.match(style, /\.ai-chat-viz-opt\{[^}]*font-size:12px!important/, "small label");
 });
@@ -176,7 +179,63 @@ test("mobile stacks ONLY under 700px (card full-width, preview drops the max cap
 });
 
 test("the widget carries a current build marker (so the live version is verifiable)", () => {
-  assert.match(SRC, /\[hajirai-widget\] build 2026-06-29 see-it-styled-hero-image/, "console build marker bumped for this change");
+  assert.match(SRC, /\[hajirai-widget\] build 2026-06-29 see-it-styled-singleflight/, "console build marker bumped for this change");
+});
+
+// ── PRD 2026-06-29: stability — single-flight, cancellation, no runaway repaint ──
+test("runVisualize is SINGLE-FLIGHT — a repeat CTA tap never builds a second host/request", () => {
+  const run = fnBody("runVisualize");
+  // Guard checks an existing host / loading|ready state and bails early.
+  assert.match(run, /card\._aiVizHost\|\|card\.dataset\.vizState==='loading'\|\|card\.dataset\.vizState==='ready'/, "early-return guard on existing host / state");
+  assert.match(run, /scrollIntoView/, "a repeat tap scrolls to the existing preview instead of refetching");
+  assert.match(run, /card\.dataset\.vizState='loading'/, "marks the card loading before building the host");
+  assert.match(run, /card\._aiVizHost=host/, "remembers the host on the card for re-entry");
+});
+
+test("vizFetch CANCELS prior work before a new scene request (no stacked fetches/timers)", () => {
+  const fetchBody = fnBody("vizFetch");
+  assert.match(fetchBody, /vizFetchCleanup\(host\)/, "tears down prior request/timers first");
+  const cleanup = fnBody("vizFetchCleanup");
+  assert.match(cleanup, /clearInterval\(host\._vizIv\)/, "clears the prior step interval");
+  assert.match(cleanup, /clearTimeout\(host\._vizTo\)/, "clears the prior timeout");
+  assert.match(cleanup, /host\._vizAbort\.abort\(\)/, "aborts the prior in-flight fetch");
+});
+
+test("vizFetch tags each request and renders ONLY the latest (stale responses dropped)", () => {
+  const fetchBody = fnBody("vizFetch");
+  assert.match(fetchBody, /host\._vizReqId=\(host\._vizReqId\|\|0\)\+1/, "monotonic request id per call");
+  // Both the success and error paths bail when superseded.
+  assert.equal((fetchBody.match(/if\(reqId!==host\._vizReqId\)return/g) || []).length, 2, "latest-only guard on both then/catch");
+});
+
+test("scene buttons are DISABLED while a request is in flight, re-enabled after", () => {
+  const fetchBody = fnBody("vizFetch");
+  assert.match(fetchBody, /vizSetSceneDisabled\(host,true\)/, "disabled at request start");
+  assert.match(fetchBody, /vizSetSceneDisabled\(host,false\)/, "re-enabled on settle");
+  const setter = fnBody("vizSetSceneDisabled");
+  assert.match(setter, /\.ai-chat-viz-opt/, "targets the scene pills");
+  assert.match(setter, /disabled/, "toggles the disabled state");
+  // CSS makes a disabled pill non-interactive.
+  const style = fnBody("injectVizStyleOnce");
+  assert.match(style, /\.ai-chat-viz-opt\[disabled\]\{[^}]*pointer-events:none!important/, "disabled pill ignores clicks");
+});
+
+test("loading is LIGHTWEIGHT — no full-card infinite shimmer repaint loop", () => {
+  const loading = fnBody("vizLoadingHtml");
+  // The old heavy shimmer (animated background-position over a big block) is gone.
+  assert.doesNotMatch(loading, /animation:aiChatViz /, "no big shimmer animation in the loading card");
+  assert.match(loading, /ai-chat-viz-loading-fill/, "static fill class");
+  assert.match(loading, /ai-chat-viz-spin/, "a single small spinner");
+  const style = fnBody("injectVizStyleOnce");
+  assert.match(style, /\.ai-chat-viz-loading-fill\{[^}]*background:#f4f4f5/, "the fill is STATIC, not animated");
+  assert.match(style, /@media \(prefers-reduced-motion:reduce\)\{\.ai-chat-viz-spin\{animation:none!important\}\}/, "reduced-motion stops the spinner");
+});
+
+test("the visualizer never lays a full-page/fixed overlay that blocks the chat", () => {
+  const style = fnBody("injectVizStyleOnce");
+  assert.doesNotMatch(style, /position:fixed/, "no fixed overlay layer in the injected CSS");
+  const run = fnBody("runVisualize");
+  assert.doesNotMatch(run, /z-index/, "no high-z-index layer created");
 });
 
 // ── PRD 2026-06-29: the keyframes/layout <style> ids must NOT collide ──
@@ -202,7 +261,7 @@ test("the card override beats the showcase carousel CSS (!important, compact blo
   assert.match(style, /\.ai-chat-viz-controls \.ai-chat-product-card\{[^}]*display:block!important/, "vertical block card");
   assert.match(style, /\.ai-chat-viz-controls \.ai-chat-product-card\{[^}]*width:100%!important/, "fills the compact column, not wider");
   assert.match(style, /\.ai-chat-viz-controls \.ai-chat-product-card\{[^}]*min-width:0!important/, "can shrink — no min-content blowout");
-  assert.match(style, /\.ai-chat-viz-controls \.ai-chat-product-img\{[^}]*height:150px!important/, "compact fixed-height product image");
+  assert.match(style, /\.ai-chat-viz-controls \.ai-chat-product-img\{[^}]*height:130px!important/, "compact fixed-height product image");
   // View product stays the visible black primary button.
   assert.match(style, /\.ai-chat-viz-controls \.ai-chat-product-cta\{[^}]*background:#000!important/, "View product stays the black primary button");
 });
@@ -237,9 +296,9 @@ test("scene panel is a distinct 'Style the look' panel with a 'Choose a setting'
   assert.doesNotMatch(body, /box-shadow/, "no heavy shadow");
 });
 
-test("scene pills are quiet, compact (~32px) and wrap cleanly", () => {
+test("scene pills are quiet, compact (~30px) and wrap cleanly", () => {
   const body = fnBody("injectVizOptions");
-  assert.match(body, /min-height:32px/, "quiet small pill, not a big CTA");
+  assert.match(body, /min-height:30px/, "quiet small pill, not a big CTA");
   assert.match(body, /border-radius:999px/, "fully rounded pill");
   assert.match(body, /flex-wrap:wrap/, "pills wrap into rows");
 });
