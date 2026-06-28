@@ -114,16 +114,61 @@ test("layout is TWO COLUMNS by default (card left, image right), mobile override
   const style = fnBody("injectVizStyleOnce");
   assert.match(style, /\.ai-chat-viz-expanded\{display:grid/, "grid container");
   // DEFAULT is two columns — so desktop gets card-left/image-right even if a
-  // parser ever drops the media query. minmax(0,…) can't be blown wide.
-  assert.match(style, /\.ai-chat-viz-expanded\{display:grid;grid-template-columns:minmax\(0,300px\) minmax\(0,1fr\)/, "default = two columns, left ≤300px, right fills");
-  assert.match(style, /align-items:start/, "columns top-aligned, card never stretches to image height");
+  // parser ever drops the media query. minmax(…) can't be blown wide.
+  assert.match(style, /\.ai-chat-viz-expanded\{display:grid;grid-template-columns:minmax\(220px,260px\) minmax\(0,1fr\)/, "default = two columns, compact left (~240-260px), right fills");
   // Only narrow widths collapse to a single column (stacked) — note the space
   // after @media (a missing space gets the rule dropped by strict parsers).
-  assert.match(style, /@media \(max-width:639px\)\{\.ai-chat-viz-expanded\{grid-template-columns:1fr\}\}/, "mobile-only override to single column, valid @media syntax");
+  assert.match(style, /@media \(max-width:639px\)\{\.ai-chat-viz-expanded\{grid-template-columns:1fr/, "mobile-only override to single column, valid @media syntax");
+});
+
+// ── PRD 2026-06-29: desktop proportions — image is the hero, card is context ──
+test("desktop columns STRETCH to equal height (preview matches the left column)", () => {
+  const style = fnBody("injectVizStyleOnce");
+  assert.match(style, /\.ai-chat-viz-expanded\{[^}]*align-items:stretch/, "grid items share the row height");
+  assert.match(style, /\.ai-chat-viz-preview\{[^}]*height:100%/, "right preview fills the row height");
+  assert.match(style, /\.ai-chat-viz-controls\{[^}]*height:100%/, "left column fills the row height");
+});
+
+test("the left column is COMPACT (~240-260px), not 300+", () => {
+  const style = fnBody("injectVizStyleOnce");
+  assert.match(style, /grid-template-columns:minmax\(220px,260px\)/, "left column capped around 260px");
+  assert.doesNotMatch(style, /minmax\(0,300px\)/, "the old wide 300px left column is gone");
+});
+
+test("the result card fills the right column height; image is the hero (object-fit:cover)", () => {
+  const style = fnBody("injectVizStyleOnce");
+  assert.match(style, /\.ai-chat-viz-result\{[^}]*height:100%/, "result wrapper fills the column height");
+  assert.match(style, /\.ai-chat-viz-result\{[^}]*min-height:420px/, "desktop floor so it never collapses");
+  assert.match(style, /\.ai-chat-viz-result-img\{[^}]*object-fit:cover/, "generated image fills as the hero");
+  assert.match(style, /\.ai-chat-viz-result-img\{[^}]*flex:1 1 auto/, "image grows to fill, disclaimer pinned below");
+  assert.match(style, /\.ai-chat-viz-disclaimer\{[^}]*flex:0 0 auto/, "disclaimer stays at the bottom, doesn't shrink the image");
+});
+
+test("the result/loading HTML uses the stable layout classes (not just inline styles)", () => {
+  const result = fnBody("vizResultHtml");
+  assert.match(result, /class="ai-chat-viz-result"/, "result wrapper class");
+  assert.match(result, /class="ai-chat-viz-result-img"/, "result image class");
+  assert.match(result, /class="ai-chat-viz-disclaimer"/, "disclaimer class");
+  const loading = fnBody("vizLoadingHtml");
+  assert.match(loading, /ai-chat-viz-result/, "loading reuses the result shell so it doesn't collapse");
+});
+
+test("the left product image is COMPACT (fixed height, contain), not a giant square", () => {
+  const style = fnBody("injectVizStyleOnce");
+  assert.match(style, /\.ai-chat-viz-controls \.ai-chat-product-img\{[^}]*height:180px!important/, "compact fixed-height card image");
+  assert.match(style, /\.ai-chat-viz-controls \.ai-chat-product-img\{[^}]*aspect-ratio:auto!important/, "no forced full square");
+  assert.match(style, /\.ai-chat-viz-controls \.ai-chat-product-img img\{[^}]*object-fit:contain/, "whole product shown, compact");
+});
+
+test("mobile override removes the forced desktop height (no huge image)", () => {
+  const style = fnBody("injectVizStyleOnce");
+  assert.match(style, /@media \(max-width:639px\)\{[^}]*\.ai-chat-viz-result\{min-height:320px;height:auto\}/, "mobile result sizes to content");
+  assert.match(style, /\.ai-chat-viz-result-img\{aspect-ratio:4\/5;height:auto/, "mobile image uses a sane aspect ratio");
+  assert.match(style, /@media \(max-width:639px\)\{\.ai-chat-viz-image\{height:auto;min-height:0\}\}/, "mobile image host drops the desktop floor");
 });
 
 test("the widget carries a current build marker (so the live version is verifiable)", () => {
-  assert.match(SRC, /\[hajirai-widget\] build 2026-06-29 see-it-styled-styleid-fix/, "console build marker bumped for this change");
+  assert.match(SRC, /\[hajirai-widget\] build 2026-06-29 see-it-styled-proportions/, "console build marker bumped for this change");
 });
 
 // ── PRD 2026-06-29: the keyframes/layout <style> ids must NOT collide ──
@@ -147,9 +192,9 @@ test("injectVizStyleOnce guards on the LAYOUT id, never the keyframes id", () =>
 test("the card override beats the showcase carousel CSS (!important, compact vertical)", () => {
   const style = fnBody("injectVizStyleOnce");
   assert.match(style, /\.ai-chat-viz-controls \.ai-chat-product-card\{[^}]*flex-direction:column!important/, "vertical card");
-  assert.match(style, /\.ai-chat-viz-controls \.ai-chat-product-card\{[^}]*width:100%!important/, "fills the 300px column, not wider");
+  assert.match(style, /\.ai-chat-viz-controls \.ai-chat-product-card\{[^}]*width:100%!important/, "fills the compact column, not wider");
   assert.match(style, /\.ai-chat-viz-controls \.ai-chat-product-card\{[^}]*min-width:0!important/, "can shrink — no min-content blowout");
-  assert.match(style, /\.ai-chat-viz-controls \.ai-chat-product-img\{[^}]*aspect-ratio:1\/1!important/, "square product image");
+  assert.match(style, /\.ai-chat-viz-controls \.ai-chat-product-img\{[^}]*height:180px!important/, "compact fixed-height product image");
   // View product stays the visible black primary button.
   assert.match(style, /\.ai-chat-viz-controls \.ai-chat-product-cta\{[^}]*background:#000!important/, "View product stays the black primary button");
 });
