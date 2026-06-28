@@ -123,7 +123,25 @@ test("layout is TWO COLUMNS by default (card left, image right), mobile override
 });
 
 test("the widget carries a current build marker (so the live version is verifiable)", () => {
-  assert.match(SRC, /\[hajirai-widget\] build 2026-06-29 see-it-styled-grid-2col/, "console build marker bumped for this change");
+  assert.match(SRC, /\[hajirai-widget\] build 2026-06-29 see-it-styled-styleid-fix/, "console build marker bumped for this change");
+});
+
+// ── PRD 2026-06-29: the keyframes/layout <style> ids must NOT collide ──
+// The startup keyframe <style> and injectVizStyleOnce() used the SAME id
+// (`ai-chat-viz-style`). The keyframes element wins the race, so the
+// getElementById guard in injectVizStyleOnce() short-circuited and the LAYOUT
+// CSS (grid + card reset) never got injected — desktop stacked. Distinct ids fix it.
+test("keyframes and layout styles use DISTINCT ids (no collision)", () => {
+  assert.match(SRC, /id='ai-chat-viz-keyframes-style'/, "startup keyframes use their own id");
+  assert.match(SRC, /id='ai-chat-viz-layout-style'/, "expanded layout CSS uses its own id");
+  // The old shared id must be gone entirely.
+  assert.doesNotMatch(SRC, /'ai-chat-viz-style'/, "the colliding shared id must be removed");
+});
+
+test("injectVizStyleOnce guards on the LAYOUT id, never the keyframes id", () => {
+  const style = fnBody("injectVizStyleOnce");
+  assert.match(style, /getElementById\('ai-chat-viz-layout-style'\)/, "idempotency check uses the layout id");
+  assert.doesNotMatch(style, /ai-chat-viz-keyframes-style/, "must not short-circuit on the keyframes element");
 });
 
 test("the card override beats the showcase carousel CSS (!important, compact vertical)", () => {
@@ -138,7 +156,7 @@ test("the card override beats the showcase carousel CSS (!important, compact ver
 
 test("the CSS travels WITH the JS (injected <style>, no separate stylesheet to cache)", () => {
   const style = fnBody("injectVizStyleOnce");
-  assert.match(style, /getElementById\('ai-chat-viz-style'\)/, "injected once, idempotent");
+  assert.match(style, /getElementById\('ai-chat-viz-layout-style'\)/, "injected once, idempotent");
   assert.match(style, /document\.createElement\('style'\)/, "a <style> element carried with the JS");
   const run = fnBody("runVisualize");
   assert.match(run, /injectVizStyleOnce\(\)/, "runVisualize injects the styles");

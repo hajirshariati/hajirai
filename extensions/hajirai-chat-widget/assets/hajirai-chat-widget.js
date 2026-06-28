@@ -4,7 +4,7 @@
 /* Build marker — bump on widget changes so a live deploy can be verified
    in DevTools console. If you don't see this line after `shopify app deploy`
    + hard refresh, the new bundle isn't live (stale checkout or CDN cache). */
-try{console.log('[hajirai-widget] build 2026-06-29 see-it-styled-grid-2col');}catch(e){}
+try{console.log('[hajirai-widget] build 2026-06-29 see-it-styled-styleid-fix');}catch(e){}
 
 /* Visual config comes from theme editor (liquid-injected as window.__AI_CHAT_CONFIG).
    Chat server URL is handled internally via app proxy at /apps/hajirai/chat. */
@@ -22,7 +22,7 @@ var CHAT_URL='/apps/hajirai/chat';
 var FEEDBACK_URL='/apps/hajirai/feedback';
 var CONFIG_URL='/apps/hajirai/widget-config';
 var VISUALIZE_URL='/apps/hajirai/visualize';
-(function(){try{if(document.getElementById('ai-chat-viz-style'))return;var st=document.createElement('style');st.id='ai-chat-viz-style';st.textContent='@keyframes aiChatViz{0%{background-position:100% 0}100%{background-position:-100% 0}}@keyframes aiChatVizSpin{to{transform:rotate(360deg)}}';(document.head||document.documentElement).appendChild(st)}catch(e){}})();
+(function(){try{if(document.getElementById('ai-chat-viz-keyframes-style'))return;var st=document.createElement('style');st.id='ai-chat-viz-keyframes-style';st.textContent='@keyframes aiChatViz{0%{background-position:100% 0}100%{background-position:-100% 0}}@keyframes aiChatVizSpin{to{transform:rotate(360deg)}}';(document.head||document.documentElement).appendChild(st)}catch(e){}})();
 var HRK='hajirai_hide_rules';
 var PCSK='hajirai_product_card_style';
 
@@ -804,7 +804,7 @@ function injectVizButton(card,cta){
 // the showcase/carousel CSS (the viewport-driven :only-child featured layout)
 // can never win once the card sits in the controls column.
 function injectVizStyleOnce(){
-  if(document.getElementById('ai-chat-viz-style'))return;
+  if(document.getElementById('ai-chat-viz-layout-style'))return;
   var css=
     '.ai-chat-viz-expanded{display:grid;grid-template-columns:minmax(0,300px) minmax(0,1fr);gap:14px;align-items:start;width:100%;margin-top:8px;box-sizing:border-box}'+
     '@media (max-width:639px){.ai-chat-viz-expanded{grid-template-columns:1fr}}'+
@@ -816,7 +816,7 @@ function injectVizStyleOnce(){
     '.ai-chat-viz-controls .ai-chat-product-info{width:100%!important;box-sizing:border-box;padding:12px 14px 14px!important;display:flex!important;flex-direction:column!important;gap:6px!important;justify-content:flex-start!important}'+
     '.ai-chat-viz-controls .ai-chat-product-cta{display:inline-flex!important;align-items:center;justify-content:center;align-self:flex-start!important;width:auto!important;margin-top:2px!important;padding:9px 16px!important;background:#000!important;color:#fff!important;border-radius:8px!important;font-size:13px!important;font-weight:600!important;letter-spacing:.02em!important;text-decoration:none!important}';
   var st=document.createElement('style');
-  st.id='ai-chat-viz-style';
+  st.id='ai-chat-viz-layout-style';
   st.textContent=css;
   (document.head||document.documentElement).appendChild(st);
 }
