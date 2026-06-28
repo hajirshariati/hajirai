@@ -76,19 +76,25 @@ test("mobile CAROUSEL photo FILLS the well (less empty space) + contain, never c
   assert.doesNotMatch(MOBILE, /\.ai-chat-product-img img \{[^}]*object-fit: cover/, "no cover on mobile product images");
 });
 
-test("mobile SINGLE/featured card is a compact HORIZONTAL grid (96px / 1fr)", () => {
+test("mobile SINGLE/featured card is a compact HORIZONTAL grid (104px / 1fr)", () => {
   assert.match(MOBILE, /:only-child \{[^}]*display: grid/, "single card is a grid");
-  assert.match(MOBILE, /:only-child \{[^}]*grid-template-columns: 96px 1fr/, "96px image column + flexible text");
-  assert.match(MOBILE, /:only-child \.ai-chat-product-img \{[^}]*width: 96px[^}]*height: 96px/, "96px image well");
-  assert.match(MOBILE, /:only-child \.ai-chat-product-img img \{[^}]*max-width: 86px[^}]*max-height: 86px/, "photo capped at 86px");
+  assert.match(MOBILE, /:only-child \{[^}]*grid-template-columns: 104px 1fr/, "104px image column + flexible text");
+  assert.match(MOBILE, /:only-child \.ai-chat-product-img \{[^}]*width: 104px/, "104px image well");
+  assert.match(MOBILE, /:only-child \.ai-chat-product-img img \{[^}]*max-width: 94px[^}]*max-height: 94px/, "photo capped at 94px");
 });
 
-test("the single card TOP-aligns the image (no centered floating gaps above/below)", () => {
-  // align-items:start on the grid → image top-aligns with the title, instead of
-  // centering a small image in a tall content column (the empty-space bug).
-  assert.match(MOBILE, /:only-child \{[^}]*align-items: start/, "image top-aligned with the title");
-  assert.doesNotMatch(MOBILE, /:only-child \{[^}]*align-items: center/, "NOT centered (that caused the top/bottom gaps)");
-  assert.match(MOBILE, /:only-child \.ai-chat-product-info \{[^}]*justify-content: flex-start/, "info hugs the top, tight vertical rhythm");
+test("the single card image column STRETCHES to the content height (no gap below image)", () => {
+  // align-items:stretch → the white image well matches the info-block height, so
+  // there's never an asymmetric empty area below a top-pinned image.
+  assert.match(MOBILE, /:only-child \{[^}]*align-items: stretch/, "image column matches content height");
+  assert.match(MOBILE, /:only-child \.ai-chat-product-img \{[^}]*align-self: stretch/, "well stretches to the row height");
+  assert.match(MOBILE, /:only-child \.ai-chat-product-img \{[^}]*min-height: 92px/, "floor so a short card doesn't shrink the image");
+});
+
+test("mobile single-card CTAs are THINNER (minimal vertical padding, no wasted space)", () => {
+  // View product gets tighter padding; the injected See It Styled button too.
+  assert.match(MOBILE, /:only-child \.ai-chat-product-cta \{[^}]*padding: 6px 14px/, "View product CTA is thin");
+  assert.match(MOBILE, /:only-child \.ai-chat-viz-btn \{[^}]*padding: 6px 13px !important/, "See It Styled button is thin (overrides its inline padding)");
 });
 
 test("the single card hugs its content (no stretched min-height / dead space)", () => {

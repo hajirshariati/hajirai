@@ -1507,17 +1507,20 @@ a.ai-chat-welcome__hint--link:hover {
      in the min-width:601px block and is unaffected.) */
   .ai-chat-products--showcase .ai-chat-product-card:only-child {
     display: grid;
-    grid-template-columns: 96px 1fr;
+    grid-template-columns: 104px 1fr;
     gap: 14px;
-    /* TOP-align the image with the title (App Store-style row) instead of
-       centering it — centering left big empty gaps above and below the small
-       image when the text column is taller. */
-    align-items: start;
+    /* STRETCH the image column to the content height so the white well always
+       matches the info block — no asymmetric empty space below a top-pinned
+       image. The photo is centered inside the white well (white-on-white reads
+       as a clean centered product shot, not a gap). */
+    align-items: stretch;
     padding: 14px;
   }
   .ai-chat-products--showcase .ai-chat-product-card:only-child .ai-chat-product-img {
-    width: 96px;
-    height: 96px;
+    width: 104px;
+    height: auto;
+    min-height: 92px;
+    align-self: stretch;
     background: #fff;
     display: flex;
     align-items: center;
@@ -1529,25 +1532,36 @@ a.ai-chat-welcome__hint--link:hover {
   .ai-chat-products--showcase .ai-chat-product-card:only-child .ai-chat-product-img img {
     width: auto;
     height: auto;
-    max-width: 86px;
-    max-height: 86px;
+    max-width: 94px;
+    max-height: 94px;
     object-fit: contain;
     display: block;
   }
   .ai-chat-products--showcase .ai-chat-product-card:only-child .ai-chat-product-info {
     padding: 0;
     min-width: 0;
-    /* Hug the top so title/price/buttons sit tight under each other. */
-    justify-content: flex-start;
-    gap: 6px;
+    /* Center the text block against the image; thin buttons keep it short. */
+    justify-content: center;
+    gap: 5px;
   }
   /* No reserved 2-line min-height → the card hugs its content (no dead space). */
   .ai-chat-products--showcase .ai-chat-product-card:only-child .ai-chat-product-title {
     min-height: 0;
   }
+  /* THINNER CTAs on mobile — minimal vertical padding so the buttons (and the
+     whole card) take less height and waste no space. */
   .ai-chat-products--showcase .ai-chat-product-card:only-child .ai-chat-product-cta {
     align-self: flex-start;
     max-width: 160px;
+    padding: 6px 14px;
+    margin-top: 0;
+  }
+  .ai-chat-products--showcase .ai-chat-product-card:only-child .ai-chat-viz-actions {
+    margin-top: 4px !important;
+    gap: 6px;
+  }
+  .ai-chat-products--showcase .ai-chat-product-card:only-child .ai-chat-viz-btn {
+    padding: 6px 13px !important;
   }
 }
 
