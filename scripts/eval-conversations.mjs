@@ -122,6 +122,7 @@ async function runScenario(scenario) {
       controller,
       encoder,
       classifiedIntent: turn.classifier || null,
+      turnPlan: turn.turnPlan || null,
     });
 
     if (turn.expect.gateHandled === false) {
@@ -974,6 +975,43 @@ const SCENARIOS = [
   { name: "useCase: 'cleats / soccer'", turns: [{ user: "I need an orthotic for my soccer cleats", classifier: C({ attributes: { useCase: "cleats" } }), expect: { gateHandled: true } }] },
   { name: "useCase: 'hockey skates'", turns: [{ user: "orthotic for hockey skates", classifier: C({ attributes: { useCase: "skates" } }), expect: { gateHandled: true } }] },
   { name: "useCase: 'dress shoes'", turns: [{ user: "I want an orthotic for dress shoes", classifier: C({ attributes: { useCase: "dress" } }), expect: { gateHandled: true } }] },
+
+  // ========== PRD 2026-06-29: hard TurnPlan ownership override ==========
+  // The CENTRAL invariant: when TurnPlan says clarification is not allowed on a
+  // condition_recommendation turn, the orthotic gate must defer BEFORE any seed
+  // question — regardless of message wording or classifier shape. Not a regex
+  // guard; an ownership boundary.
+  {
+    name: "TurnPlan override: condition_recommendation clarify=false → gate defers (exact live prompt)",
+    turns: [{
+      user: "I have plantar fasciitis and flat feet. Should I buy shoes, orthotics, or both?",
+      classifier: C({ attributes: { condition: "plantar_fasciitis" } }),
+      turnPlan: { workflow: "condition_recommendation", clarificationAllowed: false },
+      expect: { gateHandled: false },
+    }],
+  },
+  {
+    name: "TurnPlan override fires regardless of classifier shape (condition + useCase)",
+    turns: [{
+      user: "I have plantar fasciitis and flat feet. Should I buy shoes, orthotics, or both?",
+      classifier: C({ attributes: { condition: "plantar_fasciitis", useCase: "comfort_bundle" } }),
+      turnPlan: { workflow: "condition_recommendation", clarificationAllowed: false },
+      expect: { gateHandled: false },
+    }],
+  },
+  // Control: the override is SCOPED to clarificationAllowed=false. The SAME
+  // condition turn with clarification ALLOWED is untouched — the gate runs
+  // normally and still asks who-for. This is the A/B that proves the boundary
+  // is the plan flag, not the message wording.
+  {
+    name: "TurnPlan override control: clarify=TRUE on a condition turn → gate still asks gender",
+    turns: [{
+      user: "I have plantar fasciitis and flat feet.",
+      classifier: C({ attributes: { condition: "plantar_fasciitis" } }),
+      turnPlan: { workflow: "condition_recommendation", clarificationAllowed: true },
+      expect: { gateHandled: true, questionMatches: /Who are these orthotics for/i },
+    }],
+  },
 
   // ========== PRD 2026-06-28: bug 4 — no gender-stall on a rich advisory open ==========
   // A compound need + an explicit "what should I choose?" carries enough context

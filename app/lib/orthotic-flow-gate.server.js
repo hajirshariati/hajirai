@@ -711,6 +711,7 @@ export async function maybeRunOrthoticFlow({
   anthropic,
   haikuModel,
   classifiedIntent,
+  turnPlan = null,
   resolverState = null,
   storefrontSearchUrlPattern = "",
   ctaOverrides = [],
@@ -720,6 +721,26 @@ export async function maybeRunOrthoticFlow({
     return { handled: false };
   }
   if (!Array.isArray(messages) || messages.length === 0) return { handled: false };
+
+  // ── HARD TURNPLAN OWNERSHIP OVERRIDE ──────────────────────────────────
+  // TurnPlan is the single front-of-turn authority. When it has classified
+  // the turn as condition_recommendation with clarification DISALLOWED, the
+  // answer is owned by the LLM (advisory-first). No downstream gate may ask a
+  // clarifying question — so the orthotic gate must defer BEFORE any seed
+  // question can be emitted. This is the CENTRAL invariant: when TurnPlan says
+  // no clarification, no gate asks a clarification question. The regex advisory
+  // guard further down stays as defense-in-depth, but it is NOT the primary
+  // protection — this boundary is.
+  if (
+    turnPlan &&
+    turnPlan.workflow === "condition_recommendation" &&
+    turnPlan.clarificationAllowed === false
+  ) {
+    console.log(
+      "[orthotic-flow] turn-plan override: condition_recommendation clarify=false — deferring to LLM",
+    );
+    return { handled: false, case: "turn_plan_owns_condition_recommendation" };
+  }
 
   // ── LLM-owned engage decision (ORTHOTIC_GATE_LLM_OWNED, default OFF) ──
   // This pre-LLM regex gate decides "run the orthotic finder?" BEFORE the

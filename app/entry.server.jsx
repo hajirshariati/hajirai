@@ -4,6 +4,8 @@ import { ServerRouter } from "react-router";
 import { createReadableStreamFromReadable } from "@react-router/node";
 import { isbot } from "isbot";
 import { addDocumentResponseHeaders } from "./shopify.server";
+// Side-effect import: prints `[app-version] commit=<sha>` once at server boot.
+import "./lib/app-version.server";
 
 export const streamTimeout = 5000;
 

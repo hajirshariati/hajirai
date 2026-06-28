@@ -5055,6 +5055,7 @@ async function handleChatPost({ shop, sessionAccessToken, request, internal = fa
                 anthropic,
                 haikuModel: HAIKU_MODEL,
                 classifiedIntent,
+                turnPlan: ctx.turnPlan || null,
                 resolverState: ctx.resolverState || null,
                 storefrontSearchUrlPattern: String(config.storefrontSearchUrlPattern || ""),
                 ctaOverrides,
