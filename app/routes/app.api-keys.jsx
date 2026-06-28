@@ -23,6 +23,7 @@ import { CheckCircleIcon } from "@shopify/polaris-icons";
 import { TitleBar, SaveBar } from "@shopify/app-bridge-react";
 import { authenticate } from "../shopify.server";
 import { getShopConfig, updateShopConfig } from "../models/ShopConfig.server";
+import { DEFAULT_VIZ_SCENE_THEME } from "../lib/image-styling.server";
 import { getShopPlan } from "../lib/billing.server";
 import { PlanGate } from "../components/PlanGate";
 import BrandHeader from "../components/BrandHeader";
@@ -80,6 +81,8 @@ export const loader = async ({ request }) => {
     visualizeLookEnabled: config.visualizeLookEnabled === true,
     imageProvider: config.imageProvider || "",
     visualizeLookLabel: config.visualizeLookLabel || "Visualize My Look",
+    visualizeScenePrompt: config.visualizeScenePrompt || "",
+    defaultScenePrompt: DEFAULT_VIZ_SCENE_THEME,
     hasGeminiKey: (config.geminiApiKey || "") !== "",
     knowledgeRagEnabled: config.knowledgeRagEnabled === true,
     plan: { id: plan.id, name: plan.name, features: plan.features },
@@ -149,10 +152,16 @@ export const action = async ({ request }) => {
       return { error: "Invalid image provider." };
     }
     const label = String(formData.get("visualizeLookLabel") || "").trim().slice(0, 40);
+    // Scene theme: store "" when it's unchanged from the built-in default so the
+    // shop stays linked to future default improvements; otherwise the custom text
+    // (capped). A blank submission also resets to the default.
+    const sceneRaw = String(formData.get("visualizeScenePrompt") || "").trim().slice(0, 2000);
+    const scene = (!sceneRaw || sceneRaw === DEFAULT_VIZ_SCENE_THEME.trim()) ? "" : sceneRaw;
     const vData = {
       visualizeLookEnabled: enabled,
       imageProvider: provider,
       visualizeLookLabel: label || "Visualize My Look",
+      visualizeScenePrompt: scene,
     };
     const geminiKey = formData.get("geminiApiKey");
     if (geminiKey !== null && geminiKey !== "") vData.geminiApiKey = geminiKey;
@@ -299,16 +308,20 @@ const WELCOME_GLOW_STYLE_OPTIONS = [
 
 const DEFAULT_GLOW_COLORS = "#6366f1,#a855f7,#ec4899,#f59e0b,#10b981,#06b6d4";
 
-function VisualizeLookCard({ initialEnabled, initialProvider, initialLabel, hasGeminiKey, hasOpenaiKey }) {
+function VisualizeLookCard({ initialEnabled, initialProvider, initialLabel, initialScenePrompt, defaultScenePrompt, hasGeminiKey, hasOpenaiKey }) {
   const fetcher = useFetcher();
   const [enabled, setEnabled] = useState(Boolean(initialEnabled));
   const [provider, setProvider] = useState(initialProvider || "");
   const [label, setLabel] = useState(initialLabel || "Visualize My Look");
+  // Show the active theme: the merchant's custom text, or the built-in default
+  // when they've never customized it (so the default is "already there" to edit).
+  const [scene, setScene] = useState(initialScenePrompt || defaultScenePrompt || "");
   const [geminiKey, setGeminiKey] = useState("");
   const [openaiKey, setOpenaiKey] = useState("");
   const saving = fetcher.state !== "idle";
   const saved = fetcher.data?.saved === true;
   const errorMsg = fetcher.data?.error;
+  const isDefaultScene = (scene || "").trim() === (defaultScenePrompt || "").trim();
 
   const save = () => {
     const fd = new FormData();
@@ -316,6 +329,7 @@ function VisualizeLookCard({ initialEnabled, initialProvider, initialLabel, hasG
     fd.set("visualizeLookEnabled", enabled ? "true" : "false");
     fd.set("imageProvider", provider);
     fd.set("visualizeLookLabel", label);
+    fd.set("visualizeScenePrompt", scene);
     if (geminiKey) fd.set("geminiApiKey", geminiKey);
     if (openaiKey) fd.set("openaiApiKey", openaiKey);
     fetcher.submit(fd, { method: "post" });
@@ -378,6 +392,28 @@ function VisualizeLookCard({ initialEnabled, initialProvider, initialLabel, hasG
               showCharacterCount
               helpText="The text on the standout button shoppers tap."
             />
+            <TextField
+              label="Image scene theme"
+              value={scene}
+              onChange={setScene}
+              autoComplete="off"
+              multiline={5}
+              maxLength={2000}
+              showCharacterCount
+              helpText="The consistent brand look applied to EVERY generated preview. The default keeps the setting in a soft background that fades into a clean white floor the shopper walks on. The shopper's chosen setting (vacation, dinner, workday…) still picks WHICH scene; this governs the overall treatment. Edit any time."
+            />
+            <InlineStack gap="200">
+              <Button
+                variant="plain"
+                disabled={isDefaultScene}
+                onClick={() => setScene(defaultScenePrompt || "")}
+              >
+                Reset to default theme
+              </Button>
+              {isDefaultScene && (
+                <Text as="span" variant="bodySm" tone="subdued">Using the default theme</Text>
+              )}
+            </InlineStack>
             <Banner tone="info">
               <Text as="p" variant="bodySm">
                 Generative AI can occasionally alter fine product details. The preview is labeled “AI styling preview” to shoppers, and we feed your real product image as the locked reference to keep it faithful.
@@ -736,7 +772,7 @@ function HideUrlsPanel({ initial }) {
 }
 
 export default function ApiKeys() {
-  const { hasAnthropicKey, anthropicModel, modelStrategy, showFollowUps: initFollowUps, showFeedback: initFeedback, hasYotpoKey, hasAftershipKey, hideOnUrls, supportUrl: initSupportUrl, supportLabel: initSupportLabel, trackingPageUrl: initTrackingPageUrl, returnsPageUrl: initReturnsPageUrl, referralPageUrl: initReferralPageUrl, promptCaching: initCaching, klaviyoFormId: initKlaviyoFormId, klaviyoCompanyId: initKlaviyoCompanyId, klaviyoListId: initKlaviyoListId, vipModeEnabled: initVipMode, showLoginPill: initShowLoginPill, hasKlaviyoPrivateKey, hasYotpoLoyaltyKey, yotpoLoyaltyGuid: initYotpoLoyaltyGuid, loyaltyDisplay: initLoyaltyDisplay, loyaltyPointsPerDollar: initLoyaltyPointsPerDollar, loyaltyRounding: initLoyaltyRounding, dailyCapEnabled: initDailyCapEnabled, dailyCapMessages: initDailyCapMessages, embeddingProvider: initEmbeddingProvider, hasVoyageKey, hasOpenaiKey, visualizeLookEnabled: initVizEnabled, imageProvider: initImageProvider, visualizeLookLabel: initVizLabel, hasGeminiKey, knowledgeRagEnabled, plan, welcomeGlowStyle, welcomeGlowColors, welcomeGlowBorderWidth, welcomeGlowSize, welcomeGlowFadeInMs, welcomeGlowHoldMs, welcomeGlowFadeOutMs, welcomeGlowSpeed } = useLoaderData();
+  const { hasAnthropicKey, anthropicModel, modelStrategy, showFollowUps: initFollowUps, showFeedback: initFeedback, hasYotpoKey, hasAftershipKey, hideOnUrls, supportUrl: initSupportUrl, supportLabel: initSupportLabel, trackingPageUrl: initTrackingPageUrl, returnsPageUrl: initReturnsPageUrl, referralPageUrl: initReferralPageUrl, promptCaching: initCaching, klaviyoFormId: initKlaviyoFormId, klaviyoCompanyId: initKlaviyoCompanyId, klaviyoListId: initKlaviyoListId, vipModeEnabled: initVipMode, showLoginPill: initShowLoginPill, hasKlaviyoPrivateKey, hasYotpoLoyaltyKey, yotpoLoyaltyGuid: initYotpoLoyaltyGuid, loyaltyDisplay: initLoyaltyDisplay, loyaltyPointsPerDollar: initLoyaltyPointsPerDollar, loyaltyRounding: initLoyaltyRounding, dailyCapEnabled: initDailyCapEnabled, dailyCapMessages: initDailyCapMessages, embeddingProvider: initEmbeddingProvider, hasVoyageKey, hasOpenaiKey, visualizeLookEnabled: initVizEnabled, imageProvider: initImageProvider, visualizeLookLabel: initVizLabel, visualizeScenePrompt: initVizScene, defaultScenePrompt: initVizSceneDefault, hasGeminiKey, knowledgeRagEnabled, plan, welcomeGlowStyle, welcomeGlowColors, welcomeGlowBorderWidth, welcomeGlowSize, welcomeGlowFadeInMs, welcomeGlowHoldMs, welcomeGlowFadeOutMs, welcomeGlowSpeed } = useLoaderData();
   const actionData = useActionData();
   const nav = useNavigation();
   const saving = nav.state === "submitting";
@@ -1089,6 +1125,8 @@ export default function ApiKeys() {
                 initialEnabled={initVizEnabled}
                 initialProvider={initImageProvider}
                 initialLabel={initVizLabel}
+                initialScenePrompt={initVizScene}
+                defaultScenePrompt={initVizSceneDefault}
                 hasGeminiKey={hasGeminiKey}
                 hasOpenaiKey={hasOpenaiKey}
               />

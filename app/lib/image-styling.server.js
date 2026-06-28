@@ -51,13 +51,26 @@ export function isImageProviderSupported(provider) {
   return provider === "gemini" || provider === "openai";
 }
 
-// The fidelity-locked stylist prompt. The product image is the
-// authority; the text only governs the SCENE around it.
-function buildStylistPrompt({ productTitle, styleContext }) {
+// Default "scene theme" — the consistent brand treatment applied to EVERY
+// generated image. The chosen setting lives only in the soft, blurred
+// background and dissolves into a clean, seamless white floor in the
+// foreground that the shopper is walking on — bright, airy, editorial. Merchant-
+// editable via ShopConfig.visualizeScenePrompt (admin → Visualize My Look).
+export const DEFAULT_VIZ_SCENE_THEME =
+  "BRAND SCENE TREATMENT (apply to EVERY image regardless of the setting): " +
+  "the chosen setting appears ONLY in the soft, gently blurred BACKGROUND (the upper part of the frame) and SEAMLESSLY FADES into a clean, bright, seamless matte WHITE floor surface in the foreground that the person is walking on. " +
+  "The foreground is smooth white with soft, natural contact shadows under the shoes — no visible floor texture, tiles, grout, rug, sand, grass, or hard horizon line, and no harsh seam: the background scene dissolves gently into the white so the transition is smooth. " +
+  "Keep it bright, airy, and editorial, with the footwear crisp and well-lit on the white surface in the sharp foreground. This white-floor-fade look must be consistent across all previews.";
+
+// The fidelity-locked stylist prompt. The product image is the authority; the
+// text governs the SCENE around it. `sceneTheme` (merchant-configurable) is the
+// consistent brand treatment; `styleContext` (per-turn) chooses WHICH setting.
+export function buildStylistPrompt({ productTitle, styleContext, sceneTheme }) {
   const ctx = String(styleContext || "").trim();
+  const theme = String(sceneTheme || "").trim() || DEFAULT_VIZ_SCENE_THEME;
   const sceneLine = ctx
-    ? `Choose the setting from BOTH the footwear style AND what the shopper told us they need it for: "${ctx}". If the shopper named a destination, occasion, activity, or weather, set the scene THERE (e.g. they mentioned hiking or a mountain → a real mountain trail; a beach or vacation → a sunny boardwalk or sand path; the gym or running → a track or city street; a wedding or evening out → an elegant venue). Match the environment to what they actually said.`
-    : "Choose a real-world setting that naturally suits this style of footwear (boots → outdoor trail, sandals → sunny boardwalk, sneakers → city street or park, heels → elegant evening venue).";
+    ? `Choose the BACKGROUND setting from BOTH the footwear style AND what the shopper told us they need it for: "${ctx}". If the shopper named a destination, occasion, activity, or weather, set the background scene THERE (e.g. they mentioned hiking or a mountain → a real mountain trail; a beach or vacation → a sunny boardwalk or sand path; the gym or running → a track or city street; a wedding or evening out → an elegant venue). Match the environment to what they actually said.`
+    : "Choose a real-world BACKGROUND setting that naturally suits this style of footwear (boots → outdoor trail, sandals → sunny boardwalk, sneakers → city street or park, heels → elegant evening venue).";
   return [
     "You are a professional footwear stylist creating ONE photorealistic action shot for an online shopper.",
     "The attached image(s) are the EXACT product to feature. When several images are attached they are MULTIPLE ANGLES OF THE SAME single product (top/front/side) — not different products. The footwear is the HERO of the shot and must dominate the frame.",
@@ -65,6 +78,7 @@ function buildStylistPrompt({ productTitle, styleContext }) {
     `The product is: ${String(productTitle || "the item").trim()}.`,
     "MOTION (required): show a person WALKING — captured mid-stride in natural motion, one foot stepping forward with the weight shifting, as if photographed in the middle of a walk. NEVER a static standing, seated, or posed-still shot. The person should always read as moving.",
     "SCENE: " + sceneLine,
+    theme,
     "COMPOSITION RULES (critical — the footwear must be unmistakably the focus):",
     "- Use a CLOSE, feet-forward crop framed from roughly the knee or mid-calf down, following the feet in motion. Show the shoes LARGE and crisp — they should occupy about half the frame and sit in the sharp foreground. NEVER a full-length head-to-toe shot that shrinks the shoes to a small detail.",
     "- Keep the footwear razor-sharp and perfectly lit even while walking: freeze the shoes crisply. Any motion blur belongs ONLY in the background, NEVER on the product.",
@@ -170,6 +184,7 @@ export async function generateStyledImage({
   productImageUrls,
   productTitle = "",
   styleContext = "",
+  sceneTheme = "",
 }) {
   if (!isImageProviderSupported(provider)) {
     throw new Error(`unsupported image provider: ${provider || "(none)"}`);
@@ -206,7 +221,7 @@ export async function generateStyledImage({
   if (!images.length) {
     throw new Error(`product image fetch failed or timed out after ${IMAGE_FETCH_TIMEOUT_MS}ms`);
   }
-  const prompt = buildStylistPrompt({ productTitle, styleContext });
+  const prompt = buildStylistPrompt({ productTitle, styleContext, sceneTheme });
 
   let imageDataUrl;
   try {
