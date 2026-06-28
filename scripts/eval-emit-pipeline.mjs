@@ -642,6 +642,64 @@ run(
 );
 
 // ---------------------------------------------------------------------------
+// Ownership cleanup (2026-06): legacy owners must defer to TurnPlan.
+// ---------------------------------------------------------------------------
+console.log("\n— TurnPlan display authority over answer-shape suppressors —");
+
+// An availability turn ("do those come in black?") is yes/no-shaped, but
+// TurnPlan owns it as show_availability ("ALWAYS show the product card — never
+// suppress it"). The yes/no card suppressor must DEFER to TurnPlan and keep the
+// pool. (Regression for the planForcesProductDisplay gate.)
+run(
+  "ownership: yes/no suppressor must NOT wipe cards when TurnPlan requires display (availability)",
+  {
+    text: "Yes — the Danika comes in black.",
+    pool: [card("Danika Arch Support Sneaker")],
+    ctx: baseCtx({
+      latestUserMessage: "do those come in black?",
+      turnPlan: { workflow: "availability", clarificationAllowed: false, productDisplayPolicy: "show_availability", gender: null, directives: [] },
+    }),
+  },
+  (out) => {
+    assert.equal(out.pool.length, 1, "availability card was suppressed by answer-shape (TurnPlan said show_availability)");
+  },
+);
+
+// The same suppressor STILL works on a plain non-display turn (no TurnPlan
+// display requirement) — we only gated it, didn't remove it.
+run(
+  "ownership: yes/no suppressor still fires on a non-display turn",
+  {
+    text: "Yes, that's right.",
+    pool: [card("Chase Sneaker"), card("Jillian Sandal")],
+    ctx: baseCtx({ latestUserMessage: "is your store open on weekends?" }),
+  },
+  (out) => {
+    assert.equal(out.pool.length, 0, "non-display yes/no turn should still drop the noise pool");
+  },
+);
+
+console.log("\n— answer-workflow fallback text must be evidence-grounded, not browse copy —");
+
+// False-denial recovery on an ANSWER workflow must NOT ship generic "take a
+// look — here are some X we carry" browse copy; it must name the real evidence.
+run(
+  "ownership: false-denial repair names evidence on an answer workflow (no generic browse copy)",
+  {
+    text: "Sorry, we don't carry sneakers.",
+    pool: [card("Danika Arch Support Sneaker"), card("Chase Sneaker")],
+    ctx: baseCtx({
+      latestUserMessage: "what's a good sneaker for plantar fasciitis?",
+      turnPlan: { workflow: "condition_recommendation", clarificationAllowed: false, productDisplayPolicy: "show", gender: "women", directives: [] },
+    }),
+  },
+  (out) => {
+    assert.doesNotMatch(out.text, /take a look — here are some/i, "answer workflow got generic browse copy");
+    assert.match(out.text, /Danika|Chase/, "fallback names the real evidence");
+  },
+);
+
+// ---------------------------------------------------------------------------
 
 console.log(`\n${failed === 0 ? "✅" : "❌"}  ${passed} passed, ${failed} failed\n`);
 if (failed > 0) {

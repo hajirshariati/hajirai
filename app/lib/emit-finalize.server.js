@@ -76,7 +76,7 @@ import {
   umbrellaCategoryTermsFromGroups,
 } from "./catalog-matcher.server.js";
 import { extractUserConstraints } from "./catalog-resolver.server.js";
-import { isAnswerWorkflow, buildAnswerWorkflowExhaustionText } from "./turn-plan.server.js";
+import { isAnswerWorkflow, buildAnswerWorkflowExhaustionText, planForcesProductDisplay } from "./turn-plan.server.js";
 
 // Knowledge / info questions — kept in sync with KNOWLEDGE_QUESTION_RE
 // in product-turn-engine.server.js. Used to skip the response-contract
@@ -755,9 +755,17 @@ export function finalizeOutboundReply({
     if (deniedCat) {
       console.log(`[chat] false-denial guard: AI claimed the store doesn't carry "${deniedCat}" — stripping (catalog actually contains it)`);
       qualitySignals.falseDenial = true;
-      fullResponseText = pool.length > 0
-        ? `Take a look — here are some ${deniedCat.toLowerCase()} we carry.`
-        : `We do carry ${deniedCat.toLowerCase()} — could you share a bit more (gender, style, occasion)? I can pull up a few for you.`;
+      // Answer workflows are owed a real, evidence-grounded answer — never the
+      // generic "take a look" browse pitch. When the plan is an answer workflow
+      // and we have a pool, name the actual products (exhaustion text) instead of
+      // generic browse copy; only non-answer turns get the lighter recovery line.
+      if (pool.length > 0) {
+        fullResponseText = isAnswerWorkflow(ctx.turnPlan)
+          ? buildAnswerWorkflowExhaustionText(ctx.turnPlan, pool)
+          : `Take a look — here are some ${deniedCat.toLowerCase()} we carry.`;
+      } else {
+        fullResponseText = `We do carry ${deniedCat.toLowerCase()} — could you share a bit more (gender, style, occasion)? I can pull up a few for you.`;
+      }
     }
   }
 
@@ -1202,7 +1210,15 @@ export function finalizeOutboundReply({
     }
   }
 
-  if (pool.length > 0 && fullResponseText) {
+  // TurnPlan DISPLAY AUTHORITY. When the plan requires products to be shown
+  // (show / show_availability / show_focused), the answer-shape card suppressors
+  // below must NOT fire. An availability turn ("do those come in black?") is
+  // yes/no-shaped, yet TurnPlan owns it as show_availability with the directive
+  // "ALWAYS show the product card — never suppress it." Letting the yes/no
+  // suppressor wipe the pool there is a legacy owner contradicting TurnPlan.
+  const planRequiresDisplay = planForcesProductDisplay(ctx?.turnPlan);
+
+  if (pool.length > 0 && fullResponseText && !planRequiresDisplay) {
     if (isYesNoQuestion(ctx.latestUserMessage) && isYesNoAnswer(fullResponseText, pool)) {
       console.log(
         `[chat] ${ctx.shop} yes/no-suppress: customer asked yes/no, AI answered yes/no — ` +
@@ -1216,7 +1232,7 @@ export function finalizeOutboundReply({
   // question suppress blocks below. Keep these synced.
   const PRODUCT_NOUN_IN_USER_RE = /\b(?:sandals?|sneakers?|heels?|wedges?|boots?|loafers?|oxfords?|clogs?|slippers?|mary[- ]?janes?|slip[- ]?ons?|footwear|shoes?|orthotics?|insoles?|inserts?|footbeds?)\b/i;
 
-  if (pool.length > 0 && fullResponseText && ctx.latestUserMessage) {
+  if (pool.length > 0 && fullResponseText && ctx.latestUserMessage && !planRequiresDisplay) {
     const userMsg = String(ctx.latestUserMessage);
     if (
       isCapabilityCheckAboutPriorProducts(userMsg) &&
@@ -1231,7 +1247,7 @@ export function finalizeOutboundReply({
     }
   }
 
-  if (pool.length > 0 && fullResponseText && ctx.latestUserMessage) {
+  if (pool.length > 0 && fullResponseText && ctx.latestUserMessage && !planRequiresDisplay) {
     const userMsg = String(ctx.latestUserMessage);
     if (
       isPolicyOrServiceQuestion(userMsg) &&
