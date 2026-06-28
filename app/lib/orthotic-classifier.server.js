@@ -331,6 +331,9 @@ export async function classifyOrthoticTurn({ messages, anthropic, shop }) {
   }));
 
   try {
+    // COST AUDIT (docs/cost-accounting-audit.md): this orthotic intent classifier
+    // is an auxiliary Haiku call on orthotic-leaning turns, NOT separately
+    // metered into ChatUsage. Covered by the estimator's SIDE_CALL_OVERHEAD.
     const resp = await withAnthropicRetry(
       () =>
         anthropic.messages.create({

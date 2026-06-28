@@ -916,6 +916,10 @@ async function runProductTurnDispatch({ ctx, controller, encoder, claimConfig, a
           `- Plain prose. 1–2 sentences. Max ~35 words total.\n\n` +
           `Customer-facing reply:`;
         try {
+          // COST AUDIT (docs/cost-accounting-audit.md): this product-turn voice
+          // synthesis is an auxiliary Haiku call that is NOT separately metered
+          // into ChatUsage. Small + fires on a subset of turns; covered by the
+          // estimator's documented SIDE_CALL_OVERHEAD allowance.
           const r = await anthropic.messages.create({
             model: HAIKU_MODEL,
             max_tokens: 160,
@@ -1359,6 +1363,9 @@ async function runPolicyTurnDispatch({ ctx, controller, encoder, retrievedChunks
           `- Don't say "Tap the button below" or describe UI — the button renders separately.\n\n` +
           `Customer-facing answer:`;
         try {
+          // COST AUDIT (docs/cost-accounting-audit.md): policy-answer synthesis
+          // is an auxiliary Haiku call NOT separately metered into ChatUsage.
+          // Covered by the estimator's documented SIDE_CALL_OVERHEAD allowance.
           const r = await anthropic.messages.create({
             model: HAIKU_MODEL,
             max_tokens: 220,

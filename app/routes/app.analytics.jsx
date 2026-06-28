@@ -1129,7 +1129,7 @@ export default function Analytics() {
             )}
           </SectionCard>
 
-          <CostEstimator avgCostPerMessage={usage.avgCostPerMessage} totalMessages={usage.totalMessages} modelStrategy={modelStrategy} />
+          <CostEstimator avgChatCostPerMessage={usage.avgChatCostPerMessage} totalMessages={usage.totalMessages} modelStrategy={modelStrategy} />
 
           <div className="seos-an-foot">
             Cost estimates based on AI engine pricing. User data hashed for privacy.

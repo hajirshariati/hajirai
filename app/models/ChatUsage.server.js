@@ -1,5 +1,8 @@
 import prisma from "../db.server";
 import { computeCost } from "../lib/pricing.server";
+import { summarizeUsageRecords } from "../lib/usage-summary.js";
+
+export { summarizeUsageRecords };
 
 // UTC midnight keeps the cap consistent across server instances and matches
 // how Shopify reports day boundaries in the admin.
@@ -77,85 +80,11 @@ function resolveRange(arg) {
 
 export async function getUsageSummary(shop, range = 30) {
   const { start, end } = resolveRange(range);
-
   const records = await prisma.chatUsage.findMany({
     where: { shop, createdAt: { gte: start, lte: end } },
     orderBy: { createdAt: "desc" },
   });
-
-  let totalCost = 0;
-  let totalEmbeddingCost = 0;
-  let totalImageCost = 0;
-  let totalImageCount = 0;
-  let totalInputTokens = 0;
-  let totalOutputTokens = 0;
-  let totalMessages = 0;
-  let totalToolCalls = 0;
-  const byModel = {};
-  const dailyCosts = {};
-
-  for (const r of records) {
-    const day = r.createdAt.toISOString().split("T")[0];
-    if (!dailyCosts[day]) dailyCosts[day] = { cost: 0, messages: 0 };
-
-    // Image-styling rows ("Visualize My Look") are their own usage
-    // records (model = "image:<provider>"), not chat messages. Fold
-    // their cost into the true total + daily spend, but DON'T count
-    // them as messages or as a model row — otherwise the message count
-    // and per-model table are skewed.
-    if (typeof r.model === "string" && r.model.startsWith("image:")) {
-      const imgCost = r.imageCostUsd || 0;
-      totalCost += imgCost;
-      totalImageCost += imgCost;
-      totalImageCount += r.imageCount || 1;
-      dailyCosts[day].cost += imgCost;
-      continue;
-    }
-
-    // Every cost total folds in the turn's semantic-search (embedding)
-    // spend so charts and totals reflect true cost, not just Anthropic
-    // tokens. Pre-migration rows have no embeddingCostUsd → 0.
-    const embCost = r.embeddingCostUsd || 0;
-    const turnCost = r.costUsd + embCost;
-    totalCost += turnCost;
-    totalEmbeddingCost += embCost;
-    totalInputTokens += r.inputTokens;
-    totalOutputTokens += r.outputTokens;
-    totalMessages += 1;
-    totalToolCalls += r.toolCalls;
-
-    // Per-model rows stay Anthropic-only: the analytics table shows a
-    // separate "Semantic search" breakout row, so folding embeddings in
-    // here would represent the same dollars twice in the breakdown.
-    if (!byModel[r.model]) byModel[r.model] = { cost: 0, messages: 0 };
-    byModel[r.model].cost += r.costUsd;
-    byModel[r.model].messages += 1;
-
-    dailyCosts[day].cost += turnCost;
-    dailyCosts[day].messages += 1;
-  }
-
-  return {
-    totalCost,
-    totalInputTokens,
-    totalOutputTokens,
-    totalMessages,
-    totalToolCalls,
-    avgCostPerMessage: totalMessages > 0 ? totalCost / totalMessages : 0,
-    // Semantic-search (embedding) share of totalCost — included in
-    // totalCost/dailyCosts above (true spend), broken out of byModel so
-    // the analytics table's model rows + this row sum to the total.
-    embeddingCost: totalEmbeddingCost,
-    avgEmbeddingCostPerMessage: totalMessages > 0 ? totalEmbeddingCost / totalMessages : 0,
-    // "Visualize My Look" image-styling share of totalCost.
-    imageCost: totalImageCost,
-    imageCount: totalImageCount,
-    avgImageCostPerMessage: totalMessages > 0 ? totalImageCost / totalMessages : 0,
-    byModel,
-    dailyCosts,
-    startDate: start.toISOString(),
-    endDate: end.toISOString(),
-  };
+  return summarizeUsageRecords(records, start.toISOString(), end.toISOString());
 }
 
 export async function getDailySeries(shop, range = 30) {

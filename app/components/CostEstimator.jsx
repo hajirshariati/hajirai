@@ -1,68 +1,26 @@
 import { useState } from "react";
+import {
+  strategyProfile,
+  effectiveRate,
+  resolveEstimatorBaseRate,
+  ANCHOR_COPY,
+  REPLIES_LABEL,
+} from "../lib/cost-estimator-math";
 
 // ---------------------------------------------------------------------------
 // CostEstimator — Apple-style "what will this cost me?" panel. The merchant
 // types their store sessions, drags an engagement slider, and picks a
 // conversation depth; the result panel answers with a live monthly figure.
-// The per-request rate anchors on the store's own last-30-day average once
-// there's enough real traffic to trust it, otherwise on a typical blended
-// rate — and the anchor in use is always disclosed under the result.
-// Self-contained: carries its own styles so any page can drop it in.
+// The per-reply rate anchors on the store's own recorded CHAT average (image
+// previews excluded) once there's enough real traffic to trust it, otherwise
+// on a typical blended rate — and the anchor in use is always disclosed.
+//
+// NOTE on units: the multiplier below is estimated ASSISTANT REPLIES (chat
+// turns), NOT raw provider API requests. One reply can fan out into a
+// classifier call, model retries, follow-up suggestions, tools, and
+// embeddings. The cost math + constants live in lib/cost-estimator-math.js so
+// the accounting is unit-tested independently of this component.
 // ---------------------------------------------------------------------------
-const CALC_MIN_SAMPLE = 25; // real requests needed before trusting the store's own average
-
-// Per-request cost falls as volume grows: at low traffic nearly every
-// conversation pays a fresh prompt-cache write with nothing amortizing it,
-// while at high traffic the cache stays hot (reads bill at ~1/10th the
-// input price) and the fast-model share of routing rises. Extrapolating a
-// low-volume average linearly to big traffic therefore overstates cost
-// badly — so the rate log-interpolates from the anchored low-volume rate
-// down to the at-scale blended rate between 2K and 100K requests/month.
-const CALC_AMORT_START = 2000;
-const CALC_AMORT_FULL = 100000;
-
-// The per-request rate is driven mostly by which model answers — that's the
-// single biggest cost lever (see the AI-engine model-strategy setting). At
-// scale the dominant cost is the cached system-prefix READ, so the rates
-// below scale with each model's cache-read + output price relative to
-// Sonnet (pricing.server.js): Sonnet cacheRead $0.30/M, out $15/M (1.0x);
-// Haiku $0.10/M, $5/M (~1/3x); Opus $0.50/M, $25/M (~1.7x). The Sonnet
-// at-scale anchor ($0.006) is validated against real warm-cache spend.
-//   • Smart           → Sonnet for substantive turns (Haiku for trivial).
-//   • Cost optimized   → Haiku-first; Sonnet only on grounding escalation
-//                        and high-risk turns, so a Haiku-leaning blend.
-//   • Premium quality  → Opus on every turn.
-const STRATEGY_RATES = {
-  smart: { fallback: 0.008, atScale: 0.006 },
-  "cost-optimized": { fallback: 0.005, atScale: 0.0035 },
-  "always-opus": { fallback: 0.014, atScale: 0.011 },
-};
-
-// Map the stored strategy (incl. legacy values) to a rate profile + label.
-function strategyProfile(strategy) {
-  switch (strategy) {
-    case "cost-optimized":
-    case "always-haiku": // legacy: pure fast model — closest to cost-optimized
-      return { rates: STRATEGY_RATES["cost-optimized"], label: "Cost-optimized routing" };
-    case "always-opus":
-    case "premium":
-      return { rates: STRATEGY_RATES["always-opus"], label: "Premium quality" };
-    default: // smart, always-sonnet, unknown
-      return { rates: STRATEGY_RATES.smart, label: "Smart routing" };
-  }
-}
-
-function effectiveRate(baseRate, monthlyRequests, atScaleRate) {
-  if (baseRate <= atScaleRate) return baseRate;
-  if (!Number.isFinite(monthlyRequests) || monthlyRequests <= CALC_AMORT_START) return baseRate;
-  const t = Math.min(
-    1,
-    (Math.log10(monthlyRequests) - Math.log10(CALC_AMORT_START)) /
-      (Math.log10(CALC_AMORT_FULL) - Math.log10(CALC_AMORT_START)),
-  );
-  return baseRate + (atScaleRate - baseRate) * t;
-}
-
 const CALC_DEPTHS = [
   { key: "quick", label: "Quick", desc: "2 messages", turns: 2 },
   { key: "typical", label: "Typical", desc: "4 messages", turns: 4 },
@@ -78,10 +36,15 @@ function calcMoney(n) {
 
 const rateFmt = (r) => `$${r.toFixed(4).replace(/0+$/, "").replace(/\.$/, "")}`;
 
-export default function CostEstimator({ avgCostPerMessage, totalMessages, modelStrategy = "smart" }) {
+export default function CostEstimator({ avgChatCostPerMessage, totalMessages, modelStrategy = "smart" }) {
   const { rates, label: strategyLabel } = strategyProfile(modelStrategy);
-  const anchored = totalMessages >= CALC_MIN_SAMPLE && avgCostPerMessage > 0;
-  const baseRate = anchored ? avgCostPerMessage : rates.fallback;
+  // Anchor on the store's recorded CHAT average (image previews excluded) once
+  // there's enough traffic; otherwise the strategy's blended fallback rate.
+  const { anchored, baseRate } = resolveEstimatorBaseRate({
+    avgChatCostPerMessage,
+    totalMessages,
+    rates,
+  });
 
   const [sessionsRaw, setSessionsRaw] = useState("25,000");
   const [period, setPeriod] = useState("month");
@@ -112,10 +75,11 @@ export default function CostEstimator({ avgCostPerMessage, totalMessages, modelS
   const monthlySessions = period === "year" ? sessions / 12 : sessions;
   const turns = CALC_DEPTHS.find((d) => d.key === depth).turns;
   const conversations = monthlySessions * (engagement / 100);
-  const requests = conversations * turns;
-  const rate = effectiveRate(baseRate, requests, rates.atScale);
+  // Estimated assistant replies (chat turns), not raw provider API requests.
+  const replies = conversations * turns;
+  const rate = effectiveRate(baseRate, replies, rates.atScale);
   const scaled = rate < baseRate - 1e-9;
-  const monthlyCost = requests * rate;
+  const monthlyCost = replies * rate;
   const fmtInt = (n) => Math.round(n).toLocaleString("en-US");
 
   const ENG_MIN = 1;
@@ -403,8 +367,8 @@ export default function CostEstimator({ avgCostPerMessage, totalMessages, modelS
               <small>conversations / mo</small>
             </div>
             <div>
-              <span>{fmtInt(requests)}</span>
-              <small>AI requests / mo</small>
+              <span>{fmtInt(replies)}</span>
+              <small>{REPLIES_LABEL}</small>
             </div>
             <div>
               <span>{calcMoney(rate * turns)}</span>
@@ -414,14 +378,21 @@ export default function CostEstimator({ avgCostPerMessage, totalMessages, modelS
           <div className="seos-calc-anchor">
             {scaled
               ? `${anchored
-                ? `Your store's current average is ${rateFmt(baseRate)} per AI request at today's low volume`
-                : `The typical low-volume rate on ${strategyLabel} is ${rateFmt(baseRate)} per AI request`}, but AI gets much cheaper at scale — prompt caching and fast-model routing bring it down to about ${rateFmt(rate)} per request at this traffic. The estimate uses the at-scale rate.`
+                ? `Your store's current average is ${rateFmt(baseRate)} per assistant reply at today's low volume`
+                : `The typical low-volume rate on ${strategyLabel} is ${rateFmt(baseRate)} per assistant reply`}, but AI gets much cheaper at scale — prompt caching and fast-model routing bring it down to about ${rateFmt(rate)} per reply at this traffic. The estimate uses the at-scale rate.`
               : anchored
-                ? `Anchored on your store's real average of ${rateFmt(rate)} per AI request over the last 30 days.`
-                : `Based on the ${strategyLabel} blended rate of ${rateFmt(rate)} per AI request. Once your store has chat activity, this switches to your real average automatically.`}
+                ? `Anchored on your store's real average of ${rateFmt(rate)} per assistant reply.`
+                : `Based on the ${strategyLabel} blended rate of ${rateFmt(rate)} per assistant reply. Once your store has chat activity, this switches to your real average automatically.`}
           </div>
           <div className="seos-calc-anchor" style={{ marginTop: 4 }}>
-            Estimate reflects your current model strategy ({strategyLabel}) and includes semantic search embedding costs when enabled.
+            {anchored ? ANCHOR_COPY.anchored : ANCHOR_COPY.fallback}
+          </div>
+          <div className="seos-calc-anchor" style={{ marginTop: 4 }}>
+            Based on your recorded average cost per assistant reply — not a raw
+            provider request count. One reply can include a classifier call,
+            model retries, follow-up suggestions, tools, and embeddings. Style
+            preview (image) generations are billed separately and are not
+            included here. Reflects your current model strategy ({strategyLabel}).
           </div>
         </div>
       </div>
