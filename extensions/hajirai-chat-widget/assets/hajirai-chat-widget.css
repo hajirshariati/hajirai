@@ -1453,6 +1453,51 @@ a.ai-chat-welcome__hint--link:hover {
   .ai-chat-products--showcase .ai-chat-product-card:only-child {
     flex: 0 0 100%;
   }
+
+  /* Mobile: shrink the product IMAGE footprint ~40-50% so chat product cards
+     read as compact shopping cards, not image walls. `contain` keeps the whole
+     shoe visible. These are MOBILE-ONLY (desktop sizing untouched). */
+
+  /* Carousel (multi-card) image: drop the 1/1 square, cap the height. */
+  .ai-chat-products--showcase .ai-chat-product-img {
+    aspect-ratio: auto;
+    height: 120px;
+    max-height: 120px;
+  }
+  .ai-chat-product-img img {
+    object-fit: contain;
+  }
+
+  /* Single featured card → compact HORIZONTAL row (image left, info right) so a
+     lone result isn't a full-bubble-tall image. (Desktop's :only-child row lives
+     in the min-width:601px block and is unaffected.) */
+  .ai-chat-products--showcase .ai-chat-product-card:only-child {
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+  }
+  .ai-chat-products--showcase .ai-chat-product-card:only-child .ai-chat-product-img {
+    width: 100px;
+    flex: 0 0 100px;
+    height: 100px;
+    max-height: 100px;
+    aspect-ratio: auto;
+    border-radius: 10px;
+  }
+  .ai-chat-products--showcase .ai-chat-product-card:only-child .ai-chat-product-info {
+    padding: 0;
+    min-width: 0;
+    justify-content: center;
+    gap: 6px;
+  }
+  .ai-chat-products--showcase .ai-chat-product-card:only-child .ai-chat-product-title {
+    min-height: 0;
+  }
+  .ai-chat-products--showcase .ai-chat-product-card:only-child .ai-chat-product-cta {
+    align-self: flex-start;
+    max-width: 160px;
+  }
 }
 
 /* ---------- Typing indicator ---------- */
