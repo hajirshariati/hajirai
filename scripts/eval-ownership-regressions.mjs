@@ -17,7 +17,13 @@
 // Run: node scripts/eval-ownership-regressions.mjs
 
 import assert from "node:assert/strict";
-import { planTurn, buildTurnPlanPromptBlock, isAnswerWorkflow } from "../app/lib/turn-plan.server.js";
+import {
+  planTurn,
+  buildTurnPlanPromptBlock,
+  isAnswerWorkflow,
+  plannedWorkflowCardOwnerViolation,
+  plannedSearchSkippedViolation,
+} from "../app/lib/turn-plan.server.js";
 import {
   redirectOrthoticSearchToRecommender,
   sanitizeSaleBrowseSearch,
@@ -196,6 +202,56 @@ test("compatibility turn carries a 2-3 sentence cap directive", () => {
     plan.directives.some((d) => /2-3 sentences MAX/i.test(d)),
     "compatibility directive caps length at 2-3 sentences",
   );
+});
+
+// ── Ownership cleanup: mixed shoes-or-orthotics must not collapse to orthotic ──
+const SHOES_OR_ORTHO = "Help me find Aetrex shoes or orthotics for foot pain or all-day comfort";
+
+test("ownership: 'shoes or orthotics for foot pain' is a footwear advisory, not orthotic-only", () => {
+  const plan = planTurn({ message: SHOES_OR_ORTHO });
+  // Whatever the exact workflow, it must be an answer/commerce turn that SEARCHES
+  // (not the orthotic gate) and must not clarify gender.
+  assert.equal(plan.searchRequired, true, "searches");
+  assert.notEqual(plan.workflow, "clarification", "not a clarifier turn");
+});
+
+test("ownership: 'shoes or orthotics' search is NOT hijacked into recommend_orthotic", () => {
+  const plan = planTurn({ message: SHOES_OR_ORTHO });
+  const toolCall = { name: "search_products", input: { query: "foot pain comfort footwear" }, id: "soo" };
+  const out = redirectOrthoticSearchToRecommender(toolCall, {
+    recommenderTrees: ORTHO_TREES,
+    latestUserMessage: SHOES_OR_ORTHO,
+    turnPlan: plan,
+    classifiedIntent: { isOrthoticRequest: true, attributes: {} },
+  });
+  assert.equal(out.name, "search_products", "stays a footwear search — user asked shoes OR orthotics");
+});
+
+// ── Hard invariant #4: pinned workflows cannot be scorer-owned ──────────
+test("invariant: a TurnPlan-pinned workflow that ships cards must NOT be scorer-owned", () => {
+  for (const wf of ["availability", "comparison", "multi_recommendation", "compatibility", "named_product_advisory", "prior_evidence_availability"]) {
+    assert.equal(
+      plannedWorkflowCardOwnerViolation({ workflow: wf, finalCards: 3, cardOwner: "scorer" }),
+      true,
+      `${wf} + scorer + cards must be a violation`,
+    );
+    // The deterministic owners are fine.
+    assert.equal(plannedWorkflowCardOwnerViolation({ workflow: wf, finalCards: 3, cardOwner: "evidence-plan" }), false, `${wf} + evidence-plan is fine`);
+  }
+  // No cards → no violation; non-pinned workflow (browse) → scorer is fine.
+  assert.equal(plannedWorkflowCardOwnerViolation({ workflow: "comparison", finalCards: 0, cardOwner: "scorer" }), false, "0 cards = no violation");
+  assert.equal(plannedWorkflowCardOwnerViolation({ workflow: "browse", finalCards: 5, cardOwner: "scorer" }), false, "browse may be scorer-owned");
+});
+
+// ── Hard invariant #5: searchRequired+display=show ⟹ searchAttempted ────
+test("invariant: searchRequired + display=show must end with searchAttempted=true", () => {
+  const showPlan = planTurn({ message: "I have plantar fasciitis and flat feet. Should I buy shoes, orthotics, or both?" });
+  assert.equal(showPlan.searchRequired, true);
+  assert.equal(plannedSearchSkippedViolation({ plan: showPlan, searchAttempted: false }), true, "no search on a search+show plan is a violation");
+  assert.equal(plannedSearchSkippedViolation({ plan: showPlan, searchAttempted: true }), false, "search attempted → clean");
+  // A suppress-display turn (clarification/support) is exempt.
+  const clarPlan = planTurn({ message: "hi there" });
+  assert.equal(plannedSearchSkippedViolation({ plan: clarPlan, searchAttempted: false }), false, "non-display turn is exempt");
 });
 
 console.log(`\n${failed === 0 ? "✅" : "❌"}  ${passed} passed, ${failed} failed\n`);

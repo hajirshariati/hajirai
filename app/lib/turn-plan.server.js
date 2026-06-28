@@ -627,6 +627,37 @@ export function planForcesProductDisplay(plan) {
   return d === "show" || d === "show_availability" || d === "show_focused";
 }
 
+// ── Hard ownership invariants (OBSERVE — used by the turn-invariant log) ──
+// Workflows whose final cards are owned by a DETERMINISTIC selector
+// (availability-truth / prior-evidence remap / comparison pin / evidence-plan),
+// never the broad keyword scorer. If one of these ships cards owned by the
+// scorer, a legacy selector leaked past the pin and re-decided the turn.
+export const PINNED_CARD_WORKFLOWS = new Set([
+  WORKFLOWS.AVAILABILITY,
+  WORKFLOWS.PRIOR_EVIDENCE_AVAILABILITY,
+  WORKFLOWS.COMPARISON,
+  WORKFLOWS.MULTI_RECOMMENDATION,
+  WORKFLOWS.COMPATIBILITY,
+  WORKFLOWS.NAMED_PRODUCT_ADVISORY,
+]);
+
+// INVARIANT: a TurnPlan-pinned workflow that ships cards must NOT be owned by
+// the scorer. Returns true on violation.
+export function plannedWorkflowCardOwnerViolation({ workflow, finalCards = 0, cardOwner } = {}) {
+  return PINNED_CARD_WORKFLOWS.has(workflow) && finalCards > 0 && cardOwner === "scorer";
+}
+
+// INVARIANT: when TurnPlan requires a search AND requires product display, the
+// turn must not finish without attempting a search — unless the resolved
+// workflow itself became text-only/support (display=suppress). Returns true on
+// violation.
+export function plannedSearchSkippedViolation({ plan, searchAttempted } = {}) {
+  if (!plan) return false;
+  if (plan.searchRequired !== true) return false;
+  if (!planForcesProductDisplay(plan)) return false;
+  return searchAttempted !== true;
+}
+
 // Search authority: did the plan require a product search this turn?
 export function planRequiresSearch(plan) {
   return plan?.searchRequired === true;

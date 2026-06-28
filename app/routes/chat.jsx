@@ -5,7 +5,7 @@ import { getAttributeMappings } from "../models/AttributeMapping.server";
 import { getCatalogCategories, getAllCatalogCategories, getCategoryGenderAvailability, getCategoryAttributeCoverage } from "../models/Product.server";
 import { getActiveCampaigns, formatCampaignsForCS } from "../models/Campaign.server";
 import { buildSystemPrompt } from "../lib/chat-prompt.server";
-import { planTurn, buildTurnPlanPromptBlock, buildPlanClarifierRepair, planForcesProductDisplay, planRequiresSearch as planRequiresSearchFlag, clarifierGateDecision, isAnswerWorkflow } from "../lib/turn-plan.server";
+import { planTurn, buildTurnPlanPromptBlock, buildPlanClarifierRepair, planForcesProductDisplay, planRequiresSearch as planRequiresSearchFlag, clarifierGateDecision, isAnswerWorkflow, plannedWorkflowCardOwnerViolation, plannedSearchSkippedViolation } from "../lib/turn-plan.server";
 import { classifyAvailability, buildAvailabilityAnswer, AVAILABILITY_RESULT, resolveAvailabilityRequest, isAvailabilityFollowUp, familyOfTitle, collectFamilyColors, constraintIntent, parseAvailabilityConstraints, parseRequestedColors, priorAvailabilityMessage, priorAvailabilityConstraints, variantDataDiagnostics, styleKeyOfTitle, styleNameOfTitle } from "../lib/availability-truth";
 import { detectSupportHandoffNeed, buildSupportHandoffText, supportConfigured, normalizedSupportLabel, supportChatLabel } from "../lib/support-handoff";
 import { extractConstraintPlan } from "../lib/constraint-plan";
@@ -1462,8 +1462,17 @@ function turnHasConcreteCommerceConstraint(ctx) {
 // constraint, and never when the assistant's own answer is a clarifying
 // question. Refuses for clarification / sizing_help / policy_account outright.
 function forcedSearchAllowed({ ctx, text }) {
-  const wf = ctx?.turnPlan?.workflow;
+  const plan = ctx?.turnPlan;
+  const wf = plan?.workflow;
   if (wf === "clarification" || wf === "sizing_help" || wf === "policy_account") return false;
+  // TURNPLAN AUTHORITY: an answer workflow that requires a search AND requires
+  // product display may NEVER be refused by the legacy concrete-constraint
+  // heuristic (or the clarifier-shape check) below. TurnPlan owns the decision;
+  // downstream only enforces it. Refusing here is a legacy owner silently
+  // re-deciding a turn TurnPlan already pinned to searchRequired + display=show.
+  if (isAnswerWorkflow(plan) && plan?.searchRequired === true && planForcesProductDisplay(plan)) {
+    return true;
+  }
   if (text && looksLikeClarifyingQuestion(text)) return false;
   return turnHasConcreteCommerceConstraint(ctx);
 }
@@ -3978,6 +3987,25 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
           `not in prior families [${[...priorFams].join(",")}]`,
         );
       }
+    }
+    // GENERALIZED INVARIANT (#4): any TurnPlan-pinned workflow that ships cards
+    // must NOT be scorer-owned — the deterministic selector owns them. Catches
+    // multi_recommendation / compatibility / named_product_advisory leaks too,
+    // not just comparison / prior_evidence above.
+    if (plannedWorkflowCardOwnerViolation({ workflow, finalCards: finalCount, cardOwner })) {
+      console.warn(
+        `[turn-invariant] VIOLATION ${workflow} cardOwner=scorer finalCards=${finalCount} ` +
+        `— scorer took over a TurnPlan-pinned workflow`,
+      );
+    }
+    // GENERALIZED INVARIANT (#5): searchRequired + display=show must attempt a
+    // search. If it didn't, a downstream gate silently refused a TurnPlan-
+    // required search (the workflow never changed to text-only/suppress).
+    if (plannedSearchSkippedViolation({ plan: ctx?.turnPlan, searchAttempted: productSearchAttempted })) {
+      console.warn(
+        `[turn-invariant] VIOLATION ${workflow} searchRequired+display=show but searchAttempted=false ` +
+        `— a downstream gate refused a TurnPlan-required search`,
+      );
     }
   }
 
