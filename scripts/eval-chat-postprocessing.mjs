@@ -53,6 +53,8 @@ import {
   stripAvailabilityDenialSentences,
   dropNonFootwearWhenFootwearIntent,
   resolveFocusedCardByName,
+  shouldForceSneakerRelevanceFloor,
+  styleConstraintSuppressesSneakerFloor,
 } from "../app/lib/chat-postprocessing.js";
 import {
   isSingularPrescriptive,
@@ -1634,6 +1636,43 @@ test("focus-anchor — empty/garbage input is safe", () => {
   assert.equal(resolveFocusedCardByName("", SNEAKER_CARDS), null);
   assert.equal(resolveFocusedCardByName("hello there", SNEAKER_CARDS), null);
   assert.equal(resolveFocusedCardByName("danika", []), null);
+});
+
+// =====================================================================
+section("shouldForceSneakerRelevanceFloor (PRD 2026-06-28 bug 1)");
+// =====================================================================
+
+test("plain active use-case → forces sneakers", () => {
+  assert.equal(shouldForceSneakerRelevanceFloor("walking shoes for the gym"), true);
+  assert.equal(shouldForceSneakerRelevanceFloor("I do a lot of running"), true);
+  assert.equal(shouldForceSneakerRelevanceFloor("something for hiking"), true);
+});
+
+test("active use-case + style/cute constraint → does NOT force sneakers", () => {
+  assert.equal(shouldForceSneakerRelevanceFloor("cute walking"), false);
+  assert.equal(
+    shouldForceSneakerRelevanceFloor("I'm going on vacation and walking a lot, but I still want something cute"),
+    false,
+  );
+  assert.equal(shouldForceSneakerRelevanceFloor("walking but for a wedding"), false);
+  assert.equal(shouldForceSneakerRelevanceFloor("something nicer to walk around in"), false);
+});
+
+test("active use-case + explicit 'not sneakers' → does NOT force sneakers", () => {
+  assert.equal(shouldForceSneakerRelevanceFloor("walking shoes but not sneakers"), false);
+  assert.equal(shouldForceSneakerRelevanceFloor("something to walk in, other than sneakers"), false);
+});
+
+test("no active use-case → never forces sneakers (floor only applies to active asks)", () => {
+  assert.equal(shouldForceSneakerRelevanceFloor("something cute for a wedding"), false);
+  assert.equal(shouldForceSneakerRelevanceFloor("black sandals"), false);
+});
+
+test("styleConstraintSuppressesSneakerFloor flags the dressy/cute vocabulary", () => {
+  assert.equal(styleConstraintSuppressesSneakerFloor("something cute"), true);
+  assert.equal(styleConstraintSuppressesSneakerFloor("for a gala"), true);
+  assert.equal(styleConstraintSuppressesSneakerFloor("not sneakers please"), true);
+  assert.equal(styleConstraintSuppressesSneakerFloor("walking a lot"), false);
 });
 
 // =====================================================================

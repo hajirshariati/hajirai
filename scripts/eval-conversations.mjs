@@ -975,6 +975,47 @@ const SCENARIOS = [
   { name: "useCase: 'hockey skates'", turns: [{ user: "orthotic for hockey skates", classifier: C({ attributes: { useCase: "skates" } }), expect: { gateHandled: true } }] },
   { name: "useCase: 'dress shoes'", turns: [{ user: "I want an orthotic for dress shoes", classifier: C({ attributes: { useCase: "dress" } }), expect: { gateHandled: true } }] },
 
+  // ========== PRD 2026-06-28: bug 4 — no gender-stall on a rich advisory open ==========
+  // A compound need + an explicit "what should I choose?" carries enough context
+  // for advisory guidance; the gate must NOT open with a gender-only chip gate.
+  {
+    name: "Bug4: work-boot orthotic + cushioning + 'what should I choose?' → no gender stall",
+    turns: [{
+      user: "I need an orthotic for work boots, but I also want cushioning. What should I choose?",
+      classifier: C({ attributes: { useCase: "work_all_day" } }),
+      expect: { gateHandled: false },
+    }],
+  },
+  // Guard stays tight: a bare "an orthotic for <use case>" still asks who-for.
+  {
+    name: "Bug4 control: bare 'orthotic for the gym' still asks gender",
+    turns: [{
+      user: "looking for an orthotic for the gym",
+      classifier: C({ attributes: { useCase: "athletic_training" } }),
+      expect: { gateHandled: true, questionMatches: /Who are these orthotics for/i },
+    }],
+  },
+
+  // ========== PRD 2026-06-28: bug 2 — "Not sure" with no pending gate question ==========
+  // After a regular advisory answer (no chips, not a seed question), "Not sure"
+  // must NOT launch the orthotic gate or infer any attribute.
+  {
+    name: "Bug2: 'Not sure' after a plain advisory answer → gate defers (no seed question)",
+    turns: [
+      {
+        user: "what do you think about arch support generally?",
+        classifier: { isOrthoticRequest: false, isFootwearRequest: false, isRejection: false, attributes: {}, confidence: "low" },
+        expect: { gateHandled: false },
+        synthesizedAssistant: "Arch support helps distribute pressure across your foot and can ease fatigue. The right amount depends on your arch height and what feels comfortable.",
+      },
+      {
+        user: "Not sure",
+        classifier: { isOrthoticRequest: true, isFootwearRequest: false, isRejection: false, attributes: {}, confidence: "low" },
+        expect: { gateHandled: false },
+      },
+    ],
+  },
+
   // ========== Day 2: pivots & corrections mid-conversation ==========
 
   {

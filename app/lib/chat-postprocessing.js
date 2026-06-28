@@ -215,6 +215,36 @@ const FOOTWEAR_UMBRELLA_MEMBERS = [
   "mary janes", "slip ons", "footwear",
 ];
 
+// ── Sneaker relevance-floor decision (search) ──────────────────────────
+// An under-specified footwear search with an active/outdoor use-case ("walking
+// a lot", "hiking") gets a "relevance floor" that biases it toward sneakers.
+// But a STYLE / dressy / fashion constraint — "something cute", "for a
+// wedding", "vacation", "nicer", or an explicit "not sneakers" — means the
+// customer does NOT want sneakers forced; the search must range over sandals /
+// wedges / loafers / etc. Pure + exported so the decision is unit-testable
+// (the search path that consumes it needs a DB).
+const ACTIVE_USECASE_FLOOR_RE =
+  /\b(?:hiking|trail|outdoor|running|runner|walk(?:ing)?|gym|training|workout|athletic|active)\b/i;
+const STYLE_DRESSY_CONSTRAINT_RE =
+  /\b(?:cute|dressy|dress(?:y|ier)?|nicer|fancy|fashion(?:able)?|elegant|chic|stylish|wedding|formal|gala|date[\s-]?night|vacation|sandals?|wedges?|loafers?|slip[\s-]?ons?|mary[\s-]?janes?|heels?|flats?)\b/i;
+const NOT_SNEAKERS_RE =
+  /\b(?:no|not|don'?t\s+want|nothing|other\s+than|besides|instead\s+of)\s+sneakers?\b/i;
+
+export function styleConstraintSuppressesSneakerFloor(text) {
+  const t = String(text || "");
+  return STYLE_DRESSY_CONSTRAINT_RE.test(t) || NOT_SNEAKERS_RE.test(t);
+}
+
+// True when the active/outdoor relevance floor should force category=sneakers
+// for an otherwise-uncategorized footwear search: an active use-case is present
+// AND no style/dressy/fashion constraint overrides it.
+export function shouldForceSneakerRelevanceFloor(text) {
+  const t = String(text || "");
+  if (!ACTIVE_USECASE_FLOOR_RE.test(t)) return false;
+  if (styleConstraintSuppressesSneakerFloor(t)) return false;
+  return true;
+}
+
 export function detectRejectedCategories(text) {
   const out = new Set();
   if (typeof text !== "string" || !text) return out;

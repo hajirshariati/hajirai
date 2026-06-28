@@ -3,6 +3,7 @@ import { logMentions } from "../models/ChatProductMention.server";
 import { fetchCustomerContext } from "./customer-context.server";
 import { embedText, vectorLiteral, resolveShopEmbedding } from "./embeddings.server";
 import { normalizeGenderChipAnswer } from "./chat-helpers.server";
+import { shouldForceSneakerRelevanceFloor } from "./chat-postprocessing.js";
 import { textIntentDivergesFromGroup } from "./category-intent.server";
 import {
   attachClaimFactsToCard,
@@ -775,17 +776,30 @@ const searchQuery = detected.gender ? detected.query : q;
   })();
 
   let effectiveCategory = explicitCategoryFilter || inferredCategory;
-  if (!effectiveCategory) {
-    const activeUseCase = /\b(?:hiking|trail|outdoor|running|runner|walk(?:ing)?|gym|training|workout|athletic|active)\b/i.test(userIntentText);
-    if (activeUseCase && Array.isArray(merchantGroups)) {
+  // Track whether the category is a SOFT inference from the active/outdoor
+  // relevance floor (not an explicit/named category). If it is, a later
+  // hard-guard that collapses the pool to zero retries WITHOUT it rather than
+  // emitting a no-card answer (sneaker forcing must never beat a real result).
+  let categoryFromRelevanceFloor = false;
+  if (!effectiveCategory && Array.isArray(merchantGroups)) {
+    // STYLE / DRESSY OVERRIDE lives in shouldForceSneakerRelevanceFloor: an
+    // active use-case forces sneakers ONLY when no "cute / dressy / wedding /
+    // vacation / not sneakers" constraint is present (PRD 2026-06-28). When the
+    // floor is suppressed the search ranges over sandals/wedges/loafers/etc.
+    if (shouldForceSneakerRelevanceFloor(userIntentText)) {
       const categories = merchantGroups.flatMap((g) => Array.isArray(g?.categories) ? g.categories : []);
       const sneakerCat = categories.find((c) => /\bsneakers?\b/i.test(String(c || "")));
       if (sneakerCat) {
         effectiveCategory = String(sneakerCat).toLowerCase().trim();
+        categoryFromRelevanceFloor = true;
         console.log(
           `[search]   relevance floor: active/outdoor use-case → category=${effectiveCategory}`,
         );
       }
+    } else if (/\b(?:hiking|trail|outdoor|running|runner|walk(?:ing)?|gym|training|workout|athletic|active)\b/i.test(userIntentText)) {
+      console.log(
+        `[search]   relevance floor SUPPRESSED: active use-case but style/dressy constraint present — not forcing sneakers`,
+      );
     }
   }
 
@@ -1553,14 +1567,28 @@ const isExcludedByRule = (p) => {
       const title = String(p.title || "").toLowerCase();
       return nameTokens.every((t) => title.includes(t));
     };
-    filtered = filtered.filter(
+    const guarded = filtered.filter(
       (p) => productMatchesCategoryConstraint(p, effectiveCategory) || titleMatchesName(p),
     );
-    if (filtered.length !== beforeCategoryGuard) {
+    // RELEVANCE-FLOOR FALLBACK. When the category was only a SOFT inference from
+    // the active/outdoor relevance floor (sneaker forcing) and the hard-guard
+    // wiped the whole pool, the forcing was wrong for this query — keep the
+    // pre-guard results rather than emit a no-card answer. An explicit/named
+    // category still hard-guards as before (a real "show me boots" stays boots).
+    if (guarded.length === 0 && beforeCategoryGuard > 0 && categoryFromRelevanceFloor) {
       console.log(
-        `[search]   category hard-guard ${effectiveCategory}: ${filtered.length}/${beforeCategoryGuard} ` +
-          `(removed off-category semantic/near matches; title-name matches exempt)`,
+        `[search]   category hard-guard ${effectiveCategory}: relevance-floor forcing returned 0/${beforeCategoryGuard} ` +
+          `— reverting to un-forced results (style query, not sneaker-only)`,
       );
+      effectiveCategory = "";
+    } else {
+      filtered = guarded;
+      if (filtered.length !== beforeCategoryGuard) {
+        console.log(
+          `[search]   category hard-guard ${effectiveCategory}: ${filtered.length}/${beforeCategoryGuard} ` +
+            `(removed off-category semantic/near matches; title-name matches exempt)`,
+        );
+      }
     }
   }
 

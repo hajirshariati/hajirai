@@ -40,6 +40,7 @@ import {
   computeCatalogConstraintDomains,
 } from "./catalog-matcher.server.js";
 import { detectRejectedCategories } from "./chat-postprocessing.js";
+import { conditionFromText } from "./condition-normalize.js";
 
 // ─── helpers ───────────────────────────────────────────────────
 
@@ -731,8 +732,20 @@ export function extractUserConstraints(message) {
   }
   const color = pickCustomerColor(message);
   if (color) out.color = color;
-  for (const [tag, re] of Object.entries(RESOLVER_CONDITION_RE)) {
-    if (re.test(message)) { out.condition = tag; break; }
+  // Condition: route through the single canonical normalizer first
+  // (condition-normalize.js). It's the only place that knows mortons_neuroma /
+  // metatarsalgia / heel_pain, so a "Morton's neuroma" turn extracts the RIGHT
+  // condition and overwrites any stale plantar_fasciitis in memory rather than
+  // silently keeping it (PRD bug: classifier=mortons_neuroma but memory
+  // explicit=plantar_fasciitis). Fall back to the resolver's arch-type patterns
+  // (flat_feet / high_arch) the normalizer deliberately doesn't model.
+  const canonicalCondition = conditionFromText(message);
+  if (canonicalCondition) {
+    out.condition = canonicalCondition === "bunion" ? "bunions" : canonicalCondition;
+  } else {
+    for (const [tag, re] of Object.entries(RESOLVER_CONDITION_RE)) {
+      if (re.test(message)) { out.condition = tag; break; }
+    }
   }
   for (const [tag, re] of Object.entries(RESOLVER_USECASE_RE)) {
     if (re.test(message)) { out.useCase = tag; break; }

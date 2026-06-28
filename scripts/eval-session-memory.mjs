@@ -112,6 +112,37 @@ await test("S6 — orthotic chip flow: condition → arch → overpronation beco
   assert.ok(chipFacts.length >= 2, `expected ≥2 chip_click facts; got ${chipFacts.length}`);
 });
 
+// PRD 2026-06-28 bug 3: Morton's neuroma must never become plantar_fasciitis.
+await test("S6b — Morton's neuroma turn writes condition=mortons_neuroma (not plantar)", async () => {
+  const mem = buildSessionMemory({
+    messages: [u("For Morton’s neuroma, do I need metatarsal support, arch support, or both?")],
+    classifiedIntent: { isOrthoticRequest: true, attributes: { condition: "mortons_neuroma" } },
+  });
+  assert.equal(
+    mem.explicit.condition,
+    "mortons_neuroma",
+    `expected explicit condition=mortons_neuroma; got ${JSON.stringify(mem.explicit)}`,
+  );
+});
+
+// Bug 3: a NEW Morton's-neuroma turn must OVERWRITE a stale plantar_fasciitis
+// carried from an earlier turn — never keep the stale clinical condition.
+await test("S6c — Morton's neuroma overwrites a stale plantar_fasciitis in memory", async () => {
+  const mem = buildSessionMemory({
+    messages: [
+      u("I have plantar fasciitis"),
+      a("Who are these orthotics for? <<Men's>><<Women's>>"),
+      u("Actually it's for Morton's neuroma — do I need metatarsal support?"),
+    ],
+    classifiedIntent: { isOrthoticRequest: true, attributes: { condition: "mortons_neuroma" } },
+  });
+  assert.equal(
+    mem.explicit.condition,
+    "mortons_neuroma",
+    `stale plantar_fasciitis must be overwritten; got ${JSON.stringify(mem.explicit)}`,
+  );
+});
+
 await test("S7 — 'Find women sandals' then 'actually men's' pivots; latest wins, women scope goes stale", async () => {
   const mem = buildSessionMemory({
     messages: [u("Find women sandals"), a("Got it."), u("actually men's")],

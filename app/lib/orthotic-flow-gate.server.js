@@ -812,25 +812,37 @@ export async function maybeRunOrthoticFlow({
   if (!rawUserText.trim()) return { handled: false };
 
   // SHORT / AMBIGUOUS REPLY GUARD (state hygiene). A content-free reply ("not
-  // sure", "maybe", "I don't know") is only meaningful as the answer to an
-  // ACTIVE question. If the immediately-prior assistant turn did NOT ask one
-  // (no chips, no scoping/clinical question), do NOT engage the finder or infer
-  // a clinical condition from it — defer to the LLM so it asks a clarifying
-  // question instead of guessing a path from "Not sure".
+  // sure", "maybe", "I don't know", "either") is ONLY meaningful as the answer
+  // to an EXPLICIT pending gate question from the immediately-prior assistant
+  // turn. Detect that question precisely — by its chips, OR (the widget's
+  // history round-trip strips the `<<>>` markers) by its verbatim seed question
+  // text — and capture the attribute it asked for. With NO such pending gate
+  // question, defer to the LLM to clarify; never infer condition / arch /
+  // overpronation / gender / useCase from "Not sure".
   if (isShortAmbiguousReply(rawUserText)) {
     const priorAssistant = [...messages].reverse().find(
       (m) => m && m.role === "assistant" && typeof m.content === "string",
     );
     const priorText = priorAssistant ? priorAssistant.content : "";
-    const priorAskedQuestion =
-      /<<[^<>]+>>/.test(priorText) ||
-      (/\?/.test(priorText) &&
-        /\b(arch|condition|pain|orthotic|insole|met(?:atarsal)?|forefoot|heel|flat[\s-]?(?:feet|foot)|gender|men'?s|women'?s|use[\s-]?case|activity|kind|type|which|what)\b/i.test(
-          priorText,
-        ));
-    if (!priorAskedQuestion) {
+    let pendingGateAttribute = null;
+    if (priorText) {
+      if (/<<[^<>]+>>/.test(priorText)) {
+        pendingGateAttribute = findNodeByChipsInText(priorText, tree.definition)?.attribute || null;
+      }
+      if (!pendingGateAttribute) {
+        // Chips stripped: match the seed question TEXT (it always survives —
+        // body is `${question}\n\n${chips}`). Same signal used at the gate's
+        // orthotic-context check below.
+        const seedQuestionNodes = (tree?.definition?.nodes || []).filter(
+          (n) => n && n.type === "question" && typeof n.question === "string" && n.question.trim(),
+        );
+        const hit = seedQuestionNodes.find((n) => priorText.includes(n.question.trim()));
+        pendingGateAttribute = hit?.attribute || null;
+      }
+    }
+    if (!pendingGateAttribute) {
       console.log(
-        `[orthotic-flow] short-ambiguous reply ("${rawUserText.trim().slice(0, 30)}") with no pending question — deferring (no condition inference)`,
+        `[orthotic-flow] short-ambiguous reply ("${rawUserText.trim().slice(0, 30)}") with no pending gate question — deferring (no attribute inference)`,
       );
       return { handled: false, case: "short_ambiguous_no_pending" };
     }
@@ -2180,6 +2192,45 @@ export async function maybeRunOrthoticFlow({
   const step = resolveSkippableSteps(state, tree.definition);
 
   if (step.type === "question") {
+    // GENDER-STALL GUARD (bug 4). When the customer OPENS with a real orthotic
+    // question that already carries use-case / product context — "an orthotic
+    // for work boots, plus cushioning — what should I choose?" — leading with a
+    // gender-only chip gate reads as ignoring them. Gender is a SKU refinement,
+    // not a prerequisite for advisory guidance: defer to the LLM so it answers
+    // first; it can ask gender afterward only if a gendered SKU is needed.
+    //
+    // Scoped tight so a bare "I need orthotics" still asks who-for: fires ONLY
+    // when (a) the next gate question is gender, (b) NO required attribute was
+    // accumulated from prior turns (this is the opening, not mid-questionnaire),
+    // and (c) the turn carries real use-case/product context AND a guidance
+    // question or stated need.
+    if (step.node.attribute === "gender") {
+      const accumulatedHasRequired = required.some((a) => accumulated[a] !== undefined);
+      const USECASE_PRODUCT_CONTEXT_RE =
+        /\b(work\s*boots?|boots?|sneakers?|shoes?|cleats?|sandals?|hiking|trail|running|jogging|walk(?:ing)?|standing|on\s+my\s+feet|all\s+day|gym|workout|athletic|cushion(?:ing|ed)?|dress\s+shoes?|casual|office|nursing|nurse)\b/i;
+      const hasUseCaseContext =
+        !!(classifiedIntent?.attributes?.useCase) ||
+        answers.useCase !== undefined ||
+        USECASE_PRODUCT_CONTEXT_RE.test(rawUserText);
+      // The differentiator vs a plain "an orthotic for the gym" (which SHOULD
+      // ask who-for): an EXPLICIT advisory question ("what should I choose?")
+      // or a COMPOUND need ("…for work boots, but I also want cushioning"). A
+      // bare request to find an orthotic for a use case is not enough to skip
+      // the gender step.
+      const asksAdvisoryQuestion =
+        /\?/.test(rawUserText) &&
+        /\b(?:what|which|how)\b[^?]*\b(?:choose|pick|look|recommend|suggest|get|go\s+with|should|best)\b/i.test(rawUserText);
+      const hasCompoundNeed =
+        /\bbut\s+(?:i\s+(?:also\s+)?want|also)\b|\band\s+i\s+also\s+want\b|\bplus\s+i\s+(?:also\s+)?want\b/i.test(rawUserText);
+      if (!accumulatedHasRequired && hasUseCaseContext && (asksAdvisoryQuestion || hasCompoundNeed)) {
+        console.log(
+          `[orthotic-flow] gender-stall guard: opening orthotic question carries use-case/product context — ` +
+            `deferring to LLM for advisory-first (no gender-only gate)`,
+        );
+        return { handled: false, case: "advisory_first_no_gender_stall" };
+      }
+    }
+
     // Note: there used to be a "stuck-loop" detector here that fired
     // when the same question was asked twice in a row. It was too
     // aggressive — false-positives on legitimate corrections, fragment
