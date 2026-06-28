@@ -4,7 +4,7 @@
 /* Build marker — bump on widget changes so a live deploy can be verified
    in DevTools console. If you don't see this line after `shopify app deploy`
    + hard refresh, the new bundle isn't live (stale checkout or CDN cache). */
-try{console.log('[hajirai-widget] build 2026-06-29 see-it-styled-equalheight');}catch(e){}
+try{console.log('[hajirai-widget] build 2026-06-29 see-it-styled-mobilerow');}catch(e){}
 
 /* Visual config comes from theme editor (liquid-injected as window.__AI_CHAT_CONFIG).
    Chat server URL is handled internally via app proxy at /apps/hajirai/chat. */
@@ -870,7 +870,17 @@ function injectVizStyleOnce(){
     // natural 4/5 aspect ratio instead of filling a (now non-existent) row.
     '@media (max-width:699px){'+
       '.ai-chat-viz-expanded{grid-template-columns:1fr;align-items:start}'+
-      '.ai-chat-viz-controls .ai-chat-product-card{max-width:100%!important}'+
+      '.ai-chat-viz-controls{gap:8px}'+
+      // Compact HORIZONTAL product row (image left, title/price/CTA right) so the
+      // mobile card reads like a shopping row, not a tall card with whitespace.
+      // box-sizing + min-width:0 on the text column prevent horizontal overflow.
+      '.ai-chat-viz-controls .ai-chat-product-card{display:grid!important;grid-template-columns:96px 1fr!important;gap:12px!important;align-items:center!important;padding:14px!important;max-width:100%!important;box-sizing:border-box!important}'+
+      '.ai-chat-viz-controls .ai-chat-product-img{width:96px!important;height:96px!important;border-radius:10px!important}'+
+      '.ai-chat-viz-controls .ai-chat-product-info{padding:0!important;min-width:0!important;gap:4px!important}'+
+      // Title up to 2 lines, then ellipsis — keeps the row short.
+      '.ai-chat-viz-controls .ai-chat-product-title{display:-webkit-box!important;-webkit-line-clamp:2!important;-webkit-box-orient:vertical!important;overflow:hidden!important}'+
+      // CTA compact but tappable (~40px), sized to content (capped at 160px).
+      '.ai-chat-viz-controls .ai-chat-product-cta{min-height:40px!important;max-width:160px!important;margin-top:4px!important}'+
       '.ai-chat-viz-preview{height:auto}'+
       '.ai-chat-viz-image{height:auto;min-height:0}'+
       '.ai-chat-viz-result{height:auto;min-height:0;aspect-ratio:4/5}'+

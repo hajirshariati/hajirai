@@ -204,11 +204,54 @@ test("mobile (<700px) stacks AND drops the forced equal-height (natural 4/5 rati
   // result uses a natural aspect ratio instead.
   assert.match(style, /@media \(max-width:699px\)\{[^@]*\.ai-chat-viz-preview\{height:auto\}/, "preview no longer fills a row on mobile");
   assert.match(style, /@media \(max-width:699px\)\{[^@]*\.ai-chat-viz-result\{height:auto;min-height:0;aspect-ratio:4\/5\}/, "mobile result uses a natural 4/5 ratio, not row height");
-  assert.match(style, /@media \(max-width:699px\)\{[^@]*\.ai-chat-product-card\{max-width:100%!important\}/, "card may go full-width on mobile");
+});
+
+// ── PRD 2026-06-29: mobile = compact HORIZONTAL product row (less whitespace) ──
+test("mobile product card is a compact HORIZONTAL row (image left, text right)", () => {
+  const style = fnBody("injectVizStyleOnce");
+  const mobile = style.slice(style.indexOf("@media (max-width:699px)"));
+  // The mobile card is a 2-col grid: a fixed image column + a flexible text column.
+  assert.match(mobile, /\.ai-chat-viz-controls \.ai-chat-product-card\{[^}]*display:grid!important/, "horizontal grid row on mobile");
+  assert.match(mobile, /\.ai-chat-viz-controls \.ai-chat-product-card\{[^}]*grid-template-columns:96px 1fr!important/, "fixed image column + flexible text column");
+  assert.match(mobile, /\.ai-chat-viz-controls \.ai-chat-product-card\{[^}]*align-items:center!important/, "vertically centered row");
+});
+
+test("mobile product IMAGE is compact (~96px) and still object-fit:contain", () => {
+  const style = fnBody("injectVizStyleOnce");
+  const mobile = style.slice(style.indexOf("@media (max-width:699px)"));
+  assert.match(mobile, /\.ai-chat-viz-controls \.ai-chat-product-img\{[^}]*width:96px!important[^}]*height:96px!important/, "compact fixed image box, no tall area");
+  // contain comes from the base rule (not overridden on mobile), so the shoe isn't cropped.
+  assert.match(style, /\.ai-chat-viz-controls \.ai-chat-product-img img\{[^}]*object-fit:contain!important/, "image stays contain on mobile too");
+  assert.doesNotMatch(mobile, /\.ai-chat-product-img\{[^}]*aspect-ratio:4\/5/, "no forced desktop aspect ratio on the mobile card image");
+});
+
+test("mobile CTA is compact-but-tappable (~40px, capped width), not a full-width block", () => {
+  const style = fnBody("injectVizStyleOnce");
+  const mobile = style.slice(style.indexOf("@media (max-width:699px)"));
+  assert.match(mobile, /\.ai-chat-viz-controls \.ai-chat-product-cta\{[^}]*min-height:40px!important/, "tappable ~40px");
+  assert.match(mobile, /\.ai-chat-viz-controls \.ai-chat-product-cta\{[^}]*max-width:160px!important/, "sized to content, not full-width");
+});
+
+test("mobile introduces NO horizontal overflow (box-sizing + min-width:0 on the text column)", () => {
+  const style = fnBody("injectVizStyleOnce");
+  const mobile = style.slice(style.indexOf("@media (max-width:699px)"));
+  assert.match(mobile, /\.ai-chat-viz-controls \.ai-chat-product-card\{[^}]*box-sizing:border-box!important/, "padding doesn't widen the card past 100%");
+  assert.match(mobile, /\.ai-chat-viz-controls \.ai-chat-product-info\{[^}]*min-width:0!important/, "text column can shrink — no min-content overflow");
+  // No scrollbars / viewport-width hacks anywhere in the visualizer CSS.
+  assert.doesNotMatch(style, /overflow-x:(auto|scroll)/, "no horizontal scroll introduced");
+  assert.doesNotMatch(style, /100vw/, "no viewport-width rule that could overflow the bubble");
+});
+
+test("the mobile changes are SCOPED to the media query — desktop card stays vertical", () => {
+  const style = fnBody("injectVizStyleOnce");
+  // The base (non-media) card rule is still display:block (vertical stack).
+  const base = style.split("@media")[0];
+  assert.match(base, /\.ai-chat-viz-controls \.ai-chat-product-card\{[^}]*display:block!important/, "desktop card unchanged (vertical block)");
+  assert.doesNotMatch(base, /grid-template-columns:96px 1fr/, "the horizontal row is mobile-only");
 });
 
 test("the widget carries a current build marker (so the live version is verifiable)", () => {
-  assert.match(SRC, /\[hajirai-widget\] build 2026-06-29 see-it-styled-equalheight/, "console build marker bumped for this change");
+  assert.match(SRC, /\[hajirai-widget\] build 2026-06-29 see-it-styled-mobilerow/, "console build marker bumped for this change");
 });
 
 // ── PRD 2026-06-29: stability — single-flight, cancellation, no runaway repaint ──
