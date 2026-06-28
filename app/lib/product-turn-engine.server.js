@@ -101,6 +101,7 @@ export async function runProductTurn(ctx = {}, options = {}) {
     resolverState: ctx.resolverState || null,
     classifiedIntent: ctx.classifiedIntent || null,
     claimConfig,
+    turnPlan: ctx.turnPlan || null,
   });
   diagnostics.scope = scope;
 
@@ -424,12 +425,25 @@ export async function runProductTurn(ctx = {}, options = {}) {
 // pivot/stale logic. The engine's job is to read the cleaned
 // memory and surface the scope it'll use for retrieval/selection,
 // not to redo that logic.
-export function resolveTurnScope({ latestUserMessage, messages = [], sessionMemory, resolverState, classifiedIntent, claimConfig }) {
+export function resolveTurnScope({ latestUserMessage, messages = [], sessionMemory, resolverState, classifiedIntent, claimConfig, turnPlan = null }) {
   const explicit = sessionMemory?.explicit || {};
   const classified = classifiedIntent?.attributes || {};
   const matched = resolverState?.matched_constraints || {};
   const inferred = resolverState?.inferred_constraints || {};
   const inferredValue = (key) => inferred?.[key]?.value || null;
+  const rawMsg = String(latestUserMessage || "").trim();
+
+  // sale_browse is STATELESS: "current sales and promotions" must search
+  // discounted products broadly and never inherit a prior turn's
+  // category/condition/use-case/color (prod trace: stale "orthotics" turned a
+  // broad sale browse into an orthotics search). When TurnPlan owns the turn as
+  // sale_browse AND the latest message names no category, suppress the stale
+  // fills so only gender (the harmless primary line) and onSale survive.
+  const SALE_CATEGORY_RE_SCOPE =
+    /\b(sneakers?|sandals?|boots?|clogs?|loafers?|slippers?|oxfords?|flats?|heels?|wedges?|mules?|orthotics?|insoles?|footbeds?|shoes?|footwear|walking|dress)\b/i;
+  const saleBrowseStateless =
+    turnPlan?.workflow === "sale_browse" && !SALE_CATEGORY_RE_SCOPE.test(rawMsg);
+
   const scope = {
     rawMessage: String(latestUserMessage || "").trim(),
     gender: explicit.gender || classified.gender || matched.gender || inferredValue("gender"),
@@ -449,6 +463,21 @@ export function resolveTurnScope({ latestUserMessage, messages = [], sessionMemo
     catalogQuery: "",
     catalogQueryContinuedFromPrior: false,
   };
+
+  // sale_browse stateless reset (see above): drop inherited category/condition/
+  // use-case/color/named-product so a broad "what's on sale" can't be narrowed
+  // by stale memory. Gender (primary line) and onSale stay.
+  if (saleBrowseStateless) {
+    scope.category = null;
+    scope.condition = null;
+    scope.useCase = null;
+    scope.color = null;
+    scope.namedProduct = null;
+    scope.modifier = null;
+    scope.badge = null;
+    scope.onSale = true;
+    scope.catalogQuery = "sale";
+  }
 
   // Negative-filter detection. The classifier extracts attributes from
   // the message at face value: "show me sandals but NOT in black" was
@@ -530,6 +559,15 @@ export function resolveTurnScope({ latestUserMessage, messages = [], sessionMemo
   scope.requiredCatalogTerms = catalogRequirements.requiredTerms;
   scope.catalogQuery = catalogRequirements.catalogQuery;
   scope.catalogQueryContinuedFromPrior = catalogRequirements.continuedFromPrior;
+
+  // Re-pin the stateless sale browse AFTER deriveCatalogRequirements (which would
+  // otherwise re-derive a query from any residual context). Broad on-sale search,
+  // no inherited catalog terms.
+  if (saleBrowseStateless) {
+    scope.catalogQuery = "sale";
+    scope.requiredCatalogTerms = [];
+    scope.catalogQueryContinuedFromPrior = false;
+  }
 
   return scope;
 }

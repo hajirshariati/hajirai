@@ -728,6 +728,7 @@ export function redirectOrthoticSearchToRecommender(toolCall, ctx) {
   const matchesDomain = ORTHOTIC_DOMAIN_RE.test(latest) || ORTHOTIC_DOMAIN_RE.test(queryStr);
   if (!matchesDomain) return toolCall;
 
+
   // Footwear-inclusive escape hatch. The customer asked for SHOES *or*
   // insoles ("what shoes or insoles have worked for arch pain") — a
   // cross-category request the orthotic GATE already falls through on
@@ -754,6 +755,33 @@ export function redirectOrthoticSearchToRecommender(toolCall, ctx) {
       `[chat] orthotic-routing: skipped redirect — footwear-inclusive request ` +
         `("shoes or insoles") and the model is searching footwear ` +
         `(query="${queryStr.slice(0, 50)}"); letting search_products run so the customer sees shoes.`,
+    );
+    return toolCall;
+  }
+
+  // Mixed footwear + orthotic advisory, ANY order ("Should I buy shoes,
+  // orthotics, or both?"). The directional shoes↔insoles regexes above miss this
+  // because the orthotic word PRECEDES the connector and "both" follows it. This
+  // is the TurnPlan-ownership boundary in practice: when the latest message names
+  // a footwear noun AND (an orthotic word OR an explicit "both") — and the
+  // model's own query isn't orthotic-domain (it's searching shoes) — TurnPlan
+  // owns it as a footwear advisory turn (condition_recommendation), so let
+  // search_products run instead of hijacking it into the orthotic gender gate.
+  // Footwear presence is the key discriminator: a pure orthotic-only ask ("what
+  // orthotic is best for plantar fasciitis?") has NO footwear noun and still
+  // correctly routes to recommend_orthotic.
+  const FOOTWEAR_NOUN_RE =
+    /\b(shoes?|footwear|sneakers?|boots?|sandals?|clogs?|loafers?|slippers?|oxfords?|flats?|heels?|wedges?|mules?)\b/i;
+  const turnPlanOwnsAdvisory = ctx?.turnPlan?.workflow === "condition_recommendation";
+  if (
+    !queryIsOrthoticDomain &&
+    FOOTWEAR_NOUN_RE.test(latest) &&
+    (ORTHOTIC_DOMAIN_RE.test(latest) || /\bboth\b/i.test(latest) || turnPlanOwnsAdvisory)
+  ) {
+    console.log(
+      `[chat] orthotic-routing: skipped redirect — mixed footwear+orthotic advisory ` +
+        `("shoes, orthotics, or both", any order; turnPlan=${ctx?.turnPlan?.workflow || "-"}); ` +
+        `letting search_products run so footwear cards show.`,
     );
     return toolCall;
   }
@@ -953,11 +981,55 @@ export function enforceTurnPlanOnToolCall(toolCall, ctx, original) {
   return { ...toolCall, input: { ...toolCall.input, filters } };
 }
 
+// ── sanitizeSaleBrowseSearch ───────────────────────────────────────────
+// sale_browse is a STATELESS commerce turn: "show me current sales and
+// promotions" must search broadly for discounted products, never inherit a
+// prior turn's category/condition/use-case. The LLM (Haiku) otherwise reuses
+// stale context and searches query="orthotics" (prod trace), producing an
+// orthotics-only sale list with a "View All Women's Orthotics" CTA. When
+// TurnPlan owns the turn as sale_browse AND the latest message names no
+// category, force a clean deterministic on-sale search (query="sale",
+// onSale=true), keeping only an already-present gender filter. When the latest
+// message DOES name a category ("sneakers on sale"), keep it and just ensure the
+// onSale filter is set.
+const SALE_CATEGORY_RE =
+  /\b(sneakers?|sandals?|boots?|clogs?|loafers?|slippers?|oxfords?|flats?|heels?|wedges?|mules?|orthotics?|insoles?|footbeds?|shoes?|footwear|walking|dress)\b/i;
+export function sanitizeSaleBrowseSearch(toolCall, ctx) {
+  if (toolCall.name !== "search_products") return toolCall;
+  if (ctx?.turnPlan?.workflow !== "sale_browse") return toolCall;
+  const latest = String(ctx?.latestUserMessage || "");
+  const input = { ...(toolCall.input || {}) };
+  const filters = { ...(input.filters || {}) };
+
+  if (!SALE_CATEGORY_RE.test(latest)) {
+    // Broad "what's on sale" — no category named THIS turn. Build a clean,
+    // stateless on-sale search; never inherit prior category/condition/use-case.
+    const cleaned = { query: "sale", onSale: true, filters: {} };
+    if (filters.gender) cleaned.filters.gender = filters.gender; // primary line is harmless
+    if (JSON.stringify(cleaned) !== JSON.stringify({ ...input, filters })) {
+      console.log(
+        `[chat] sale_browse: stateless rewrite — dropped stale context ` +
+          `(was query="${String(input.query || "").slice(0, 40)}", filters=${JSON.stringify(filters)}) ` +
+          `→ query="sale" onSale=true`,
+      );
+      return { ...toolCall, input: cleaned };
+    }
+    return toolCall;
+  }
+
+  // A category IS named this turn — keep the model's query/filters, just make
+  // sure the on-sale filter is actually applied.
+  if (input.onSale === true) return toolCall;
+  input.onSale = true;
+  return { ...toolCall, input: { ...input, filters } };
+}
+
 export function rewriteToolCall(toolCall, ctx) {
   const original = toolCall;
   let rewritten = toolCall;
   rewritten = forceComparisonLookup(rewritten, ctx);
   rewritten = redirectOrthoticSearchToRecommender(rewritten, ctx);
+  rewritten = sanitizeSaleBrowseSearch(rewritten, ctx);
   rewritten = stripStaleCategoriesOnScopeReset(rewritten, ctx);
   rewritten = injectStructuredColorFilter(rewritten, ctx);
   rewritten = injectLockedGender(rewritten, ctx);

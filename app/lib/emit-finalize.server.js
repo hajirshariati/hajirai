@@ -975,15 +975,40 @@ export function finalizeOutboundReply({
       fullResponseText = genderFiltered.text;
     }
 
-    // Context-carrying gender chips: when a category is already in
-    // scope, rewrite bare <<Men's>>/<<Women's>> navigation chips into
-    // the self-contained compound (<<Men's shoes>>) so a tapped chip
-    // carries its own context on the next turn. Runs AFTER the
-    // contradicting-gender strip (only surviving chips get decorated)
-    // and BEFORE the catalog-scoped boundary (the compound gets
-    // catalog-validated — umbrella terms let "shoes" prove out via
-    // group triggers).
-    {
+    // Answer workflows with gender already resolved + clarification disallowed
+    // must NOT carry gender navigation chips at all. TurnPlan owns gender, so
+    // <<Men's>>/<<Women's>> chips here are an invalid draft — strip them entirely
+    // (the upstream prompt should prevent them; this is the safety net) and SKIP
+    // the decoration step. Decorating them into <<Women's sneakers>> only to have
+    // a later boundary strip them is exactly what spun the validator-retry loop.
+    const planSuppressesGenderChips =
+      ctx?.turnPlan?.clarificationAllowed === false &&
+      isAnswerWorkflow(ctx?.turnPlan) &&
+      (ctx?.turnPlan?.gender === "men" || ctx?.turnPlan?.gender === "women");
+    if (planSuppressesGenderChips) {
+      const before = fullResponseText;
+      // Remove any chip whose label starts with a gender token (bare or compound:
+      // <<Men's>>, <<Women's sneakers>>, <<Men's shoes>>).
+      fullResponseText = fullResponseText
+        .replace(/<<\s*(?:men|women)(?:['’]?s)?\b[^>]*>>/gi, "")
+        .replace(/[ \t]{2,}/g, " ")
+        .replace(/\n{3,}/g, "\n\n")
+        .trim();
+      if (before !== fullResponseText) {
+        console.log(
+          `[chat] ${ctx.shop} turn-plan(${ctx.turnPlan.workflow}): stripped gender nav chips ` +
+            `(gender=${ctx.turnPlan.gender} resolved, clarify=false) — gender is TurnPlan-owned`,
+        );
+      }
+    } else {
+      // Context-carrying gender chips: when a category is already in
+      // scope, rewrite bare <<Men's>>/<<Women's>> navigation chips into
+      // the self-contained compound (<<Men's shoes>>) so a tapped chip
+      // carries its own context on the next turn. Runs AFTER the
+      // contradicting-gender strip (only surviving chips get decorated)
+      // and BEFORE the catalog-scoped boundary (the compound gets
+      // catalog-validated — umbrella terms let "shoes" prove out via
+      // group triggers).
       const categoryNoun = genderChipCategoryNounFromContext(ctx);
       if (categoryNoun) {
         const decorated = decorateGenderNavigationChips(fullResponseText, { categoryNoun });

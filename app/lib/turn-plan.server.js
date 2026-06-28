@@ -337,6 +337,7 @@ export function planTurn({
       gender: genderFor(true),
       directives: [
         "Answer the compatibility question DIRECTLY (can the orthotic/insole go inside this shoe) from the named product's facts plus orthotic knowledge — e.g. removable footbed = yes, fixed = limited. Show ONLY the named product's card if any. Do NOT search for or show random orthotic products unless the customer explicitly asked to shop orthotics.",
+        "Keep it SHORT: 2-3 sentences MAX, direct answer first. No product cards unless a specific product was named in the conversation.",
       ],
     });
   }
@@ -673,7 +674,23 @@ export function buildTurnPlanPromptBlock(plan) {
     `Clarifying question allowed: ${plan.clarificationAllowed ? "yes (at most one)" : "NO — do not ask, act on what you have"}`,
     `Product display: ${plan.productDisplayPolicy}`,
   ];
-  if (plan.gender) lines.push(`Gender to use: ${plan.gender} (do not ask — refine later if needed)`);
+  if (plan.gender) {
+    // For answer workflows where gender is already resolved/defaulted and no
+    // clarification is allowed, be EXPLICIT and absolute: the model must not ask
+    // gender or emit gender chips. Leaving it as a soft "refine later" let the
+    // model still open with "women's or men's?" + <<Women's>>/<<Men's>> chips,
+    // which then get stripped downstream → validator retry loop → empty-text
+    // repair (prod trace). Killing it at the prompt is the primary fix.
+    if (plan.clarificationAllowed === false && ANSWER_WORKFLOWS.has(plan.workflow)) {
+      lines.push(
+        `Gender: ${plan.gender} — ALREADY RESOLVED/DEFAULTED by TurnPlan. Do NOT ask "men's or women's?", ` +
+          `and do NOT emit <<Men's>>/<<Women's>> chips. Search the ${plan.gender}'s line now; ` +
+          `mention the other line only as plain words later if it's genuinely relevant.`,
+      );
+    } else {
+      lines.push(`Gender to use: ${plan.gender} (do not ask — refine later if needed)`);
+    }
+  }
   for (const d of plan.directives) lines.push(`- ${d}`);
   return lines.join("\n");
 }
