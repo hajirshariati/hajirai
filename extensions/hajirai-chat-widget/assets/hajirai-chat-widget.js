@@ -733,8 +733,8 @@ function vizLoadingHtml(step){
 }
 function vizResultHtml(src){
   return '<div class="ai-chat-viz-card" style="border:1px solid rgba(0,0,0,.08);border-radius:14px;overflow:hidden;background:#fff">'+
-    '<img src="'+esc(src)+'" alt="AI-generated styling preview" style="display:block;width:100%;height:auto"/>'+
-    '<div style="font-size:11px;color:#9a9a9a;padding:7px 10px;text-align:center;line-height:1.35">\u2728 AI-generated \u2014 may not exactly match the product.</div>'+
+    '<img src="'+esc(src)+'" alt="AI style preview" style="display:block;width:100%;height:auto"/>'+
+    '<div style="font-size:11px;color:#9a9a9a;padding:7px 10px;text-align:center;line-height:1.35">AI style preview. Product details may vary.</div>'+
   '</div>';
 }
 function vizErrorHtml(msg){
@@ -755,22 +755,32 @@ function vizErrorHtml(msg){
    card's box (no cramping). The card is a single <a> link, so the
    button stops click propagation to avoid navigating to the product.
    The generated image renders BELOW the card (see runVisualize). */
+function vizLabel(cta){
+  // Migrate the old default to the new name; respect a genuinely custom label.
+  var l=cta&&cta.label;
+  return (l&&l!=='Visualize My Look')?l:'See It Styled';
+}
 function injectVizButton(card,cta){
   if(!card||card.querySelector('.ai-chat-viz-btn'))return;
-  // Place "Visualize My Look" BESIDE the "View product" button, on the
-  // same line, inside the card. Sized to match the View product CTA.
+  // "See It Styled" is a SECONDARY action sitting BESIDE "View product" (the
+  // primary). Soft warm-outline styling, smaller visual weight, no heavy
+  // shadow — it must never read as the main buy CTA. The card is a single <a>,
+  // so the button stops click propagation to avoid navigating to the product.
   var viz=document.createElement('span');
   viz.className='ai-chat-viz-btn';
   viz.setAttribute('role','button');viz.setAttribute('tabindex','0');
-  viz.style.cssText='display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:8px 14px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;letter-spacing:.02em;color:#fff;white-space:nowrap;background:linear-gradient(100deg,var(--ai-chat-primary,#2d6b4f),var(--ai-chat-accent,#3a7d5c));box-shadow:0 2px 8px rgba(45,107,79,.28)';
-  viz.innerHTML=vizSparkle()+'<span>'+esc(cta.label||'Visualize My Look')+'</span>';
+  viz.style.cssText='display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:8px 13px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;letter-spacing:.01em;white-space:nowrap;background:#F4E8D3;border:1px solid #C9A76D;color:#8A6632';
+  viz.innerHTML=vizSparkle()+'<span>'+esc(vizLabel(cta))+'</span>';
+  viz.addEventListener('mouseenter',function(){viz.style.background='#EAD8B8'});
+  viz.addEventListener('mouseleave',function(){viz.style.background='#F4E8D3'});
   var go=function(e){if(e){e.preventDefault();e.stopPropagation();}runVisualize(cta,card)};
   viz.addEventListener('click',go);
   viz.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){go(e)}});
   var viewCta=card.querySelector('.ai-chat-product-cta');
   if(viewCta&&viewCta.parentNode&&getComputedStyle(viewCta).display!=='none'){
-    // Wrap "View product" + Visualize in a single flex row so they sit
-    // side by side (wraps gracefully if the card is too narrow).
+    // Wrap "View product" + "See It Styled" in a single flex row so they sit
+    // side by side when there's room and STACK (See It Styled under View
+    // product) when the card is too narrow / on mobile.
     var row=document.createElement('div');
     row.className='ai-chat-viz-actions';
     row.style.cssText='display:flex;flex-wrap:wrap;gap:8px;align-items:stretch;margin-top:4px';
@@ -792,84 +802,90 @@ function runVisualize(cta,card){
   var viz=card&&card.querySelector('.ai-chat-viz-btn');
   if(viz)viz.style.display='none';
   if(!card||!card.parentNode)return;
-  // Render the preview as a sibling immediately AFTER the card. The
-  // product row is a flex container, so this places the image BESIDE
-  // the card (card stays its width, image fills the rest).
+  // Open a DEDICATED style-preview panel as a sibling AFTER the card — never
+  // inside the card's tap target. The panel holds the generated image AND the
+  // scene selector, so neither can be confused with the product-card click.
+  // It sits beside the card when there's room and wraps below on narrow/mobile.
   var host=document.createElement('div');
   host.className='ai-chat-viz-host';
-  host.setAttribute('role','status');host.setAttribute('aria-live','polite');host.setAttribute('aria-label','Creating your styling preview');
-  host.style.cssText='flex:1 1 58%;min-width:0;align-self:flex-start;margin-left:10px';
+  host.style.cssText='flex:1 1 280px;min-width:240px;align-self:flex-start;margin-left:10px';
+  var imgWrap=document.createElement('div');
+  imgWrap.className='ai-chat-viz-image';
+  imgWrap.setAttribute('role','status');imgWrap.setAttribute('aria-live','polite');imgWrap.setAttribute('aria-label','Creating your styling preview');
+  host.appendChild(imgWrap);
   card.parentNode.insertBefore(host,card.nextSibling);
   vizFetch(host,cta,card);
 }
-// A small, curated set of high-quality scene presets the shopper can pick to
-// RE-generate the SAME shoe in a different setting. Kept deliberately short —
-// these are settings the image model renders reliably well for footwear. The
-// label is what the shopper sees; ctx is the scene phrase fed as styleContext
-// (the existing /visualize endpoint already styles around whatever it's given).
-var VIZ_SCENES=[
-  {k:'beach',label:'Beach',ctx:'a sunny beach boardwalk by the ocean'},
-  {k:'city',label:'City',ctx:'a stylish downtown city sidewalk'},
-  {k:'park',label:'Park',ctx:'a green park pathway on a bright sunny day'},
-  {k:'evening',label:'Evening',ctx:'an elegant evening out at a chic venue'}
+// Fallback scene set when the server didn't send one (older config/cache).
+var DEFAULT_VIZ_SCENES=[
+  {label:'Walking',ctx:'a scenic outdoor walking path'},
+  {label:'Travel',ctx:'a stylish city street while traveling'},
+  {label:'Errands',ctx:'a bright casual everyday errands setting'},
+  {label:'Workday',ctx:'a polished everyday workday setting'}
 ];
-// After the first preview renders, drop a compact row of scene chips into the
-// EXISTING empty space under "View product" inside the card. Picking one
-// re-generates the same product in that setting. Injected once; never grows the
-// card beyond the space already there.
-function injectVizOptions(card,cta,host){
-  if(!card)return;
-  var info=card.querySelector('.ai-chat-product-info')||card;
-  if(info.querySelector('.ai-chat-viz-options'))return;
+// The element inside the host that holds the loading box / generated image /
+// error — kept SEPARATE from the scene selector so re-generating a scene swaps
+// only the image and the selector (with its active state) persists.
+function vizImageHost(host){return (host&&host.querySelector('.ai-chat-viz-image'))||host;}
+// Render the scene selector INSIDE the style-preview panel (host), below the
+// generated image — never inside the clickable product card. Premium segmented
+// pills: selected = filled, unselected = subtle warm border. Picking one
+// re-generates the SAME product in that setting; clicks never reach the card.
+function injectVizOptions(host,cta,card){
+  if(!host||host.querySelector('.ai-chat-viz-options'))return;
+  var scenes=(cta&&cta.scenes&&cta.scenes.length)?cta.scenes:DEFAULT_VIZ_SCENES;
   var wrap=document.createElement('div');
   wrap.className='ai-chat-viz-options';
-  wrap.style.cssText='margin-top:8px;display:flex;flex-direction:column;gap:5px';
+  wrap.style.cssText='margin-top:10px;display:flex;flex-direction:column;gap:7px';
   var lbl=document.createElement('div');
-  lbl.textContent='Try another setting';
-  lbl.style.cssText='font-size:11px;color:#8a8a8a;font-weight:600;letter-spacing:.01em';
+  lbl.textContent='Choose a setting';
+  lbl.style.cssText='font-size:11px;color:#8A6632;font-weight:700;letter-spacing:.04em;text-transform:uppercase';
   wrap.appendChild(lbl);
-  var chips=document.createElement('div');
-  chips.style.cssText='display:flex;flex-wrap:wrap;gap:5px';
-  VIZ_SCENES.forEach(function(s){
+  var seg=document.createElement('div');
+  seg.className='ai-chat-viz-seg';
+  seg.style.cssText='display:flex;flex-wrap:wrap;gap:6px';
+  scenes.forEach(function(s){
     var chip=document.createElement('button');
     chip.type='button';
     chip.className='ai-chat-viz-opt';
-    chip.setAttribute('data-scene',s.k);
+    chip.setAttribute('data-scene',s.label);
+    chip.setAttribute('aria-pressed','false');
     chip.textContent=s.label;
-    chip.style.cssText='padding:5px 11px;border:1px solid rgba(45,107,79,.32);border-radius:14px;background:#fff;color:var(--ai-chat-primary,#2d6b4f);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;line-height:1.2';
+    chip.style.cssText='padding:6px 13px;border:1px solid #C9A76D;border-radius:999px;background:#fff;color:#8A6632;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;line-height:1.2;transition:background .15s,color .15s';
     chip.addEventListener('click',function(e){
       if(e){e.preventDefault();e.stopPropagation();}
-      // Highlight the active scene; clear the others.
-      var kids=chips.children;
-      for(var i=0;i<kids.length;i++){kids[i].style.background='#fff';kids[i].style.color='var(--ai-chat-primary,#2d6b4f)';}
-      chip.style.background='var(--ai-chat-primary,#2d6b4f)';chip.style.color='#fff';
-      var c2={productHandle:cta.productHandle,productTitle:cta.productTitle||'',styleContext:s.ctx,label:cta.label||'Visualize My Look'};
+      var kids=seg.children;
+      for(var i=0;i<kids.length;i++){kids[i].style.background='#fff';kids[i].style.color='#8A6632';kids[i].setAttribute('aria-pressed','false');}
+      chip.style.background='#C9A76D';chip.style.color='#fff';chip.setAttribute('aria-pressed','true');
+      var c2={productHandle:cta.productHandle,productTitle:cta.productTitle||'',styleContext:s.ctx,label:cta.label,scenes:cta.scenes};
       vizFetch(host,c2,card);
     });
-    chips.appendChild(chip);
+    seg.appendChild(chip);
   });
-  wrap.appendChild(chips);
-  info.appendChild(wrap);
+  wrap.appendChild(seg);
+  host.appendChild(wrap);
 }
 // Loading → fetch → result/error. Runs INDEPENDENTLY of the chat stream
 // (own fetch, no input lock), so the customer can keep chatting while
 // the preview renders. 60s ceiling so a hung provider can't spin forever.
 function vizFetch(host,cta,card){
+  var imgHost=vizImageHost(host);
   var steps=['Analyzing the product…','Composing the scene…','Styling the look…','Rendering your preview…'];
-  var si=0;host.innerHTML=vizLoadingHtml(steps[0]);scrollBottom();
-  var iv=setInterval(function(){si=Math.min(si+1,steps.length-1);var l=host.querySelector('.ai-chat-viz-step');if(l)l.textContent=steps[si]},2200);
+  var si=0;imgHost.innerHTML=vizLoadingHtml(steps[0]);scrollBottom();
+  var iv=setInterval(function(){si=Math.min(si+1,steps.length-1);var l=imgHost.querySelector('.ai-chat-viz-step');if(l)l.textContent=steps[si]},2200);
   var ctrl=(typeof AbortController!=='undefined')?new AbortController():null;
   var to=setTimeout(function(){if(ctrl){try{ctrl.abort()}catch(e){}}},60000);
   var opts={method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({productHandle:cta.productHandle,styleContext:cta.styleContext||''})};
   if(ctrl)opts.signal=ctrl.signal;
   fetch(VISUALIZE_URL,opts)
     .then(function(r){return r.json().catch(function(){return{}})})
-    .then(function(d){clearInterval(iv);clearTimeout(to);if(d&&d.ok&&d.imageDataUrl){host.innerHTML=vizResultHtml(d.imageDataUrl);injectVizOptions(card,cta,host)}else{vizError(host,cta,(d&&d.message)||'Could not create the preview right now.',card)}scrollBottom()})
+    .then(function(d){clearInterval(iv);clearTimeout(to);if(d&&d.ok&&d.imageDataUrl){imgHost.innerHTML=vizResultHtml(d.imageDataUrl);injectVizOptions(host,cta,card)}else{vizError(host,cta,(d&&d.message)||'Could not create the preview right now.',card)}scrollBottom()})
     .catch(function(e){clearInterval(iv);clearTimeout(to);vizError(host,cta,(e&&e.name==='AbortError')?'That took too long — please try again.':'Connection issue. Please try again.',card);scrollBottom()});
 }
 function vizError(host,cta,msg,card){
-  host.innerHTML=vizErrorHtml(msg);
-  var r=host.querySelector('.ai-chat-viz-retry');
+  var imgHost=vizImageHost(host);
+  imgHost.innerHTML=vizErrorHtml(msg);
+  var r=imgHost.querySelector('.ai-chat-viz-retry');
   if(r)r.addEventListener('click',function(){vizFetch(host,cta,card)});
 }
 function ctaHtml(linkCTA){
@@ -1139,7 +1155,7 @@ if(p.type==='action'&&p.action==='show_dead_end'){
   scrollBottom();
 }
 if(p.type==='visualize_cta'&&p.productHandle){
-  vizCta={productHandle:p.productHandle,productTitle:p.productTitle||'',styleContext:p.styleContext||'',label:p.label||'Visualize My Look'};
+  vizCta={productHandle:p.productHandle,productTitle:p.productTitle||'',styleContext:p.styleContext||'',label:p.label||'See It Styled',scenes:(p.scenes&&p.scenes.length)?p.scenes:null,sceneGroup:p.sceneGroup||'',productCategory:p.productCategory||''};
 }
 if(p.type==='done'){finish(full,prods,msgDiv,buffSugg,linkCTA,fitReport,buffChoices,vizCta,supportCta);return true}
 if(p.type==='error'){

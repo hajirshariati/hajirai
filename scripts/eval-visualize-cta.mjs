@@ -5,7 +5,7 @@
 // Run: node scripts/eval-visualize-cta.mjs
 
 import assert from "node:assert/strict";
-import { buildVisualizeCtaEvent } from "../app/lib/visualize-cta.server.js";
+import { buildVisualizeCtaEvent, visualizeSceneGroup, VISUALIZE_SCENE_GROUPS } from "../app/lib/visualize-cta.server.js";
 
 let passed = 0;
 let failed = 0;
@@ -35,9 +35,9 @@ test("fires for openai provider with its key + custom label", () => {
   assert.ok(ev && ev.label === "See It Styled");
 });
 
-test("falls back to default label when blank", () => {
+test("falls back to the 'See It Styled' default label when blank", () => {
   const ev = buildVisualizeCtaEvent({ config: { ...enabledGemini, visualizeLookLabel: "" }, product, messages });
-  assert.equal(ev.label, "Visualize My Look");
+  assert.equal(ev.label, "See It Styled");
 });
 
 test("null when feature disabled", () => {
@@ -65,6 +65,69 @@ test("null when product has no handle", () => {
 test("accepts featuredImageUrl as the image source", () => {
   const ev = buildVisualizeCtaEvent({ config: enabledGemini, product: { handle: "h", title: "T", featuredImageUrl: "https://x/y.jpg" }, messages });
   assert.ok(ev && ev.productImage === "https://x/y.jpg");
+});
+
+// ── Aetrex polish: only visible footwear gets the styling CTA ──
+const styleable = { handle: "h", image: "https://x/y.jpg" };
+const fires = (extra) => buildVisualizeCtaEvent({ config: enabledGemini, product: { ...styleable, ...extra }, messages });
+
+test("footwear categories DO get the styling CTA", () => {
+  for (const category of ["Sandals", "Sneakers", "Loafers", "Boots", "Wedges Heels"]) {
+    const ev = fires({ category, title: `Maui ${category}` });
+    assert.ok(ev && ev.type === "visualize_cta", `expected CTA for ${category}`);
+  }
+});
+
+test("non-style products do NOT get the styling CTA", () => {
+  const blocked = [
+    { category: "Orthotics", title: "Premium Memory Foam Orthotics" },
+    { category: "Insoles", title: "Cushion Insole" },
+    { category: "Inserts", title: "Gel Insert" },
+    { category: "Footbeds", title: "Replacement Footbed" },
+    { category: "Accessories", title: "Leather Protector Spray" },
+    { category: "Accessories", title: "Aetrex Foot Roller" },
+    { category: "Socks", title: "Compression Socks" },
+    { category: "Shoe Care", title: "Cleaning Care Kit" },
+  ];
+  for (const p of blocked) {
+    assert.equal(fires(p), null, `expected NO CTA for ${p.title}`);
+  }
+});
+
+test("a wearable sandal whose NAME contains 'Orthotic' stays eligible", () => {
+  const ev = fires({ category: "Sandals", title: "Maui Orthotic Flip" });
+  assert.ok(ev && ev.type === "visualize_cta");
+});
+
+// ── Aetrex polish: scene labels change by product category ──
+test("visualizeSceneGroup maps category → group", () => {
+  assert.equal(visualizeSceneGroup("Sandals", "Maui Sandal"), "sandals");
+  assert.equal(visualizeSceneGroup("Wedges Heels", "Finley Wedge"), "sandals");
+  assert.equal(visualizeSceneGroup("Sneakers", "Danika Sneaker"), "sneakers");
+  assert.equal(visualizeSceneGroup("Loafers", "Kenzie Loafer"), "dress");
+  assert.equal(visualizeSceneGroup("Boots", "Chelsea Boot"), "dress");
+  assert.equal(visualizeSceneGroup("", "Mystery Footwear"), "sneakers"); // sensible default
+});
+
+test("the event carries the category-matched scene set", () => {
+  const sandalEv = fires({ category: "Sandals", title: "Maui Sandal" });
+  assert.equal(sandalEv.sceneGroup, "sandals");
+  assert.deepEqual(sandalEv.scenes.map((s) => s.label), ["Vacation", "Weekend", "Dinner", "Workday"]);
+
+  const sneakerEv = fires({ category: "Sneakers", title: "Danika Sneaker" });
+  assert.deepEqual(sneakerEv.scenes.map((s) => s.label), ["Walking", "Travel", "Errands", "Workday"]);
+
+  const dressEv = fires({ category: "Loafers", title: "Kenzie Loafer" });
+  assert.deepEqual(dressEv.scenes.map((s) => s.label), ["Office", "Dinner", "Travel", "Weekend"]);
+});
+
+test("every scene group has 4 labelled, context-bearing presets", () => {
+  for (const group of Object.values(VISUALIZE_SCENE_GROUPS)) {
+    assert.equal(group.length, 4);
+    for (const s of group) {
+      assert.ok(s.label && s.ctx, "each scene needs a label + ctx");
+    }
+  }
 });
 
 console.log(`\n${failed === 0 ? "✅" : "❌"}  ${passed} passed, ${failed} failed\n`);

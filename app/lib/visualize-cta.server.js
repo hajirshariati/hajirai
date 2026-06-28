@@ -8,6 +8,42 @@
 
 import { isImageProviderSupported } from "./image-styling.server.js";
 
+// Scene presets per footwear category, shown in the style-preview panel so the
+// shopper can re-render the SAME shoe in real-life settings. `label` is what the
+// shopper sees; `ctx` is the scene phrase fed to /visualize as styleContext.
+// Pure data + a pure classifier → unit-testable.
+export const VISUALIZE_SCENE_GROUPS = {
+  sandals: [
+    { label: "Vacation", ctx: "a sunny vacation beach boardwalk by the ocean" },
+    { label: "Weekend", ctx: "a relaxed weekend outdoor setting" },
+    { label: "Dinner", ctx: "an elegant evening dinner venue" },
+    { label: "Workday", ctx: "a polished everyday workday setting" },
+  ],
+  sneakers: [
+    { label: "Walking", ctx: "a scenic outdoor walking path" },
+    { label: "Travel", ctx: "a stylish city street while traveling" },
+    { label: "Errands", ctx: "a bright casual everyday errands setting" },
+    { label: "Workday", ctx: "a polished everyday workday setting" },
+  ],
+  dress: [
+    { label: "Office", ctx: "a modern professional office setting" },
+    { label: "Dinner", ctx: "an elegant evening dinner venue" },
+    { label: "Travel", ctx: "a stylish city street while traveling" },
+    { label: "Weekend", ctx: "a refined weekend outing" },
+  ],
+};
+
+// Pick the scene group from a product's category/title. Sandals & wedges →
+// sandals; sneakers/athletic → sneakers; loafers/dress/boots/heels → dress.
+// Unknown footwear falls back to the (most general) sneakers set.
+export function visualizeSceneGroup(category = "", title = "") {
+  const hay = `${category} ${title}`.toLowerCase();
+  if (/\b(?:sandals?|wedges?|slides?|flip[\s-]*flops?|espadrilles?)\b/.test(hay)) return "sandals";
+  if (/\b(?:sneakers?|trainers?|athletic|running|runners?|tennis)\b/.test(hay)) return "sneakers";
+  if (/\b(?:loafers?|oxfords?|dress|boots?|booties?|bootie|heels?|pumps?|mary[\s-]*janes?|flats?|clogs?|mules?|slippers?)\b/.test(hay)) return "dress";
+  return "sneakers";
+}
+
 function recentUserStyleContext(messages, max = 4) {
   if (!Array.isArray(messages)) return "";
   const users = messages
@@ -37,28 +73,32 @@ export function buildVisualizeCtaEvent({ config, product, messages }) {
   // or $0 service line items (prod trace 2026-06-23: a "VIP Processing"
   // $0.00 SKU got the CTA on an order-status turn).
   const NON_WEARABLE_RE =
-    /\b(?:accessor|shoe[\s-]*care|care[\s-]*kit|cleaner|cleaning|protect|spray|sock|gift[\s-]*card|lace|freshener|deodor|processing|shipping|handling|surcharge|warranty|\bfee\b|deposit)/i;
+    /\b(?:accessor|shoe[\s-]*care|care[\s-]*kit|cleaner|cleaning|protect|spray|sock|gift[\s-]*card|lace|freshener|deodor|roller|\bkit\b|processing|shipping|handling|surcharge|warranty|\bfee\b|deposit)/i;
   const category = String(product?.category || product?._category || product?.productType || "");
   const title = String(product?.title || "");
   if (NON_WEARABLE_RE.test(category) || NON_WEARABLE_RE.test(title)) return null;
 
-  // EXCLUDE orthotics / insoles / footbeds: they sit INSIDE a shoe, so
-  // "see it on" produces a nonsensical insole-on-a-bare-foot image (prod
+  // EXCLUDE orthotics / insoles / inserts / footbeds: they sit INSIDE a shoe,
+  // so "see it on" produces a nonsensical insole-on-a-bare-foot image (prod
   // trace 2026-06-24: "Men's Premium Memory Foam Orthotics" got an AI
   // image of a loose insole next to a foot). Match the CATEGORY only —
   // never the title — because real wearable sandals carry "Orthotic" in
   // their name (e.g. "Maui Orthotic Flip") and must stay eligible.
-  const INSERT_CATEGORY_RE = /\b(?:orthotic|insole|footbed|foot[\s-]*bed)/i;
+  const INSERT_CATEGORY_RE = /\b(?:orthotic|insole|insert|footbed|foot[\s-]*bed)/i;
   if (INSERT_CATEGORY_RE.test(category)) return null;
   const priceNum = Number(product?.price);
   if (Number.isFinite(priceNum) && priceNum <= 0) return null;
 
+  const sceneGroup = visualizeSceneGroup(category, title);
   return {
     type: "visualize_cta",
     productHandle: handle,
     productTitle: String(product?.title || "").trim(),
     productImage: image,
+    productCategory: category,
     styleContext: recentUserStyleContext(messages),
-    label: String(config.visualizeLookLabel || "").trim() || "Visualize My Look",
+    label: String(config.visualizeLookLabel || "").trim() || "See It Styled",
+    sceneGroup,
+    scenes: VISUALIZE_SCENE_GROUPS[sceneGroup],
   };
 }

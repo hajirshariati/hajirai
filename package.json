@@ -37,6 +37,7 @@
     "eval:decision-tree": "node scripts/eval-decision-tree.mjs",
     "eval:emit-pipeline": "node scripts/eval-emit-pipeline.mjs",
     "eval:visualize-cta": "node scripts/eval-visualize-cta.mjs",
+    "eval:visualize-widget": "node scripts/eval-visualize-widget.mjs",
     "eval:orthotic-regressions": "node scripts/eval-orthotic-regressions.mjs",
     "eval:turn-scope": "node scripts/eval-turn-scope.mjs",
     "eval": "npm run eval:intent && npm run eval:memory && npm run eval:quality && npm run eval:classifier-gate && npm run eval:turn-scope"
