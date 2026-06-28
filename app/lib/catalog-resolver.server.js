@@ -779,7 +779,13 @@ const SPECIFIC_PRODUCT_STOPWORDS = new Set([
   ...Object.values(RESOLVER_CATEGORY_LEX),
   // common product-title words
   "the", "and", "with", "for", "from", "shoe", "shoes", "footwear",
-  "support", "arch", "insole", "insoles", "orthotic", "orthotics",
+  "support", "arch", "insole", "insoles", "inserts", "insert", "orthotic", "orthotics",
+  // Generic NEED / BODY words. The catalog carries body/need-named SKUs
+  // ("Aetrex Foot Roller", condition kits), so "foot"/"feet"/"pain"/"comfort"
+  // became false product families/specifics — "shoes or orthotics for foot pain"
+  // logged families=[foot] and resolved a lone insole (live trace 2026-06-30).
+  // These are intent/need signals, never a product the customer named.
+  "foot", "feet", "pain", "comfort", "comfortable", "allday",
   "men", "women", "mens", "womens", "kids", "unisex",
   "leather", "suede", "fabric", "mesh", "knit", "rubber",
   "size", "wide", "narrow", "medium", "standard", "regular",
@@ -831,6 +837,17 @@ const SPECIFIC_PRODUCT_STOPWORDS = new Set([
   "help", "question", "questions", "about", "here", "there", "this", "that",
 ]);
 
+// The merchant's own brand/shop name is never a distinguishing product token
+// (every product IS theirs). "aetrex" is a static stopword above; this also
+// strips the shop's own subdomain token so the public repo / any merchant gets
+// the same protection without a hardcoded brand. e.g. "aetrex-shoes.myshopify
+// .com" → "aetrex"; "great-feet.myshopify.com" → "great".
+function shopBrandToken(shop) {
+  const sub = String(shop || "").toLowerCase().split(".")[0] || "";
+  const tok = sub.split(/[^a-z0-9]+/).filter(Boolean)[0] || "";
+  return tok.length >= 4 ? tok : "";
+}
+
 function firstMeaningfulToken(title) {
   if (!title) return null;
   const tokens = String(title).toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
@@ -881,8 +898,9 @@ export async function detectSpecificProduct(shop, message, { _testFacts } = {}) 
     tokenToHandles.set(tok, arr);
   }
 
+  const brand = shopBrandToken(shop);
   const messageTokens = new Set(
-    lcText.split(/[^a-z0-9]+/).filter((t) => t && t.length >= 4 && !SPECIFIC_PRODUCT_STOPWORDS.has(t)),
+    lcText.split(/[^a-z0-9]+/).filter((t) => t && t.length >= 4 && t !== brand && !SPECIFIC_PRODUCT_STOPWORDS.has(t)),
   );
 
   const candidates = new Set();
@@ -932,9 +950,10 @@ export async function extractCatalogProductFamilies(shop, message, { _testFacts 
   }
   const out = [];
   const seen = new Set();
+  const brand = shopBrandToken(shop);
   const msgTokens = lcText
     .split(/[^a-z0-9]+/)
-    .filter((t) => t && t.length >= 4 && !SPECIFIC_PRODUCT_STOPWORDS.has(t));
+    .filter((t) => t && t.length >= 4 && t !== brand && !SPECIFIC_PRODUCT_STOPWORDS.has(t));
   for (const t of msgTokens) {
     if (families.has(t) && !seen.has(t)) {
       seen.add(t);

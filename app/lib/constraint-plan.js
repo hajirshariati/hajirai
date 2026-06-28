@@ -145,6 +145,62 @@ function slotQuery(category, { conditions, useCases, support }) {
   return parts.join(" ").trim() || category;
 }
 
+// ── Slot ↔ card category guard ─────────────────────────────────────────
+// A multi_recommendation slot search ("supportive foot pain shoes") can return
+// an off-category product first (the scorer surfaced an insole). The slot's
+// selected card MUST match the slot category before it can be pinned — otherwise
+// the "shoes" slot ships an orthotic and the carousel contradicts the answer
+// (live trace 2026-06-30: shoes slot picked l1300u-m / Thinsoles).
+const ORTHOTIC_TITLE_RE = /\b(orthotic|orthotics|insole|insoles|inserts?|footbed|footbeds|thinsole|thinsoles|arch\s*support\s*insert)\b/i;
+const ACCESSORY_TITLE_RE = /\b(roller|sock|socks|shoe\s*lace|laces|cleaner|spray|freshener|brush|shoe\s*horn|deodor\w*|protector|kit)\b/i;
+const SLOT_FOOTWEAR_RE = {
+  sandals: /\b(sandal|sandals|slide|slides)\b/i,
+  sneakers: /\b(sneaker|sneakers|trainer|trainers)\b/i,
+  slippers: /\b(slipper|slippers)\b/i,
+  boots: /\b(boot|boots|bootie|booties)\b/i,
+  wedges: /\b(wedge|wedges)\b/i,
+  loafers: /\b(loafer|loafers)\b/i,
+  clogs: /\b(clog|clogs)\b/i,
+  oxfords: /\b(oxford|oxfords)\b/i,
+  mules: /\b(mule|mules)\b/i,
+  flats: /\b(flat|flats|ballet)\b/i,
+  heels: /\b(heel|heels|pump|pumps)\b/i,
+  slides: /\b(slide|slides)\b/i,
+};
+function cardCategoryText(card) {
+  return [card?.title, card?.product_title, card?.category, card?.product_type, card?.productType, card?.type]
+    .filter(Boolean).join(" ");
+}
+export function cardMatchesSlotCategory(card, slotCategory) {
+  const text = cardCategoryText(card);
+  const cat = String(slotCategory || "").toLowerCase().trim();
+  if (!text) return true;           // can't classify → don't over-filter
+  const isOrthotic = ORTHOTIC_TITLE_RE.test(text);
+  if (cat === "orthotics") return isOrthotic;            // orthotics slot ⟹ only orthotic/insole
+  // Any footwear slot (umbrella "shoes" or a specific category) must NOT ship an
+  // orthotic/insole/accessory.
+  if (isOrthotic || ACCESSORY_TITLE_RE.test(text)) return false;
+  if (cat === "shoes" || cat === "footwear" || !cat) return true; // umbrella ⟹ any real footwear
+  const re = SLOT_FOOTWEAR_RE[cat];
+  return re ? re.test(text) : true; // unknown specific category → don't block
+}
+
+// INVARIANT: a multi_recommendation answer that PROMISES both footwear and
+// orthotics must actually show at least one of each. Returns true on mismatch
+// (promised both, but the cards are not one-of-each) so the caller can either
+// correct the text or log a violation. Never promise both while showing one.
+const PROMISES_BOTH_RE =
+  /\b(both|one\s+of\s+each|best\s+of\s+each|shoes?\s+and\s+(?:an?\s+)?(?:orthotic|insole)|(?:orthotic|insole)s?\s+and\s+(?:an?\s+)?shoe)\b/i;
+export function multiRecoTextCardMismatch({ text = "", cards = [] } = {}) {
+  if (!PROMISES_BOTH_RE.test(String(text || ""))) return false;
+  let hasFootwear = false, hasOrthotic = false;
+  for (const c of cards || []) {
+    if (cardMatchesSlotCategory(c, "orthotics")) hasOrthotic = true;
+    else if (cardMatchesSlotCategory(c, "shoes")) hasFootwear = true;
+  }
+  return !(hasFootwear && hasOrthotic);
+}
+
 // ── The plan ───────────────────────────────────────────────────────────
 // askType ∈ compatibility | multi_recommendation | condition_recommendation |
 //           browse | other

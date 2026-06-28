@@ -9,6 +9,8 @@ import {
   isCompatibilityAsk,
   isMultiRecommendationAsk,
   CATEGORY_NOUN_SET,
+  cardMatchesSlotCategory,
+  multiRecoTextCardMismatch,
 } from "../app/lib/constraint-plan.js";
 
 let pass = 0, fail = 0;
@@ -119,6 +121,43 @@ check("isMultiRecommendationAsk needs 2+ categories + a reco frame", () => {
 });
 check("detectCategoryNouns dedupes + preserves order", () => {
   assert.deepEqual(detectCategoryNouns("sandals, then more sandals, then sneakers"), ["sandals", "sneakers"]);
+});
+
+// ── 2026-06-30: slot ↔ card category guard (mixed shoes/orthotics) ────────
+check("shoes slot REJECTS an orthotic/insole card (the l1300u-m bug)", () => {
+  assert.equal(cardMatchesSlotCategory({ title: "Unisex Thinsoles Orthotics" }, "shoes"), false);
+  assert.equal(cardMatchesSlotCategory({ title: "Memory Foam Insole for Shoes" }, "shoes"), false);
+  assert.equal(cardMatchesSlotCategory({ title: "Aetrex Foot Roller" }, "shoes"), false, "accessory excluded too");
+});
+check("shoes slot ACCEPTS real footwear", () => {
+  assert.equal(cardMatchesSlotCategory({ title: "Kendall Arch Support Thong Sandal" }, "shoes"), true);
+  assert.equal(cardMatchesSlotCategory({ title: "Danika Arch Support Sneaker" }, "shoes"), true);
+});
+check("orthotics slot ONLY accepts orthotic/insole products", () => {
+  assert.equal(cardMatchesSlotCategory({ title: "Unisex Thinsoles Orthotics" }, "orthotics"), true);
+  assert.equal(cardMatchesSlotCategory({ title: "Kendall Arch Support Thong Sandal" }, "orthotics"), false);
+});
+check("specific footwear slots only accept their own category", () => {
+  assert.equal(cardMatchesSlotCategory({ title: "Kendall Thong Sandal" }, "sandals"), true);
+  assert.equal(cardMatchesSlotCategory({ title: "Danika Sneaker" }, "sandals"), false);
+  assert.equal(cardMatchesSlotCategory({ title: "Danika Sneaker" }, "sneakers"), true);
+});
+check("classifies from product_type when the title omits the category word", () => {
+  assert.equal(cardMatchesSlotCategory({ title: "Chase", product_type: "Sneakers" }, "sneakers"), true);
+});
+
+// ── text/card alignment invariant ─────────────────────────────────────────
+check("promising both shoes+orthotics while showing only an orthotic is a mismatch", () => {
+  const text = "Here's the best of each — a supportive shoe and an orthotic.";
+  assert.equal(multiRecoTextCardMismatch({ text, cards: [{ title: "Unisex Thinsoles Orthotics" }] }), true);
+});
+check("promising both is satisfied when one footwear AND one orthotic are shown", () => {
+  const text = "Both a supportive shoe and an orthotic below.";
+  const cards = [{ title: "Danika Arch Support Sneaker" }, { title: "Unisex Thinsoles Orthotics" }];
+  assert.equal(multiRecoTextCardMismatch({ text, cards }), false);
+});
+check("a single-category answer (no 'both' promise) is never a mismatch", () => {
+  assert.equal(multiRecoTextCardMismatch({ text: "Here are supportive sneakers for work.", cards: [{ title: "Danika Sneaker" }] }), false);
 });
 
 console.log("");

@@ -14,6 +14,10 @@ const REQUEST_WORDS = new Set([
   "uses", "using", "try", "want", "what", "which", "with", "you", "your",
   "cheap", "cheaper", "budget", "affordable", "good", "great", "top",
   "except", "excluding", "instead", "without",
+  // Intent / decision verbs — "help me find", "should I buy", "what should I
+  // choose" are NEED signals, never literal catalog requirements (live trace
+  // 2026-06-30: "should buy"/"help me find"/"foot pain" leaked into requiredTerms).
+  "help", "should", "buy", "buying", "choose", "choosing", "pick", "looking",
 ]);
 
 const GENERIC_CATALOG_WORDS = new Set([
@@ -21,6 +25,11 @@ const GENERIC_CATALOG_WORDS = new Set([
   "footwear", "option", "options", "feature", "features", "featuring",
   "technology", "technologies", "material", "materials",
   "color", "colors",
+  // Generic NEED / body words — intent signals, not catalog constraints. A
+  // search must not require the literal token "foot"/"pain"/"comfort"/"all day".
+  "foot", "feet", "pain", "comfort", "allday", "all", "day",
+  // Store brand name is never a catalog requirement (every product is theirs).
+  "aetrex",
 ]);
 
 // These are conversational preferences, not objective catalog facts.

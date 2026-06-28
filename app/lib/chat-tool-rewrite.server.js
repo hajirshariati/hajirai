@@ -707,6 +707,10 @@ const ORTHOTIC_CLINICAL_RE =
 
 export function redirectOrthoticSearchToRecommender(toolCall, ctx) {
   if (toolCall.name !== "search_products") return toolCall;
+  // Evidence-plan slot searches (and any deterministic catalog listing) opt out
+  // of the guided recommender: a broad "shoes or orthotics" / "show me orthotics
+  // for foot pain" wants a normal catalog list, not the attribute-gathering gate.
+  if (ctx?.suppressOrthoticRedirect) return toolCall;
   const trees = Array.isArray(ctx?.recommenderTrees) ? ctx.recommenderTrees : [];
   if (trees.length === 0) return toolCall;
 

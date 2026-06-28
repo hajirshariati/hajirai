@@ -8,7 +8,7 @@ import { buildSystemPrompt } from "../lib/chat-prompt.server";
 import { planTurn, buildTurnPlanPromptBlock, buildPlanClarifierRepair, planForcesProductDisplay, planRequiresSearch as planRequiresSearchFlag, clarifierGateDecision, isAnswerWorkflow, plannedWorkflowCardOwnerViolation, plannedSearchSkippedViolation } from "../lib/turn-plan.server";
 import { classifyAvailability, buildAvailabilityAnswer, AVAILABILITY_RESULT, resolveAvailabilityRequest, isAvailabilityFollowUp, familyOfTitle, collectFamilyColors, constraintIntent, parseAvailabilityConstraints, parseRequestedColors, priorAvailabilityMessage, priorAvailabilityConstraints, variantDataDiagnostics, styleKeyOfTitle, styleNameOfTitle } from "../lib/availability-truth";
 import { detectSupportHandoffNeed, buildSupportHandoffText, supportConfigured, normalizedSupportLabel, supportChatLabel } from "../lib/support-handoff";
-import { extractConstraintPlan } from "../lib/constraint-plan";
+import { extractConstraintPlan, cardMatchesSlotCategory, multiRecoTextCardMismatch } from "../lib/constraint-plan";
 import { detectProcessNarration, stripProcessNarration, buildSalesVoiceFallback, SALES_JUDGMENT_WORKFLOWS } from "../lib/sales-voice";
 import { classifyTurnScope, scopeAttributesToTurn, isShortAmbiguousReply } from "../lib/turn-scope";
 import { buildPriorEvidenceAvailabilityText, buildPriorEvidenceMultiColorText, askedConstraintLabel, titleCaseWord } from "../lib/prior-evidence";
@@ -2861,6 +2861,12 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       // deterministic concise fallback can label "X for sandals, Y for sneakers".
       const pickedPairs = [];
       const seenHandles = new Set();
+      // Slot searches are deterministic catalog listing — NEVER route an
+      // orthotics slot through the guided recommend_orthotic gate (it demands
+      // attributes the customer didn't give and ships zero cards). Suppress the
+      // orthotic redirect for these slot searches; the guided finder is reserved
+      // for an explicit "help me choose the right orthotic" turn.
+      const slotCtx = { ...ctx, suppressOrthoticRedirect: true };
       for (const slot of cplan.slots) {
         const filters = {};
         if (gender && gender !== "kids") filters.gender = gender;
@@ -2869,11 +2875,17 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
         const input = { query: slot.query, filters, limit: 4 };
         if (slot.constraints?.priceMax) input.priceMax = slot.constraints.priceMax;
         let cards = [];
-        try { cards = extractProductCards("search_products", await dispatchTool("search_products", input, ctx), ctx); }
+        try { cards = extractProductCards("search_products", await dispatchTool("search_products", input, slotCtx), ctx); }
         catch (e) { console.warn(`[evidence-plan] slot "${slot.category}" search failed: ${e?.message || e}`); }
-        const best = (cards || []).find((c) => c?.handle && !seenHandles.has(c.handle));
+        // HARD SLOT GUARD: the picked card must match the slot category. A "shoes"
+        // slot can never pin an orthotic/insole; an "orthotics" slot only an
+        // orthotic. Off-category hits are skipped so text and cards stay aligned.
+        const best = (cards || []).find(
+          (c) => c?.handle && !seenHandles.has(c.handle) && cardMatchesSlotCategory(c, slot.category),
+        );
         if (best) { picked.push(best); pickedPairs.push({ card: best, category: slot.category }); seenHandles.add(best.handle); }
-        console.log(`[evidence-plan] slot=${slot.category} query="${slot.query}" → ${cards?.length || 0} hit(s), picked=${best ? best.handle : "-"}`);
+        const rejected = (cards || []).length - (cards || []).filter((c) => cardMatchesSlotCategory(c, slot.category)).length;
+        console.log(`[evidence-plan] slot=${slot.category} query="${slot.query}" → ${cards?.length || 0} hit(s), ${rejected} off-category skipped, picked=${best ? best.handle : "-"}`);
       }
       if (picked.length > 0) {
         evidencePinnedCards = picked;
@@ -4005,6 +4017,15 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       console.warn(
         `[turn-invariant] VIOLATION ${workflow} searchRequired+display=show but searchAttempted=false ` +
         `— a downstream gate refused a TurnPlan-required search`,
+      );
+    }
+    // multi_recommendation TEXT/CARD ALIGNMENT: never promise both shoes and
+    // orthotics while showing only one category.
+    if (workflow === "multi_recommendation" &&
+        multiRecoTextCardMismatch({ text: fullResponseText, cards: finalProductCards })) {
+      console.warn(
+        `[turn-invariant] VIOLATION multi_recommendation text promises both footwear+orthotics ` +
+        `but finalCards are not one-of-each (finalCards=${finalCount})`,
       );
     }
   }

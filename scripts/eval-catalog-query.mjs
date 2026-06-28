@@ -48,6 +48,14 @@ await test("CQ1 — arbitrary material before category becomes a concrete requir
   assert.deepEqual(requirements("memory foam sneakers").requiredTerms, ["memory foam"]);
 });
 
+await test("CQ0 — intent/need phrases never become catalog requirements (2026-06-30)", () => {
+  // "help me find", "should buy", "foot pain", "all-day comfort", brand "Aetrex"
+  // are intent/need signals — they must NOT be required search terms.
+  assert.deepEqual(requirements("Help me find Aetrex shoes or orthotics for foot pain or all-day comfort").requiredTerms, []);
+  assert.deepEqual(requirements("what shoes should I buy for foot pain").requiredTerms, []);
+  assert.deepEqual(requirements("help me find comfortable all-day shoes").requiredTerms, []);
+});
+
 await test("CQ2 — named technology works without CamelCase dependence", () => {
   assert.equal(normalizeCatalogText("BioRocker™ Technology"), "bio rocker technology");
   assert.deepEqual(

@@ -14,7 +14,7 @@
 // Run: node scripts/eval-named-family-evidence.mjs
 
 import assert from "node:assert/strict";
-import { extractCatalogProductFamilies } from "../app/lib/catalog-resolver.server.js";
+import { extractCatalogProductFamilies, detectSpecificProduct } from "../app/lib/catalog-resolver.server.js";
 import { alignCardsToAnswerText } from "../app/lib/emit-finalize.server.js";
 import { planTurn, WORKFLOWS as W } from "../app/lib/turn-plan.server.js";
 
@@ -35,8 +35,28 @@ const FACTS = [
   { title: "Tamara Wedge Sandal" },
   { title: "Men Plantar Fasciitis Kit" },
   { title: "Carly Sparkle Sneaker" },
+  // Brand-prefixed accessory + an orthotic SKU — the exact rows that turned
+  // "foot"/"aetrex" into false families/specifics (live trace 2026-06-30).
+  { title: "Aetrex Foot Roller", productHandle: "a001538" },
+  { title: "Unisex Thinsoles Orthotics", productHandle: "l1300u-m" },
 ];
-const families = (msg) => extractCatalogProductFamilies("shop", msg, { _testFacts: FACTS });
+const families = (msg) => extractCatalogProductFamilies("aetrex.myshopify.com", msg, { _testFacts: FACTS });
+const specific = (msg) => detectSpecificProduct("aetrex.myshopify.com", msg, { _testFacts: FACTS });
+
+// ── 2026-06-30: generic need/body/brand words must NOT become families/specifics ──
+await run("mixed shoes-or-orthotics: 'foot'/'aetrex' are not product families", async () => {
+  const msg = "Help me find Aetrex shoes or orthotics for foot pain or all-day comfort";
+  assert.deepEqual(await families(msg), [], "no families — foot/aetrex/shoes/orthotics are all stopwords");
+});
+await run("mixed shoes-or-orthotics: does NOT resolve to a single product (a001538)", async () => {
+  const msg = "Help me find Aetrex shoes or orthotics for foot pain or all-day comfort";
+  const handle = await specific(msg);
+  assert.equal(handle, null, `must not resolve to a lone product (got ${handle})`);
+});
+await run("'foot pain' alone is not the Aetrex Foot Roller", async () => {
+  assert.deepEqual(await families("shoes for foot pain"), [], "foot is a body word, not a family");
+  assert.equal(await specific("shoes for foot pain"), null, "no single product from a need phrase");
+});
 
 // ── 5. over-detection fixed ───────────────────────────────────────────
 await run("'plantar fasciitis ... sandals' names NO family (was 'plantar')", async () => {
