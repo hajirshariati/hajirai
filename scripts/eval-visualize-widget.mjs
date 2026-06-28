@@ -110,14 +110,20 @@ test("the generated image renders in the right column, separate from the card", 
 });
 
 // ── PRD 2026-06-29: expanded layout via injected CSS GRID (robust) ──
-test("layout uses a CSS grid with minmax(0,…) columns (can't be blown wide)", () => {
+test("layout is TWO COLUMNS by default (card left, image right), mobile overrides to stacked", () => {
   const style = fnBody("injectVizStyleOnce");
   assert.match(style, /\.ai-chat-viz-expanded\{display:grid/, "grid container");
-  assert.match(style, /grid-template-columns:minmax\(0,300px\) minmax\(0,1fr\)/, "left ≤300px, right fills — minmax(0,…) prevents content blowout");
-  assert.match(style, /@media\(min-width:640px\)/, "two columns only on desktop/tablet");
+  // DEFAULT is two columns — so desktop gets card-left/image-right even if a
+  // parser ever drops the media query. minmax(0,…) can't be blown wide.
+  assert.match(style, /\.ai-chat-viz-expanded\{display:grid;grid-template-columns:minmax\(0,300px\) minmax\(0,1fr\)/, "default = two columns, left ≤300px, right fills");
   assert.match(style, /align-items:start/, "columns top-aligned, card never stretches to image height");
-  // Mobile default is a single column (stacked).
-  assert.match(style, /grid-template-columns:1fr/, "mobile: single column / stacked");
+  // Only narrow widths collapse to a single column (stacked) — note the space
+  // after @media (a missing space gets the rule dropped by strict parsers).
+  assert.match(style, /@media \(max-width:639px\)\{\.ai-chat-viz-expanded\{grid-template-columns:1fr\}\}/, "mobile-only override to single column, valid @media syntax");
+});
+
+test("the widget carries a current build marker (so the live version is verifiable)", () => {
+  assert.match(SRC, /\[hajirai-widget\] build 2026-06-29 see-it-styled-grid-2col/, "console build marker bumped for this change");
 });
 
 test("the card override beats the showcase carousel CSS (!important, compact vertical)", () => {

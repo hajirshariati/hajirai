@@ -4,7 +4,7 @@
 /* Build marker — bump on widget changes so a live deploy can be verified
    in DevTools console. If you don't see this line after `shopify app deploy`
    + hard refresh, the new bundle isn't live (stale checkout or CDN cache). */
-try{console.log('[hajirai-widget] build 2026-06-17 strip-dangling-md');}catch(e){}
+try{console.log('[hajirai-widget] build 2026-06-29 see-it-styled-grid-2col');}catch(e){}
 
 /* Visual config comes from theme editor (liquid-injected as window.__AI_CHAT_CONFIG).
    Chat server URL is handled internally via app proxy at /apps/hajirai/chat. */
@@ -806,8 +806,8 @@ function injectVizButton(card,cta){
 function injectVizStyleOnce(){
   if(document.getElementById('ai-chat-viz-style'))return;
   var css=
-    '.ai-chat-viz-expanded{display:grid;grid-template-columns:1fr;gap:14px;align-items:start;width:100%;margin-top:8px;box-sizing:border-box}'+
-    '@media(min-width:640px){.ai-chat-viz-expanded{grid-template-columns:minmax(0,300px) minmax(0,1fr)}}'+
+    '.ai-chat-viz-expanded{display:grid;grid-template-columns:minmax(0,300px) minmax(0,1fr);gap:14px;align-items:start;width:100%;margin-top:8px;box-sizing:border-box}'+
+    '@media (max-width:639px){.ai-chat-viz-expanded{grid-template-columns:1fr}}'+
     '.ai-chat-viz-controls{display:flex;flex-direction:column;gap:10px;min-width:0;align-self:start}'+
     '.ai-chat-viz-preview{min-width:0;align-self:start}'+
     '.ai-chat-viz-controls .ai-chat-product-card{display:flex!important;flex-direction:column!important;flex:0 0 auto!important;width:100%!important;max-width:100%!important;min-width:0!important;gap:0!important;padding:0!important;margin:0!important;overflow:hidden!important;border:1px solid rgba(0,0,0,.08)!important;border-radius:12px!important;background:#fff!important}'+
