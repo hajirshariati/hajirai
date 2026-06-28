@@ -798,22 +798,41 @@ function injectVizButton(card,cta){
 }
 function runVisualize(cta,card){
   if(!cta||!cta.productHandle)return;
-  // HIDE the CTA once tapped (cleaner than greying it out).
+  // HIDE the in-card CTA once tapped — in the expanded state the scene selector
+  // replaces the need for a second "See It Styled" button.
   var viz=card&&card.querySelector('.ai-chat-viz-btn');
   if(viz)viz.style.display='none';
   if(!card||!card.parentNode)return;
-  // Open a DEDICATED style-preview panel as a sibling AFTER the card — never
-  // inside the card's tap target. The panel holds the generated image AND the
-  // scene selector, so neither can be confused with the product-card click.
-  // It sits beside the card when there's room and wraps below on narrow/mobile.
+  // Build a two-column expanded layout that REPLACES the card's slot:
+  //   left  = style controls (the product card at NATURAL height + the scene
+  //           selector panel BELOW it — never inside the card's tap target)
+  //   right = the large generated image + its disclaimer
+  // align-items:flex-start so the compact card never stretches to the image's
+  // height (that was the big blank area under "View product"). flex-wrap means
+  // the columns stack cleanly on mobile: card → controls → image → disclaimer.
+  var parent=card.parentNode;
   var host=document.createElement('div');
-  host.className='ai-chat-viz-host';
-  host.style.cssText='flex:1 1 280px;min-width:240px;align-self:flex-start;margin-left:10px';
+  host.className='ai-chat-viz-host ai-chat-viz-expanded';
+  // flex:1 1 100% so it fills the slot whether the card lived in a flex row
+  // (carousel) or a block list; align-items:flex-start so columns never stretch.
+  host.style.cssText='display:flex;flex-wrap:wrap;align-items:flex-start;gap:12px;width:100%;flex:1 1 100%;box-sizing:border-box';
+  var leftCol=document.createElement('div');
+  leftCol.className='ai-chat-viz-controls';
+  leftCol.style.cssText='display:flex;flex-direction:column;gap:10px;align-self:flex-start;flex:0 1 320px;max-width:340px;min-width:0;box-sizing:border-box';
+  var rightCol=document.createElement('div');
+  rightCol.className='ai-chat-viz-preview';
+  rightCol.style.cssText='align-self:flex-start;flex:1 1 280px;min-width:240px;box-sizing:border-box';
   var imgWrap=document.createElement('div');
   imgWrap.className='ai-chat-viz-image';
   imgWrap.setAttribute('role','status');imgWrap.setAttribute('aria-live','polite');imgWrap.setAttribute('aria-label','Creating your styling preview');
-  host.appendChild(imgWrap);
-  card.parentNode.insertBefore(host,card.nextSibling);
+  rightCol.appendChild(imgWrap);
+  // Drop the wrapper into the card's slot, then MOVE the card into the left
+  // column (single-product turn → no carousel concerns) at its natural height.
+  parent.insertBefore(host,card);
+  leftCol.appendChild(card);
+  card.style.width='100%';card.style.maxWidth='100%';card.style.alignSelf='flex-start';card.style.margin='0';
+  host.appendChild(leftCol);
+  host.appendChild(rightCol);
   vizFetch(host,cta,card);
 }
 // Fallback scene set when the server didn't send one (older config/cache).
@@ -827,23 +846,31 @@ var DEFAULT_VIZ_SCENES=[
 // error — kept SEPARATE from the scene selector so re-generating a scene swaps
 // only the image and the selector (with its active state) persists.
 function vizImageHost(host){return (host&&host.querySelector('.ai-chat-viz-image'))||host;}
-// Render the scene selector INSIDE the style-preview panel (host), below the
-// generated image — never inside the clickable product card. Premium segmented
-// pills: selected = filled, unselected = subtle warm border. Picking one
-// re-generates the SAME product in that setting; clicks never reach the card.
+// Render the scene selector as its own panel in the LEFT controls column,
+// directly BELOW the product card — never inside the card's tap target. It's a
+// visually distinct, Apple-style panel: small "Style the look" header, a
+// "Choose a setting" helper, then warm-gold pills (selected = filled gold,
+// unselected = white with a soft gold border). Picking one re-generates the
+// SAME product in that setting; clicks never reach the card.
 function injectVizOptions(host,cta,card){
   if(!host||host.querySelector('.ai-chat-viz-options'))return;
+  // Place it in the left controls column (below the card); fall back to host.
+  var mount=host.querySelector('.ai-chat-viz-controls')||host;
   var scenes=(cta&&cta.scenes&&cta.scenes.length)?cta.scenes:DEFAULT_VIZ_SCENES;
   var wrap=document.createElement('div');
   wrap.className='ai-chat-viz-options';
-  wrap.style.cssText='margin-top:10px;display:flex;flex-direction:column;gap:7px';
-  var lbl=document.createElement('div');
-  lbl.textContent='Choose a setting';
-  lbl.style.cssText='font-size:11px;color:#8A6632;font-weight:700;letter-spacing:.04em;text-transform:uppercase';
-  wrap.appendChild(lbl);
+  wrap.style.cssText='display:flex;flex-direction:column;gap:8px;padding:12px;border:1px solid #E7DAC1;border-radius:12px;background:#FCFAF6;box-sizing:border-box';
+  var head=document.createElement('div');
+  head.textContent='Style the look';
+  head.style.cssText='font-size:13px;color:#5C4A2A;font-weight:700;letter-spacing:.01em';
+  var help=document.createElement('div');
+  help.textContent='Choose a setting';
+  help.style.cssText='font-size:11px;color:#9A8A6A;margin-top:-4px';
+  wrap.appendChild(head);
+  wrap.appendChild(help);
   var seg=document.createElement('div');
   seg.className='ai-chat-viz-seg';
-  seg.style.cssText='display:flex;flex-wrap:wrap;gap:6px';
+  seg.style.cssText='display:flex;flex-wrap:wrap;gap:8px';
   scenes.forEach(function(s){
     var chip=document.createElement('button');
     chip.type='button';
@@ -851,7 +878,8 @@ function injectVizOptions(host,cta,card){
     chip.setAttribute('data-scene',s.label);
     chip.setAttribute('aria-pressed','false');
     chip.textContent=s.label;
-    chip.style.cssText='padding:6px 13px;border:1px solid #C9A76D;border-radius:999px;background:#fff;color:#8A6632;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;line-height:1.2;transition:background .15s,color .15s';
+    // Compact but tappable (≥40px tap target for mobile); wraps cleanly.
+    chip.style.cssText='display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:8px 15px;border:1px solid #C9A76D;border-radius:10px;background:#fff;color:#8A6632;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;line-height:1.2;white-space:nowrap;box-sizing:border-box;transition:background .15s,color .15s';
     chip.addEventListener('click',function(e){
       if(e){e.preventDefault();e.stopPropagation();}
       var kids=seg.children;
@@ -863,7 +891,7 @@ function injectVizOptions(host,cta,card){
     seg.appendChild(chip);
   });
   wrap.appendChild(seg);
-  host.appendChild(wrap);
+  mount.appendChild(wrap);
 }
 // Loading → fetch → result/error. Runs INDEPENDENTLY of the chat stream
 // (own fetch, no input lock), so the customer can keep chatting while

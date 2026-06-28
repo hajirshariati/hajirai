@@ -74,10 +74,11 @@ test("preview opens only ON CLICK — injectVizButton wires a handler, never aut
   assert.equal(body.split("runVisualize(").length - 1, 1, "no second, bare runVisualize call");
 });
 
-test("scene selector lives in the preview PANEL (host), not the product card", () => {
+test("scene selector lives in the LEFT controls column, not the product card", () => {
   const body = fnBody("injectVizOptions");
   assert.match(SRC, /function injectVizOptions\(host,cta,card\)/, "signature takes host first, not the card");
-  assert.match(body, /host\.appendChild\(wrap\)/, "options appended to the host panel");
+  assert.match(body, /ai-chat-viz-controls/, "mounts into the left controls column");
+  assert.match(body, /mount\.appendChild\(wrap\)/, "options appended to the controls column, not the card");
   assert.doesNotMatch(body, /ai-chat-product-info/, "options must NOT be injected into the card body");
 });
 
@@ -102,10 +103,46 @@ test("disclaimer reads 'AI style preview. Product details may vary.'", () => {
   assert.doesNotMatch(SRC, /AI-generated — may not exactly match/);
 });
 
-test("the generated image renders in a dedicated host, separate from the card", () => {
+test("the generated image renders in the right column, separate from the card", () => {
   const run = fnBody("runVisualize");
   assert.match(run, /ai-chat-viz-image/, "image host element created");
-  assert.match(run, /card\.parentNode\.insertBefore\(host,card\.nextSibling\)/, "panel is a sibling AFTER the card");
+  assert.match(run, /rightCol\.appendChild\(imgWrap\)/, "image lives in the right column");
+});
+
+// ── PRD 2026-06-28: expanded two-column layout (Apple-style) ──
+test("expanded wrapper uses align-items:flex-start (card never stretches to image)", () => {
+  const run = fnBody("runVisualize");
+  assert.match(run, /align-items:flex-start/, "wrapper must not stretch its columns");
+  // The left controls column holds the card at its natural height.
+  assert.match(run, /ai-chat-viz-controls/, "left controls column created");
+  assert.match(run, /flex-direction:column/, "controls stack vertically (card then scenes)");
+});
+
+test("the product card is MOVED into the left controls column (natural height)", () => {
+  const run = fnBody("runVisualize");
+  assert.match(run, /leftCol\.appendChild\(card\)/, "card moved into the left column");
+  // Card width pinned to the column, not stretched to the image.
+  assert.match(run, /card\.style\.alignSelf='flex-start'/, "card aligns to top, no vertical stretch");
+});
+
+test("layout stacks cleanly on mobile (flex-wrap) with no horizontal overflow", () => {
+  const run = fnBody("runVisualize");
+  assert.match(run, /flex-wrap:wrap/, "columns wrap → stack on narrow screens");
+  assert.match(run, /box-sizing:border-box/, "border-box guards against overflow");
+});
+
+test("scene panel is a distinct 'Style the look' panel with a 'Choose a setting' helper", () => {
+  const body = fnBody("injectVizOptions");
+  assert.match(body, /Style the look/, "panel header");
+  assert.match(body, /Choose a setting/, "helper text");
+  assert.match(body, /border:1px solid #E7DAC1/, "subtle bordered panel, visually separate from the card");
+  assert.doesNotMatch(body, /box-shadow/, "no heavy shadow");
+});
+
+test("scene pills are compact but tappable (>=40px) and wrap cleanly", () => {
+  const body = fnBody("injectVizOptions");
+  assert.match(body, /min-height:40px/, "mobile tap target");
+  assert.match(body, /flex-wrap:wrap/, "pills wrap into rows");
 });
 
 console.log(`\n${failed === 0 ? "✅" : "❌"}  ${passed} passed, ${failed} failed\n`);
