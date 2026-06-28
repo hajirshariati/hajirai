@@ -1429,6 +1429,22 @@ export function detectFootwearOverElicitation({
   if (!u || u.length < 3) return null;
   const uStem = u.replace(/s$/, "");
   const types = Array.isArray(catalogProductTypes) ? catalogProductTypes : [];
+  // NEGATIVE CONSTRAINT FIRST. A category the customer rejected this turn
+  // ("shoes that don't look like sneakers") must NEVER be force-searched — the
+  // guard would otherwise read the bare category WORD ("sneakers") out of the
+  // negation and inject category=sneakers (PRD 2026-06-28). Skip any rejected
+  // category from the match below so the guard falls through to a non-rejected
+  // category or the generic Footwear path.
+  const rejectedCats = detectRejectedCategories(String(latestUserMessage || ""));
+  const isRejectedCat = (cat) => {
+    const c = String(cat || "").toLowerCase().replace(/\s+/g, " ").trim();
+    if (!c) return false;
+    for (const r of rejectedCats) {
+      const rs = r.endsWith("s") ? r.slice(0, -1) : r;
+      if (rs.length >= 3 && (c.includes(rs) || rs.includes(c.replace(/s$/, "")))) return true;
+    }
+    return false;
+  };
   // Path A — chip-click match: latest message EQUALS a catalog category
   // (after normalizing plural/whitespace). e.g. customer clicked
   // "Sneakers" chip → uStem="sneaker" matches category "Sneakers".
@@ -1438,7 +1454,7 @@ export function detectFootwearOverElicitation({
       .replace(/s$/, "")
       .replace(/\s+/g, " ")
       .trim();
-    return c.length >= 3 && c === uStem;
+    return c.length >= 3 && c === uStem && !isRejectedCat(cat);
   });
   // Path B — free-text match: latest message CONTAINS a category
   // word as a whole-token substring. Production trace: customer says
@@ -1452,6 +1468,7 @@ export function detectFootwearOverElicitation({
     catMatch = sortedTypes.find((cat) => {
       const c = String(cat || "").toLowerCase().trim();
       if (c.length < 3) return false;
+      if (isRejectedCat(cat)) return false;
       // Build a regex that allows a trailing 's' on the catalog word
       // (sneaker → sneakers) and respects word boundaries.
       const escaped = c.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/s$/, "s?");
@@ -1467,6 +1484,8 @@ export function detectFootwearOverElicitation({
     }
   }
   if (!catMatch) return null;
+  // Defensive: never force a rejected category, no matter how it was matched.
+  if (isRejectedCat(catMatch)) return null;
   // SOURCE TRACKING (fix 3 — over-elicitation must never fire off stale memory).
   // catMatch is derived ONLY from the latest message: Path A is an exact chip
   // match against `u`, Path B is a whole-token match in `u`, Path C is a generic

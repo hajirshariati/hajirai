@@ -995,6 +995,32 @@ const SCENARIOS = [
       expect: { gateHandled: false },
     }],
   },
+  // Broadened strategy phrasings (PRD 2026-06-28 Failure 1) — all advisory.
+  {
+    name: "Strategy: 'shoes or orthotics for flat feet?' → no gender stall",
+    turns: [{
+      user: "For my flat feet, should I get shoes or orthotics?",
+      classifier: C({ attributes: { condition: "flat_feet" } }),
+      expect: { gateHandled: false },
+    }],
+  },
+  {
+    name: "Strategy: 'do I need shoes and orthotics' for plantar fasciitis → no gender stall",
+    turns: [{
+      user: "I have plantar fasciitis — do I need shoes and orthotics?",
+      classifier: C({ attributes: { condition: "plantar_fasciitis" } }),
+      expect: { gateHandled: false },
+    }],
+  },
+  // Control: an orthotic FOR dress shoes is a SELECTION, not a strategy Q.
+  {
+    name: "Bug4 control: 'orthotic for dress shoes' is a selection → still asks gender",
+    turns: [{
+      user: "I want an orthotic for dress shoes",
+      classifier: C({ attributes: { useCase: "dress" } }),
+      expect: { gateHandled: true, questionMatches: /Who are these orthotics for/i },
+    }],
+  },
   // Guard stays tight: a bare "an orthotic for <use case>" still asks who-for.
   {
     name: "Bug4 control: bare 'orthotic for the gym' still asks gender",

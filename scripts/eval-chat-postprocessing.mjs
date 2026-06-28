@@ -867,6 +867,41 @@ test("category not in catalog → does not fire", () => {
   assert.equal(r, null);
 });
 
+// PRD 2026-06-28 Failure 2: a REJECTED category in the message must never be
+// force-searched. "shoes … that don't look like sneakers" must not inject
+// category=sneakers; it falls through to the generic Footwear search instead.
+test("negative constraint: 'don't look like sneakers' never forces category=sneakers", () => {
+  const r = detectFootwearOverElicitation({
+    classifiedIntent: { isFootwearRequest: true, attributes: { gender: "Women" } },
+    latestUserMessage: "Show me comfortable shoes for standing at work that don't look like sneakers.",
+    establishedGender: "women",
+    catalogProductTypes: FAKE_TYPES,
+  });
+  // May fire on the generic shoe mention, but NEVER as sneakers.
+  if (r) assert.notEqual(r.category, "sneakers", `forced rejected category: ${r.category}`);
+});
+
+test("negative constraint: 'not sneakers' bare → guard does not inject sneakers", () => {
+  const r = detectFootwearOverElicitation({
+    classifiedIntent: { isFootwearRequest: true, attributes: { gender: "women" } },
+    latestUserMessage: "not sneakers",
+    establishedGender: "women",
+    catalogProductTypes: FAKE_TYPES,
+  });
+  assert.ok(r === null || r.category !== "sneakers");
+});
+
+test("a genuine 'Sneakers' chip click (no negation) still forces sneakers", () => {
+  const r = detectFootwearOverElicitation({
+    classifiedIntent: { isFootwearRequest: true, attributes: { gender: "Women" } },
+    latestUserMessage: "Sneakers",
+    establishedGender: "women",
+    catalogProductTypes: FAKE_TYPES,
+  });
+  assert(r);
+  assert.equal(r.category, "sneakers");
+});
+
 test("no classifier → does not fire", () => {
   const r = detectFootwearOverElicitation({
     classifiedIntent: null,
@@ -1772,6 +1807,37 @@ test("no rejection → pool untouched", () => {
   const out = dropRejectedCategoryCards(pool, "show me comfortable shoes");
   assert.equal(out.cards.length, 1);
   assert.deepEqual(out.dropped, []);
+});
+
+// INVARIANT (PRD 2026-06-28): when a category is rejected this turn, no owner
+// may reintroduce it — not the over-elicitation directive (filters), and not
+// the final card pool. Exercised together on the exact failing message.
+test("INVARIANT: a rejected category survives nowhere — directive nor cards", () => {
+  const msg = "Show me comfortable shoes for standing at work that don't look like sneakers.";
+  const rejected = detectRejectedCategories(msg);
+  assert.ok(rejected.has("sneakers"), "sneakers must be rejected for this turn");
+
+  // Over-elicitation directive must not force the rejected category.
+  const guard = detectFootwearOverElicitation({
+    classifiedIntent: { isFootwearRequest: true, attributes: { gender: "Women" } },
+    latestUserMessage: msg,
+    establishedGender: "women",
+    catalogProductTypes: ["Sneakers", "Loafers", "Clogs", "Mary Janes"],
+  });
+  if (guard) {
+    assert.notEqual(guard.category, "sneakers");
+    assert.ok(!/filters\.category="sneakers"/.test(guard.directive), "directive must not pin sneakers");
+  }
+
+  // Final card pool must drop every sneaker card and keep the allowed ones.
+  const pool = [
+    { handle: "danika", _category: "Sneakers" },
+    { handle: "kenzie", _category: "Loafers" },
+    { handle: "savannah", _category: "Mary Janes" },
+  ];
+  const out = dropRejectedCategoryCards(pool, msg);
+  assert.deepEqual(out.cards.map((c) => c.handle), ["kenzie", "savannah"]);
+  assert.deepEqual(out.dropped, ["danika"]);
 });
 
 // =====================================================================

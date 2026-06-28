@@ -2229,13 +2229,21 @@ export async function maybeRunOrthoticFlow({
         /\bbut\s+(?:i\s+(?:also\s+)?want|also)\b|\band\s+i\s+also\s+want\b|\bplus\s+i\s+(?:also\s+)?want\b/i.test(rawUserText);
       const asksWhatToChoose =
         /\bwhat\s+should\s+i\s+(?:choose|do|get|pick|look|consider|buy|wear)\b|\bwhich\s+should\s+i\b/i.test(rawUserText);
-      // (B) a shoes-vs-orthotics strategy decision (names BOTH product types).
+      // (B) a shoes-vs-orthotics STRATEGY decision — the customer is weighing
+      // buying shoes vs orthotics vs both. Matched by STRUCTURE (alternatives /
+      // "or both" / "should I buy shoes" / "shoes and orthotics"), NOT a loose
+      // "orthotic … shoes" co-occurrence — so "an orthotic FOR dress shoes" (a
+      // committed selection) is NOT mistaken for a strategy question.
       const asksShoesOrthoticStrategy =
-        /\b(?:shoes?|footwear|boots?|sneakers?|sandals?)\b[^.?!]{0,40}\borthotics?\b/i.test(rawUserText) ||
-        /\borthotics?\b[^.?!]{0,40}\b(?:shoes?|footwear|sneakers?|sandals?)\b/i.test(rawUserText);
+        /\b(?:shoes?|footwear|boots?)\s+or\s+orthotics?\b/i.test(rawUserText) ||
+        /\borthotics?\s+or\s+(?:shoes?|footwear|boots?)\b/i.test(rawUserText) ||
+        /\b(?:shoes?|footwear|boots?)\s+and\s+orthotics?\b/i.test(rawUserText) ||
+        /\borthotics?\s+and\s+(?:shoes?|footwear|boots?)\b/i.test(rawUserText) ||
+        /\bshould\s+i\s+(?:buy|get|wear)\s+(?:shoes?|footwear|boots?)\b/i.test(rawUserText) ||
+        /\bdo\s+i\s+need\s+orthotics?\b/i.test(rawUserText) ||
+        /\b(?:shoes?|orthotics?|footwear|insoles?|boots?)\b[^.?!]{0,40}\bor\s+both\b/i.test(rawUserText);
       const advisoryBypass =
-        (hasCompoundNeed && asksWhatToChoose) ||
-        (asksShoesOrthoticStrategy && /\?/.test(rawUserText));
+        (hasCompoundNeed && asksWhatToChoose) || asksShoesOrthoticStrategy;
       if (!accumulatedHasRequired && hasContext && advisoryBypass) {
         console.log(
           `[orthotic-flow] gender-stall guard: advisory (compound-need or shoes-vs-orthotics) with context — ` +
