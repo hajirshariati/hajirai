@@ -251,7 +251,7 @@ test("the mobile changes are SCOPED to the media query — desktop card stays ve
 });
 
 test("the widget carries a current build marker (so the live version is verifiable)", () => {
-  assert.match(SRC, /\[hajirai-widget\] build 2026-06-30 viz-loading-fills-hero/, "console build marker bumped for this change");
+  assert.match(SRC, /\[hajirai-widget\] build 2026-06-30 viz-stable-bubble-width/, "console build marker bumped for this change");
 });
 
 // ── PRD 2026-06-29: stability — single-flight, cancellation, no runaway repaint ──
@@ -350,6 +350,16 @@ test("the product card is MOVED into the left controls column", () => {
   const run = fnBody("runVisualize");
   assert.match(run, /leftCol\.appendChild\(card\)/, "card moved into the left column");
   assert.match(run, /ai-chat-viz-controls/, "left controls column");
+});
+
+test("the bubble is pinned to a STABLE width so loading and final image match", () => {
+  const run = fnBody("runVisualize");
+  // The shrink-to-fit chat bubble must be forced full-width when the visualizer
+  // mounts, so the 1fr preview column doesn't jump wider when the image loads.
+  assert.match(run, /closest\('\.ai-chat-msg-bubble'\)/, "reaches the message bubble");
+  assert.match(run, /vizBubble\.style\.width='100%'/, "bubble pinned to full width");
+  assert.match(run, /closest\('\.ai-chat-msg'\)/, "reaches the message");
+  assert.match(run, /vizMsg\.style\.width='100%'/, "message pinned to full width (capped by max-width)");
 });
 
 test("the expanded layout is anchored OUTSIDE the products carousel container", () => {

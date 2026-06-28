@@ -4,7 +4,7 @@
 /* Build marker — bump on widget changes so a live deploy can be verified
    in DevTools console. If you don't see this line after `shopify app deploy`
    + hard refresh, the new bundle isn't live (stale checkout or CDN cache). */
-try{console.log('[hajirai-widget] build 2026-06-30 viz-loading-fills-hero');}catch(e){}
+try{console.log('[hajirai-widget] build 2026-06-30 viz-stable-bubble-width');}catch(e){}
 
 /* Visual config comes from theme editor (liquid-injected as window.__AI_CHAT_CONFIG).
    Chat server URL is handled internally via app proxy at /apps/hajirai/chat. */
@@ -940,6 +940,16 @@ function runVisualize(cta,card){
   // Hide the now-empty products container(s) so they don't leave a blank gap.
   if(origContainer&&!origContainer.querySelector('.ai-chat-product-card'))origContainer.style.display='none';
   if(anchor&&anchor!==origContainer&&!anchor.querySelector('.ai-chat-product-card'))anchor.style.display='none';
+  // STABLE WIDTH: the chat bubble shrink-wraps to its content, so during loading
+  // (a narrow spinner box) the whole two-column grid was narrow, then JUMPED
+  // wider once the large generated image loaded. Pin the message + bubble to
+  // their full available width (capped by the message max-width) the moment the
+  // visualizer mounts, so the 1fr preview column is the SAME width from the
+  // loading state through the final image.
+  var vizMsg=host.closest('.ai-chat-msg');
+  if(vizMsg)vizMsg.style.width='100%';
+  var vizBubble=host.closest('.ai-chat-msg-bubble');
+  if(vizBubble){vizBubble.style.width='100%';vizBubble.style.boxSizing='border-box';}
   // Remember the host so a repeat CTA tap scrolls here instead of rebuilding.
   card._aiVizHost=host;
   // Inject the "Style the look" panel NOW (not only after the first image) so the

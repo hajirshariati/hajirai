@@ -58,9 +58,11 @@ export function isImageProviderSupported(provider) {
 // editable via ShopConfig.visualizeScenePrompt (admin → Visualize My Look).
 export const DEFAULT_VIZ_SCENE_THEME =
   "BRAND SCENE TREATMENT (apply to EVERY image regardless of the setting): " +
-  "the chosen setting appears ONLY in the soft, gently blurred BACKGROUND (the upper part of the frame) and SEAMLESSLY FADES into a clean, bright, seamless matte WHITE floor surface in the foreground that the person is walking on. " +
-  "The foreground is smooth white with soft, natural contact shadows under the shoes — no visible floor texture, tiles, grout, rug, sand, grass, or hard horizon line, and no harsh seam: the background scene dissolves gently into the white so the transition is smooth. " +
-  "Keep it bright, airy, and editorial, with the footwear crisp and well-lit on the white surface in the sharp foreground. This white-floor-fade look must be consistent across all previews.";
+  "compose the shot like a seamless infinity-cove / cyclorama studio set where the floor and the background are ONE continuous bright-white surface that curves up — there is NO visible corner, baseboard, wall line, or horizon. " +
+  "The chosen setting is present only as a soft, gently blurred suggestion in the FAR background, and it must transition into the white GRADUALLY and believably: the scene's colors progressively desaturate and brighten through soft atmospheric haze / light mist (like gentle distance fog dissolving to white) until they wash out completely into clean white toward the foreground where the person is walking. " +
+  "ABSOLUTELY NO hard edge, sharp seam, straight line, or abrupt cut between the scene and the white — the blend is a smooth, continuous gradient over a large portion of the frame so it reads as real depth and air, never as a product cut-out pasted on a white block. " +
+  "The foreground is smooth, bright, matte white with soft, natural contact shadows and a subtle reflection under the shoes — no floor texture, tiles, grout, rug, sand, or grass. " +
+  "Keep it bright, airy, and editorial, with the footwear crisp and well-lit on the white surface in the sharp foreground. This seamless white-cove look with a gradual, believable fade must be consistent across all previews.";
 
 // The fidelity-locked stylist prompt. The product image is the authority; the
 // text governs the SCENE around it. `sceneTheme` (merchant-configurable) is the
