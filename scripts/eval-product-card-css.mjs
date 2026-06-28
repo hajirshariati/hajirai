@@ -48,25 +48,44 @@ console.log("\nmobile compact product-card invariants\n");
 
 const MOBILE = mobileBlock();
 
-test("mobile CAROUSEL image is capped (~120px) and drops the 1/1 square", () => {
-  // The showcase carousel image rule inside the mobile block.
+test("mobile image WELLS are clean WHITE (no gray gutters/bars)", () => {
+  // Catch-all base override kills the #f3f4f6 placeholder fill on mobile.
+  assert.match(MOBILE, /\.ai-chat-product-img \{\s*background: #fff/, "base image well is white on mobile");
+  // Carousel + single wells are explicitly white.
+  assert.match(MOBILE, /\.ai-chat-products--showcase \.ai-chat-product-img \{[^}]*background: #fff/, "carousel well white");
+  assert.match(MOBILE, /:only-child \.ai-chat-product-img \{[^}]*background: #fff/, "single-card well white");
+  // No gray fill anywhere in the mobile block.
+  assert.doesNotMatch(MOBILE, /background:\s*#f[0-9a-f]{2,5}\b(?<!#fff)/i, "no light-gray background on mobile");
+  assert.doesNotMatch(MOBILE, /#f3f4f6|#f7f7f7|#eee|#ececec/i, "no known gray placeholder colors");
+});
+
+test("mobile CAROUSEL well is capped (~118-128px) and drops the 1/1 square", () => {
   assert.match(MOBILE, /\.ai-chat-products--showcase \.ai-chat-product-img \{[^}]*aspect-ratio: auto/, "no forced 1/1 on mobile");
-  assert.match(MOBILE, /\.ai-chat-products--showcase \.ai-chat-product-img \{[^}]*max-height: 120px/, "carousel image capped ~120px");
+  assert.match(MOBILE, /\.ai-chat-products--showcase \.ai-chat-product-img \{[^}]*height: 124px/, "carousel well height ~118-128px");
+  // The well centers the image (flex), so the photo sits on white, not stretched.
+  assert.match(MOBILE, /\.ai-chat-products--showcase \.ai-chat-product-img \{[^}]*display: flex[^}]*(align-items: center|justify-content: center)/, "well flex-centers the photo");
 });
 
-test("mobile SINGLE/featured card becomes a compact HORIZONTAL row", () => {
-  assert.match(MOBILE, /\.ai-chat-products--showcase \.ai-chat-product-card:only-child \{[^}]*flex-direction: row/, "single card is image-left/info-right");
-  assert.match(MOBILE, /\.ai-chat-products--showcase \.ai-chat-product-card:only-child \.ai-chat-product-img \{[^}]*width: 100px/, "compact ~100px image box");
-  assert.match(MOBILE, /\.ai-chat-products--showcase \.ai-chat-product-card:only-child \.ai-chat-product-img \{[^}]*max-height: 100px/, "single card image max-height ~90-110px");
-  assert.match(MOBILE, /\.ai-chat-products--showcase \.ai-chat-product-card:only-child \.ai-chat-product-img \{[^}]*aspect-ratio: auto/, "no forced 1/1 on the single card image");
+test("mobile CAROUSEL photo is naturally sized + contain (never stretched/cover)", () => {
+  assert.match(MOBILE, /\.ai-chat-products--showcase \.ai-chat-product-img img \{[^}]*max-width: 82%/, "photo capped to 82% width");
+  assert.match(MOBILE, /\.ai-chat-products--showcase \.ai-chat-product-img img \{[^}]*max-height: 92px/, "photo capped ~88-96px tall");
+  assert.match(MOBILE, /\.ai-chat-products--showcase \.ai-chat-product-img img \{[^}]*object-fit: contain/, "contain, not cover");
+  // Crucially the image is auto-sized, NOT forced to fill (which would gutter).
+  assert.match(MOBILE, /\.ai-chat-products--showcase \.ai-chat-product-img img \{[^}]*width: auto[^}]*height: auto/, "image is auto-sized, not stretched to fill");
+  assert.doesNotMatch(MOBILE, /\.ai-chat-product-img img \{[^}]*object-fit: cover/, "no cover on mobile product images");
 });
 
-test("mobile product images use object-fit:contain (shoes never cropped)", () => {
-  assert.match(MOBILE, /\.ai-chat-product-img img \{[^}]*object-fit: contain/, "contain on mobile product images");
+test("mobile SINGLE/featured card is a compact HORIZONTAL grid (88px / 1fr)", () => {
+  assert.match(MOBILE, /:only-child \{[^}]*display: grid/, "single card is a grid");
+  assert.match(MOBILE, /:only-child \{[^}]*grid-template-columns: 88px 1fr/, "88px image column + flexible text");
+  assert.match(MOBILE, /:only-child \{[^}]*align-items: center/, "vertically centered row");
+  assert.match(MOBILE, /:only-child \.ai-chat-product-img \{[^}]*width: 88px[^}]*height: 88px/, "88px image well");
+  assert.match(MOBILE, /:only-child \.ai-chat-product-img img \{[^}]*max-width: 78px[^}]*max-height: 78px/, "photo capped at 78px");
 });
 
-test("the single card CTA stays tappable but capped (not full-width)", () => {
-  assert.match(MOBILE, /\.ai-chat-products--showcase \.ai-chat-product-card:only-child \.ai-chat-product-cta \{[^}]*max-width: 160px/, "CTA sized to content");
+test("the single card hugs its content (no stretched min-height / dead space)", () => {
+  assert.match(MOBILE, /:only-child \.ai-chat-product-title \{[^}]*min-height: 0/, "title doesn't reserve dead 2-line height");
+  assert.match(MOBILE, /:only-child \.ai-chat-product-cta \{[^}]*max-width: 160px/, "CTA sized to content, not full-width");
 });
 
 test("DESKTOP product-card sizing is UNCHANGED (rules are mobile-scoped)", () => {

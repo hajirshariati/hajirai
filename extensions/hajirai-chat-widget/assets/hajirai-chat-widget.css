@@ -1454,36 +1454,73 @@ a.ai-chat-welcome__hint--link:hover {
     flex: 0 0 100%;
   }
 
-  /* Mobile: shrink the product IMAGE footprint ~40-50% so chat product cards
-     read as compact shopping cards, not image walls. `contain` keeps the whole
-     shoe visible. These are MOBILE-ONLY (desktop sizing untouched). */
+  /* ── Mobile product cards: clean Apple-style white tiles ──
+     The product IMAGE WELL is pure WHITE (no gray gutters/bars) and the photo
+     is naturally sized + centered inside it via flex — NOT stretched to fill,
+     so `contain` never leaves a gray frame. MOBILE-ONLY (desktop untouched). */
 
-  /* Carousel (multi-card) image: drop the 1/1 square, cap the height. */
+  /* Kill the default gray placeholder fill on EVERY mobile product image well
+     (the base rule uses a light-gray) — real photos sit on clean white. */
+  .ai-chat-product-img {
+    background: #fff;
+  }
+
+  /* Carousel (multi-card) card shell. */
+  .ai-chat-products--showcase .ai-chat-product-card {
+    background: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  /* Carousel image well: white, flex-centered, capped height — no 1/1 square. */
   .ai-chat-products--showcase .ai-chat-product-img {
     aspect-ratio: auto;
-    height: 120px;
-    max-height: 120px;
+    width: 100%;
+    height: 124px;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
   }
-  .ai-chat-product-img img {
+  /* Real photo: sized to its own ratio, centered on white — never stretched. */
+  .ai-chat-products--showcase .ai-chat-product-img img {
+    width: auto;
+    height: auto;
+    max-width: 82%;
+    max-height: 92px;
     object-fit: contain;
+    display: block;
   }
 
-  /* Single featured card → compact HORIZONTAL row (image left, info right) so a
+  /* Single featured card → compact HORIZONTAL grid (image left, info right) so a
      lone result isn't a full-bubble-tall image. (Desktop's :only-child row lives
      in the min-width:601px block and is unaffected.) */
   .ai-chat-products--showcase .ai-chat-product-card:only-child {
-    flex-direction: row;
-    align-items: center;
+    display: grid;
+    grid-template-columns: 88px 1fr;
     gap: 12px;
-    padding: 12px;
+    align-items: center;
+    padding: 14px;
   }
   .ai-chat-products--showcase .ai-chat-product-card:only-child .ai-chat-product-img {
-    width: 100px;
-    flex: 0 0 100px;
-    height: 100px;
-    max-height: 100px;
+    width: 88px;
+    height: 88px;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    overflow: hidden;
     aspect-ratio: auto;
-    border-radius: 10px;
+  }
+  .ai-chat-products--showcase .ai-chat-product-card:only-child .ai-chat-product-img img {
+    width: auto;
+    height: auto;
+    max-width: 78px;
+    max-height: 78px;
+    object-fit: contain;
+    display: block;
   }
   .ai-chat-products--showcase .ai-chat-product-card:only-child .ai-chat-product-info {
     padding: 0;
@@ -1491,6 +1528,7 @@ a.ai-chat-welcome__hint--link:hover {
     justify-content: center;
     gap: 6px;
   }
+  /* No reserved 2-line min-height → the card hugs its content (no dead space). */
   .ai-chat-products--showcase .ai-chat-product-card:only-child .ai-chat-product-title {
     min-height: 0;
   }
