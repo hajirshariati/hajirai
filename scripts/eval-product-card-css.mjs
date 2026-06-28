@@ -75,12 +75,19 @@ test("mobile CAROUSEL photo is naturally sized + contain (never stretched/cover)
   assert.doesNotMatch(MOBILE, /\.ai-chat-product-img img \{[^}]*object-fit: cover/, "no cover on mobile product images");
 });
 
-test("mobile SINGLE/featured card is a compact HORIZONTAL grid (88px / 1fr)", () => {
+test("mobile SINGLE/featured card is a compact HORIZONTAL grid (96px / 1fr)", () => {
   assert.match(MOBILE, /:only-child \{[^}]*display: grid/, "single card is a grid");
-  assert.match(MOBILE, /:only-child \{[^}]*grid-template-columns: 88px 1fr/, "88px image column + flexible text");
-  assert.match(MOBILE, /:only-child \{[^}]*align-items: center/, "vertically centered row");
-  assert.match(MOBILE, /:only-child \.ai-chat-product-img \{[^}]*width: 88px[^}]*height: 88px/, "88px image well");
-  assert.match(MOBILE, /:only-child \.ai-chat-product-img img \{[^}]*max-width: 78px[^}]*max-height: 78px/, "photo capped at 78px");
+  assert.match(MOBILE, /:only-child \{[^}]*grid-template-columns: 96px 1fr/, "96px image column + flexible text");
+  assert.match(MOBILE, /:only-child \.ai-chat-product-img \{[^}]*width: 96px[^}]*height: 96px/, "96px image well");
+  assert.match(MOBILE, /:only-child \.ai-chat-product-img img \{[^}]*max-width: 86px[^}]*max-height: 86px/, "photo capped at 86px");
+});
+
+test("the single card TOP-aligns the image (no centered floating gaps above/below)", () => {
+  // align-items:start on the grid → image top-aligns with the title, instead of
+  // centering a small image in a tall content column (the empty-space bug).
+  assert.match(MOBILE, /:only-child \{[^}]*align-items: start/, "image top-aligned with the title");
+  assert.doesNotMatch(MOBILE, /:only-child \{[^}]*align-items: center/, "NOT centered (that caused the top/bottom gaps)");
+  assert.match(MOBILE, /:only-child \.ai-chat-product-info \{[^}]*justify-content: flex-start/, "info hugs the top, tight vertical rhythm");
 });
 
 test("the single card hugs its content (no stretched min-height / dead space)", () => {

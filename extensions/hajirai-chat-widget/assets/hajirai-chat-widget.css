@@ -1498,34 +1498,38 @@ a.ai-chat-welcome__hint--link:hover {
      in the min-width:601px block and is unaffected.) */
   .ai-chat-products--showcase .ai-chat-product-card:only-child {
     display: grid;
-    grid-template-columns: 88px 1fr;
-    gap: 12px;
-    align-items: center;
+    grid-template-columns: 96px 1fr;
+    gap: 14px;
+    /* TOP-align the image with the title (App Store-style row) instead of
+       centering it — centering left big empty gaps above and below the small
+       image when the text column is taller. */
+    align-items: start;
     padding: 14px;
   }
   .ai-chat-products--showcase .ai-chat-product-card:only-child .ai-chat-product-img {
-    width: 88px;
-    height: 88px;
+    width: 96px;
+    height: 96px;
     background: #fff;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 8px;
+    border-radius: 10px;
     overflow: hidden;
     aspect-ratio: auto;
   }
   .ai-chat-products--showcase .ai-chat-product-card:only-child .ai-chat-product-img img {
     width: auto;
     height: auto;
-    max-width: 78px;
-    max-height: 78px;
+    max-width: 86px;
+    max-height: 86px;
     object-fit: contain;
     display: block;
   }
   .ai-chat-products--showcase .ai-chat-product-card:only-child .ai-chat-product-info {
     padding: 0;
     min-width: 0;
-    justify-content: center;
+    /* Hug the top so title/price/buttons sit tight under each other. */
+    justify-content: flex-start;
     gap: 6px;
   }
   /* No reserved 2-line min-height → the card hugs its content (no dead space). */
