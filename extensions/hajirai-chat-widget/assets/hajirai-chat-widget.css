@@ -1472,25 +1472,34 @@ a.ai-chat-welcome__hint--link:hover {
     border-radius: 12px;
     overflow: hidden;
   }
-  /* Carousel image well: white, flex-centered, capped height — no 1/1 square. */
+  /* Carousel image well: white, flex-centered, capped height — no 1/1 square.
+     Kept TIGHT (just a little padding) so the photo fills the well instead of
+     floating in a big empty box. */
   .ai-chat-products--showcase .ai-chat-product-img {
     aspect-ratio: auto;
     width: 100%;
-    height: 124px;
+    height: 112px;
+    padding: 6px 8px;
+    box-sizing: border-box;
     background: #fff;
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
   }
-  /* Real photo: sized to its own ratio, centered on white — never stretched. */
+  /* Real photo: fills the well height (minus the small padding), centered on
+     white, ratio preserved — never stretched, never cropped. */
   .ai-chat-products--showcase .ai-chat-product-img img {
     width: auto;
     height: auto;
-    max-width: 82%;
-    max-height: 92px;
+    max-width: 90%;
+    max-height: 100%;
     object-fit: contain;
     display: block;
+  }
+  /* Tighten the gap between the photo and the title. */
+  .ai-chat-products--showcase .ai-chat-product-info {
+    padding-top: 8px;
   }
 
   /* Single featured card → compact HORIZONTAL grid (image left, info right) so a

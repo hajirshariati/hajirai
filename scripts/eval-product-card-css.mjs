@@ -59,19 +59,20 @@ test("mobile image WELLS are clean WHITE (no gray gutters/bars)", () => {
   assert.doesNotMatch(MOBILE, /#f3f4f6|#f7f7f7|#eee|#ececec/i, "no known gray placeholder colors");
 });
 
-test("mobile CAROUSEL well is capped (~118-128px) and drops the 1/1 square", () => {
+test("mobile CAROUSEL well is TIGHT (~112px) and drops the 1/1 square", () => {
   assert.match(MOBILE, /\.ai-chat-products--showcase \.ai-chat-product-img \{[^}]*aspect-ratio: auto/, "no forced 1/1 on mobile");
-  assert.match(MOBILE, /\.ai-chat-products--showcase \.ai-chat-product-img \{[^}]*height: 124px/, "carousel well height ~118-128px");
+  assert.match(MOBILE, /\.ai-chat-products--showcase \.ai-chat-product-img \{[^}]*height: 112px/, "carousel well is tight, not a tall empty box");
   // The well centers the image (flex), so the photo sits on white, not stretched.
   assert.match(MOBILE, /\.ai-chat-products--showcase \.ai-chat-product-img \{[^}]*display: flex[^}]*(align-items: center|justify-content: center)/, "well flex-centers the photo");
 });
 
-test("mobile CAROUSEL photo is naturally sized + contain (never stretched/cover)", () => {
-  assert.match(MOBILE, /\.ai-chat-products--showcase \.ai-chat-product-img img \{[^}]*max-width: 82%/, "photo capped to 82% width");
-  assert.match(MOBILE, /\.ai-chat-products--showcase \.ai-chat-product-img img \{[^}]*max-height: 92px/, "photo capped ~88-96px tall");
+test("mobile CAROUSEL photo FILLS the well (less empty space) + contain, never cover", () => {
+  // Photo fills the well height (minus the small padding) instead of floating.
+  assert.match(MOBILE, /\.ai-chat-products--showcase \.ai-chat-product-img img \{[^}]*max-width: 90%/, "photo uses most of the width");
+  assert.match(MOBILE, /\.ai-chat-products--showcase \.ai-chat-product-img img \{[^}]*max-height: 100%/, "photo fills the well height — no big empty margins");
   assert.match(MOBILE, /\.ai-chat-products--showcase \.ai-chat-product-img img \{[^}]*object-fit: contain/, "contain, not cover");
   // Crucially the image is auto-sized, NOT forced to fill (which would gutter).
-  assert.match(MOBILE, /\.ai-chat-products--showcase \.ai-chat-product-img img \{[^}]*width: auto[^}]*height: auto/, "image is auto-sized, not stretched to fill");
+  assert.match(MOBILE, /\.ai-chat-products--showcase \.ai-chat-product-img img \{[^}]*width: auto[^}]*height: auto/, "image is auto-sized, ratio preserved");
   assert.doesNotMatch(MOBILE, /\.ai-chat-product-img img \{[^}]*object-fit: cover/, "no cover on mobile product images");
 });
 
