@@ -109,49 +109,47 @@ test("the generated image renders in the right column, separate from the card", 
   assert.match(run, /rightCol\.appendChild\(imgWrap\)/, "image lives in the right column");
 });
 
-// ── PRD 2026-06-28: expanded two-column layout (Apple-style) ──
-test("expanded wrapper uses align-items:flex-start (card never stretches to image)", () => {
-  const run = fnBody("runVisualize");
-  assert.match(run, /align-items:flex-start/, "wrapper must not stretch its columns");
-  // The left controls column holds the card at its natural height.
-  assert.match(run, /ai-chat-viz-controls/, "left controls column created");
-  assert.match(run, /flex-direction:column/, "controls stack vertically (card then scenes)");
+// ── PRD 2026-06-29: expanded layout via injected CSS GRID (robust) ──
+test("layout uses a CSS grid with minmax(0,…) columns (can't be blown wide)", () => {
+  const style = fnBody("injectVizStyleOnce");
+  assert.match(style, /\.ai-chat-viz-expanded\{display:grid/, "grid container");
+  assert.match(style, /grid-template-columns:minmax\(0,300px\) minmax\(0,1fr\)/, "left ≤300px, right fills — minmax(0,…) prevents content blowout");
+  assert.match(style, /@media\(min-width:640px\)/, "two columns only on desktop/tablet");
+  assert.match(style, /align-items:start/, "columns top-aligned, card never stretches to image height");
+  // Mobile default is a single column (stacked).
+  assert.match(style, /grid-template-columns:1fr/, "mobile: single column / stacked");
 });
 
-test("the product card is MOVED into the left controls column (natural height)", () => {
+test("the card override beats the showcase carousel CSS (!important, compact vertical)", () => {
+  const style = fnBody("injectVizStyleOnce");
+  assert.match(style, /\.ai-chat-viz-controls \.ai-chat-product-card\{[^}]*flex-direction:column!important/, "vertical card");
+  assert.match(style, /\.ai-chat-viz-controls \.ai-chat-product-card\{[^}]*width:100%!important/, "fills the 300px column, not wider");
+  assert.match(style, /\.ai-chat-viz-controls \.ai-chat-product-card\{[^}]*min-width:0!important/, "can shrink — no min-content blowout");
+  assert.match(style, /\.ai-chat-viz-controls \.ai-chat-product-img\{[^}]*aspect-ratio:1\/1!important/, "square product image");
+  // View product stays the visible black primary button.
+  assert.match(style, /\.ai-chat-viz-controls \.ai-chat-product-cta\{[^}]*background:#000!important/, "View product stays the black primary button");
+});
+
+test("the CSS travels WITH the JS (injected <style>, no separate stylesheet to cache)", () => {
+  const style = fnBody("injectVizStyleOnce");
+  assert.match(style, /getElementById\('ai-chat-viz-style'\)/, "injected once, idempotent");
+  assert.match(style, /document\.createElement\('style'\)/, "a <style> element carried with the JS");
+  const run = fnBody("runVisualize");
+  assert.match(run, /injectVizStyleOnce\(\)/, "runVisualize injects the styles");
+});
+
+test("the product card is MOVED into the left controls column", () => {
   const run = fnBody("runVisualize");
   assert.match(run, /leftCol\.appendChild\(card\)/, "card moved into the left column");
-  assert.match(run, /resetCardForExpanded\(card\)/, "card is reset to a clean compact card");
-});
-
-test("the card is fully inline-reset so showcase/carousel CSS can't bloat it", () => {
-  const reset = fnBody("resetCardForExpanded");
-  // Natural height, not stretched: column flow, flex:0 0 auto, align top.
-  assert.match(reset, /flex:0 0 auto/, "card takes its natural height");
-  assert.match(reset, /flex-direction:column/, "image-on-top vertical card");
-  assert.match(reset, /align-self:flex-start/, "no vertical stretch");
-  assert.match(reset, /width:100%/, "fills the (capped) left column, not wider");
-  // The product image is re-pinned (escaping the showcase 160px/3.3-card rules).
-  assert.match(reset, /aspect-ratio:1\/1/, "square product image");
-  // View product stays a visible primary button out of showcase scope.
-  assert.match(reset, /ai-chat-product-cta/, "View product CTA re-styled");
-  assert.match(reset, /background:#000/, "View product stays the black primary button");
+  assert.match(run, /ai-chat-viz-controls/, "left controls column");
 });
 
 test("the expanded layout is anchored OUTSIDE the products carousel container", () => {
   const run = fnBody("runVisualize");
   assert.match(run, /closest\('\.ai-chat-products-wrap'\)/, "escapes the showcase scroll/scope");
   assert.match(run, /insertBefore\(host,anchor\.nextSibling\)/, "wrapper placed after the products container");
-  // Left column is capped so two columns can sit side by side on desktop.
-  assert.match(run, /max-width:320px/, "left controls column is width-capped");
   // The emptied products container is hidden so no blank gap remains.
   assert.match(run, /\.style\.display='none'/, "empty products container hidden");
-});
-
-test("layout stacks cleanly on mobile (flex-wrap) with no horizontal overflow", () => {
-  const run = fnBody("runVisualize");
-  assert.match(run, /flex-wrap:wrap/, "columns wrap → stack on narrow screens");
-  assert.match(run, /box-sizing:border-box/, "border-box guards against overflow");
 });
 
 test("scene panel is a distinct 'Style the look' panel with a 'Choose a setting' helper", () => {

@@ -796,61 +796,62 @@ function injectVizButton(card,cta){
     info.appendChild(viz);
   }
 }
-// Fully inline-style the moved product card so NONE of the carousel/showcase
-// stylesheet rules apply once it's out of `.ai-chat-products--showcase`. Those
-// rules (the `:only-child` featured layout, the 3.3-card flex-basis) are
-// viewport-driven and force the card wide — which is what broke the two-column
-// layout. Here the card becomes a clean, compact, natural-height vertical card:
-// square image on top, title/price/View-product below.
-function resetCardForExpanded(card){
-  card.style.cssText='display:flex;flex-direction:column;flex:0 0 auto;width:100%;max-width:100%;min-width:0;gap:0;padding:0;margin:0;align-self:flex-start;overflow:hidden;border:1px solid rgba(0,0,0,0.08);border-radius:12px;background:#fff;text-decoration:none;color:inherit';
-  var cimg=card.querySelector('.ai-chat-product-img');
-  if(cimg)cimg.style.cssText='width:100%;height:auto;aspect-ratio:1/1;flex:0 0 auto;border-radius:0;overflow:hidden;background:#f3f4f6';
-  var cimgImg=cimg&&cimg.querySelector('img');
-  if(cimgImg)cimgImg.style.cssText='width:100%;height:100%;object-fit:cover;display:block';
-  var cinfo=card.querySelector('.ai-chat-product-info');
-  if(cinfo)cinfo.style.cssText='width:100%;box-sizing:border-box;padding:12px 14px 14px;display:flex;flex-direction:column;gap:6px;justify-content:flex-start';
-  // "View product" stays the primary action — force its button look (the
-  // showcase rule that painted it black no longer applies out of scope).
-  var ccta=card.querySelector('.ai-chat-product-cta');
-  if(ccta)ccta.style.cssText='display:inline-flex;align-items:center;justify-content:center;align-self:flex-start;margin-top:2px;padding:9px 16px;background:#000;color:#fff;text-align:center;font-size:13px;font-weight:600;border-radius:8px;letter-spacing:.02em;text-decoration:none';
+// Inject the expanded-preview layout CSS once, carried WITH the widget JS (not
+// the separate stylesheet) so there's no second asset to cache-bust. Uses CSS
+// GRID with minmax(0,…) columns — unlike flexbox, a grid track can't be blown
+// wide by the product card's content (the flex min-content problem that kept
+// the card ~600px and pushed the image below). The card rules use !important so
+// the showcase/carousel CSS (the viewport-driven :only-child featured layout)
+// can never win once the card sits in the controls column.
+function injectVizStyleOnce(){
+  if(document.getElementById('ai-chat-viz-style'))return;
+  var css=
+    '.ai-chat-viz-expanded{display:grid;grid-template-columns:1fr;gap:14px;align-items:start;width:100%;margin-top:8px;box-sizing:border-box}'+
+    '@media(min-width:640px){.ai-chat-viz-expanded{grid-template-columns:minmax(0,300px) minmax(0,1fr)}}'+
+    '.ai-chat-viz-controls{display:flex;flex-direction:column;gap:10px;min-width:0;align-self:start}'+
+    '.ai-chat-viz-preview{min-width:0;align-self:start}'+
+    '.ai-chat-viz-controls .ai-chat-product-card{display:flex!important;flex-direction:column!important;flex:0 0 auto!important;width:100%!important;max-width:100%!important;min-width:0!important;gap:0!important;padding:0!important;margin:0!important;overflow:hidden!important;border:1px solid rgba(0,0,0,.08)!important;border-radius:12px!important;background:#fff!important}'+
+    '.ai-chat-viz-controls .ai-chat-product-img{width:100%!important;height:auto!important;aspect-ratio:1/1!important;border-radius:0!important;flex:0 0 auto!important;overflow:hidden!important}'+
+    '.ai-chat-viz-controls .ai-chat-product-img img{width:100%;height:100%;object-fit:cover;display:block}'+
+    '.ai-chat-viz-controls .ai-chat-product-info{width:100%!important;box-sizing:border-box;padding:12px 14px 14px!important;display:flex!important;flex-direction:column!important;gap:6px!important;justify-content:flex-start!important}'+
+    '.ai-chat-viz-controls .ai-chat-product-cta{display:inline-flex!important;align-items:center;justify-content:center;align-self:flex-start!important;width:auto!important;margin-top:2px!important;padding:9px 16px!important;background:#000!important;color:#fff!important;border-radius:8px!important;font-size:13px!important;font-weight:600!important;letter-spacing:.02em!important;text-decoration:none!important}';
+  var st=document.createElement('style');
+  st.id='ai-chat-viz-style';
+  st.textContent=css;
+  (document.head||document.documentElement).appendChild(st);
 }
 function runVisualize(cta,card){
   if(!cta||!cta.productHandle)return;
+  injectVizStyleOnce();
   // HIDE the in-card CTA once tapped — in the expanded state the scene selector
   // replaces the need for a second "See It Styled" button.
   var viz=card&&card.querySelector('.ai-chat-viz-btn');
   if(viz)viz.style.display='none';
   if(!card||!card.parentNode)return;
-  // Build a two-column expanded layout, anchored OUTSIDE the products container
-  // so the carousel/scroll CSS can't constrain it:
-  //   left  = style controls (compact product card at NATURAL height + the
-  //           scene selector panel BELOW it — never inside the card's tap target)
-  //   right = the large generated image + its disclaimer
-  // align-items:flex-start so the card never stretches to the image's height
-  // (that was the big blank area). flex-wrap → on a narrow widget the columns
-  // stack cleanly: card → controls → image → disclaimer.
+  // Build the two-column expanded layout, anchored OUTSIDE the products
+  // container so the carousel/scroll CSS can't constrain it. The grid CSS above
+  // owns the columns: left = controls (compact card at natural height + the
+  // scene panel below it), right = the large generated image. On a narrow
+  // widget (<640px) the grid collapses to one column → card, controls, image
+  // stack cleanly. NO inline layout styles here — the injected grid CSS rules.
   var origContainer=card.parentNode;
   var anchor=card.closest('.ai-chat-products-wrap')||card.closest('.ai-chat-products')||card;
   var host=document.createElement('div');
   host.className='ai-chat-viz-host ai-chat-viz-expanded';
-  host.style.cssText='display:flex;flex-wrap:wrap;align-items:flex-start;gap:14px;width:100%;box-sizing:border-box;margin-top:8px';
   var leftCol=document.createElement('div');
   leftCol.className='ai-chat-viz-controls';
-  leftCol.style.cssText='display:flex;flex-direction:column;gap:10px;align-self:flex-start;flex:0 1 300px;max-width:320px;min-width:0;box-sizing:border-box';
   var rightCol=document.createElement('div');
   rightCol.className='ai-chat-viz-preview';
-  rightCol.style.cssText='align-self:flex-start;flex:1 1 320px;min-width:240px;max-width:560px;box-sizing:border-box';
   var imgWrap=document.createElement('div');
   imgWrap.className='ai-chat-viz-image';
   imgWrap.setAttribute('role','status');imgWrap.setAttribute('aria-live','polite');imgWrap.setAttribute('aria-label','Creating your styling preview');
   rightCol.appendChild(imgWrap);
-  // Place the wrapper AFTER the outermost products container (escaping showcase
-  // scope), move the card into the left column, and reset it to a clean card.
+  // Place the wrapper AFTER the outermost products container, then move the card
+  // into the left column. The injected `.ai-chat-viz-controls .ai-chat-product-card`
+  // rules (with !important) reset it to a clean compact card.
   if(anchor&&anchor.parentNode)anchor.parentNode.insertBefore(host,anchor.nextSibling);
   else origContainer.appendChild(host);
   leftCol.appendChild(card);
-  resetCardForExpanded(card);
   host.appendChild(leftCol);
   host.appendChild(rightCol);
   // Hide the now-empty products container(s) so they don't leave a blank gap.
