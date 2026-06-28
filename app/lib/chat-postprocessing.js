@@ -194,7 +194,7 @@ export function validateFollowUpSuggestion(suggestion, replyText) {
 //     word wins. Without the lazy quantifier, the engine consumes
 //     as much as possible and lands on the latest category in the
 //     window — producing the wrong pairing.
-const REJECT_RE = /\b(?:no|don'?t[\s-]?(?:like|want|need|care\s+for|carry|have|do)|do\s+not\s+(?:like|want|need|care\s+for|carry|have|do)|doesn'?t[\s-]?(?:like|want|need|care\s+for|carry|have|do)|does\s+not\s+(?:like|want|need|care\s+for|carry|have|do)|didn'?t[\s-]?(?:like|want|need|care\s+for)|did\s+not\s+(?:like|want|need|care\s+for)|hate|hates|dislike|dislikes|avoid|avoids|avoiding|without|besides|other[\s-]?than|except[\s-]?for|except|instead[\s-]?of|rather[\s-]?than|not[\s-]?into|not[\s-]?a[\s-]?fan|not[\s-]?interested[\s-]?in)\b[^.!?,\n]{0,50}?\b((?:shoes?|footwear|orthotics?|insoles?|footbeds?|sandals?|sneakers?|boots?|clogs?|loafers?|slippers?|oxfords?|wedges?|heels?|flats|mules?|mary[\s-]?janes?|slip[\s-]?ons?))\b/gi;
+const REJECT_RE = /\b(?:no|don'?t[\s-]?(?:like|want|need|care\s+for|carry|have|do|look[\s-]?like)|do\s+not\s+(?:like|want|need|care\s+for|carry|have|do|look[\s-]?like)|doesn'?t[\s-]?(?:like|want|need|care\s+for|carry|have|do|look[\s-]?like)|does\s+not\s+(?:like|want|need|care\s+for|carry|have|do|look[\s-]?like)|didn'?t[\s-]?(?:like|want|need|care\s+for)|did\s+not\s+(?:like|want|need|care\s+for)|nothing[\s-]?like|not[\s-]?look[\s-]?like|hate|hates|dislike|dislikes|avoid|avoids|avoiding|without|besides|other[\s-]?than|except[\s-]?for|except|instead[\s-]?of|rather[\s-]?than|nicer[\s-]?than|dressier[\s-]?than|fancier[\s-]?than|classier[\s-]?than|nice[r]?[\s-]?than|any(?:thing)?[\s-]?but|everything[\s-]?but|not[\s-]?into|not[\s-]?a[\s-]?fan|not[\s-]?interested[\s-]?in|not(?![\s-]?(?:sure|certain|really|quite|too|that|so|very|yet)\b))\b[^.!?,\n]{0,50}?\b((?:shoes?|footwear|orthotics?|insoles?|footbeds?|sandals?|sneakers?|boots?|clogs?|loafers?|slippers?|oxfords?|wedges?|heels?|flats|mules?|mary[\s-]?janes?|slip[\s-]?ons?))\b/gi;
 const FOLLOWING_REJECTED_CATEGORY_RE = /^\s*(?:,\s*|\b(?:and|or|nor)\b\s+)\b((?:shoes?|footwear|orthotics?|insoles?|footbeds?|sandals?|sneakers?|boots?|clogs?|loafers?|slippers?|oxfords?|wedges?|heels?|flats|mules?|mary[\s-]?janes?|slip[\s-]?ons?))\b/i;
 
 // Permissive context — when the captured category is preceded by
@@ -1324,6 +1324,51 @@ export function looksLikeClarifyingQuestion(text) {
   return /\?\s*$/.test(lastChunk.trim());
 }
 
+// Category / gender / recipient / style clarifier QUESTIONS that a turn with
+// clarificationAllowed=false must never ask. Used to strip such a question
+// SENTENCE even when it's buried inside an otherwise-fine recommendation (the
+// whole-reply clarifier gate only catches short stalls). PRD 2026-06-28:
+// "…here are options. Are you thinking sneakers, sandals, or open to both? Also,
+// are you shopping for yourself or someone else?" shipped on a clarify=false turn.
+const DISALLOWED_CLARIFIER_SENTENCE_RES = [
+  /\bmen'?s?\s+or\s+women'?s?\b/i,
+  /\bwomen'?s?\s+or\s+men'?s?\b/i,
+  /\b(?:are|is)\s+(?:you|this|it)\s+(?:shopping|looking)\s+for\b/i,
+  /\bshopping\s+for\s+(?:yourself|someone|a\s+man|a\s+woman|him|her|men|women|your)\b/i,
+  /\bfor\s+yourself\s+or\s+(?:someone|somebody|a\s+gift)\b/i,
+  /\bare\s+you\s+(?:thinking|leaning|after|open\s+to|picturing|looking\s+(?:for|at))\b/i,
+  /\b(?:sneakers?|sandals?|boots?|loafers?|wedges?|heels?|flats?|slip[\s-]?ons?|mary[\s-]?janes?|clogs?|mules?|oxfords?)\b[^.?!]*\bor\b[^.?!]*\?/i,
+  /\b(?:what|which)\s+(?:style|color|colour|size|budget|type|kind|occasion)\b[^.?!]*\?/i,
+  /\bwhat'?s\s+your\s+budget\b/i,
+  /\bany\s+(?:particular|specific)\s+(?:style|color|colour|budget|type|occasion)\b/i,
+];
+
+// Remove disallowed clarifier question SENTENCES from a reply, keeping the rest
+// intact. Returns the original text untouched when nothing matches or when
+// stripping would leave no substantive content (let the upstream clarifier gate
+// / grounding validator handle an all-clarifier reply instead).
+export function stripDisallowedClarifierQuestions(text) {
+  const t = String(text || "");
+  if (!t.trim() || !t.includes("?")) return { text: t, stripped: [] };
+  const parts = t.match(/[^.?!]*[.?!]+|\S[^.?!]*$/g) || [t];
+  const stripped = [];
+  const kept = parts.filter((s) => {
+    const sentence = s.trim();
+    if (
+      sentence.endsWith("?") &&
+      DISALLOWED_CLARIFIER_SENTENCE_RES.some((re) => re.test(sentence))
+    ) {
+      stripped.push(sentence);
+      return false;
+    }
+    return true;
+  });
+  if (stripped.length === 0) return { text: t, stripped: [] };
+  const out = kept.join(" ").replace(/\s{2,}/g, " ").trim();
+  if (out.replace(/[^a-z0-9]/gi, "").length < 20) return { text: t, stripped: [] };
+  return { text: out, stripped };
+}
+
 // =====================================================================
 // Suggestion gender-contradiction filter
 // =====================================================================
@@ -1462,17 +1507,55 @@ const NON_FOOTWEAR_CATEGORY_RE =
 const ACCESSORY_INTENT_RE =
   /\b(?:accessor|shoe[\s-]*care|care[\s-]*kit|cleaner|cleaning|protect|spray|socks?|gift[\s-]*card|laces?|freshener|deodor)\b/i;
 
+// Drop cards in a category the customer explicitly REJECTED this turn ("shoes
+// that don't look like sneakers", "not sneakers", "anything but sneakers"). The
+// search tool already filters rejected categories before tiering; this is the
+// central backstop for the forced-card / evidence-reuse / prior-card paths that
+// don't go back through search. Unlike the wrong-topic guard, this DOES empty
+// the pool if every candidate is rejected — never show the exact category the
+// customer ruled out; the caller broadens within the allowed categories.
+export function dropRejectedCategoryCards(cards, userMessage) {
+  if (!Array.isArray(cards) || cards.length === 0) return { cards, dropped: [] };
+  const rejected = detectRejectedCategories(String(userMessage || ""));
+  if (rejected.size === 0) return { cards, dropped: [] };
+  const stems = Array.from(rejected)
+    .map((c) => (c.endsWith("s") ? c.slice(0, -1) : c))
+    .filter((c) => c.length >= 3);
+  if (stems.length === 0) return { cards, dropped: [] };
+  const catOf = (c) =>
+    String(c?._category || c?.category || c?.productType || "").toLowerCase();
+  const isRejected = (c) => stems.some((s) => catOf(c).includes(s));
+  const kept = cards.filter((c) => !isRejected(c));
+  const dropped = cards.filter(isRejected).map((c) => c?.handle || c?.title || "?");
+  return { cards: kept, dropped };
+}
+
+// Orthotics / insoles / footbeds are a real product line, but on a BROAD
+// footwear recommendation they don't belong in the shoe carousel unless the
+// customer actually asked for them (PRD 2026-06-28: a "cute vacation walking
+// shoes" reco surfaced an orthotic card). Kept only when the latest message
+// names orthotics/insoles/inserts/footbeds/arch support.
+const ORTHOTIC_CARD_CATEGORY_RE = /\b(?:orthotic|insole|footbed)s?\b|\binserts?\b/i;
+const ORTHOTIC_INTENT_RE = /\b(?:orthotics?|insoles?|inserts?|footbeds?|arch\s+support)\b/i;
+
 export function dropNonFootwearWhenFootwearIntent(cards, userMessage) {
   if (!Array.isArray(cards) || cards.length === 0) return { cards, dropped: [] };
-  // Customer explicitly wants accessories/care → leave the pool as-is.
-  if (ACCESSORY_INTENT_RE.test(String(userMessage || ""))) return { cards, dropped: [] };
+  const msg = String(userMessage || "");
+  const wantsAccessory = ACCESSORY_INTENT_RE.test(msg);
+  const wantsOrthotic = ORTHOTIC_INTENT_RE.test(msg);
   const catOf = (c) => String(c?._category || c?.category || c?.productType || "");
-  const isNonFootwear = (c) => NON_FOOTWEAR_CATEGORY_RE.test(catOf(c));
-  const footwear = cards.filter((c) => !isNonFootwear(c));
-  const nonFootwear = cards.filter(isNonFootwear);
-  // Only drop when real footwear remains to show.
-  if (footwear.length === 0 || nonFootwear.length === 0) return { cards, dropped: [] };
-  return { cards: footwear, dropped: nonFootwear.map((c) => c?.handle || c?.title || "?") };
+  const isUnwanted = (c) => {
+    const cat = catOf(c);
+    if (NON_FOOTWEAR_CATEGORY_RE.test(cat) && !wantsAccessory) return true;
+    if (ORTHOTIC_CARD_CATEGORY_RE.test(cat) && !wantsOrthotic) return true;
+    return false;
+  };
+  const footwear = cards.filter((c) => !isUnwanted(c));
+  const unwanted = cards.filter(isUnwanted);
+  // Only drop when real footwear remains to show (a genuine orthotic/accessory
+  // turn whose whole pool is that category is left intact).
+  if (footwear.length === 0 || unwanted.length === 0) return { cards, dropped: [] };
+  return { cards: footwear, dropped: unwanted.map((c) => c?.handle || c?.title || "?") };
 }
 
 // Titles/categories that are not shoppable products at all — $0 service

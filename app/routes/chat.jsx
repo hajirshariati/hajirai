@@ -91,6 +91,8 @@ import {
   detectFootwearOverElicitation,
   resolverPromisedRecommendation,
   dropNonFootwearWhenFootwearIntent,
+  dropRejectedCategoryCards,
+  stripDisallowedClarifierQuestions,
   dropNonShoppableItems,
   detectComparisonIntent,
   resolveFocusedCardByName,
@@ -2982,6 +2984,16 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       pool = footwearOnly.cards;
     }
   }
+  // Negative-category backstop: drop cards in a category the customer rejected
+  // this turn ("shoes that don't look like sneakers"). Central enforcement for
+  // forced-card / evidence-reuse / prior-card paths that bypass the search tool.
+  {
+    const rejFiltered = dropRejectedCategoryCards(pool, ctx.latestUserMessage);
+    if (rejFiltered.dropped.length > 0) {
+      console.log(`[chat] ${ctx.shop} rejected-category guard: dropped`, rejFiltered.dropped);
+      pool = rejFiltered.cards;
+    }
+  }
   // Compare-intent flows read the single shared signal off session
   // memory's latestTurnIntent rather than re-running a regex here.
   const isCompareTurn = ctx?.sessionMemory?.latestTurnIntent?.reason === "compare_request";
@@ -3047,6 +3059,21 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       fullResponseText = repaired;
     } else if (clarGate.action === "block_no_products") {
       console.log(`[chat] turn-plan(${ctx.turnPlan.workflow}): disallowed clarifier but no products to repair with — leaving text`);
+    }
+  }
+  // Clarifier-question strip (clarificationAllowed=false). The gate above only
+  // repairs a reply that is WHOLLY a short clarifier; a longer recommendation
+  // that buries a category/gender/recipient clarifier question at the end slips
+  // through. Strip just those question sentences so an act-don't-ask turn never
+  // ships "Are you thinking sneakers, sandals, or both? Shopping for yourself?".
+  if (ctx?.turnPlan?.clarificationAllowed === false) {
+    const clar = stripDisallowedClarifierQuestions(fullResponseText);
+    if (clar.stripped.length > 0) {
+      console.log(
+        `[chat] turn-plan(${ctx.turnPlan.workflow}): stripped disallowed clarifier question(s): ` +
+          clar.stripped.map((s) => `"${s.slice(0, 50)}"`).join(", "),
+      );
+      fullResponseText = clar.text;
     }
   }
 

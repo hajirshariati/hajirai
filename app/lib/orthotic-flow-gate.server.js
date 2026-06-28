@@ -2205,27 +2205,41 @@ export async function maybeRunOrthoticFlow({
     // and (c) the turn carries real use-case/product context AND a guidance
     // question or stated need.
     if (step.node.attribute === "gender") {
+      // ADVISORY BYPASS. Two precise advisory shapes don't need gender first —
+      // gender is a SKU refinement, not a prerequisite for the advice:
+      //   (A) a COMPOUND need + "what should I choose?" — "an orthotic for work
+      //       boots, but I also want cushioning. What should I choose?"
+      //   (B) a SHOES-vs-ORTHOTICS strategy question — "…should I buy shoes,
+      //       orthotics, or both?"
+      // Both differ from a committed orthotic SELECTION ("what's the best
+      // orthotic for me", "what orthotic should I get for plantar fasciitis"),
+      // which genuinely needs gender to pick the SKU — those still ask who-for.
+      // Only at the opening (no required attribute accumulated yet).
       const accumulatedHasRequired = required.some((a) => accumulated[a] !== undefined);
-      const USECASE_PRODUCT_CONTEXT_RE =
-        /\b(work\s*boots?|boots?|sneakers?|shoes?|cleats?|sandals?|hiking|trail|running|jogging|walk(?:ing)?|standing|on\s+my\s+feet|all\s+day|gym|workout|athletic|cushion(?:ing|ed)?|dress\s+shoes?|casual|office|nursing|nurse)\b/i;
-      const hasUseCaseContext =
+      const ADVISORY_CONTEXT_RE =
+        /\b(work\s*boots?|boots?|sneakers?|shoes?|cleats?|sandals?|hiking|trail|running|jogging|walk(?:ing)?|standing|on\s+my\s+feet|all\s+day|gym|workout|athletic|cushion(?:ing|ed)?|dress|casual|office|nursing|nurse|plantar|fasciitis|neuroma|metatars(?:al|algia)?|bunions?|heel|flat\s+feet|diabet(?:ic|es))\b/i;
+      const hasContext =
+        !!(classifiedIntent?.attributes?.condition) ||
         !!(classifiedIntent?.attributes?.useCase) ||
+        answers.condition !== undefined ||
         answers.useCase !== undefined ||
-        USECASE_PRODUCT_CONTEXT_RE.test(rawUserText);
-      // The differentiator vs a plain "an orthotic for the gym" (which SHOULD
-      // ask who-for): an EXPLICIT advisory question ("what should I choose?")
-      // or a COMPOUND need ("…for work boots, but I also want cushioning"). A
-      // bare request to find an orthotic for a use case is not enough to skip
-      // the gender step.
-      const asksAdvisoryQuestion =
-        /\?/.test(rawUserText) &&
-        /\b(?:what|which|how)\b[^?]*\b(?:choose|pick|look|recommend|suggest|get|go\s+with|should|best)\b/i.test(rawUserText);
+        ADVISORY_CONTEXT_RE.test(rawUserText);
+      // (A) compound need + an open "what should I choose?"
       const hasCompoundNeed =
         /\bbut\s+(?:i\s+(?:also\s+)?want|also)\b|\band\s+i\s+also\s+want\b|\bplus\s+i\s+(?:also\s+)?want\b/i.test(rawUserText);
-      if (!accumulatedHasRequired && hasUseCaseContext && (asksAdvisoryQuestion || hasCompoundNeed)) {
+      const asksWhatToChoose =
+        /\bwhat\s+should\s+i\s+(?:choose|do|get|pick|look|consider|buy|wear)\b|\bwhich\s+should\s+i\b/i.test(rawUserText);
+      // (B) a shoes-vs-orthotics strategy decision (names BOTH product types).
+      const asksShoesOrthoticStrategy =
+        /\b(?:shoes?|footwear|boots?|sneakers?|sandals?)\b[^.?!]{0,40}\borthotics?\b/i.test(rawUserText) ||
+        /\borthotics?\b[^.?!]{0,40}\b(?:shoes?|footwear|sneakers?|sandals?)\b/i.test(rawUserText);
+      const advisoryBypass =
+        (hasCompoundNeed && asksWhatToChoose) ||
+        (asksShoesOrthoticStrategy && /\?/.test(rawUserText));
+      if (!accumulatedHasRequired && hasContext && advisoryBypass) {
         console.log(
-          `[orthotic-flow] gender-stall guard: opening orthotic question carries use-case/product context — ` +
-            `deferring to LLM for advisory-first (no gender-only gate)`,
+          `[orthotic-flow] gender-stall guard: advisory (compound-need or shoes-vs-orthotics) with context — ` +
+            `deferring to LLM for advisory-first (gender is a follow-up, not a prerequisite)`,
         );
         return { handled: false, case: "advisory_first_no_gender_stall" };
       }

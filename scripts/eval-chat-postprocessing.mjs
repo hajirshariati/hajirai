@@ -55,6 +55,8 @@ import {
   resolveFocusedCardByName,
   shouldForceSneakerRelevanceFloor,
   styleConstraintSuppressesSneakerFloor,
+  stripDisallowedClarifierQuestions,
+  dropRejectedCategoryCards,
 } from "../app/lib/chat-postprocessing.js";
 import {
   isSingularPrescriptive,
@@ -122,10 +124,31 @@ test("never empties the pool: all-accessory pool is left intact", () => {
   assert.deepEqual(out.dropped, []);
 });
 
-test("orthotics are NOT dropped (real product line)", () => {
+test("orthotics dropped from a BROAD footwear reco (not explicitly asked)", () => {
   const pool = [
     { handle: "l600-orthotic", _category: "Orthotics" },
     { handle: "danika-sneaker", _category: "Sneakers" },
+  ];
+  const out = dropNonFootwearWhenFootwearIntent(pool, "cute comfortable shoes for vacation");
+  assert.equal(out.cards.length, 1);
+  assert.equal(out.cards[0].handle, "danika-sneaker");
+  assert.deepEqual(out.dropped, ["l600-orthotic"]);
+});
+
+test("orthotics KEPT when the customer explicitly asked for them", () => {
+  const pool = [
+    { handle: "l600-orthotic", _category: "Orthotics" },
+    { handle: "danika-sneaker", _category: "Sneakers" },
+  ];
+  const out = dropNonFootwearWhenFootwearIntent(pool, "do you have orthotics or insoles?");
+  assert.equal(out.cards.length, 2);
+  assert.deepEqual(out.dropped, []);
+});
+
+test("all-orthotic pool is left intact (a genuine orthotic turn)", () => {
+  const pool = [
+    { handle: "l600-orthotic", _category: "Orthotics" },
+    { handle: "l700-insole", _category: "Insoles" },
   ];
   const out = dropNonFootwearWhenFootwearIntent(pool, "gift for my mom");
   assert.equal(out.cards.length, 2);
@@ -1673,6 +1696,82 @@ test("styleConstraintSuppressesSneakerFloor flags the dressy/cute vocabulary", (
   assert.equal(styleConstraintSuppressesSneakerFloor("for a gala"), true);
   assert.equal(styleConstraintSuppressesSneakerFloor("not sneakers please"), true);
   assert.equal(styleConstraintSuppressesSneakerFloor("walking a lot"), false);
+});
+
+// =====================================================================
+section("stripDisallowedClarifierQuestions (PRD 2026-06-28 bug 1a)");
+// =====================================================================
+
+test("strips category + recipient clarifier questions, keeps the recommendation", () => {
+  const reply =
+    "These are great for a cute vacation look — the Jillian and the Savannah both have cushioned footbeds for all-day walking. " +
+    "Are you thinking sneakers, sandals, or open to both? Also, are you shopping for yourself or someone else?";
+  const out = stripDisallowedClarifierQuestions(reply);
+  assert.equal(out.stripped.length, 2);
+  assert.ok(!/\?/.test(out.text), `no question should remain: ${out.text}`);
+  assert.ok(/Jillian and the Savannah/.test(out.text), "recommendation text retained");
+});
+
+test("strips a buried 'men's or women's?' clarifier", () => {
+  const out = stripDisallowedClarifierQuestions(
+    "Here are some supportive options that work well for standing all day. Men's or women's?",
+  );
+  assert.equal(out.stripped.length, 1);
+  assert.ok(!/\?/.test(out.text));
+});
+
+test("leaves a non-clarifier reply untouched", () => {
+  const reply = "The Lynco L600 has a deep heel cup and full-length arch support — a solid pick for plantar fasciitis.";
+  const out = stripDisallowedClarifierQuestions(reply);
+  assert.equal(out.stripped.length, 0);
+  assert.equal(out.text, reply);
+});
+
+test("does not gut an all-clarifier reply (let the upstream gate handle it)", () => {
+  const out = stripDisallowedClarifierQuestions("Men's or women's?");
+  assert.equal(out.stripped.length, 0); // stripping would leave <20 chars → untouched
+});
+
+// =====================================================================
+section("rejected categories end-to-end (PRD 2026-06-28 bug 3)");
+// =====================================================================
+
+test("detects 'don't look like sneakers' / 'not sneakers' / 'anything but'", () => {
+  assert.deepEqual([...detectRejectedCategories("shoes that don't look like sneakers")], ["sneakers"]);
+  assert.deepEqual([...detectRejectedCategories("not sneakers")], ["sneakers"]);
+  assert.deepEqual([...detectRejectedCategories("anything but sneakers")], ["sneakers"]);
+  assert.deepEqual([...detectRejectedCategories("nicer than sneakers")], ["sneakers"]);
+  assert.deepEqual([...detectRejectedCategories("other than sneakers")], ["sneakers"]);
+});
+
+test("does NOT mis-fire on 'not sure if I want sneakers or sandals'", () => {
+  assert.equal(detectRejectedCategories("not sure if I want sneakers or sandals").size, 0);
+  assert.equal(detectRejectedCategories("I want sneakers").size, 0);
+});
+
+test("dropRejectedCategoryCards removes the rejected category, keeps the rest", () => {
+  const pool = [
+    { handle: "danika", _category: "Sneakers" },
+    { handle: "jocelyn", _category: "Loafers" },
+    { handle: "savannah", _category: "Mary Janes" },
+  ];
+  const out = dropRejectedCategoryCards(pool, "comfortable shoes that don't look like sneakers");
+  assert.deepEqual(out.cards.map((c) => c.handle), ["jocelyn", "savannah"]);
+  assert.deepEqual(out.dropped, ["danika"]);
+});
+
+test("dropRejectedCategoryCards empties rather than show a rejected card (broaden upstream)", () => {
+  const pool = [{ handle: "danika", _category: "Sneakers" }];
+  const out = dropRejectedCategoryCards(pool, "not sneakers");
+  assert.deepEqual(out.cards, []);
+  assert.deepEqual(out.dropped, ["danika"]);
+});
+
+test("no rejection → pool untouched", () => {
+  const pool = [{ handle: "danika", _category: "Sneakers" }];
+  const out = dropRejectedCategoryCards(pool, "show me comfortable shoes");
+  assert.equal(out.cards.length, 1);
+  assert.deepEqual(out.dropped, []);
 });
 
 // =====================================================================

@@ -12,7 +12,7 @@ import {
   priorEvidenceCardOwnerViolation,
   priorEvidenceStrayCards,
 } from "../app/lib/prior-evidence.js";
-import { parseRequestedColors } from "../app/lib/availability-truth.js";
+import { parseRequestedColors, familyOfTitle } from "../app/lib/availability-truth.js";
 
 let pass = 0, fail = 0;
 function check(name, fn) {
@@ -119,6 +119,24 @@ check("a random alternate product is flagged as a stray", () => {
   const strays = priorEvidenceStrayCards(finalCards, ["tamara", "danika", "mandy"], familyOf);
   assert.equal(strays.length, 1);
   assert.match(strays[0].title, /Millie/);
+});
+
+// ── familyOfTitle: prior-evidence family extraction (PRD 2026-06-28 bug 4) ──
+// Generic/gender tokens must never be a family. Log leaked
+// families=[women's,jocelyn,danika] — "women's" is not a product family.
+check("gender prefix ('Women's') is stripped, real family wins", () => {
+  assert.equal(familyOfTitle("Women's Jocelyn Slingback Sandal - Black"), "jocelyn");
+  assert.equal(familyOfTitle("Women’s Danika Lace-Up Sneaker"), "danika"); // curly apostrophe
+  assert.equal(familyOfTitle("Men's Jillian Quarter Strap"), "jillian");
+});
+check("category / orthotic / descriptor tokens are not families", () => {
+  assert.equal(familyOfTitle("Men's Orthotic Insole"), "");
+  assert.equal(familyOfTitle("Active Arch Support Insole"), "");
+  assert.equal(familyOfTitle("Women's Comfort Sandal"), "");
+});
+check("a real family token still resolves", () => {
+  assert.equal(familyOfTitle("Lynco L600 Orthotic"), "lynco");
+  assert.equal(familyOfTitle("Savannah Wedge - Tan"), "savannah");
 });
 
 console.log("");

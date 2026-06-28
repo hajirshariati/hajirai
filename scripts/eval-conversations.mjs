@@ -986,12 +986,30 @@ const SCENARIOS = [
       expect: { gateHandled: false },
     }],
   },
+  // Shoes-vs-orthotics strategy question → advisory-first, no gender gate.
+  {
+    name: "Bug4: 'plantar fasciitis … shoes, orthotics, or both?' → no gender stall",
+    turns: [{
+      user: "I have plantar fasciitis and flat feet. Should I buy shoes, orthotics, or both?",
+      classifier: C({ attributes: { condition: "plantar_fasciitis" } }),
+      expect: { gateHandled: false },
+    }],
+  },
   // Guard stays tight: a bare "an orthotic for <use case>" still asks who-for.
   {
     name: "Bug4 control: bare 'orthotic for the gym' still asks gender",
     turns: [{
       user: "looking for an orthotic for the gym",
       classifier: C({ attributes: { useCase: "athletic_training" } }),
+      expect: { gateHandled: true, questionMatches: /Who are these orthotics for/i },
+    }],
+  },
+  // Committed orthotic SELECTION still needs gender (not a strategy question).
+  {
+    name: "Bug4 control: 'what orthotic should I get for plantar fasciitis' still asks gender",
+    turns: [{
+      user: "what orthotic should I get for plantar fasciitis",
+      classifier: C({ attributes: { condition: "plantar_fasciitis" } }),
       expect: { gateHandled: true, questionMatches: /Who are these orthotics for/i },
     }],
   },

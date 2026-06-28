@@ -166,15 +166,37 @@ export const AVAILABILITY_RESULT = {
 // meaningful word before a " - color" suffix. Inlined so this module stays
 // prisma-free and the eval runs in any repo.
 const FAMILY_STOPWORDS = new Set([
-  "the", "aetrex", "womens", "women", "mens", "men", "kids", "unisex",
+  "the", "aetrex", "womens", "women", "mens", "men", "kids", "kid", "unisex", "boys", "girls",
   "new", "classic", "comfort", "premium", "pro",
+]);
+// familyOfTitle needs a WIDER stopword net than styleKeyOfTitle: it must skip
+// generic category nouns, orthotic vocabulary, and descriptors to reach the
+// actual style NAME ("jocelyn", "danika"). styleKeyOfTitle must NOT use these —
+// it relies on tokens like "sport" / "active" to distinguish styles (Jillian
+// Sport vs Jillian Braided), so they stay out of FAMILY_STOPWORDS. PRD
+// 2026-06-28: families=[women's,jocelyn,danika] leaked "women's".
+const FAMILY_NAME_STOPWORDS = new Set([
+  ...FAMILY_STOPWORDS,
+  "shoe", "shoes", "footwear", "sandal", "sandals", "sneaker", "sneakers",
+  "boot", "boots", "bootie", "booties", "loafer", "loafers", "slide", "slides",
+  "clog", "clogs", "mule", "mules", "wedge", "wedges", "heel", "heels",
+  "flat", "flats", "oxford", "oxfords", "slipper", "slippers",
+  "orthotic", "orthotics", "insole", "insoles", "insert", "inserts", "footbed", "footbeds",
+  "active", "arch", "support", "sport", "athletic",
 ]);
 export function familyOfTitle(title) {
   if (!title) return "";
   const beforeDash = String(title).split(/\s[-–—]\s/)[0];
-  const words = beforeDash.toLowerCase().replace(/[^a-z0-9\s']/g, " ").split(/\s+/).filter(Boolean);
+  // Strip apostrophes BEFORE stopword matching so "Women's" collapses to
+  // "womens" (a stopword) instead of slipping through as the family token.
+  const words = beforeDash
+    .toLowerCase()
+    .replace(/'/g, "")
+    .replace(/[^a-z0-9\s]/g, " ")
+    .split(/\s+/)
+    .filter(Boolean);
   for (const w of words) {
-    if (w.length > 2 && !FAMILY_STOPWORDS.has(w)) return w;
+    if (w.length > 2 && !FAMILY_NAME_STOPWORDS.has(w)) return w;
   }
   return "";
 }

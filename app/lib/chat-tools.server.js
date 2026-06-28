@@ -3,7 +3,7 @@ import { logMentions } from "../models/ChatProductMention.server";
 import { fetchCustomerContext } from "./customer-context.server";
 import { embedText, vectorLiteral, resolveShopEmbedding } from "./embeddings.server";
 import { normalizeGenderChipAnswer } from "./chat-helpers.server";
-import { shouldForceSneakerRelevanceFloor } from "./chat-postprocessing.js";
+import { shouldForceSneakerRelevanceFloor, detectRejectedCategories } from "./chat-postprocessing.js";
 import { textIntentDivergesFromGroup } from "./category-intent.server";
 import {
   attachClaimFactsToCard,
@@ -722,6 +722,32 @@ const searchQuery = detected.gender ? detected.query : q;
   const userIntentText = `${q} ${latestText}`;
   let merchantExclude = matchesCategoryRule(userIntentText, categoryExclusions, latestText, activeCategoryGroup);
 
+  // NEGATIVE CATEGORY CONSTRAINTS (PRD 2026-06-28). "comfortable shoes that
+  // don't look like sneakers", "not sneakers", "anything but sneakers" — the
+  // rejected category must be enforced end-to-end: it can never be the forced
+  // category and its products must never reach the cards. Detected centrally
+  // (detectRejectedCategories) and merged into the exclusion terms below so the
+  // pool is filtered BEFORE tiering — i.e. the search broadens into the allowed
+  // non-rejected categories instead of showing rejected cards.
+  const rejectedCategorySet = detectRejectedCategories(
+    String(latestUserMessage || userText || conversationText || query || ""),
+  );
+  // Singular stems so substring matching catches both "sneaker" and "sneakers"
+  // productTypes/category attrs.
+  const rejectedCategoryStems = Array.from(rejectedCategorySet)
+    .map((c) => (c.endsWith("s") ? c.slice(0, -1) : c))
+    .filter((c) => c.length >= 3);
+  const isRejectedCategoryValue = (val) => {
+    const v = String(val || "").toLowerCase().trim();
+    if (!v) return false;
+    return rejectedCategoryStems.some((stem) => v.includes(stem));
+  };
+  // If the LLM lifted the rejected category into filters.category, drop it.
+  if (attrFilters.category && isRejectedCategoryValue(attrFilters.category)) {
+    console.log(`[search] negation override: dropping category=${attrFilters.category} filter — message rejects it`);
+    delete attrFilters.category;
+  }
+
   // Auto-bypass merchant exclusion rule when the AI passed an
   // explicit category filter and that category isn't in the rule's
   // excludeTerms. The exclusion rule was meant to clean up broad
@@ -776,6 +802,12 @@ const searchQuery = detected.gender ? detected.query : q;
   })();
 
   let effectiveCategory = explicitCategoryFilter || inferredCategory;
+  // A rejected category can NEVER be the forced/effective category, no matter
+  // how it got here (explicit filter, inferred from text, or relevance floor).
+  if (effectiveCategory && isRejectedCategoryValue(effectiveCategory)) {
+    console.log(`[search]   dropping effectiveCategory=${effectiveCategory} — message rejects it`);
+    effectiveCategory = "";
+  }
   // Track whether the category is a SOFT inference from the active/outdoor
   // relevance floor (not an explicit/named category). If it is, a later
   // hard-guard that collapses the pool to zero retries WITHOUT it rather than
@@ -788,7 +820,9 @@ const searchQuery = detected.gender ? detected.query : q;
     // floor is suppressed the search ranges over sandals/wedges/loafers/etc.
     if (shouldForceSneakerRelevanceFloor(userIntentText)) {
       const categories = merchantGroups.flatMap((g) => Array.isArray(g?.categories) ? g.categories : []);
-      const sneakerCat = categories.find((c) => /\bsneakers?\b/i.test(String(c || "")));
+      const sneakerCat = categories.find(
+        (c) => /\bsneakers?\b/i.test(String(c || "")) && !isRejectedCategoryValue(c),
+      );
       if (sneakerCat) {
         effectiveCategory = String(sneakerCat).toLowerCase().trim();
         categoryFromRelevanceFloor = true;
@@ -1083,7 +1117,13 @@ const getProductHaystack = (p) => {
   return `${base} ${productAttrs} ${variantAttrs}`;
 };
 
-  const excludeTerms = merchantExclude ? splitCsv(merchantExclude) : [];
+  // Merchant exclusion rule terms PLUS this turn's rejected categories — both
+  // remove matching products from the pool before tiering, so a rejected
+  // category never reaches the cards.
+  const excludeTerms = [
+    ...(merchantExclude ? splitCsv(merchantExclude) : []),
+    ...rejectedCategoryStems,
+  ];
 
 const isExcludedByRule = (p) => {
   if (excludeTerms.length === 0) return false;
