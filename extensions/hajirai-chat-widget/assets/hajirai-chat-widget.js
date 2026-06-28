@@ -4,7 +4,7 @@
 /* Build marker — bump on widget changes so a live deploy can be verified
    in DevTools console. If you don't see this line after `shopify app deploy`
    + hard refresh, the new bundle isn't live (stale checkout or CDN cache). */
-try{console.log('[hajirai-widget] build 2026-06-29 mobile-single-card-thin-ctas');}catch(e){}
+try{console.log('[hajirai-widget] build 2026-06-30 viz-loading-fills-hero');}catch(e){}
 
 /* Visual config comes from theme editor (liquid-injected as window.__AI_CHAT_CONFIG).
    Chat server URL is handled internally via app proxy at /apps/hajirai/chat. */
@@ -829,8 +829,8 @@ function injectVizStyleOnce(){
     '.ai-chat-viz-controls{display:flex;flex-direction:column;gap:10px;min-width:0;justify-content:flex-start}'+
     // Right column + image host both fill the grid-row height so the result card
     // can resolve height:100% against a definite height.
-    '.ai-chat-viz-preview{min-width:0;height:100%}'+
-    '.ai-chat-viz-image{min-width:0;height:100%;min-height:260px;display:flex;flex-direction:column}'+
+    '.ai-chat-viz-preview{min-width:0;width:100%;height:100%}'+
+    '.ai-chat-viz-image{min-width:0;width:100%;height:100%;min-height:260px;display:flex;flex-direction:column}'+
     // Compact product card — small reference content, NOT the hero. Vertical
     // block: image on top, info below. Image is a short fixed band so a tall
     // product photo can't blow the card up.
@@ -861,7 +861,10 @@ function injectVizStyleOnce(){
     '.ai-chat-viz-opt[disabled]{opacity:.5!important;pointer-events:none!important;cursor:default!important}'+
     // Lightweight loading: a STATIC soft fill (no full-card shimmer repaint loop
     // that pegged the main thread / froze the page) plus one small spinner.
-    '.ai-chat-viz-loading-fill{position:relative;flex:1 1 auto;min-height:200px;overflow:hidden;background:#f4f4f5}'+
+    // The loading fill is the SAME box as the final image wrapper — full width
+    // and grows to fill the card — so the loading state and the finished image
+    // occupy an identical footprint (no narrow/short loading block).
+    '.ai-chat-viz-loading-fill{position:relative;flex:1 1 auto;width:100%;min-height:200px;overflow:hidden;background:#f4f4f5}'+
     '.ai-chat-viz-spin{width:16px;height:16px;border:2px solid var(--ai-chat-primary,#2d6b4f);border-top-color:transparent;border-radius:50%;display:inline-block;animation:aiChatVizSpin .8s linear infinite;flex:none}'+
     // Respect reduced-motion: stop the spinner from animating at all.
     '@media (prefers-reduced-motion:reduce){.ai-chat-viz-spin{animation:none!important}}'+
