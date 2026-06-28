@@ -121,8 +121,31 @@ test("expanded wrapper uses align-items:flex-start (card never stretches to imag
 test("the product card is MOVED into the left controls column (natural height)", () => {
   const run = fnBody("runVisualize");
   assert.match(run, /leftCol\.appendChild\(card\)/, "card moved into the left column");
-  // Card width pinned to the column, not stretched to the image.
-  assert.match(run, /card\.style\.alignSelf='flex-start'/, "card aligns to top, no vertical stretch");
+  assert.match(run, /resetCardForExpanded\(card\)/, "card is reset to a clean compact card");
+});
+
+test("the card is fully inline-reset so showcase/carousel CSS can't bloat it", () => {
+  const reset = fnBody("resetCardForExpanded");
+  // Natural height, not stretched: column flow, flex:0 0 auto, align top.
+  assert.match(reset, /flex:0 0 auto/, "card takes its natural height");
+  assert.match(reset, /flex-direction:column/, "image-on-top vertical card");
+  assert.match(reset, /align-self:flex-start/, "no vertical stretch");
+  assert.match(reset, /width:100%/, "fills the (capped) left column, not wider");
+  // The product image is re-pinned (escaping the showcase 160px/3.3-card rules).
+  assert.match(reset, /aspect-ratio:1\/1/, "square product image");
+  // View product stays a visible primary button out of showcase scope.
+  assert.match(reset, /ai-chat-product-cta/, "View product CTA re-styled");
+  assert.match(reset, /background:#000/, "View product stays the black primary button");
+});
+
+test("the expanded layout is anchored OUTSIDE the products carousel container", () => {
+  const run = fnBody("runVisualize");
+  assert.match(run, /closest\('\.ai-chat-products-wrap'\)/, "escapes the showcase scroll/scope");
+  assert.match(run, /insertBefore\(host,anchor\.nextSibling\)/, "wrapper placed after the products container");
+  // Left column is capped so two columns can sit side by side on desktop.
+  assert.match(run, /max-width:320px/, "left controls column is width-capped");
+  // The emptied products container is hidden so no blank gap remains.
+  assert.match(run, /\.style\.display='none'/, "empty products container hidden");
 });
 
 test("layout stacks cleanly on mobile (flex-wrap) with no horizontal overflow", () => {
