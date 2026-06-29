@@ -87,16 +87,19 @@ export function askedConstraintLabel({ reqColor, askedSize, askedWidth, inherite
 
 // When a width/size availability follow-up ("what about wide widths?") matches
 // NONE of the prior styles, we don't dead-end with zero cards — we search for
-// alternatives that DO offer it. This is the honest framing line for that
-// fallback. `label` is the asked width/size phrasing (e.g. "wide", "size 9");
-// returns null when there are no alternatives to show (keep the plain "I'm not
-// seeing those" text). Live trace 2026-06-30.
+// alternatives that DO offer it, and SHOW them. Because cards ARE shown, the
+// wording must be POSITIVE closest-match language, not a denial: a "I'm not
+// seeing those" lead-in next to 3 displayed cards trips denial_with_products and
+// reads as a contradiction (PRD trace 6c4a79d: warnings=denial_with_products on
+// a turn that displayed 3 wide-width cards). `label` is the asked phrasing (e.g.
+// "wide width", "size 9"); returns null when there are no alternatives to show
+// (the caller keeps its own honest no-match text).
 export function buildWidthSizeFallbackText(label, count) {
   if (!count || count < 1) return null;
-  const what = String(label || "that width").trim();
+  const what = String(label || "that direction").trim();
   return count === 1
-    ? `I don't see those exact styles in ${what}, but here's a ${what} option you might like.`
-    : `I don't see those exact styles in ${what}, but here are ${what} options you might like.`;
+    ? `I found a ${what} option that fits this direction. This is the closest match.`
+    : `I found a few ${what} options that fit this direction. These are the closest matches.`;
 }
 
 // INVARIANT: on a prior_evidence_availability turn with cards shown, the owner

@@ -26,6 +26,11 @@ import {
   shouldBlockProcessNarration,
   PROCESS_NARRATION_RETRY_INSTRUCTION,
 } from "./sales-voice.js";
+import {
+  containsUnsupportedCompatibilityClaim,
+  hasExplicitOrthoticCompatibleEvidence,
+  buildOrthoticCompatibilityAnswer,
+} from "./compatibility-truth.server.js";
 
 // Token-level family extractor (same as the old guard so behavior
 // matches the working parts of today's pipeline).
@@ -556,6 +561,11 @@ const BLOCKING_KINDS = new Set([
   "false_catalog_denial",
   "false_color_denial",
   "raw_handle_leak",
+  // Compatibility product-truth: an unsupported orthotic↔sandal claim
+  // ("removable footbed", "orthotics drop into sandals") with no explicit
+  // catalog evidence is a safety/factual failure — block and force a rewrite to
+  // the Aetrex-safe answer (closed shoes / built-in-support sandals).
+  "unsupported_compatibility_claim",
   // Answer workflows (availability/comparison/named-product/condition) owe a
   // real answer — a generic "take a look" or stock clarifier is a non-answer
   // and forces a synthesis retry. Scoped to those workflows via the
@@ -935,6 +945,32 @@ export function validateGrounding({ text, pool = [], categoryGenderMap = null, u
         message: PROCESS_NARRATION_RETRY_INSTRUCTION,
       });
     }
+  }
+
+  // COMPATIBILITY PRODUCT-TRUTH (BLOCKING). On a compatibility turn, an
+  // unsupported orthotic↔sandal claim ("removable footbed", "orthotics drop into
+  // sandals", "make room for the orthotic") with NO explicit catalog evidence of
+  // an orthotic-compatible product is a fabricated product fact — reject and
+  // force a rewrite to the Aetrex-safe answer (closed shoes / footwear with
+  // removable insoles; for a sandal, built-in arch support). If the pool DOES
+  // carry explicit removable-footbed/orthotic-compatible evidence, the claim is
+  // allowed (only for that product), so no error.
+  if (
+    workflow === "compatibility" &&
+    containsUnsupportedCompatibilityClaim(text) &&
+    !hasExplicitOrthoticCompatibleEvidence(pool)
+  ) {
+    errors.push({
+      kind: "unsupported_compatibility_claim",
+      claim: firstSentenceOf(text).slice(0, 80),
+      message:
+        "You made an orthotic↔sandal compatibility claim (e.g. a removable footbed, " +
+        "an orthotic dropping into a sandal, or making room for an orthotic) that NO " +
+        "catalog evidence supports. Aetrex orthotics belong in closed shoes or footwear " +
+        "with removable insoles/enough depth — never open sandals — and Aetrex sandals " +
+        "have BUILT-IN arch support, not removable footbeds for orthotics. Rewrite to: \"" +
+        buildOrthoticCompatibilityAnswer() + "\"",
+    });
   }
 
   // Partition: only blocking (safety/factual) errors fail validation and

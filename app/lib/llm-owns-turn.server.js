@@ -392,6 +392,20 @@ export async function runWithGroundingRetry({
         validation: { ok: true, errors: [], attempts: attempt + 1, availabilityTerminal: true },
       };
     }
+    // Compatibility product-truth owns the answer deterministically (the
+    // Aetrex-safe orthotic↔sandal line). The model didn't write it, so the
+    // validator must not "correct" it back into the unsupported claim — terminal.
+    if (result?.answerOwner === "compatibility-truth") {
+      console.log(`[grounding-retry] compatibility-truth owns the answer — terminal, no retry`);
+      if (typeof onAttempt === "function") {
+        onAttempt({ attempt, validation: { ok: true, errors: [], warnings: [] }, textLen: text.length, poolSize: pool.length });
+      }
+      return {
+        ...applyLengthCap(result, [], planWorkflow),
+        totalUsage: { ...accUsage },
+        validation: { ok: true, errors: [], attempts: attempt + 1, compatibilityTerminal: true },
+      };
+    }
     const validation = validateGrounding({
       text,
       pool,

@@ -112,6 +112,7 @@ import {
   familyFromQuery,
 } from "../lib/emit-finalize.server";
 import { detectConversationGoal, ANCHOR_GOALS, isBroadGenderRequest, broadGenderRequestGender } from "../lib/turn-intent.server";
+import { isOrthoticSandalCompatibilityQuestion, buildOrthoticCompatibilityAnswer, hasExplicitOrthoticCompatibleEvidence, isUnsafeCompatibilitySuggestion, SAFE_COMPATIBILITY_SUGGESTIONS } from "../lib/compatibility-truth.server";
 import { buildVisualizeCtaEvent } from "../lib/visualize-cta.server";
 import prisma from "../db.server";
 import { recordChatUsage, getTodayMessageCount } from "../models/ChatUsage.server";
@@ -3121,7 +3122,31 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   // Compatibility: pin ONLY the named product's card (if shown at all). Never
   // surface random orthotic products — the answer is text from product +
   // orthotic knowledge.
-  if (ctx.turnPlan?.workflow === "compatibility" && !availabilityPinnedCards && !comparisonPinnedCards && !evidencePinnedCards && !rewriteOnlyRetry) {
+  // PRODUCT-TRUTH GUARD (workflow-agnostic). "Can I wear orthotics inside
+  // sandals, or do I need closed shoes?" routes to compatibility; "do any
+  // sandals have removable footbeds for orthotics?" routes to clarification —
+  // but Aetrex product truth doesn't depend on the workflow label. Whenever an
+  // orthotic↔sandal compatibility question is asked and the pool has NO explicit
+  // orthotic-compatible/removable-footbed evidence, OWN the wording: orthotics go
+  // in CLOSED shoes / footwear with removable insoles, never open sandals; for a
+  // sandal, point to built-in arch support. If the pool DOES carry explicit
+  // evidence for a specific product, defer to the LLM (it may speak to that
+  // product). Skip when a stronger deterministic owner already pinned cards.
+  if (
+    isOrthoticSandalCompatibilityQuestion(ctx.latestUserMessage || "") &&
+    !availabilityPinnedCards && !comparisonPinnedCards && !evidencePinnedCards && !priorEvidencePinnedCards &&
+    !rewriteOnlyRetry
+  ) {
+    const compatPool = [...(Array.isArray(pool) ? pool : []), ...Array.from(allProductPool.values())];
+    if (!hasExplicitOrthoticCompatibleEvidence(compatPool)) {
+      fullResponseText = buildOrthoticCompatibilityAnswer();
+      answerOwner = "compatibility-truth";
+      evidencePinnedCards = [];
+      console.log(`[compatibility-truth] orthotic↔sandal question (workflow=${ctx.turnPlan?.workflow || "-"}) — deterministic Aetrex-safe answer, cards=0`);
+    }
+  }
+
+  if (ctx.turnPlan?.workflow === "compatibility" && answerOwner !== "compatibility-truth" && !availabilityPinnedCards && !comparisonPinnedCards && !evidencePinnedCards && !rewriteOnlyRetry) {
     try {
       const fams = Array.isArray(ctx.turnPlan.namedFamilies) ? ctx.turnPlan.namedFamilies : [];
       if (fams.length > 0) {
@@ -4514,6 +4539,10 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     // denial_with_products so it doesn't burn retries (#4, live QA 2026-06-30).
     availabilityResult: availabilityVerdictResult,
     availabilityReason: availabilityVerdictReason,
+    // Lets the contract exempt prior-evidence closest-match cards from
+    // denial_with_products and flag unsupported compatibility claims.
+    workflow: ctx?.turnPlan?.workflow,
+    cardOwner: resolvedCardOwner,
   });
   if (turnWarnings.length > 0) {
     console.log(
@@ -5734,6 +5763,17 @@ async function handleChatPost({ shop, sessionAccessToken, request, internal = fa
           const emitFollowUpSuggestions = async ({ lastText, recommenderInvoked, cardsCount = 0 }) => {
             const hasChoiceButtons = /<<[^<>]+>>/.test(lastText);
             if (config.showFollowUps === false || hasChoiceButtons || recommenderInvoked) return null;
+            // Orthotic↔sandal compatibility class: emit DETERMINISTIC Aetrex-safe
+            // follow-ups and skip the LLM roundtrip. The model otherwise proposes
+            // "Show me sandals with removable footbeds", which the catalog can't
+            // satisfy (dropped later as catalog_intersection_empty) — leaving the
+            // customer with no next step. Offer supportive sandals / closed-shoe
+            // orthotics / shoes-vs-orthotics instead.
+            if (isOrthoticSandalCompatibilityQuestion(String(body.message || ""))) {
+              controller.enqueue(encoder.encode(sseChunk({ type: "suggestions", questions: SAFE_COMPATIBILITY_SUGGESTIONS.slice(0, 3) })));
+              console.log(`[chat] ${ctx.shop} compatibility-truth: emitted ${SAFE_COMPATIBILITY_SUGGESTIONS.length} safe follow-up(s) (no removable-footbed sandal)`);
+              return null;
+            }
             // Cost gate: when the reply attached product cards, the cards
             // ARE the customer's next move — text suggestions duplicate
             // them and add a Haiku roundtrip. When the reply is very
@@ -5790,6 +5830,13 @@ async function handleChatPost({ shop, sessionAccessToken, request, internal = fa
                 for (const q of questions) {
                   if (suggestionContradictsGender(q, establishedGender)) {
                     dropped.push({ q, reason: `gender contradicts established=${establishedGender}` });
+                    continue;
+                  }
+                  // Never suggest an orthotic-compatible / removable-footbed
+                  // sandal — the catalog can't satisfy it (drop by intent, not
+                  // incidentally via catalog_intersection_empty).
+                  if (isUnsafeCompatibilitySuggestion(q)) {
+                    dropped.push({ q, reason: "unsupported_compatibility_suggestion" });
                     continue;
                   }
                   // Single code-owned answerability gate: never suggest a

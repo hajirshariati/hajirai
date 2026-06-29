@@ -18,6 +18,10 @@ import {
   normalizeVariantSize,
   normalizeVariantWidth,
 } from "./variant-matcher.server.js";
+import {
+  containsUnsupportedCompatibilityClaim,
+  hasExplicitOrthoticCompatibleEvidence,
+} from "./compatibility-truth.server.js";
 
 // Customer question shapes where the LLM was actively answering a
 // meta question about the products (reviews, ratings, returns, fit,
@@ -2707,10 +2711,29 @@ export function validateTurnResult(result = {}) {
     });
   }
 
-  if (products.length > 0 && !availabilityPartial && detectAiNoMatchPhrasing(text)) {
+  // A prior-evidence broaden SHOWS closest-match alternates with positive
+  // wording ("I found a few wide-width options…"). Its deterministic text is
+  // never a denial, so a cards-shown prior-evidence turn must not trip
+  // denial_with_products (PRD trace 6c4a79d flagged it while displaying 3 cards).
+  const priorEvidenceCardsShown = result.cardOwner === "prior-evidence" && products.length > 0;
+  if (products.length > 0 && !availabilityPartial && !priorEvidenceCardsShown && detectAiNoMatchPhrasing(text)) {
     warnings.push({
       code: "denial_with_products",
       message: "Text contains no-match wording while product cards are attached.",
+    });
+  }
+
+  // Compatibility product-truth: an orthotic↔sandal claim with no explicit
+  // catalog evidence is unsupported (the grounding validator blocks + rewrites
+  // it; this is the contract-level mirror for observability/tests).
+  if (
+    result.workflow === "compatibility" &&
+    containsUnsupportedCompatibilityClaim(text) &&
+    !hasExplicitOrthoticCompatibleEvidence(products)
+  ) {
+    warnings.push({
+      code: "unsupported_compatibility_claim",
+      message: "Compatibility reply asserts an orthotic↔sandal claim with no catalog evidence.",
     });
   }
 

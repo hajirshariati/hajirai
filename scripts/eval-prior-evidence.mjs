@@ -24,17 +24,19 @@ function check(name, fn) {
 const familyOf = (title) => String(title || "").toLowerCase().split(/[^a-z0-9]+/).filter(Boolean)[0] || "";
 
 // ── width/size fallback (P4): no exact prior match → offer alternatives ──
-check("buildWidthSizeFallbackText: frames wide alternatives, null when none", () => {
+check("buildWidthSizeFallbackText: POSITIVE closest-match framing (cards are shown), null when none", () => {
+  // Cards ARE displayed, so the wording must be positive closest-match — never a
+  // denial lead-in that trips denial_with_products next to 3 visible cards.
   assert.equal(
     buildWidthSizeFallbackText("wide", 3),
-    "I don't see those exact styles in wide, but here are wide options you might like.",
+    "I found a few wide options that fit this direction. These are the closest matches.",
   );
   assert.equal(
     buildWidthSizeFallbackText("wide", 1),
-    "I don't see those exact styles in wide, but here's a wide option you might like.",
+    "I found a wide option that fits this direction. This is the closest match.",
   );
-  assert.equal(buildWidthSizeFallbackText("size 9", 2), "I don't see those exact styles in size 9, but here are size 9 options you might like.");
-  // No alternatives found → null (keep the honest "I'm not seeing those" text).
+  assert.equal(buildWidthSizeFallbackText("size 9", 2), "I found a few size 9 options that fit this direction. These are the closest matches.");
+  // No alternatives found → null (caller keeps its own honest no-match text).
   assert.equal(buildWidthSizeFallbackText("wide", 0), null);
 });
 
