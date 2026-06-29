@@ -96,6 +96,30 @@ check("Jillian in pink → AVAILABLE soft-color, matchedColor=rose", () => {
 check("Jillian in black (color only, in stock) → AVAILABLE", () => {
   assert.equal(classify("jillian", "black").result, R.AVAILABLE);
 });
+// ── audit #1: a color that is only a SUBSTRING of the style name must NOT
+// read as available ("tan" ⊂ Titan, "rose" ⊂ Primrose, "red" ⊂ Mildred).
+const TITAN = { handle: "titan", title: "Titan Comfort Sandal", variants: [variant(8, "Black", 5)] };
+const PRIMROSE = { handle: "primrose", title: "Primrose Ballet Flat", variants: [variant(8, "Black", 5)] };
+const MILDRED = { handle: "mildred", title: "Mildred Loafer", variants: [variant(8, "Black", 5)] };
+check("Titan in 'tan' (substring of style name) → NOT a false 'Yes, available'", () => {
+  const v = classifyAvailability({ products: [TITAN], family: "titan", color: "tan" });
+  assert.notEqual(v.result, R.AVAILABLE, "must not be AVAILABLE");
+  assert.doesNotMatch(buildAvailabilityAnswer(v), /\bYes\b/i, "no affirmative 'Yes — available in Tan'");
+});
+check("Primrose in 'rose' (substring of style name) → NOT a false 'Yes, available'", () => {
+  const v = classifyAvailability({ products: [PRIMROSE], family: "primrose", color: "rose" });
+  assert.notEqual(v.result, R.AVAILABLE);
+  assert.doesNotMatch(buildAvailabilityAnswer(v), /\bYes\b/i);
+});
+check("Mildred in 'red' (substring of style name) → NOT a false 'Yes, available'", () => {
+  const v = classifyAvailability({ products: [MILDRED], family: "mildred", color: "red" });
+  assert.notEqual(v.result, R.AVAILABLE);
+  assert.doesNotMatch(buildAvailabilityAnswer(v), /\bYes\b/i);
+});
+check("ROMY '- Tan' suffix still legitimately matches Tan (word boundary kept)", () => {
+  // The dash-suffix color is a real word-boundary match — must STILL work.
+  assert.equal(classify("romy", "tan").result, R.AVAILABLE);
+});
 // ── #1 Aetrex size labels: "7 US" and ranges parse + match ──
 check("Savannah champagne size 7 (label '7 US') → AVAILABLE", () => {
   assert.equal(classify("savannah", "champagne", "7").result, R.AVAILABLE);

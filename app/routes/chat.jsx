@@ -5,7 +5,7 @@ import { getAttributeMappings } from "../models/AttributeMapping.server";
 import { getCatalogCategories, getAllCatalogCategories, getCategoryGenderAvailability, getCategoryAttributeCoverage } from "../models/Product.server";
 import { getActiveCampaigns, formatCampaignsForCS } from "../models/Campaign.server";
 import { buildSystemPrompt } from "../lib/chat-prompt.server";
-import { planTurn, buildTurnPlanPromptBlock, buildPlanClarifierRepair, planForcesProductDisplay, planRequiresSearch as planRequiresSearchFlag, clarifierGateDecision, isAnswerWorkflow, plannedWorkflowCardOwnerViolation, plannedSearchSkippedViolation } from "../lib/turn-plan.server";
+import { planTurn, buildTurnPlanPromptBlock, buildPlanClarifierRepair, planForcesProductDisplay, planRequiresSearch as planRequiresSearchFlag, clarifierGateDecision, isAnswerWorkflow, plannedWorkflowCardOwnerViolation, plannedSearchSkippedViolation, cardsNotInEvidencePool } from "../lib/turn-plan.server";
 import { classifyAvailability, buildAvailabilityAnswer, AVAILABILITY_RESULT, resolveAvailabilityRequest, isAvailabilityFollowUp, familyOfTitle, collectFamilyColors, constraintIntent, parseAvailabilityConstraints, parseRequestedColors, priorAvailabilityMessage, priorAvailabilityConstraints, variantDataDiagnostics, styleKeyOfTitle, styleNameOfTitle } from "../lib/availability-truth";
 import { detectSupportHandoffNeed, buildSupportHandoffText, supportConfigured, normalizedSupportLabel, supportChatLabel } from "../lib/support-handoff";
 import { extractConstraintPlan, cardMatchesSlotCategory, multiRecoTextCardMismatch } from "../lib/constraint-plan";
@@ -2883,7 +2883,15 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
         const best = (cards || []).find(
           (c) => c?.handle && !seenHandles.has(c.handle) && cardMatchesSlotCategory(c, slot.category),
         );
-        if (best) { picked.push(best); pickedPairs.push({ card: best, category: slot.category }); seenHandles.add(best.handle); }
+        if (best) {
+          picked.push(best); pickedPairs.push({ card: best, category: slot.category }); seenHandles.add(best.handle);
+          // Seed the pinned slot card into the evidence pool (mirrors the
+          // comparison/prior-evidence blocks). Without this the grounding
+          // validator flags the LLM naming a pinned card as ungrounded and burns
+          // the whole retry budget on a card we deliberately chose (audit #4).
+          const poolKey = String(best.handle || best.title || "").toLowerCase();
+          if (poolKey && !allProductPool.has(poolKey)) allProductPool.set(poolKey, best);
+        }
         const rejected = (cards || []).length - (cards || []).filter((c) => cardMatchesSlotCategory(c, slot.category)).length;
         console.log(`[evidence-plan] slot=${slot.category} query="${slot.query}" → ${cards?.length || 0} hit(s), ${rejected} off-category skipped, picked=${best ? best.handle : "-"}`);
       }
@@ -4027,6 +4035,28 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
         `[turn-invariant] VIOLATION multi_recommendation text promises both footwear+orthotics ` +
         `but finalCards are not one-of-each (finalCards=${finalCount})`,
       );
+    }
+    // INVARIANT (audit #6): every SHOWN card must be in the evidence pool. The
+    // scorer picks FROM the pool, so a scorer-owned card outside it is a leak
+    // (injection or cleanup-resurrection). Deterministic owners (availability/
+    // comparison/evidence-plan/prior-evidence) are authoritative by construction
+    // — they have their own count/owner/family invariants above — so we only
+    // assert membership (and repair) on scorer-owned turns to avoid dropping a
+    // legitimately-pinned card. REPAIR: drop the stray card rather than ship a
+    // product we can't ground.
+    if (cardOwner === "scorer" && finalCount > 0) {
+      const stray = cardsNotInEvidencePool({
+        finalCards: finalProductCards,
+        evidencePool: Array.from(allProductPool.values()),
+      });
+      if (stray.length > 0) {
+        const strayKeys = new Set(stray.map((c) => c?.handle || c?.title));
+        console.warn(
+          `[turn-invariant] VIOLATION ${stray.length} scorer card(s) not in evidence pool ` +
+          `[${stray.map((c) => c?.handle || c?.title).join(",")}] — dropping (cannot ground)`,
+        );
+        finalProductCards = finalProductCards.filter((c) => !strayKeys.has(c?.handle || c?.title));
+      }
     }
   }
 

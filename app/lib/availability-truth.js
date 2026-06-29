@@ -442,10 +442,20 @@ function productColors(product) {
 function productMatchesColor(product, color) {
   if (!color) return true;
   const want = String(color).toLowerCase().trim();
+  if (!want) return true;
+  // WORD-BOUNDARY ONLY — never a raw substring. A raw `title.includes(want)`
+  // matched colors that are merely a substring of the STYLE NAME ("tan" ⊂
+  // "Titan", "rose" ⊂ "Primrose", "red" ⊂ "Mildred") and falsely answered
+  // "Yes — available in <color>" (audit 2026-06-30, #1). The dash-suffix path in
+  // productColors() can also surface a multi-word segment, so even the
+  // catalog-color loop must use word boundaries, not includes().
+  const wantRe = new RegExp(`\\b${escapeRe(want)}\\b`);
   for (const c of productColors(product)) {
-    if (c === want || c.includes(want) || want.includes(c)) return true;
+    if (c === want) return true;
+    if (wantRe.test(c)) return true;                                  // "dark rose" carries "rose"
+    if (new RegExp(`\\b${escapeRe(c)}\\b`).test(want)) return true;    // requested "light blue" → "blue"
   }
-  return String(product?.title || "").toLowerCase().includes(want);
+  return wantRe.test(String(product?.title || "").toLowerCase());
 }
 
 // Soft color families — a shopper word maps to close catalog colors so we

@@ -23,12 +23,13 @@ import {
   isAnswerWorkflow,
   plannedWorkflowCardOwnerViolation,
   plannedSearchSkippedViolation,
+  cardsNotInEvidencePool,
 } from "../app/lib/turn-plan.server.js";
 import {
   redirectOrthoticSearchToRecommender,
   sanitizeSaleBrowseSearch,
 } from "../app/lib/chat-tool-rewrite.server.js";
-import { resolveTurnScope } from "../app/lib/product-turn-engine.server.js";
+import { resolveTurnScope, detectNegativeAttributeFilter } from "../app/lib/product-turn-engine.server.js";
 
 let passed = 0, failed = 0;
 const failures = [];
@@ -252,6 +253,55 @@ test("invariant: searchRequired + display=show must end with searchAttempted=tru
   // A suppress-display turn (clarification/support) is exempt.
   const clarPlan = planTurn({ message: "hi there" });
   assert.equal(plannedSearchSkippedViolation({ plan: clarPlan, searchAttempted: false }), false, "non-display turn is exempt");
+});
+
+// ── Audit #2: negated color SYNONYMS clear the positive color ──────────
+test("audit#2: 'not maroon'/'not wine'/'not coral' resolve to the canonical family", () => {
+  assert.equal(detectNegativeAttributeFilter("sneakers but not in maroon").color, "burgundy", "maroon → burgundy");
+  assert.equal(detectNegativeAttributeFilter("not wine").color, "burgundy", "wine → burgundy");
+  assert.equal(detectNegativeAttributeFilter("anything but coral").color, "pink", "coral → pink");
+  assert.equal(detectNegativeAttributeFilter("nothing in charcoal").color, "charcoal", "charcoal kept");
+});
+
+test("audit#2: a negated synonym CLEARS the positive color and excludes the family", () => {
+  // Classifier resolved color=burgundy from "maroon"; the negation must clear it.
+  const scope = resolveTurnScope({
+    latestUserMessage: "show me sneakers but not in maroon",
+    sessionMemory: { explicit: { category: "sneakers", color: "burgundy" } },
+    classifiedIntent: { attributes: { category: "sneakers", color: "burgundy" } },
+  });
+  assert.equal(scope.color, null, "positive color cleared (was the rejected family)");
+  assert.equal(scope.excluded?.color, "burgundy", "excluded carries the canonical family");
+});
+
+test("audit#2: negating a DIFFERENT color does not clear an unrelated positive color", () => {
+  const scope = resolveTurnScope({
+    latestUserMessage: "show me black sneakers but not in maroon",
+    classifiedIntent: { attributes: { category: "sneakers", color: "black" } },
+  });
+  assert.equal(scope.color, "black", "black survives — only burgundy is excluded");
+  assert.equal(scope.excluded?.color, "burgundy");
+});
+
+// ── Audit #6: every shown card must be in the evidence pool ────────────
+test("audit#6: cardsNotInEvidencePool flags a stray card, passes pooled cards", () => {
+  const pool = [{ handle: "danika", title: "Danika Sneaker" }, { handle: "kendall", title: "Kendall Sandal" }];
+  assert.equal(cardsNotInEvidencePool({ finalCards: [{ handle: "danika" }], evidencePool: pool }).length, 0, "pooled by handle → clean");
+  assert.equal(cardsNotInEvidencePool({ finalCards: [{ title: "Kendall Sandal" }], evidencePool: pool }).length, 0, "pooled by title → clean");
+  const stray = cardsNotInEvidencePool({ finalCards: [{ handle: "ghost", title: "Ghost Boot" }], evidencePool: pool });
+  assert.equal(stray.length, 1, "card not in pool → flagged");
+  assert.equal(stray[0].handle, "ghost");
+});
+
+test("audit#4/#6: a multi-reco pinned card seeded into the pool is NOT flagged as stray", () => {
+  // #4 seeds the slot's pinned card into the evidence pool; #6 then sees it as
+  // grounded. Simulate: the pinned card IS in the pool → no violation.
+  const pinned = { handle: "l1300u-m", title: "Unisex Thinsoles Orthotics" };
+  const poolWithSeed = [{ handle: "danika", title: "Danika Sneaker" }, pinned];
+  assert.equal(cardsNotInEvidencePool({ finalCards: [pinned], evidencePool: poolWithSeed }).length, 0, "seeded pin is grounded");
+  // Without the #4 seed it WOULD be flagged (the bug we fixed).
+  const poolNoSeed = [{ handle: "danika", title: "Danika Sneaker" }];
+  assert.equal(cardsNotInEvidencePool({ finalCards: [pinned], evidencePool: poolNoSeed }).length, 1, "un-seeded pin would be flagged");
 });
 
 console.log(`\n${failed === 0 ? "✅" : "❌"}  ${passed} passed, ${failed} failed\n`);

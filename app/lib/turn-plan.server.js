@@ -647,6 +647,26 @@ export function plannedWorkflowCardOwnerViolation({ workflow, finalCards = 0, ca
   return PINNED_CARD_WORKFLOWS.has(workflow) && finalCards > 0 && cardOwner === "scorer";
 }
 
+// INVARIANT (audit #6): every product card SHOWN must be a product the turn
+// actually retrieved — i.e. present in the evidence pool. Cleanup may remove a
+// card but must NEVER add an unrelated one; a scorer-injected or cleanup-
+// resurrected card that isn't in the pool is a hallucination risk. Returns the
+// STRAY final cards (those whose handle/title is not in the evidence pool);
+// empty array = clean. Matches on handle first, title as a fallback.
+export function cardsNotInEvidencePool({ finalCards = [], evidencePool = [] } = {}) {
+  const poolKeys = new Set();
+  for (const c of evidencePool || []) {
+    if (c?.handle) poolKeys.add(String(c.handle).toLowerCase());
+    if (c?.title) poolKeys.add(String(c.title).toLowerCase());
+  }
+  if (poolKeys.size === 0) return [];
+  return (finalCards || []).filter((c) => {
+    const h = c?.handle ? String(c.handle).toLowerCase() : "";
+    const t = c?.title ? String(c.title).toLowerCase() : "";
+    return !(h && poolKeys.has(h)) && !(t && poolKeys.has(t));
+  });
+}
+
 // INVARIANT: when TurnPlan requires a search AND requires product display, the
 // turn must not finish without attempting a search — unless the resolved
 // workflow itself became text-only/support (display=suppress). Returns true on

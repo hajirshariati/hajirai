@@ -49,6 +49,7 @@ import {
   compactGroup,
   matchingGroupsForText,
 } from "./category-intent.server.js";
+import { RESOLVER_COLOR_LEX } from "./catalog-resolver.server.js";
 
 // Flag — feature gate for production wiring. Read at engine entry
 // so flipping it at runtime (env update) takes effect without a
@@ -491,7 +492,13 @@ export function resolveTurnScope({ latestUserMessage, messages = [], sessionMemo
   if (negativeMatch) {
     scope.excluded = scope.excluded || {};
     for (const [field, value] of Object.entries(negativeMatch)) {
-      if (scope[field] && String(scope[field]).toLowerCase() === String(value).toLowerCase()) {
+      // For color, compare on the canonical family so a negated SYNONYM clears
+      // the positive constraint ("not maroon" clears color=burgundy).
+      const want = String(value).toLowerCase();
+      const have = field === "color"
+        ? canonicalColor(scope[field])
+        : String(scope[field] || "").toLowerCase();
+      if (scope[field] && have === want) {
         scope[field] = null;
       }
       scope.excluded[field] = value;
@@ -578,8 +585,26 @@ export function resolveTurnScope({ latestUserMessage, messages = [], sessionMemo
 // excluded values, or null when no negation found. The caller clears
 // the positive filter when it equals the excluded value and stores
 // the exclusion so downstream filters can drop matching cards.
-const NEGATIVE_COLOR_RE =
-  /\b(?:not|but\s+not|except|other\s+than|no(?:t)?\s+in|nothing\s+in|but\s+no|anything\s+but)\s+(?:in\s+)?(black|white|brown|navy|blue|red|pink|grey|gray|tan|taupe|silver|gold|cream|ivory|beige|purple|green|orange|yellow|cognac|burgundy|olive|cork|chilli)\b/i;
+// Canonicalize a color word to its family ("maroon"/"wine" → "burgundy",
+// "coral"/"rose" → "pink"), so a negated SYNONYM reconciles with the positive
+// color the classifier stored ("not maroon" must clear color=burgundy). Unknown
+// words fall back to themselves. (audit 2026-06-30, #2)
+function canonicalColor(c) {
+  const k = String(c || "").toLowerCase().trim();
+  return RESOLVER_COLOR_LEX[k] || k;
+}
+// Build the negated-color alternation from the SAME lexicon the positive path
+// uses, so every synonym (maroon/wine/coral/rose/charcoal/sage/…) is recognized
+// — plus a few catalog-only colors the lexicon doesn't carry.
+const NEG_COLOR_EXTRAS = ["beige", "cork", "chilli", "khaki", "blush", "mauve", "plum", "teal"];
+const NEG_COLOR_ALT = Array.from(new Set([...Object.keys(RESOLVER_COLOR_LEX), ...NEG_COLOR_EXTRAS]))
+  .sort((a, b) => b.length - a.length)
+  .map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+  .join("|");
+const NEGATIVE_COLOR_RE = new RegExp(
+  `\\b(?:not|but\\s+not|except|other\\s+than|no(?:t)?\\s+in|nothing\\s+in|but\\s+no|anything\\s+but)\\s+(?:in\\s+)?(${NEG_COLOR_ALT})\\b`,
+  "i",
+);
 const NEGATIVE_GENDER_RE =
   /\b(?:not|but\s+not|except|other\s+than|no)\s+(?:for\s+)?(men|women|kids|girls|boys|men's|women's|kids')\b/i;
 const NEGATIVE_CATEGORY_RE =
@@ -590,7 +615,8 @@ export function detectNegativeAttributeFilter(message) {
   if (!text) return null;
   const out = {};
   const colorMatch = text.match(NEGATIVE_COLOR_RE);
-  if (colorMatch) out.color = colorMatch[1].toLowerCase();
+  // Store the CANONICAL family so it reconciles with the positive color.
+  if (colorMatch) out.color = canonicalColor(colorMatch[1]);
   const genderMatch = text.match(NEGATIVE_GENDER_RE);
   if (genderMatch) out.gender = genderMatch[1].toLowerCase().replace(/'s$/, "");
   const categoryMatch = text.match(NEGATIVE_CATEGORY_RE);

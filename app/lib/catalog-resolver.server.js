@@ -533,7 +533,7 @@ export function buildResolverStatePromptBlock(resolverState) {
 // maps. Returns { gender?, category?, color?, condition?, useCase? }.
 // Intentionally narrow — we only extract things the resolver can
 // validate against the catalog. Anything subtler is left to search.
-const RESOLVER_COLOR_LEX = {
+export const RESOLVER_COLOR_LEX = {
   burgundy: "burgundy", wine: "burgundy", maroon: "burgundy",
   navy: "navy",
   cognac: "cognac", tan: "tan", camel: "tan",
