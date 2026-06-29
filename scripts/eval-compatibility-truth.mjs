@@ -72,14 +72,18 @@ test("2. unsupported-claim phrases caught; safe answer is clean", () => {
   assert.ok(!containsUnsupportedCompatibilityClaim(buildOrthoticCompatibilityAnswer()), "safe answer must be clean");
 });
 
-// 3 ── explicit per-product evidence unlocks the claim ─────────────────────────
-test("3. explicit removable-footbed evidence is recognized per product", () => {
-  const evidenceCard = { title: "Maui Slide", description: "Features a removable footbed that accommodates an orthotic." };
-  const plainCard = { title: "Plain Sandal", description: "A comfortable everyday sandal." };
-  assert.ok(cardAssertsOrthoticCompatibility(evidenceCard));
-  assert.ok(!cardAssertsOrthoticCompatibility(plainCard));
-  assert.ok(hasExplicitOrthoticCompatibleEvidence([plainCard, evidenceCard]));
-  assert.ok(!hasExplicitOrthoticCompatibleEvidence([plainCard]));
+// 3 ── explicit per-SANDAL evidence unlocks the claim; closed shoes never do ────
+test("3. removable-footbed evidence counts only on a SANDAL, never a closed shoe", () => {
+  const sandalEvidence = { title: "Maui Slide", description: "Features a removable footbed that accommodates an orthotic." };
+  const plainSandal = { title: "Jane Sandal", description: "A comfortable everyday sandal." };
+  // The turn-1 regression: a CLOSED shoe whose copy mentions a removable insole
+  // must NOT unlock the sandal claim (orthotics already belong in closed shoes).
+  const closedShoeWithInsole = { title: "Danika Sneaker", category: "Sneakers", description: "Includes a removable insole." };
+  assert.ok(cardAssertsOrthoticCompatibility(sandalEvidence));
+  assert.ok(!cardAssertsOrthoticCompatibility(plainSandal));
+  assert.ok(!cardAssertsOrthoticCompatibility(closedShoeWithInsole), "closed shoe must not count as sandal evidence");
+  assert.ok(hasExplicitOrthoticCompatibleEvidence([plainSandal, sandalEvidence]));
+  assert.ok(!hasExplicitOrthoticCompatibleEvidence([plainSandal, closedShoeWithInsole]), "a pool of closed shoes does not unlock the claim");
 });
 
 // 4 ── grounding validator blocks the claim, allows it only with evidence ──────
@@ -91,13 +95,22 @@ test("4. validateGrounding: compatibility claim blocks w/o evidence, allowed w/ 
   assert.equal(bad.ok, false);
   assert.ok(bad.errors.some((e) => e.kind === "unsupported_compatibility_claim"));
 
-  // The SAME claim is allowed when a specific product carries the evidence.
-  const evidenceCard = { title: "Maui", description: "removable footbed for orthotics" };
+  // The SAME claim is allowed when a specific SANDAL carries the evidence.
+  const evidenceCard = { title: "Maui Sandal", description: "removable footbed for orthotics" };
   const ok = validateGrounding({
     text: "The Maui has a removable footbed that fits an orthotic.",
     pool: [evidenceCard], workflow: "compatibility",
   });
-  assert.equal(ok.ok, true, "claim allowed when product evidence exists");
+  assert.equal(ok.ok, true, "claim allowed when sandal evidence exists");
+
+  // But a pool of CLOSED shoes with removable insoles does NOT unlock it
+  // (the live turn-1 failure: searchRequired pulled closed shoes into the pool).
+  const closedShoes = [{ title: "Danika Sneaker", category: "Sneakers", description: "removable insole" }];
+  const stillBad = validateGrounding({
+    text: "Yes — our sandals have a removable footbed so the orthotic drops right in.",
+    pool: closedShoes, workflow: "compatibility",
+  });
+  assert.equal(stillBad.ok, false, "closed-shoe insole must not license a sandal claim");
 
   // The Aetrex-safe answer always validates.
   const safe = validateGrounding({ text: buildOrthoticCompatibilityAnswer(), pool: [], workflow: "compatibility" });

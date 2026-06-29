@@ -68,10 +68,22 @@ export function containsUnsupportedCompatibilityClaim(text) {
 const COMPAT_EVIDENCE_RE =
   /\b(?:removable\s+foot\s?bed|removable\s+insole|removable\s+cushion|orthotic[-\s]compatible|orthotic[-\s]friendly|accommodates?\s+(?:an?\s+)?orthotics?|fits?\s+(?:an?\s+)?orthotics?|deep(?:er)?\s+(?:heel\s+)?cup\s+for\s+orthotics?|room\s+for\s+orthotics?)\b/i;
 
-// Does this single card explicitly assert orthotic compatibility?
+// Sandal / open-footwear product shape — the claim is specifically about whether
+// a SANDAL takes an orthotic, so only a SANDAL'S evidence is relevant.
+const SANDAL_PRODUCT_RE = /\b(?:sandals?|slides?|flip[-\s]?flops?|open[-\s]?toe[ds]?|thongs?)\b/i;
+
+// Does this single card explicitly assert orthotic compatibility ON A SANDAL?
+// A removable insole on a CLOSED shoe is irrelevant — orthotics already belong in
+// closed shoes; the open question is sandals. So both must hold: the product is a
+// sandal/open shoe AND it carries explicit removable-footbed/orthotic-compatible
+// language. (Live trace 2026-06-29: 6 closed-shoe cards with "removable insole"
+// in their copy wrongly unlocked the LLM's sandal claim.)
 export function cardAssertsOrthoticCompatibility(card) {
   if (!card || typeof card !== "object") return false;
   const tags = Array.isArray(card.tags) ? card.tags.join(" ") : String(card.tags || "");
+  const category = String(card.category || card._category || card.productType || "");
+  const hayShape = [card.title, category, tags].filter(Boolean).join(" ");
+  if (!SANDAL_PRODUCT_RE.test(hayShape)) return false;
   let facts = "";
   try { facts = JSON.stringify(card._variantFacts || card.variantFacts || {}); } catch { facts = ""; }
   const hay = [card.title, card.description, card._description, card.body_html, tags, facts]
