@@ -52,7 +52,7 @@ import { buildRecommenderTools } from "../lib/recommender-tools.server";
 import { maybeRunOrthoticFlow, isOrthoticHostileReply, isOrthoticConfusionReply } from "../lib/orthotic-flow-gate.server";
 import { classifyOrthoticTurn, shouldRunOrthoticClassifier } from "../lib/orthotic-classifier.server";
 import { resolveCatalogTurn, buildResolverStatePromptBlock, extractUserConstraints, detectSpecificProduct, mentionsCatalogProductFamily, extractCatalogProductFamilies } from "../lib/catalog-resolver.server";
-import { getCatalogFacetIndex } from "../lib/catalog-facts.server";
+import { getCatalogFacetIndex, normalizeGender } from "../lib/catalog-facts.server";
 import { catalogScopedNavigationQuestionVerdict, umbrellaCategoryTermsFromGroups } from "../lib/catalog-matcher.server";
 import { buildSessionMemory, detectClarifyingQuestionType, memorySummary, buildSessionMemoryPromptBlock } from "../lib/session-memory.server";
 import {
@@ -2501,6 +2501,10 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   // black?"). Like the other pins it wins over the scorer — the cards are a
   // subset/remap of the prior displayed families, never random alternates.
   let priorEvidencePinnedCards = null;
+  // True once a prior_evidence_availability search (per-family or the broaden
+  // fallback) actually returned gender-correct products. Used by the turn
+  // invariant: search-found + show_availability must not finish with zero cards.
+  let priorEvidenceSearchFound = false;
   // Deterministic concise fallback text built from the pinned evidence cards.
   // When the LLM's phrasing for a multi_recommendation turn can't pass the
   // grounding validator (typically `too_long` after rewrite-only retries), the
@@ -2682,45 +2686,93 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
         }
         fullResponseText = buildPriorEvidenceAvailabilityText(items, askedLabel, Boolean(reqColor));
 
-        // WIDTH/SIZE FALLBACK. None of the prior styles offers the requested
-        // width/size — don't dead-end with zero-card ambiguity. Search for
-        // alternatives that DO offer it, verify each against variant truth, and
-        // show up to 3 (live trace 2026-06-30: "What about wide widths?" ended
-        // with zero cards). If nothing confirms, keep the honest "not seeing
-        // those" text and no cards.
+        // BROADEN FALLBACK. None of the prior styles offers the requested
+        // constraint (width / size / color / a feature like waterproof) — don't
+        // dead-end with zero-card ambiguity. Search for alternatives that DO
+        // offer it WITHIN the established gender, and show up to 3 (live trace
+        // 2026-06-30: "What about wide widths?" found 8 women's wide products yet
+        // ended with zero cards because the per-family variant re-confirm rejected
+        // all of them). Two safety rules: (a) never fail open to the opposite
+        // gender — every candidate is gender-guarded; (b) if the strict variant
+        // re-confirm rejects everything but the gender-filtered search DID return
+        // real products, trust the search (it already applied the constraint) and
+        // show those rather than finishing at zero.
         const noPriorMatch = !items.some((it) => it.ok);
-        if (noPriorMatch && (reqWidth || reqSize) && !reqColor) {
+        const featureKw = (latestMsg.match(/\b(waterproof|water[-\s]?resistant|slip[-\s]?resistant|leather|suede|memory\s+foam|machine\s+washable|vegan)\b/i) || [])[0] || null;
+        if (noPriorMatch && (reqWidth || reqSize || reqColor || featureKw)) {
           try {
-            const label = reqWidth ? String(reqWidth) : `size ${reqSize}`;
+            // Establish the gender for the broaden so we never fail open. Prefer
+            // the session gender, then a men/women TurnPlan gender, then the prior
+            // displayed cards' gender when they unanimously agree.
+            const priorGenders = Array.from(new Set(
+              priorCards.map((c) => normalizeGender(c?._gender || c?.gender)).filter((g) => g === "men" || g === "women" || g === "kids"),
+            ));
+            const fbGender = ctx.sessionGender
+              || (ctx.turnPlan?.gender === "men" || ctx.turnPlan?.gender === "women" ? ctx.turnPlan.gender : null)
+              || (priorGenders.length === 1 ? priorGenders[0] : null);
+            const cardGenderOk = (c) => {
+              if (!fbGender) return true;            // no established gender — don't over-filter
+              const g = normalizeGender(c?._gender || c?.gender);
+              return !g || g === "unisex" || g === fbGender; // drop ONLY the opposite gender
+            };
+
+            const label = reqWidth ? "wide width" : reqSize ? `size ${reqSize}` : reqColor ? String(reqColor) : String(featureKw).toLowerCase();
+            const constraintTerm = reqWidth ? "wide width" : reqSize ? `size ${reqSize}` : reqColor || String(featureKw);
             const priorCats = Array.from(new Set(
               priorCards.map((c) => String(c?._category || c?.category || "").toLowerCase()).filter(Boolean),
             ));
             const altFilters = {};
-            if (ctx.sessionGender) altFilters.gender = ctx.sessionGender;
+            if (fbGender && fbGender !== "kids") altFilters.gender = fbGender;
             if (priorCats.length === 1) altFilters.category = priorCats[0];
-            const altQuery = [reqWidth ? "wide width" : `size ${reqSize}`, priorCats[0] || "shoes"].filter(Boolean).join(" ");
-            const altCands = extractProductCards("search_products", await dispatchTool("search_products", { query: altQuery, filters: altFilters, limit: 8 }, ctx), ctx);
+            if (reqColor) altFilters.color = reqColor;
+            const altQuery = [constraintTerm, priorCats[0] || "shoes"].filter(Boolean).join(" ");
+            const altCandsRaw = extractProductCards("search_products", await dispatchTool("search_products", { query: altQuery, filters: altFilters, limit: 8 }, ctx), ctx);
+            // Gender guard FIRST — never let an opposite-gender product through.
+            const altCands = (altCandsRaw || []).filter(cardGenderOk);
+            if (altCands.length > 0) priorEvidenceSearchFound = true;
+
+            // Strict pass: confirm the constraint against variant truth where we
+            // can (width/size/color). Feature asks (waterproof) have no variant
+            // facts to check, so trust the search keyword match.
             const confirmed = [];
-            for (const c of (altCands || [])) {
+            for (const c of altCands) {
               const key = String(c.handle || c.title || "").toLowerCase();
               if (!key || seenHandles.has(key)) continue;
-              const fam = titleStyleFamily(c.title || "").toLowerCase();
-              if (!fam) continue;
-              const fps = await prisma.product.findMany({
-                where: { shop: ctx.shop, NOT: { status: { in: ["DRAFT", "ARCHIVED"] } }, title: { contains: fam, mode: "insensitive" } },
-                include: { variants: true }, take: 20,
-              });
-              const v = classifyAvailability({ products: fps, family: fam, size: reqSize, width: reqWidth });
-              if (v.result === AVAILABILITY_RESULT.AVAILABLE) { confirmed.push(c); if (confirmed.length >= 3) break; }
+              if (reqWidth || reqSize || reqColor) {
+                const fam = titleStyleFamily(c.title || "").toLowerCase();
+                if (!fam) continue;
+                const fps = await prisma.product.findMany({
+                  where: { shop: ctx.shop, NOT: { status: { in: ["DRAFT", "ARCHIVED"] } }, title: { contains: fam, mode: "insensitive" } },
+                  include: { variants: true }, take: 20,
+                });
+                const v = classifyAvailability({ products: fps, family: fam, size: reqSize, width: reqWidth, color: reqColor || null });
+                if (v.result === AVAILABILITY_RESULT.AVAILABLE) { confirmed.push(c); if (confirmed.length >= 3) break; }
+              } else {
+                confirmed.push(c); if (confirmed.length >= 3) break;
+              }
             }
-            const fallbackText = buildWidthSizeFallbackText(label, confirmed.length);
-            if (fallbackText) {
-              for (const c of confirmed) pushCard(c);
+
+            // SAFE BROADEN: the strict re-confirm rejected everything, but the
+            // gender-filtered search returned real products. The search already
+            // applied gender + the constraint, so show those instead of zero.
+            let shown = confirmed;
+            if (shown.length === 0 && altCands.length > 0) {
+              shown = altCands
+                .filter((c) => { const k = String(c.handle || c.title || "").toLowerCase(); return k && !seenHandles.has(k); })
+                .slice(0, 3);
+              if (shown.length > 0) console.log(`[prior-evidence] ${label} safe-broaden: variant re-confirm matched 0, showing ${shown.length} gender-guarded search result(s) (gender=${fbGender || "-"})`);
+            }
+
+            const fallbackText = buildWidthSizeFallbackText(label, shown.length);
+            if (fallbackText && shown.length > 0) {
+              for (const c of shown) pushCard(c);
               fullResponseText = fallbackText;
-              console.log(`[prior-evidence] ${label} fallback: showing ${confirmed.length} confirmed alternative(s)`);
+              console.log(`[prior-evidence] ${label} fallback: showing ${shown.length} alternative(s) (gender=${fbGender || "-"})`);
+            } else {
+              console.log(`[prior-evidence] ${label} fallback: no gender-correct alternatives found (gender=${fbGender || "-"}) — honest no-match text, no cards`);
             }
           } catch (fbErr) {
-            console.warn("[prior-evidence] width/size fallback failed (non-fatal):", fbErr?.message || fbErr);
+            console.warn("[prior-evidence] broaden fallback failed (non-fatal):", fbErr?.message || fbErr);
           }
         }
       }
@@ -4327,6 +4379,15 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       });
       if (strayCard) {
         recordTurnInvariantViolation("prior_evidence_stray_card", { card: strayCard.title, priorFamilies: [...priorFams] });
+      }
+      // ZERO-CARD CONVERSION (#4): a broad availability follow-up ("what about
+      // wide widths?", "do those come in black?", "any waterproof?") whose
+      // broaden search DID return gender-correct products must convert them into
+      // cards. Search-found + show_availability + finalCards=0 means the owner
+      // found evidence but failed to display it (live trace 2026-06-30:
+      // filtered=8 → finalCards=0).
+      if (priorEvidenceSearchFound && planForcesProductDisplay(ctx?.turnPlan) && finalCount === 0) {
+        recordTurnInvariantViolation("prior_evidence_zero_cards", { workflow, searchFound: true });
       }
     }
     // GENERALIZED INVARIANT (#4): any TurnPlan-pinned workflow that ships cards

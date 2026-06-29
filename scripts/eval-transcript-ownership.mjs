@@ -19,6 +19,8 @@ import { fileURLToPath } from "node:url";
 import { planTurn, planForcesProductDisplay } from "../app/lib/turn-plan.server.js";
 import { maybeRunOrthoticFlow } from "../app/lib/orthotic-flow-gate.server.js";
 import { resolveTurnIntent, isBroadGenderRequest, broadGenderRequestGender } from "../app/lib/turn-intent.server.js";
+import { parseAvailabilityConstraints } from "../app/lib/availability-truth.js";
+import { normalizeGender } from "../app/lib/catalog-facts.server.js";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const orthoticTree = { intent: "orthotic", definition: JSON.parse(readFileSync(resolve(here, "seeds/aetrex-orthotic-tree.json"), "utf8")) };
@@ -178,6 +180,38 @@ await turn("CHAIN(curly): 'Show me men’s options' detected + stale dropped", (
   for (const k of ["category", "color", "width", "condition"]) {
     assert.ok(intent.staleKeysToDrop.includes(k), `curly: intent must drop ${k}; got ${JSON.stringify(intent.staleKeysToDrop)}`);
   }
+});
+
+// ── Prior-evidence wide-width follow-up (the zero-card-conversion bug) ────────
+// "I need shoes for standing at work all day, but I don't want sneakers." then
+// "What about wide widths?". The follow-up applies a wide-width constraint to
+// the SET just shown → prior_evidence_availability. PRD trace: the broaden search
+// found 8 women's wide products yet finished finalCards=0 (per-family re-confirm
+// rejected all). The contract: stay in the customer's gender (no men fail-open),
+// detect the width, and route to the deterministic owner that converts the
+// search hits into cards.
+await turn("PE: 'standing all day, no sneakers' → condition_reco, cards", () => {
+  plan({ message: "I need shoes for standing at work all day, but I don't want sneakers" },
+    { wf: "condition_recommendation", search: true, cards: true });
+});
+
+await turn("PE: 'What about wide widths?' → prior_evidence_availability, gender stays women", () => {
+  // chat.jsx threads prior families + the established women gender into planTurn.
+  const p = planTurn({
+    message: "What about wide widths?",
+    hasPriorCards: true,
+    priorCardFamilies: ["Reagan", "Sandra", "Maui"],
+    attrs: { gender: "women" },
+  });
+  assert.equal(p.workflow, "prior_evidence_availability", `expected prior_evidence_availability, got ${p.workflow}`);
+  assert.equal(p.productDisplayPolicy, "show_availability");
+  assert.equal(p.gender, "women", "must NOT fail open off the customer's women line");
+  // The width follow-up parses to width=wide (drives the broaden search).
+  assert.equal(parseAvailabilityConstraints("What about wide widths?").width, "wide");
+  // Gender guard: a women prior card normalizes to women; an opposite-gender
+  // candidate (men) never equals it, so the runtime broaden drops it.
+  assert.equal(normalizeGender("womens"), "women");
+  assert.notEqual(normalizeGender("men"), normalizeGender("women"));
 });
 
 console.log("");
