@@ -207,6 +207,39 @@ test("availability-truth answer is TERMINAL — no retry, attempts=1 (width_not_
   assert.match(out.fullResponseText, /Savannah/);
 });
 
+test("prior-evidence answer is TERMINAL — no retry, keeps cards (positive closest-match text)", async () => {
+  // Live trace 2026-06-29: the prior-evidence broaden's positive wording ("…these
+  // are the closest matches") reads to the grounding validator as a generic
+  // fallback / process-narration non-answer → 3 retries → hard handoff that
+  // DROPPED the 3 good cards. Prior-evidence owns the text deterministically, so
+  // it must be terminal-valid on attempt 1 and keep its cards.
+  let calls = 0;
+  const cards = [
+    { handle: "tamara-black", title: "Tamara Sandal - Black" },
+    { handle: "esd-ortho", title: "ESD Orthotic" },
+    { handle: "naomi", title: "Naomi" },
+  ];
+  const runLoop = async () => {
+    calls += 1;
+    return {
+      fullResponseText: "I found a few wide width options that fit this direction. These are the closest matches.",
+      finalProductCards: cards,
+      messages: [],
+      answerOwner: "prior-evidence",
+      cardOwner: "prior-evidence",
+    };
+  };
+  const out = await runWithGroundingRetry({
+    runLoop,
+    initialMessages: [{ role: "user", content: "What about wide widths?" }],
+    turnPlan: { workflow: "prior_evidence_availability" },
+  });
+  assert.equal(out.validation.ok, true, "prior-evidence must be terminal-ok");
+  assert.equal(out.validation.attempts, 1);
+  assert.equal(calls, 1, "must not retry a prior-evidence answer");
+  assert.equal((out.finalProductCards || []).length, 3, "must keep all 3 cards (no hard handoff)");
+});
+
 test("ungrounded product → retries with error feedback, succeeds on attempt 2", async () => {
   let calls = 0;
   const pool = [{ handle: "jillian-black", title: "Jillian Sandal - Black" }];

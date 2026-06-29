@@ -406,6 +406,24 @@ export async function runWithGroundingRetry({
         validation: { ok: true, errors: [], attempts: attempt + 1, compatibilityTerminal: true },
       };
     }
+    // Prior-evidence owns the answer deterministically too — the remap/broaden
+    // text (buildPriorEvidenceAvailabilityText / buildWidthSizeFallbackText) is
+    // code-authored, not the model's, and the cards are a deterministic pin. The
+    // grounding validator must not judge it: its positive closest-match wording
+    // ("…these are the closest matches") reads as a generic-fallback / narration
+    // non-answer, which used to drive 3 retries → hard handoff that DROPPED the 3
+    // good cards (live trace 2026-06-29). Terminal, like availability-truth.
+    if (result?.answerOwner === "prior-evidence") {
+      console.log(`[grounding-retry] prior-evidence owns the answer — terminal, no retry`);
+      if (typeof onAttempt === "function") {
+        onAttempt({ attempt, validation: { ok: true, errors: [], warnings: [] }, textLen: text.length, poolSize: pool.length });
+      }
+      return {
+        ...applyLengthCap(result, [], planWorkflow),
+        totalUsage: { ...accUsage },
+        validation: { ok: true, errors: [], attempts: attempt + 1, priorEvidenceTerminal: true },
+      };
+    }
     const validation = validateGrounding({
       text,
       pool,
