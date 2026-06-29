@@ -56,6 +56,17 @@ await test("CQ0 — intent/need phrases never become catalog requirements (2026-
   assert.deepEqual(requirements("help me find comfortable all-day shoes").requiredTerms, []);
 });
 
+await test("CQ0b — contractions and grammar never become catalog requirements (2026-06-30)", () => {
+  // Live trace: "don't want sneakers" → terms="don"; "Should I look at shoes" →
+  // terms="look at". Contraction fragments and look/grammar verbs are not terms.
+  assert.deepEqual(requirements("don't want sneakers").requiredTerms, []);
+  assert.deepEqual(requirements("Should I look at shoes for walking?").requiredTerms, []);
+  assert.deepEqual(requirements("can I check out some boots").requiredTerms, []);
+  assert.deepEqual(requirements("doesn't have to be sandals").requiredTerms, []);
+  // A real material/feature is STILL extracted.
+  assert.deepEqual(requirements("shoes with removable insoles").requiredTerms, ["removable insoles"]);
+});
+
 await test("CQ2 — named technology works without CamelCase dependence", () => {
   assert.equal(normalizeCatalogText("BioRocker™ Technology"), "bio rocker technology");
   assert.deepEqual(

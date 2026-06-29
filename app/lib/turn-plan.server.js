@@ -118,6 +118,22 @@ const CART_RE = new RegExp(
 const POLICY_RE =
   /\b(return|returns|refund|exchange(?:s|d)?|warranty|guarantee|ship(?:ping|ped)?|delivery|deliver|track(?:ing)?|order\s+status|my\s+order|where\s+is\s+my|cancel(?:lation)?|account|sign\s+in|log\s+in|password|invoice|receipt)\b/i;
 
+// An INFORMATIONAL / hypothetical question ABOUT the return/refund/exchange
+// rules — "what if I need to return them?", "what's your return policy?", "can I
+// return these if they don't fit?", "are they returnable?". This is a POLICY
+// answer, NOT a customer-service handoff (live trace 2026-06-30: "What if I need
+// to return them?" matched the order-action pattern and got a human handoff). It
+// must win over CUSTOMER_SERVICE_RE's "i need to return" action phrasing.
+const POLICY_QUESTION_RE = new RegExp(
+  "\\bwhat\\s+if\\b[^.?!\\n]{0,40}\\b(?:return|returns|refund|exchange|send\\s+back|don'?t\\s+fit|doesn'?t\\s+fit|too\\s+(?:small|big|tight))\\b" + "|" +
+  "\\bwhat\\s+happens\\s+if\\b[^.?!\\n]{0,40}\\b(?:return|refund|exchange|don'?t\\s+fit|doesn'?t\\s+fit)\\b" + "|" +
+  "\\b(?:return|refund|exchange)\\s+policy\\b" + "|" +
+  "\\b(?:do\\s+you|can\\s+i|could\\s+i|am\\s+i\\s+able\\s+to)\\b[^.?!\\n]{0,30}\\b(?:return|exchange|refund)\\b[^.?!\\n]{0,30}\\b(?:if|when|in\\s+case|policy|them|it|these)\\b" + "|" +
+  "\\b(?:is|are)\\s+(?:it|they|these|those)\\s+returnable\\b" + "|" +
+  "\\bhow\\s+(?:do|does|long|easy)\\b[^.?!\\n]{0,25}\\b(?:return|returns|refund|exchange)\\b",
+  "i",
+);
+
 // CUSTOMER SERVICE — a problem/issue with a specific order, shipment, delivery,
 // payment, or account that needs a HUMAN (not a policy FAQ answer). These get a
 // live-chat handoff, never a product search or cards. Distinct from POLICY_RE,
@@ -351,7 +367,7 @@ export function planTurn({
   // delivery / payment / account that needs a HUMAN. Routed BEFORE policy and
   // browse so "an order that says delivered but I didn't get it" never falls
   // through to a product search. No search, no cards — emit the live-chat CTA.
-  if (CUSTOMER_SERVICE_RE.test(m)) {
+  if (CUSTOMER_SERVICE_RE.test(m) && !POLICY_QUESTION_RE.test(m)) {
     return finalize({
       workflow: WORKFLOWS.CUSTOMER_SERVICE,
       requiredEvidence: ["policy_or_order_data"],
@@ -366,8 +382,10 @@ export function planTurn({
     });
   }
 
-  // 1. Policy / order / account — never a product turn.
-  if (POLICY_RE.test(m)) {
+  // 1. Policy / order / account — never a product turn. Also catches a return/
+  // refund POLICY QUESTION ("are they returnable?", "what if I need to return
+  // them?") even when POLICY_RE's word boundary misses it (e.g. "returnable").
+  if (POLICY_RE.test(m) || POLICY_QUESTION_RE.test(m)) {
     return finalize({
       workflow: WORKFLOWS.POLICY_ACCOUNT,
       requiredEvidence: ["policy_or_order_data"],

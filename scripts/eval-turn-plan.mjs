@@ -91,6 +91,17 @@ scenario("shipping time", { message: "How long does shipping take to California?
 scenario("exchange", { message: "Do you do exchanges for a different size?" },
   { workflow: W.POLICY_ACCOUNT });
 
+// P3 — a return/refund POLICY question is policy_account, NOT a human handoff.
+scenario("'What if I need to return them?' → policy_account", { message: "What if I need to return them?" },
+  { workflow: W.POLICY_ACCOUNT, searchRequired: false, productDisplayPolicy: "suppress" });
+scenario("'are they returnable?' → policy_account", { message: "are they returnable?" },
+  { workflow: W.POLICY_ACCOUNT, searchRequired: false });
+scenario("'can I return these if they don't fit?' → policy_account", { message: "can I return these if they don't fit?" },
+  { workflow: W.POLICY_ACCOUNT });
+// A genuine return ACTION on an order is still customer_service.
+scenario("'I need to return my order' → customer_service (action, not policy)", { message: "I need to return my order" },
+  { workflow: W.CUSTOMER_SERVICE });
+
 // ── 1a. customer-service ISSUES (order/delivery/refund/account) → human handoff,
 // no search, no cards. Routed BEFORE browse so an order problem never searches.
 scenario("'order says delivered but I didn't get it' → customer_service", { message: "I need help with an order that says delivered but I didn't get it." },

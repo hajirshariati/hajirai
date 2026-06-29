@@ -85,6 +85,20 @@ export function askedConstraintLabel({ reqColor, askedSize, askedWidth, inherite
   return "in that";
 }
 
+// When a width/size availability follow-up ("what about wide widths?") matches
+// NONE of the prior styles, we don't dead-end with zero cards — we search for
+// alternatives that DO offer it. This is the honest framing line for that
+// fallback. `label` is the asked width/size phrasing (e.g. "wide", "size 9");
+// returns null when there are no alternatives to show (keep the plain "I'm not
+// seeing those" text). Live trace 2026-06-30.
+export function buildWidthSizeFallbackText(label, count) {
+  if (!count || count < 1) return null;
+  const what = String(label || "that width").trim();
+  return count === 1
+    ? `I don't see those exact styles in ${what}, but here's a ${what} option you might like.`
+    : `I don't see those exact styles in ${what}, but here are ${what} options you might like.`;
+}
+
 // INVARIANT: on a prior_evidence_availability turn with cards shown, the owner
 // must be the prior-evidence remap (or Availability Truth), never the scorer.
 export function priorEvidenceCardOwnerViolation({ workflow, finalCards, cardOwner } = {}) {

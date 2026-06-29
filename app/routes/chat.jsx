@@ -12,7 +12,7 @@ import { detectSupportHandoffNeed, buildSupportHandoffText, supportConfigured, n
 import { extractConstraintPlan, cardMatchesSlotCategory, multiRecoTextCardMismatch, slotSearchCategory } from "../lib/constraint-plan";
 import { detectProcessNarration, stripProcessNarration, buildSalesVoiceFallback, SALES_JUDGMENT_WORKFLOWS } from "../lib/sales-voice";
 import { classifyTurnScope, scopeAttributesToTurn, isShortAmbiguousReply } from "../lib/turn-scope";
-import { buildPriorEvidenceAvailabilityText, buildPriorEvidenceMultiColorText, askedConstraintLabel, titleCaseWord } from "../lib/prior-evidence";
+import { buildPriorEvidenceAvailabilityText, buildPriorEvidenceMultiColorText, askedConstraintLabel, titleCaseWord, buildWidthSizeFallbackText } from "../lib/prior-evidence";
 import { selectEvidenceCards } from "../lib/evidence-select";
 import { retrieveRelevantChunks } from "../lib/knowledge-chunks.server";
 import { buildKidsCoveragePrompt } from "../lib/kids-coverage.server";
@@ -2670,6 +2670,48 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
           items.push({ name: displayName, ok });
         }
         fullResponseText = buildPriorEvidenceAvailabilityText(items, askedLabel, Boolean(reqColor));
+
+        // WIDTH/SIZE FALLBACK. None of the prior styles offers the requested
+        // width/size — don't dead-end with zero-card ambiguity. Search for
+        // alternatives that DO offer it, verify each against variant truth, and
+        // show up to 3 (live trace 2026-06-30: "What about wide widths?" ended
+        // with zero cards). If nothing confirms, keep the honest "not seeing
+        // those" text and no cards.
+        const noPriorMatch = !items.some((it) => it.ok);
+        if (noPriorMatch && (reqWidth || reqSize) && !reqColor) {
+          try {
+            const label = reqWidth ? String(reqWidth) : `size ${reqSize}`;
+            const priorCats = Array.from(new Set(
+              priorCards.map((c) => String(c?._category || c?.category || "").toLowerCase()).filter(Boolean),
+            ));
+            const altFilters = {};
+            if (ctx.sessionGender) altFilters.gender = ctx.sessionGender;
+            if (priorCats.length === 1) altFilters.category = priorCats[0];
+            const altQuery = [reqWidth ? "wide width" : `size ${reqSize}`, priorCats[0] || "shoes"].filter(Boolean).join(" ");
+            const altCands = extractProductCards("search_products", await dispatchTool("search_products", { query: altQuery, filters: altFilters, limit: 8 }, ctx), ctx);
+            const confirmed = [];
+            for (const c of (altCands || [])) {
+              const key = String(c.handle || c.title || "").toLowerCase();
+              if (!key || seenHandles.has(key)) continue;
+              const fam = titleStyleFamily(c.title || "").toLowerCase();
+              if (!fam) continue;
+              const fps = await prisma.product.findMany({
+                where: { shop: ctx.shop, NOT: { status: { in: ["DRAFT", "ARCHIVED"] } }, title: { contains: fam, mode: "insensitive" } },
+                include: { variants: true }, take: 20,
+              });
+              const v = classifyAvailability({ products: fps, family: fam, size: reqSize, width: reqWidth });
+              if (v.result === AVAILABILITY_RESULT.AVAILABLE) { confirmed.push(c); if (confirmed.length >= 3) break; }
+            }
+            const fallbackText = buildWidthSizeFallbackText(label, confirmed.length);
+            if (fallbackText) {
+              for (const c of confirmed) pushCard(c);
+              fullResponseText = fallbackText;
+              console.log(`[prior-evidence] ${label} fallback: showing ${confirmed.length} confirmed alternative(s)`);
+            }
+          } catch (fbErr) {
+            console.warn("[prior-evidence] width/size fallback failed (non-fatal):", fbErr?.message || fbErr);
+          }
+        }
       }
       // Seed the evidence pool with the prior + remapped cards so the grounding
       // validator sees the product names in the deterministic answer as grounded.

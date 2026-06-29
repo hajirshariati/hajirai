@@ -11,6 +11,7 @@ import {
   askedConstraintLabel,
   priorEvidenceCardOwnerViolation,
   priorEvidenceStrayCards,
+  buildWidthSizeFallbackText,
 } from "../app/lib/prior-evidence.js";
 import { parseRequestedColors, familyOfTitle } from "../app/lib/availability-truth.js";
 
@@ -21,6 +22,21 @@ function check(name, fn) {
 }
 
 const familyOf = (title) => String(title || "").toLowerCase().split(/[^a-z0-9]+/).filter(Boolean)[0] || "";
+
+// ── width/size fallback (P4): no exact prior match → offer alternatives ──
+check("buildWidthSizeFallbackText: frames wide alternatives, null when none", () => {
+  assert.equal(
+    buildWidthSizeFallbackText("wide", 3),
+    "I don't see those exact styles in wide, but here are wide options you might like.",
+  );
+  assert.equal(
+    buildWidthSizeFallbackText("wide", 1),
+    "I don't see those exact styles in wide, but here's a wide option you might like.",
+  );
+  assert.equal(buildWidthSizeFallbackText("size 9", 2), "I don't see those exact styles in size 9, but here are size 9 options you might like.");
+  // No alternatives found → null (keep the honest "I'm not seeing those" text).
+  assert.equal(buildWidthSizeFallbackText("wide", 0), null);
+});
 
 // ── answer text (matches the PRD example wording) ──
 check("some available → names which do and which don't, matching the carousel", () => {

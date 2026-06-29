@@ -62,6 +62,38 @@ await test("T2 — 'how about mens?' is gender-only continuation; keeps category
 });
 
 // ---------------------------------------------------------------------------
+// P2 — a BROAD gender request ("show me men's options") widens to the whole
+// gender line and DROPS stale category/color/width/condition, so it doesn't
+// search stale women's wedges/wide/black and falsely deny "we don't carry
+// men's footwear" (live trace 2026-06-30). A SPECIFIC "men's sandals" does NOT.
+// ---------------------------------------------------------------------------
+await test("P2 — 'Show me men's options' drops stale category/color/width/condition", () => {
+  const intent = resolveTurnIntent({
+    latestUserText: "Show me men's options",
+    previousScope: { gender: "women", category: "wedges-heels", color: "black", width: "wide", condition: "heel_pain" },
+  });
+  assert.equal(intent.label, L.PIVOT_FULL);
+  for (const k of ["category", "color", "width", "condition"]) {
+    assert.ok(intent.staleKeysToDrop.includes(k), `must drop ${k}; got ${JSON.stringify(intent.staleKeysToDrop)}`);
+  }
+});
+await test("P2 — broad gender request resets even with no prior gender on record", () => {
+  const intent = resolveTurnIntent({
+    latestUserText: "what do you have for men",
+    previousScope: { category: "wedges-heels", width: "wide" },
+  });
+  assert.equal(intent.label, L.PIVOT_FULL);
+  assert.ok(intent.staleKeysToDrop.includes("category"));
+});
+await test("P2 — a SPECIFIC 'men's sandals' is a category pivot, not a broad reset", () => {
+  const intent = resolveTurnIntent({
+    latestUserText: "men's sandals",
+    previousScope: { gender: "women", category: "wedges-heels", width: "wide" },
+  });
+  assert.notEqual(intent.reason, "broad_gender_request");
+});
+
+// ---------------------------------------------------------------------------
 // 3. "any pink ones?" keeps category, changes color (color pivot).
 // ---------------------------------------------------------------------------
 await test("T3 — 'any pink ones?' is color pivot; keeps category", () => {

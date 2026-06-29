@@ -51,6 +51,16 @@ const RESET_THEN_SEARCH_RE =
 const BROAD_RESET_RE =
   /\b(?:any\s+(?:type|kind|sort|style)\s+of|all\s+(?:types|kinds|sorts|styles)|doesn'?t\s+matter|whatever\s+is|anything|everything(?:\s+you\s+(?:have|carry|sell))?|all\s+(?:of\s+)?your\s+\w+|all\s+your\s+stuff|show\s+me\s+(?:whatever|anything|everything|all)|what\s+else|something\s+else|other\s+(?:options|things|stuff))\b/i;
 
+// A BROAD request scoped to a gender — "men's options", "show me women's
+// stuff", "what do you have for men". It widens to the whole gender line, so
+// any stale category/color/width/condition from the PRIOR (other-gender) turn
+// must drop — otherwise "Show me men's options" after a women's wedges/wide/
+// black/heel-pain turn searches men's wedges-wide-black and falsely denies "we
+// don't carry men's footwear" (live trace 2026-06-30). A SPECIFIC category
+// ("men's sandals") is NOT broad — it's a normal pivot handled below.
+const BROAD_GENDER_REQUEST_RE =
+  /\b(?:men'?s?|mens|women'?s?|womens|kids?|guys?|ladies|male|female)\s+(?:options|stuff|styles|selection|things|picks|footwear|shoes|everything|anything)\b|\b(?:what\s+(?:do|have)\s+you\s+(?:have|carry|got)|anything)\s+for\s+(?:men|women|guys|kids|him|her)\b/i;
+
 // Pronoun back-reference — "all of them", "any of those", "both of
 // them". Looks like a broad reset but is actually referring to a set
 // the assistant already showed. Treat as continue.
@@ -457,12 +467,12 @@ export function resolveTurnIntent({
   //    Drops category-bound scope, keeps gender. The customer is
   //    widening within a subject.
   // -----------------------------------------------------------------------
-  if (BROAD_RESET_RE.test(text) && !PRONOUN_BACK_REF_RE.test(text)) {
+  if ((BROAD_RESET_RE.test(text) || BROAD_GENDER_REQUEST_RE.test(text)) && !PRONOUN_BACK_REF_RE.test(text)) {
     const drop = ["category", ...CATEGORY_BOUND_KEYS].filter((k) => prev[k] != null);
     return {
       label: LABEL.PIVOT_FULL,
       confidence: 0.9,
-      reason: "broad_reset",
+      reason: BROAD_GENDER_REQUEST_RE.test(text) ? "broad_gender_request" : "broad_reset",
       staleKeysToDrop: drop,
     };
   }

@@ -18,6 +18,21 @@ const REQUEST_WORDS = new Set([
   // choose" are NEED signals, never literal catalog requirements (live trace
   // 2026-06-30: "should buy"/"help me find"/"foot pain" leaked into requiredTerms).
   "help", "should", "buy", "buying", "choose", "choosing", "pick", "looking",
+  // Grammar / look-verbs — "look at shoes", "check out" are framing, not a
+  // catalog requirement (live trace 2026-06-30: "Should I look at shoes…" →
+  // terms="look at").
+  "look", "looks", "see", "seeing", "check", "checking", "at", "out", "about",
+  "browse", "browsing", "consider", "considering", "get", "getting",
+  // Contraction fragments left behind when an apostrophe is stripped/split —
+  // "don't" → "don"/"t", "doesn't" → "doesn", etc. None is a catalog term (live
+  // trace 2026-06-30: "don't want sneakers" → terms="don").
+  "don", "dont", "doesn", "doesnt", "didn", "didnt", "won", "wont", "cant",
+  "couldn", "couldnt", "wouldn", "wouldnt", "shouldn", "shouldnt", "isn", "isnt",
+  "aren", "arent", "wasn", "wasnt", "weren", "werent", "haven", "havent",
+  "hasn", "hasnt", "hadn", "hadnt", "ain", "aint", "im", "ive", "ill",
+  "re", "ll", "ve", "td",
+  // Copulas / auxiliaries left in a "doesn't have to be X" prefix.
+  "be", "been", "being", "was", "were", "am", "been",
 ]);
 
 const GENERIC_CATALOG_WORDS = new Set([
