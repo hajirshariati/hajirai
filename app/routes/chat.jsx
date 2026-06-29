@@ -2505,6 +2505,10 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   // fallback) actually returned gender-correct products. Used by the turn
   // invariant: search-found + show_availability must not finish with zero cards.
   let priorEvidenceSearchFound = false;
+  // Handles the broaden fallback DELIBERATELY surfaced from non-prior families
+  // (the prior styles didn't offer the asked width/size/color). These are
+  // intentional alternates, so the stray-card invariant must exempt them.
+  const priorEvidenceBroadenHandles = new Set();
   // Deterministic concise fallback text built from the pinned evidence cards.
   // When the LLM's phrasing for a multi_recommendation turn can't pass the
   // grounding validator (typically `too_long` after rewrite-only retries), the
@@ -2702,12 +2706,17 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
         if (noPriorMatch && (reqWidth || reqSize || reqColor || featureKw)) {
           try {
             // Establish the gender for the broaden so we never fail open. Prefer
-            // the session gender, then a men/women TurnPlan gender, then the prior
-            // displayed cards' gender when they unanimously agree.
+            // the session gender, then stored memory gender, a men/women TurnPlan
+            // gender, then the prior displayed cards' gender when they unanimously
+            // agree. (Live trace 2026-06-30: none of these were set — the store's
+            // women default lived only in the search scope — so the guard ran as a
+            // no-op; we now also INFER from the result set below.)
             const priorGenders = Array.from(new Set(
               priorCards.map((c) => normalizeGender(c?._gender || c?.gender)).filter((g) => g === "men" || g === "women" || g === "kids"),
             ));
-            const fbGender = ctx.sessionGender
+            let fbGender = ctx.sessionGender
+              || normalizeGender(ctx.sessionMemory?.explicit?.gender)
+              || normalizeGender(ctx.sessionMemory?.inferred?.gender)
               || (ctx.turnPlan?.gender === "men" || ctx.turnPlan?.gender === "women" ? ctx.turnPlan.gender : null)
               || (priorGenders.length === 1 ? priorGenders[0] : null);
             const cardGenderOk = (c) => {
@@ -2727,7 +2736,20 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
             if (reqColor) altFilters.color = reqColor;
             const altQuery = [constraintTerm, priorCats[0] || "shoes"].filter(Boolean).join(" ");
             const altCandsRaw = extractProductCards("search_products", await dispatchTool("search_products", { query: altQuery, filters: altFilters, limit: 8 }, ctx), ctx);
-            // Gender guard FIRST — never let an opposite-gender product through.
+            // No established gender? INFER it from the result set's majority so the
+            // guard still enforces a single gender (the search scopes by the store
+            // default, but never trust that — pin it down and drop any minority
+            // opposite-gender card rather than ship a mixed-gender carousel).
+            if (!fbGender) {
+              const tally = {};
+              for (const c of (altCandsRaw || [])) {
+                const g = normalizeGender(c?._gender || c?.gender);
+                if (g === "men" || g === "women" || g === "kids") tally[g] = (tally[g] || 0) + 1;
+              }
+              const top = Object.entries(tally).sort((a, b) => b[1] - a[1])[0];
+              if (top) { fbGender = top[0]; console.log(`[prior-evidence] ${label} broaden: gender inferred from results = ${fbGender}`); }
+            }
+            // Gender guard — never let an opposite-gender product through.
             const altCands = (altCandsRaw || []).filter(cardGenderOk);
             if (altCands.length > 0) priorEvidenceSearchFound = true;
 
@@ -2765,7 +2787,11 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
 
             const fallbackText = buildWidthSizeFallbackText(label, shown.length);
             if (fallbackText && shown.length > 0) {
-              for (const c of shown) pushCard(c);
+              for (const c of shown) {
+                pushCard(c);
+                const k = String(c.handle || c.title || "").toLowerCase();
+                if (k) priorEvidenceBroadenHandles.add(k); // intentional alternate — exempt from stray-card invariant
+              }
               fullResponseText = fallbackText;
               console.log(`[prior-evidence] ${label} fallback: showing ${shown.length} alternative(s) (gender=${fbGender || "-"})`);
             } else {
@@ -4375,7 +4401,12 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       );
       const strayCard = (finalProductCards || []).find((c) => {
         const f = familyOfTitle(c?.title || "");
-        return f && priorFams.size > 0 && !priorFams.has(f);
+        if (!f || priorFams.size === 0 || priorFams.has(f)) return false;
+        // The broaden fallback DELIBERATELY surfaces alternates from non-prior
+        // families when no prior style offered the asked width/size/color — those
+        // are intentional, not strays.
+        const k = String(c?.handle || c?.title || "").toLowerCase();
+        return !priorEvidenceBroadenHandles.has(k);
       });
       if (strayCard) {
         recordTurnInvariantViolation("prior_evidence_stray_card", { card: strayCard.title, priorFamilies: [...priorFams] });
