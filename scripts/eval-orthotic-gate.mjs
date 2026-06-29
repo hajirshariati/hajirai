@@ -1970,6 +1970,44 @@ await test("priorTurnWasOrthoticSeedQuestion is false after a normal product rep
   assert.equal(priorTurnWasOrthoticSeedQuestion({ messages, tree }), false);
 });
 
+// ── Mid-seed-flow footwear answer stays on the gate's rails (no verbose LLM Q) ─
+await test("mid-flow 'hoka sneakers for my dad' stays in the gate (clean chip Q, not browse)", async () => {
+  // Live trace 2026-06-29: answering "Who are these orthotics for?" with a shoe
+  // noun flipped isOrthoticRequest=false → C_resolver_strong_action / footwear
+  // veto → fell to the LLM, which free-formed a long 2-part clarifier. The shoe
+  // noun is the ANSWER ("the orthotic goes in sneakers"), not a footwear browse.
+  const resolverState = { type: "resolver_state", recommended_next_action: { type: "recommend" }, matched_constraints: { category: "sneakers", gender: "men" }, inferred_constraints: {}, candidate_products: [1, 2, 3, 4, 5, 6], impossible_constraints: [] };
+  const classifiedIntent = { isFootwearRequest: true, isOrthoticRequest: false, attributes: { gender: "Men", useCase: null, condition: null } };
+  const { events, encoder, controller } = makeMockSse();
+  const out = await maybeRunOrthoticFlow({
+    messages: [
+      { role: "user", content: "Help me choose the right Aetrex orthotic" },
+      { role: "assistant", content: "Who are these orthotics for?" },
+      { role: "user", content: "hoka sneakers for my dad" },
+    ],
+    tree, shop: "test.myshopify.com", controller, encoder, classifiedIntent, resolverState,
+  });
+  assert.equal(out.handled, true, "gate must stay engaged mid-flow, not yield to browse/LLM");
+  assert.notEqual(out.case, "C_resolver_strong_action");
+  assert.notEqual(out.case, "D_footwear_request_with_noun");
+  const q = events.find((e) => e?.type === "text");
+  assert.ok(q && /<<[^<>]+>>/.test(q.text), "must emit a clean chip question, not a free-form clarifier");
+});
+
+await test("genuine footwear browse (no prior seed question) STILL yields to the resolver", async () => {
+  const resolverState = { type: "resolver_state", recommended_next_action: { type: "recommend" }, matched_constraints: { category: "sneakers", gender: "men" }, inferred_constraints: {}, candidate_products: [1, 2, 3, 4, 5, 6], impossible_constraints: [] };
+  const classifiedIntent = { isFootwearRequest: true, isOrthoticRequest: false, attributes: { gender: "Men" } };
+  const { encoder, controller } = makeMockSse();
+  const out = await maybeRunOrthoticFlow({
+    messages: [
+      { role: "assistant", content: "Here are some great options." },
+      { role: "user", content: "hoka sneakers for my dad" },
+    ],
+    tree, shop: "test.myshopify.com", controller, encoder, classifiedIntent, resolverState,
+  });
+  assert.equal(out.handled, false, "a real footwear browse must still yield, not get hijacked into the orthotic quiz");
+});
+
 console.log("");
 if (failed === 0) {
   console.log(`✅  ${passed} passed, 0 failed\n`);

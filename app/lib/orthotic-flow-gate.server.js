@@ -813,6 +813,16 @@ export async function maybeRunOrthoticFlow({
     return "";
   })();
 
+  // Are we MID-FLOW — is this turn an ANSWER to a pending orthotic seed question?
+  // If so, a footwear noun in the reply ("hoka sneakers", "dress shoes") is the
+  // ANSWER to "what kind of shoes will the orthotics go in?", NOT a footwear
+  // browse request. The router-yield cases below (C: resolver wants to recommend
+  // footwear; D: footwear-request-with-noun) must NOT fire here, or the guided
+  // flow falls off its rails into a verbose free-form LLM clarifier (live trace
+  // 2026-06-29: "hoka sneakers for my dad" answering the gender seed question
+  // flipped isOrthoticRequest=false → C_resolver_strong_action → LLM 2-part Q).
+  const inOrthoticSeedFlow = priorTurnWasOrthoticSeedQuestion({ messages, tree });
+
   // ── SHOES-vs-ORTHOTICS open decision ──────────────────────────────────
   // "What Aetrex shoes or orthotics would you recommend?" — the customer hasn't
   // chosen between a supportive shoe and a removable orthotic. Don't dump a random
@@ -931,7 +941,10 @@ export async function maybeRunOrthoticFlow({
     const isOrthoticScope =
       matched.category === "orthotics" ||
       inferred.category?.value === "orthotics" ||
-      classifiedIntent?.isOrthoticRequest === true;
+      classifiedIntent?.isOrthoticRequest === true ||
+      // Mid-seed-flow: the reply is an answer to the orthotic finder, so this IS
+      // an orthotic turn even if the classifier flipped to footwear on a shoe noun.
+      inOrthoticSeedFlow;
 
     // recommend and controlled_oos are always authoritative — they
     // come straight from a catalog match. no_match is authoritative
@@ -962,9 +975,13 @@ export async function maybeRunOrthoticFlow({
       : "";
   if (
     classifiedIntent?.isFootwearRequest === true &&
-    FOOTWEAR_NOUN_GLOBAL_RE.test(latestText)
+    FOOTWEAR_NOUN_GLOBAL_RE.test(latestText) &&
+    !inOrthoticSeedFlow // mid-flow: the shoe noun answers "what shoes?", not a browse
   ) {
     return { handled: false, case: "D_footwear_request_with_noun" };
+  }
+  if (inOrthoticSeedFlow && (classifiedIntent?.isFootwearRequest === true || FOOTWEAR_NOUN_GLOBAL_RE.test(latestText))) {
+    console.log(`[orthotic-flow] mid-seed-flow: footwear noun in the reply is the ANSWER to the orthotic finder — staying engaged (not yielding to browse)`);
   }
 
   // The latest message must be from the user — that's what we're
@@ -1872,7 +1889,7 @@ export async function maybeRunOrthoticFlow({
         typeof m.content === "string" &&
         looksLikeFootwearCommit(m.content),
     );
-  if (footwearCommitInLatest || footwearCommitInPrior) {
+  if ((footwearCommitInLatest || footwearCommitInPrior) && !inOrthoticSeedFlow) {
     const softGenderGateEscape = shouldSoftEscapeFootwearGenderGate({
       messages: priorMessages,
       answers,
