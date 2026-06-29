@@ -61,16 +61,26 @@ const BROAD_RESET_RE =
 const BROAD_GENDER_REQUEST_RE =
   /\b(?:men'?s?|mens|women'?s?|womens|kids?|guys?|ladies|male|female)\s+(?:options|stuff|styles|selection|things|picks|footwear|shoes|everything|anything)\b|\b(?:what\s+(?:do|have)\s+you\s+(?:have|carry|got)|anything)\s+for\s+(?:men|women|guys|kids|him|her)\b/i;
 
+// Normalize typographic punctuation so the apostrophe-bearing patterns
+// ("men's", "what's") match regardless of keyboard. iOS / Shopify chat widgets
+// send a CURLY apostrophe (U+2019) and curly quotes by default — "Show me men's
+// options" with a curly ' never matched `men'?s?` (straight quote), so the
+// broad-gender detector returned false and the runtime pin silently never fired
+// in PRD (live trace 2026-06-30). Fold every apostrophe/quote variant to ASCII.
+export function normalizeApostrophes(text) {
+  return String(text || "").replace(/[‘’ʼ′＇]/g, "'").replace(/[“”]/g, '"');
+}
+
 // Runtime detector (shared with the live execution path in chat.jsx, not just
 // the classifier). True when the CURRENT message is a broad gender browse.
 export function isBroadGenderRequest(text) {
-  return BROAD_GENDER_REQUEST_RE.test(String(text || ""));
+  return BROAD_GENDER_REQUEST_RE.test(normalizeApostrophes(text));
 }
 
 // The gender a broad gender request targets — men | women | kids | null.
 export function broadGenderRequestGender(text) {
   if (!isBroadGenderRequest(text)) return null;
-  const t = String(text || "").toLowerCase();
+  const t = normalizeApostrophes(text).toLowerCase();
   if (/\b(?:men'?s?|mens|guys?|male|\bhim\b|for\s+(?:men|guys|him))\b/.test(t)) return "men";
   if (/\b(?:women'?s?|womens|ladies|female|\bher\b|for\s+(?:women|her))\b/.test(t)) return "women";
   if (/\b(?:kids?|children|for\s+kids)\b/.test(t)) return "kids";
@@ -319,7 +329,10 @@ export function resolveTurnIntent({
   resolverState = null,
   catalogProbe = null,
 } = {}) {
-  const text = String(latestUserText || "").trim();
+  // Fold curly apostrophes/quotes to ASCII first — widget input uses U+2019, and
+  // every shape below ("men's", "what's", "doesn't") is written with a straight
+  // quote, so without this the broad-gender + meta rules silently miss.
+  const text = normalizeApostrophes(latestUserText).trim();
   const prev = previousScope || {};
   const extracted = extractedUserConstraints ?? extractUserConstraints(text) ?? {};
   const chipKeys = chipClickKeysThisTurn(choiceEvents, turnIndex);

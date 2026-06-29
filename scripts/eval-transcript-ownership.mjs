@@ -165,6 +165,21 @@ await turn("CHAIN: 'Show me men's options' → browse gender=men, broad, stale d
   }
 });
 
+// The widget sends a CURLY apostrophe (U+2019). The straight-quote regex missed
+// it in PRD, so the detector returned false and the runtime pin never fired.
+// Every detector + the intent drop must behave identically with the curly form.
+await turn("CHAIN(curly): 'Show me men’s options' detected + stale dropped", () => {
+  const curly = "Show me men’s options";
+  assert.notEqual(curly, "Show me men's options", "fixture must use the curly apostrophe");
+  assert.equal(isBroadGenderRequest(curly), true, "curly apostrophe must still detect broad gender");
+  assert.equal(broadGenderRequestGender(curly), "men");
+  const staleScope = { gender: "men", category: "footwear", color: "black", width: "wide", condition: "heel_pain" };
+  const intent = resolveTurnIntent({ latestUserText: curly, previousScope: staleScope });
+  for (const k of ["category", "color", "width", "condition"]) {
+    assert.ok(intent.staleKeysToDrop.includes(k), `curly: intent must drop ${k}; got ${JSON.stringify(intent.staleKeysToDrop)}`);
+  }
+});
+
 console.log("");
 if (fail === 0) {
   console.log(`✅  ${pass} passed, 0 failed\n`);

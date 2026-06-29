@@ -1860,6 +1860,17 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   // re-pinned the prior cards). Force tool_choice:none for the whole turn.
   if (workflowDisablesTools(ctx?.turnPlan?.workflow)) forceNoTools = true;
 
+  // Broad gender browse ("Show me men's options") is a DETERMINISTIC owner: the
+  // gender-only pin below runs the one correct search itself. Let the model keep
+  // tools and it re-searches the PRIOR cards' categories for the new gender
+  // (gender=men category="wedges heels" → women-only → mismatch → zero cards →
+  // "we don't carry men's footwear"; live trace 2026-06-30). Force tools off so
+  // the stale-category search can never happen in the first place.
+  if (ctx?.turnPlan?.workflow === "browse" && isBroadGenderRequest(ctx?.latestUserMessage || "")) {
+    forceNoTools = true;
+    console.log(`[broad-gender-browse] tools forced OFF — deterministic gender-only pin owns this turn (msg="${String(ctx?.latestUserMessage || "").slice(0, 60)}")`);
+  }
+
   // Tracks the final hop's stop_reason. If the loop exits with this still
   // === "tool_use", the model was cut off by the hop budget mid-tool-use
   // (it wanted to call another tool) — any text it left is an incomplete
@@ -3142,11 +3153,24 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   // searches can never become the final cards. Category is honored ONLY if the
   // customer names one in THIS message — and a specific category never matches
   // isBroadGenderRequest, so this fires only on a genuinely broad ask.
+  const broadGenderMsg = ctx.latestUserMessage || "";
+  const broadGenderDetected = isBroadGenderRequest(broadGenderMsg);
+  const broadGenderBlocked =
+    !!availabilityPinnedCards || !!comparisonPinnedCards || !!evidencePinnedCards ||
+    !!priorEvidencePinnedCards || rewriteOnlyRetry;
+  if (ctx.turnPlan?.workflow === "browse" && broadGenderDetected && broadGenderBlocked) {
+    // Detected but another deterministic owner already pinned cards (or this is a
+    // rewrite-only retry). Log so PRD shows the pin was reached and why it ceded.
+    console.log(`[broad-gender-browse] detected but ceded — availPin=${!!availabilityPinnedCards} cmpPin=${!!comparisonPinnedCards} evPin=${!!evidencePinnedCards} priorPin=${!!priorEvidencePinnedCards} rewriteOnly=${rewriteOnlyRetry}`);
+  } else if (ctx.turnPlan?.workflow === "browse" && !broadGenderDetected) {
+    // Browse turn that did NOT look like a broad gender ask — make the negative
+    // decision visible so a missed-match (e.g. punctuation) is debuggable in PRD.
+    console.log(`[broad-gender-browse] not a broad gender request — msg="${String(broadGenderMsg).slice(0, 60)}"`);
+  }
   if (
     ctx.turnPlan?.workflow === "browse" &&
-    isBroadGenderRequest(ctx.latestUserMessage || "") &&
-    !availabilityPinnedCards && !comparisonPinnedCards && !evidencePinnedCards && !priorEvidencePinnedCards &&
-    !rewriteOnlyRetry
+    broadGenderDetected &&
+    !broadGenderBlocked
   ) {
     try {
       const bg = broadGenderRequestGender(ctx.latestUserMessage || "") || ctx.turnPlan?.gender || ctx.sessionGender || null;
@@ -3164,7 +3188,16 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
         // The model drafted its text BEFORE this turn against the stale context —
         // if it denied ("we don't carry men's…") or didn't present products,
         // replace it with the clean framing so text and the pinned cards agree.
-        if (detectAiNoMatchPhrasing(fullResponseText) || !textPresentsProducts(fullResponseText)) {
+        // It may ALSO present products but drag the stale scope into the wording
+        // ("here are men's shoes for your heel pain and wide feet") — the broad
+        // ask cleared that scope, so any stale term NOT in the current message is
+        // a leak. Scrub it: replace the whole draft with the clean framing.
+        const curMsg = String(ctx.latestUserMessage || "").toLowerCase();
+        const STALE_LEAK_RE = /\b(?:heel\s+pain|plantar|flat\s+feet|fasciitis|wide(?:\s+width|\s+feet)?|narrow|wedges?|heels?|boots?|sandals?|women'?s?|footwear)\b/i;
+        const leaks = (fullResponseText.match(new RegExp(STALE_LEAK_RE.source, "gi")) || [])
+          .filter((m) => !curMsg.includes(m.toLowerCase()));
+        if (detectAiNoMatchPhrasing(fullResponseText) || !textPresentsProducts(fullResponseText) || leaks.length > 0) {
+          if (leaks.length > 0) console.log(`[broad-gender-browse] scrubbed stale-scope leak from text: ${JSON.stringify([...new Set(leaks.map((s) => s.toLowerCase()))])}`);
           fullResponseText = evidenceFallbackText;
         }
         console.log(`[broad-gender-browse] gender=${bg || "-"} pinned ${picked.length} card(s) via gender-only search "${input.query}" (overrode stale-category model searches)`);

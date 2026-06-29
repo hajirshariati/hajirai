@@ -109,6 +109,29 @@ await test("P2 runtime — isBroadGenderRequest / broadGenderRequestGender", () 
   assert.equal(broadGenderRequestGender("show me men's sandals"), null, "specific category is not a broad request");
 });
 
+// P2 PRD regression — the widget sends a CURLY apostrophe (U+2019). The
+// straight-quote regex missed it, so the detector returned false in PRD and the
+// runtime pin never fired. Every curly variant must behave like the straight one.
+await test("P2 runtime — curly apostrophe (U+2019) still detects broad gender", () => {
+  const curlyBroad = ["Show me men’s options", "men’s options", "show me women’s stuff", "men’s footwear"];
+  for (const s of curlyBroad) {
+    assert.ok(!s.includes("'"), `fixture must use curly ’: ${s}`);
+    assert.equal(isBroadGenderRequest(s), true, `curly broad: ${s}`);
+  }
+  assert.equal(broadGenderRequestGender("Show me men’s options"), "men");
+  assert.equal(broadGenderRequestGender("show me women’s stuff"), "women");
+  assert.equal(isBroadGenderRequest("men’s sandals"), false, "curly specific category is not broad");
+  // The curly form must drop the same stale scope a straight one does.
+  const intent = resolveTurnIntent({
+    latestUserText: "Show me men’s options",
+    previousScope: { gender: "men", category: "footwear", color: "black", width: "wide", condition: "heel_pain" },
+  });
+  assert.equal(intent.reason, "broad_gender_request");
+  for (const k of ["category", "color", "width", "condition"]) {
+    assert.ok(intent.staleKeysToDrop.includes(k), `curly drop ${k}: ${JSON.stringify(intent.staleKeysToDrop)}`);
+  }
+});
+
 // ---------------------------------------------------------------------------
 // 3. "any pink ones?" keeps category, changes color (color pivot).
 // ---------------------------------------------------------------------------
