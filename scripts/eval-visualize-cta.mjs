@@ -94,6 +94,25 @@ test("non-style products do NOT get the styling CTA", () => {
   }
 });
 
+test("UNDER-TAGGED insole (no Orthotics category) is blocked by the TITLE check", () => {
+  // Prod trace 2026-06-29: "Men's Speed Orthotics - Insole For Running" (l700m-m)
+  // was NOT category-tagged Orthotics — only productType=Footwear — so the
+  // category check missed it and it got a "Style the look" preview of an insole.
+  // The title contains "Insole" → must be blocked regardless of tagging.
+  assert.equal(fires({ productType: "Footwear", title: "Men's Speed Orthotics - Insole For Running" }), null);
+  assert.equal(fires({ title: "Speed Orthotic Insert" }), null);
+  assert.equal(fires({ category: "", title: "Replacement Footbeds" }), null);
+});
+
+test("orthotic-recommender turn is NEVER visualize-eligible (structural guarantee)", () => {
+  // recommend_orthotic only ever returns insoles; the turn flag suppresses the
+  // CTA even if the product name has no insole word and no orthotic category.
+  const product = { handle: "x", image: "https://cdn.example/x.jpg", price: 50, title: "Premium Support" };
+  assert.equal(buildVisualizeCtaEvent({ config: enabledGemini, product, messages, isInsoleRecommendation: true }), null);
+  // ...but the SAME product on a non-recommender turn (a real shoe) still fires.
+  assert.ok(buildVisualizeCtaEvent({ config: enabledGemini, product: { ...product, title: "Premium Sneaker", category: "Sneakers" }, messages, isInsoleRecommendation: false }));
+});
+
 test("a wearable sandal whose NAME contains 'Orthotic' stays eligible", () => {
   const ev = fires({ category: "Sandals", title: "Maui Orthotic Flip" });
   assert.ok(ev && ev.type === "visualize_cta");

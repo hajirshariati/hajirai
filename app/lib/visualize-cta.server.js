@@ -54,8 +54,15 @@ function recentUserStyleContext(messages, max = 4) {
 
 // Returns the SSE event object or null. `config` must carry the
 // (decrypted) provider keys, as getShopConfig provides.
-export function buildVisualizeCtaEvent({ config, product, messages }) {
+export function buildVisualizeCtaEvent({ config, product, messages, isInsoleRecommendation = false }) {
   if (!config?.visualizeLookEnabled) return null;
+  // STRUCTURAL GUARANTEE: the orthotic recommender (recommend_orthotic) ONLY ever
+  // returns insoles/orthotics — products that go INSIDE a shoe, never worn on
+  // their own. So a turn driven by it is never visualize-eligible, regardless of
+  // how the SKU is category-tagged. This is the reliable signal; the
+  // category/title checks below are defense-in-depth for the non-recommender
+  // paths (named-product / search) where an insole can still surface.
+  if (isInsoleRecommendation) return null;
   const provider = String(config.imageProvider || "").trim();
   if (!isImageProviderSupported(provider)) return null;
   // Don't dangle a button that will error on click — require the key
@@ -86,6 +93,16 @@ export function buildVisualizeCtaEvent({ config, product, messages }) {
   // their name (e.g. "Maui Orthotic Flip") and must stay eligible.
   const INSERT_CATEGORY_RE = /\b(?:orthotic|insole|insert|footbed|foot[\s-]*bed)/i;
   if (INSERT_CATEGORY_RE.test(category)) return null;
+  // TITLE check for STANDALONE-INSOLE words. The category check above is the
+  // primary signal, but it FAILS when the SKU is mis/under-tagged (prod trace
+  // 2026-06-29: "Men's Speed Orthotics - Insole For Running", handle l700m-m, was
+  // NOT category-tagged Orthotics, so it slipped through and got a "Style the
+  // look" preview of an insole). Unlike bare "orthotic" — which real wearable
+  // sandals carry in their name ("Maui Orthotic Flip") and must stay eligible —
+  // the words insole / insert / footbed NEVER appear in wearable footwear titles,
+  // so matching them on the TITLE is safe and catches under-tagged insoles.
+  const INSOLE_TITLE_RE = /\b(?:insole|insert|footbed|foot[\s-]*bed)s?\b/i;
+  if (INSOLE_TITLE_RE.test(title)) return null;
   const priceNum = Number(product?.price);
   if (Number.isFinite(priceNum) && priceNum <= 0) return null;
 

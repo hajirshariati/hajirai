@@ -3765,7 +3765,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     if (deduped.length > 0) {
       controller.enqueue(encoder.encode(sseChunk({ type: "products", products: deduped })));
       if (deduped.length === 1) {
-        const vizEvent = buildVisualizeCtaEvent({ config: ctx.shopConfig, product: deduped[0], messages: ctx.messages });
+        const vizEvent = buildVisualizeCtaEvent({ config: ctx.shopConfig, product: deduped[0], messages: ctx.messages, isInsoleRecommendation: recommenderInvokedThisTurn });
         if (vizEvent) {
           controller.enqueue(encoder.encode(sseChunk(vizEvent)));
           console.log(`[chat] ${ctx.shop} visualize_cta emitted for "${vizEvent.productTitle}"`);
@@ -3800,7 +3800,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       controller.enqueue(encoder.encode(sseChunk({ type: "products", products: deduped })));
       // A single focused/pinned card can carry the See-It-Styled CTA.
       if (deduped.length === 1) {
-        const vizEvent = buildVisualizeCtaEvent({ config: ctx.shopConfig, product: deduped[0], messages: ctx.messages });
+        const vizEvent = buildVisualizeCtaEvent({ config: ctx.shopConfig, product: deduped[0], messages: ctx.messages, isInsoleRecommendation: recommenderInvokedThisTurn });
         if (vizEvent) {
           controller.enqueue(encoder.encode(sseChunk(vizEvent)));
           console.log(`[chat] ${ctx.shop} visualize_cta emitted for "${vizEvent.productTitle}"`);
@@ -4266,6 +4266,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
           config: ctx.shopConfig,
           product: deduped[0],
           messages: ctx.messages,
+          isInsoleRecommendation: recommenderInvokedThisTurn,
         });
         if (vizEvent) {
           controller.enqueue(encoder.encode(sseChunk(vizEvent)));
@@ -4276,7 +4277,9 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
           const c = ctx.shopConfig || {};
           const prov = String(c.imageProvider || "").trim();
           const hasKey = prov === "gemini" ? Boolean(c.geminiApiKey) : prov === "openai" ? Boolean(c.openaiApiKey) : false;
-          const reason = !c.visualizeLookEnabled ? "feature disabled in Settings"
+          const reason = recommenderInvokedThisTurn ? "orthotic recommendation (insole — never wearable)"
+            : /\b(?:insole|insert|footbed|foot[\s-]*bed)s?\b/i.test(String(deduped[0]?.title || "")) ? "product title is a standalone insole/insert"
+            : !c.visualizeLookEnabled ? "feature disabled in Settings"
             : !(prov === "gemini" || prov === "openai") ? `no image provider selected (imageProvider=${JSON.stringify(c.imageProvider)})`
             : !hasKey ? `no API key saved for provider "${prov}"`
             : !(deduped[0]?.image || deduped[0]?.featuredImageUrl) ? "product has no image"
