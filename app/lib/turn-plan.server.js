@@ -208,6 +208,16 @@ const BROWSE_RE =
 const RECOMMEND_RE =
   /\b(what\s+(?:would|do)\s+you\s+recommend|what\s+should\s+i\s+(?:get|buy|wear)|help\s+me\s+(?:find|pick|choose)|need\s+(?:a\s+)?(?:sandal|shoe|footwear|sneaker|boot|something))\b/i;
 
+// A bare affirmation — "yes", "sure", "ok", "please do", "go ahead". On its own
+// it carries no intent; it INHERITS the action the assistant just offered.
+const AFFIRM_RE =
+  /^\s*(?:yes|yep|yeah|yup|ya|sure|ok|okay|k|please|yes\s+please|please\s+do|do\s+it|go\s+ahead|sounds?\s+good|that\s+works|let'?s\s+do\s+it|absolutely|definitely|of\s+course|why\s+not)\b/i;
+// The assistant's prior OFFER, parsed from its last message.
+const OFFER_SIMILAR_RE =
+  /\b(similar|alternativ\w*|other\s+(?:options|styles|ones|pairs)|more\s+(?:options|styles|like)|something\s+else|comparable|compare\s+it)\b/i;
+const OFFER_VARIANTS_RE =
+  /\b(?:check|see|look\s+up|pull\s+up|find\s+out)\b[^.?!\n]{0,40}\b(?:sizes?|colors?|colours?|availability|stock|in\s+stock|what'?s\s+available)\b|\b(?:sizes?|colors?|colours?)\b[^.?!\n]{0,20}\b(?:available|in\s+stock|options)\b|\bwant\s+me\s+to\s+(?:check|see|look)\b/i;
+
 // Gender signals, split by direction so the plan can RESOLVE men/women,
 // not merely detect "some gender was mentioned". Recipient nouns and
 // pronouns count: "my husband / dad / son / his" → men; "my wife / mom /
@@ -264,6 +274,7 @@ export function planTurn({
   focusProduct = null,
   hasPriorCards = false,
   priorCardFamilies = [],
+  priorAssistantText = "",
   primaryGender = "women",
 } = {}) {
   const m = String(message || "");
@@ -610,6 +621,45 @@ export function planTurn({
       gender: genderFor(true),
       directives: ["Search and show matching products with a short framing sentence."],
     });
+  }
+
+  // 6b. Bare affirmation resolving against the prior assistant OFFER. A lone
+  // "yes" carries no intent — it inherits the action the bot just offered (live
+  // trace 2026-06-29: "yes" became a generic clarification, the model called a
+  // tool anyway, and the resulting card was wiped). Resolve it to that action;
+  // with no actionable offer it falls through to clarification (tools blocked).
+  const isBareAffirmation = AFFIRM_RE.test(m) && words(m) <= 4;
+  if (isBareAffirmation && priorAssistantText) {
+    const prior = String(priorAssistantText);
+    const hasFocus = hasProductContext || hasPriorCards || Boolean(focusProduct);
+    if (OFFER_VARIANTS_RE.test(prior) && hasFocus) {
+      return finalize({
+        workflow: WORKFLOWS.AVAILABILITY,
+        requiredEvidence: ["variant_facts"],
+        searchRequired: true,
+        clarificationAllowed: false,
+        productDisplayPolicy: "show_availability",
+        answerRequirements: reqs({ answerFirst: true, concise: true, answerInText: true }),
+        gender: genderFor(false),
+        directives: [
+          "The customer said YES to checking sizes/colors for the product just discussed. Look up THAT product's live variants and answer which sizes/colors are in stock; if a pick is needed, ask which size/color. Keep its card.",
+        ],
+      });
+    }
+    if (OFFER_SIMILAR_RE.test(prior) && hasFocus) {
+      return finalize({
+        workflow: WORKFLOWS.BROWSE,
+        requiredEvidence: ["product_facts"],
+        searchRequired: true,
+        clarificationAllowed: false,
+        productDisplayPolicy: "show",
+        answerRequirements: reqs({ concise: true }),
+        gender: genderFor(false),
+        directives: [
+          "The customer said YES to seeing similar alternatives. Search for products similar to the one just discussed and show a few — do NOT ask a generic clarifying question.",
+        ],
+      });
+    }
   }
 
   // 7. Clarification / no actionable data.

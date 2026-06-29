@@ -117,6 +117,18 @@ scenario("'I want to buy it' (focus product) → cart_handoff", { message: "I wa
 scenario("'I want to buy something' (no focus) → not cart_handoff", { message: "I want to buy some sandals" },
   { workflow: W.BROWSE });
 
+// ── bare "yes" resolves against the prior assistant OFFER ─────────────────
+// Live trace 2026-06-29: a lone "yes" became a generic clarification, the model
+// called a tool anyway, and the resulting card was wiped.
+scenario("'yes' after 'want similar alternatives?' → search (browse)", { message: "yes", priorAssistantText: "Want me to pull up some similar alternatives?", hasPriorCards: true },
+  { workflow: W.BROWSE, searchRequired: true, clarificationAllowed: false });
+scenario("'yes please' after 'check sizes/colors?' → availability", { message: "yes please", priorAssistantText: "Want me to check the sizes and colors for the Drew?", focusProduct: { title: "Drew" }, hasPriorCards: true },
+  { workflow: W.AVAILABILITY, searchRequired: true });
+scenario("'yes' with NO actionable prior offer → clarification (no tools)", { message: "yes", priorAssistantText: "Anything else I can help with today?", hasPriorCards: true },
+  { workflow: W.CLARIFICATION, searchRequired: false, clarificationAllowed: true, productDisplayPolicy: "suppress" });
+scenario("'yes' with no prior assistant text → clarification", { message: "yes" },
+  { workflow: W.CLARIFICATION, searchRequired: false });
+
 // ── named-product STYLING → advisory (named family dominates, not outfit browse)
 // Live trace 2026-06-29: "wear gabby with a white dress with big red flowers"
 // routed to generic browse and dropped Gabby for red footwear. A named product

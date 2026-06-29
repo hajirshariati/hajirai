@@ -1826,6 +1826,14 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
 
   const activeTools = tools || TOOLS;
 
+  // Clarification turns must NOT call tools. The plan already decided there's no
+  // actionable product intent (a bare "yes" with no prior offer, a vague
+  // opener); letting the model search anyway wastes a hop and creates a card
+  // that the clarification gate then wipes (live trace 2026-06-29). Force
+  // tool_choice:none for the whole turn. Actionable affirmations are routed to
+  // a real search workflow upstream (planTurn 6b), so they're unaffected.
+  if (ctx?.turnPlan?.workflow === "clarification") forceNoTools = true;
+
   // Tracks the final hop's stop_reason. If the loop exits with this still
   // === "tool_use", the model was cut off by the hop budget mid-tool-use
   // (it wanted to call another tool) — any text it left is an incomplete
@@ -5003,6 +5011,9 @@ async function handleChatPost({ shop, sessionAccessToken, request, internal = fa
               focusProduct: focusProduct ? (focusProduct.handle || focusProduct.title || true) : null,
               hasPriorCards: Array.isArray(priorProductCards) && priorProductCards.length > 0,
               priorCardFamilies,
+              // The bot's last message — lets a bare "yes" inherit the action it
+              // just offered ("want similar alternatives?", "check sizes?").
+              priorAssistantText: lastAssistantContent(messages) || "",
               primaryGender: "women",
             });
             // The named families this turn must search — the evidence lock
