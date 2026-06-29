@@ -6,7 +6,7 @@ import { getCatalogCategories, getAllCatalogCategories, getCategoryGenderAvailab
 import { getActiveCampaigns, formatCampaignsForCS } from "../models/Campaign.server";
 import { buildSystemPrompt } from "../lib/chat-prompt.server";
 import { planTurn, buildTurnPlanPromptBlock, buildPlanClarifierRepair, planForcesProductDisplay, planRequiresSearch as planRequiresSearchFlag, clarifierGateDecision, isAnswerWorkflow, plannedWorkflowCardOwnerViolation, plannedSearchSkippedViolation, cardsNotInEvidencePool, textPresentsProducts, workflowDisablesTools, resolvedFamilyGender } from "../lib/turn-plan.server";
-import { recordTurnInvariantViolation } from "../lib/turn-invariant.server";
+import { recordTurnInvariantViolation, logTurnInvariant } from "../lib/turn-invariant.server";
 import { classifyAvailability, buildAvailabilityAnswer, AVAILABILITY_RESULT, resolveAvailabilityRequest, isAvailabilityFollowUp, familyOfTitle, collectFamilyColors, constraintIntent, parseAvailabilityConstraints, parseRequestedColors, priorAvailabilityMessage, priorAvailabilityConstraints, variantDataDiagnostics, styleKeyOfTitle, styleNameOfTitle } from "../lib/availability-truth";
 import { detectSupportHandoffNeed, buildSupportHandoffText, supportConfigured, normalizedSupportLabel, supportChatLabel } from "../lib/support-handoff";
 import { extractConstraintPlan, cardMatchesSlotCategory, multiRecoTextCardMismatch, slotSearchCategory } from "../lib/constraint-plan";
@@ -1720,6 +1720,7 @@ async function emitSoftGenderGateBrowse({ ctx, controller, encoder }) {
     `[chat] ${ctx.shop} soft-gender-gate browse emitted ` +
       `query=${JSON.stringify(input.query)} poolSize=${cards.length} repeatIndex=${repeatIndex} excluded=${excludeHandles ? excludeHandles.size : 0}`,
   );
+  return cards.length;
 }
 
 // Generic brand-mention detector. When the customer asks "do you have
@@ -4373,7 +4374,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     console.log(
       `[turn-invariant] workflow=${workflow} answerOwner=${answerOwner} cardOwner=${cardOwner} ` +
       `pinnedCards=${pinnedCount == null ? "-" : pinnedCount} finalCards=${finalCount} ` +
-      `textCleanupChanged=${textCleanupChanged ? "yes" : "no"}`,
+      `textCleanupChanged=${textCleanupChanged ? "yes" : "no"} path=agentic-loop`,
     );
     if ((workflow === "availability" || workflow === "comparison") && pinnedCount != null && finalCount !== pinnedCount) {
       recordTurnInvariantViolation("pinned_cards_mutated", { workflow, pinned: pinnedCount, final: finalCount });
@@ -5241,6 +5242,7 @@ async function handleChatPost({ shop, sessionAccessToken, request, internal = fa
               // returning is what the React Router stream wrapper uses
               // as the close signal. Calling close here can race with
               // the wrapper's own teardown.
+              logTurnInvariant({ answerOwner: "cheat-code", cardOwner: "none", finalCards: 0, path: "cheat-code" });
               return;
             }
           } catch (cheatErr) {
@@ -5627,6 +5629,13 @@ async function handleChatPost({ shop, sessionAccessToken, request, internal = fa
                 console.log(`[router] ${ctx.shop} ${routerLog.resolver || "resolver=skip"}`);
                 console.log(`[router] ${ctx.shop} ${routerLog.orthoticGate}`);
                 console.log(`[router] ${ctx.shop} final_path=${routerLog.finalPath}`);
+                // The gate either asked a seed question (no cards) or emitted a
+                // recommendation (cards) — either way it OWNS text and any cards.
+                logTurnInvariant({
+                  workflow: ctx.turnPlan?.workflow || "-", answerOwner: "orthotic-gate",
+                  cardOwner: "orthotic-gate", finalCards: "-", path: "orthotic-gate",
+                  extra: `case=${gate?.case || "-"}`,
+                });
                 return;
               }
               if (gate?.softGenderGateEscape) {
@@ -5635,7 +5644,12 @@ async function handleChatPost({ shop, sessionAccessToken, request, internal = fa
                 console.log(`[router] ${ctx.shop} ${routerLog.resolver || "resolver=skip"}`);
                 console.log(`[router] ${ctx.shop} ${routerLog.orthoticGate}`);
                 console.log(`[router] ${ctx.shop} final_path=${routerLog.finalPath}`);
-                await emitSoftGenderGateBrowse({ ctx, controller, encoder });
+                const softCards = await emitSoftGenderGateBrowse({ ctx, controller, encoder });
+                logTurnInvariant({
+                  workflow: ctx.turnPlan?.workflow || "browse", answerOwner: "soft-gender-browse",
+                  cardOwner: "soft-gender-browse", finalCards: typeof softCards === "number" ? softCards : "-",
+                  path: "soft-gender-browse",
+                });
                 return;
               }
             } catch (gateErr) {
@@ -6156,6 +6170,11 @@ async function handleChatPost({ shop, sessionAccessToken, request, internal = fa
                 `otherColors=${variantFactResult.diagnostics?.otherColors || 0} ` +
                 `textLen=${variantFactResult.answerText?.length || 0}`,
             );
+            logTurnInvariant({
+              workflow: ctx.turnPlan?.workflow || "availability", answerOwner: "variant-facts",
+              cardOwner: (variantFactResult.products?.length || 0) > 0 ? "variant-facts" : "none",
+              finalCards: variantFactResult.products?.length ?? "-", path: "variant-facts",
+            });
             return;
           }
 
@@ -6182,6 +6201,12 @@ async function handleChatPost({ shop, sessionAccessToken, request, internal = fa
                 `followUps=${policyResult.diagnostics?.followUps || 0} ` +
                 `textLen=${policyResult.answerText?.length || 0}`,
             );
+            // Policy answers from KnowledgeFile content; cards are intentionally
+            // suppressed (display=suppress) — log so the empty carousel is owned.
+            logTurnInvariant({
+              workflow: ctx.turnPlan?.workflow || "policy_account", answerOwner: "policy-engine",
+              cardOwner: "none", finalCards: 0, path: "policy-engine",
+            });
             return; // policy emitted text/products(empty)/done; no agent loop.
           }
           if (policyResult && policyResult.declined && policyResult.diagnostics?.intent) {
@@ -6208,6 +6233,11 @@ async function handleChatPost({ shop, sessionAccessToken, request, internal = fa
                   .join("|") || "-"} ` +
                 `textLen=${resolverNoMatchResult.answerText?.length || 0}`,
             );
+            logTurnInvariant({
+              workflow: ctx.turnPlan?.workflow || "-", answerOwner: "resolver-no-match",
+              cardOwner: "none", finalCards: 0, path: "resolver-no-match",
+              extra: `reason=${resolverNoMatchResult.diagnostics?.reason || "-"}`,
+            });
             return; // exact catalog no-match emitted text/products(empty)/done.
           }
 
@@ -6231,6 +6261,11 @@ async function handleChatPost({ shop, sessionAccessToken, request, internal = fa
                 `textLen=${engineResult.answerText?.length || 0} ` +
                 `cards=${engineResult.products?.length || 0}`,
             );
+            logTurnInvariant({
+              workflow: ctx.turnPlan?.workflow || "-", answerOwner: "product-engine",
+              cardOwner: (engineResult.products?.length || 0) > 0 ? "product-engine" : "none",
+              finalCards: engineResult.products?.length ?? "-", path: "product-engine",
+            });
             return; // engine emitted text+products+done; no agent loop.
           }
           if (engineResult && engineResult.declined) {

@@ -13,6 +13,22 @@
 
 const counters = new Map();
 
+// Canonical END-OF-TURN log. EVERY customer turn must emit exactly one of these
+// — whether the agentic LLM loop owned it or a deterministic dispatcher
+// (orthotic gate, variant-facts, policy, resolver-no-match, product-engine, …)
+// answered and returned BEFORE the loop. Without it, a turn that exits through a
+// legacy dispatcher leaves no "who owned this, and how did it end?" record, so a
+// silently-wrong owner is invisible in PRD logs. `answerOwner` = who produced the
+// text; `cardOwner` = who produced the cards ("none" when suppressed); `path` =
+// the code path that owned the turn (e.g. "policy-engine", "agentic-loop").
+export function logTurnInvariant({ workflow = "-", answerOwner = "-", cardOwner = "-", finalCards = "-", path = "-", extra = "" } = {}) {
+  const tail = extra ? ` ${extra}` : "";
+  console.log(
+    `[turn-invariant] workflow=${workflow} answerOwner=${answerOwner} cardOwner=${cardOwner} ` +
+    `finalCards=${finalCards} path=${path}${tail}`,
+  );
+}
+
 // Record (and log) a turn-invariant violation. `code` is a stable, low-cardinality
 // identifier (e.g. "card_not_in_evidence_pool"); `fields` is structured context.
 export function recordTurnInvariantViolation(code, fields = {}) {
