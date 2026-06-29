@@ -9,7 +9,7 @@
 // Run: node scripts/eval-turn-plan.mjs
 
 import assert from "node:assert/strict";
-import { planTurn, WORKFLOWS, textPresentsProducts } from "../app/lib/turn-plan.server.js";
+import { planTurn, WORKFLOWS, textPresentsProducts, workflowDisablesTools, resolvedFamilyGender } from "../app/lib/turn-plan.server.js";
 
 let pass = 0, fail = 0;
 const fails = [];
@@ -18,6 +18,39 @@ function check(name, fn) {
   try { fn(); console.log(`  ✓ ${name}`); pass++; }
   catch (err) { console.log(`  ✗ ${name} — ${err.message}`); fails.push({ name, err }); fail++; }
 }
+
+// C1 — deterministic non-search turns disable tools (no stray search whose card
+// the deterministic owner then overwrites; live trace 2026-06-30 display_recovery).
+check("workflowDisablesTools: re-pin / selection / clarification turns are tools-off", () => {
+  for (const w of ["clarification", "display_recovery", "product_focus", "cart_handoff"]) {
+    assert.equal(workflowDisablesTools(w), true, `${w} must be tools-off`);
+  }
+  for (const w of ["browse", "availability", "condition_recommendation", "named_product_advisory", "comparison", "sale_browse"]) {
+    assert.equal(workflowDisablesTools(w), false, `${w} must keep tools`);
+  }
+});
+
+// C3 — a resolved named family's catalog gender overrides a stale conversation
+// gender (women's Savannah must not stay "men" from a prior turn).
+check("resolvedFamilyGender returns the single gender, null when mixed/empty", () => {
+  assert.equal(resolvedFamilyGender([{ _gender: "women" }, { gender: "women" }]), "women");
+  assert.equal(resolvedFamilyGender([{ gender: "men" }]), "men");
+  assert.equal(resolvedFamilyGender([{ _gender: "women" }, { gender: "men" }]), null, "mixed → null (let stated gender stand)");
+  assert.equal(resolvedFamilyGender([]), null);
+  assert.equal(resolvedFamilyGender([{ title: "no gender field" }]), null);
+});
+
+// C2 — named-product advisory/styling must instruct using the shown product's
+// own color/title (no color drift from earlier in the chat → no retry).
+check("named_product_advisory directive forbids color drift", () => {
+  const styling = planTurn({ message: "i want to wear gabby with a short white dress", namedProduct: true });
+  assert.equal(styling.workflow, WORKFLOWS.NAMED_PRODUCT_ADVISORY);
+  assert.ok(styling.directives.some((d) => /actual title and color|own color|never\s+(?:a\s+)?color/i.test(d)),
+    `styling directive must pin the shown color; got ${JSON.stringify(styling.directives)}`);
+  const advisory = planTurn({ message: "is the Gabby worth it?", namedProduct: true });
+  assert.ok(advisory.directives.some((d) => /actual title and color|never a color carried over/i.test(d)),
+    `advisory directive must pin the shown color; got ${JSON.stringify(advisory.directives)}`);
+});
 
 // textPresentsProducts — protects real cards from the clarification card-wipe
 // and powers the cards-promised-but-none-shown recovery.

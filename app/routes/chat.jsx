@@ -5,7 +5,7 @@ import { getAttributeMappings } from "../models/AttributeMapping.server";
 import { getCatalogCategories, getAllCatalogCategories, getCategoryGenderAvailability, getCategoryAttributeCoverage } from "../models/Product.server";
 import { getActiveCampaigns, formatCampaignsForCS } from "../models/Campaign.server";
 import { buildSystemPrompt } from "../lib/chat-prompt.server";
-import { planTurn, buildTurnPlanPromptBlock, buildPlanClarifierRepair, planForcesProductDisplay, planRequiresSearch as planRequiresSearchFlag, clarifierGateDecision, isAnswerWorkflow, plannedWorkflowCardOwnerViolation, plannedSearchSkippedViolation, cardsNotInEvidencePool, textPresentsProducts } from "../lib/turn-plan.server";
+import { planTurn, buildTurnPlanPromptBlock, buildPlanClarifierRepair, planForcesProductDisplay, planRequiresSearch as planRequiresSearchFlag, clarifierGateDecision, isAnswerWorkflow, plannedWorkflowCardOwnerViolation, plannedSearchSkippedViolation, cardsNotInEvidencePool, textPresentsProducts, workflowDisablesTools, resolvedFamilyGender } from "../lib/turn-plan.server";
 import { recordTurnInvariantViolation } from "../lib/turn-invariant.server";
 import { classifyAvailability, buildAvailabilityAnswer, AVAILABILITY_RESULT, resolveAvailabilityRequest, isAvailabilityFollowUp, familyOfTitle, collectFamilyColors, constraintIntent, parseAvailabilityConstraints, parseRequestedColors, priorAvailabilityMessage, priorAvailabilityConstraints, variantDataDiagnostics, styleKeyOfTitle, styleNameOfTitle } from "../lib/availability-truth";
 import { detectSupportHandoffNeed, buildSupportHandoffText, supportConfigured, normalizedSupportLabel, supportChatLabel } from "../lib/support-handoff";
@@ -1850,13 +1850,15 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
 
   const activeTools = tools || TOOLS;
 
-  // Clarification turns must NOT call tools. The plan already decided there's no
-  // actionable product intent (a bare "yes" with no prior offer, a vague
-  // opener); letting the model search anyway wastes a hop and creates a card
-  // that the clarification gate then wipes (live trace 2026-06-29). Force
-  // tool_choice:none for the whole turn. Actionable affirmations are routed to
-  // a real search workflow upstream (planTurn 6b), so they're unaffected.
-  if (ctx?.turnPlan?.workflow === "clarification") forceNoTools = true;
+  // Deterministic non-search turns must NOT call tools. The plan already decided
+  // there's no search to run: clarification (a bare "yes" / vague opener), and
+  // the re-pin / selection / cart turns whose cards come straight from prior
+  // evidence — display_recovery, product_focus, cart_handoff. Letting the model
+  // search anyway wastes a hop and produces a stray card the deterministic owner
+  // then has to overwrite (live trace 2026-06-30: display_recovery search=false,
+  // yet the model searched "walking supportive shoes" before evidence-plan
+  // re-pinned the prior cards). Force tool_choice:none for the whole turn.
+  if (workflowDisablesTools(ctx?.turnPlan?.workflow)) forceNoTools = true;
 
   // Tracks the final hop's stop_reason. If the loop exits with this still
   // === "tool_use", the model was cut off by the hop budget mid-tool-use
@@ -2545,6 +2547,18 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
         if (key && !seen.has(key)) { seen.add(key); merged.push(c); }
       }
       pool = merged;
+    }
+    // RESOLVED-GENDER OVERRIDE. A named product's catalog gender is authoritative
+    // — once we've FOUND the family, adopt its gender for the rest of the turn so
+    // a stale conversation gender (a prior "men's" turn) can't mislabel a women's
+    // Savannah/Gabby in the CTA/memory or force a fail-open (live trace
+    // 2026-06-30: Savannah carried gender=men). Only when the found cards share a
+    // single clear gender — a genuinely mixed family is left to the stated gender.
+    const resolved = resolvedFamilyGender(namedCards);
+    if (resolved && ctx.sessionGender !== resolved) {
+      console.log(`[chat] resolved-gender override: named family gender=${resolved} supersedes stale gender=${ctx.sessionGender || "-"} for this turn`);
+      ctx.sessionGender = resolved;
+      if (ctx.turnPlan) ctx.turnPlan.gender = resolved;
     }
   }
 

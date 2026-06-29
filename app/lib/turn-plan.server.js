@@ -52,6 +52,28 @@ export function textPresentsProducts(text) {
   return /\b(?:here(?:'s|\s+are|\s+is)|these\s+are|i(?:'ve|\s+have)?\s+found|i\s+found|take\s+a\s+look|check\s+(?:out|these)|below\s+are|a\s+few\s+(?:options|picks|styles|pairs)|some\s+(?:options|picks|great|solid)|\d+\s+(?:options|picks|styles|pairs|great)|my\s+(?:top\s+)?(?:picks|recommendations)|recommend(?:ed)?\s+(?:these|the\s+following)|pulled\s+(?:up|together)|found\s+(?:you\s+)?(?:a\s+few|some|\d+))\b/i.test(t);
 }
 
+// Workflows whose answer comes from prior evidence / a deterministic re-pin with
+// NO search this turn — the agent loop must run with tools DISABLED so the model
+// can't fire a stray search whose card the deterministic owner then overwrites
+// (live trace 2026-06-30: display_recovery search=false, model searched anyway).
+const TOOLS_OFF_WORKFLOWS = new Set(["clarification", "display_recovery", "product_focus", "cart_handoff"]);
+export function workflowDisablesTools(workflow) {
+  return TOOLS_OFF_WORKFLOWS.has(String(workflow || ""));
+}
+
+// The single authoritative gender of a resolved NAMED family's cards, or null if
+// the cards are empty or span multiple genders. A named product's catalog gender
+// overrides a stale conversation gender for the turn (live trace 2026-06-30:
+// women's Savannah carried a stale gender=men).
+export function resolvedFamilyGender(cards = []) {
+  const g = new Set(
+    (Array.isArray(cards) ? cards : [])
+      .map((c) => String(c?._gender || c?.gender || "").toLowerCase())
+      .filter((x) => x === "men" || x === "women"),
+  );
+  return g.size === 1 ? [...g][0] : null;
+}
+
 // A GENDER-ONLY refinement of a prior shopping turn: "how about mens?", "men's?",
 // "for men", "women's instead", "what about for my husband". On its own it's not
 // a clarification — it re-runs the prior search with the gender swapped.
@@ -263,6 +285,18 @@ function resolveStatedGender(m, attrs) {
   if (male && !female) return "men";
   if (female && !male) return "women";
   return null; // none, or conflicting
+}
+
+// Gender stated in the CURRENT message ONLY — never inherited from stale memory
+// (attrs.gender). For a NAMED product the catalog gender is inherent in the
+// product itself, so a stale conversation gender (e.g. a prior "men's" turn)
+// must NOT filter a women's Savannah/Gabby to men's and force a fail-open
+// (live trace 2026-06-30). Returns men|women|null.
+function messageGender(m) {
+  const male = MALE_RE.test(m), female = FEMALE_RE.test(m);
+  if (male && !female) return "men";
+  if (female && !male) return "women";
+  return null;
 }
 
 function words(s) {
@@ -584,9 +618,11 @@ export function planTurn({
       directives: styling
         ? [
             "This is a STYLING question about the NAMED product. Search for and show the named product — it is the subject and must be the card shown. Give concise styling advice on how it pairs with the outfit the customer described. The colors/patterns in the outfit (e.g. a white dress, red flowers, blue jeans) are NOT product filters — never search a different color/category because of the outfit. If the customer didn't name a product COLOR, don't apply one.",
+            "Refer to the product ONLY by the actual title and color of the card you are showing. Do NOT mention any other color — never a color from earlier in the conversation or from the customer's outfit. If you name a color, it must be the shown product's own color.",
           ]
         : [
             "Look up the named product this turn and answer the value/suitability question directly from its real facts — answer first, one honest tradeoff, then the card. Never answer a named-product question from memory alone.",
+            "Refer to the product ONLY by the actual title and color of the card you are showing — never a color carried over from earlier in the conversation.",
           ],
     });
   }
