@@ -76,30 +76,36 @@ test("mobile CAROUSEL photo FILLS the well (less empty space) + contain, never c
   assert.doesNotMatch(MOBILE, /\.ai-chat-product-img img \{[^}]*object-fit: cover/, "no cover on mobile product images");
 });
 
-test("mobile SINGLE/featured card is a compact HORIZONTAL grid (104px / 1fr)", () => {
+test("mobile SINGLE card: image left, title/price right, CTAs in a full-width BOTTOM row", () => {
+  // 3-row grid with a "cta cta" row spanning both columns.
   assert.match(MOBILE, /:only-child \{[^}]*display: grid/, "single card is a grid");
-  assert.match(MOBILE, /:only-child \{[^}]*grid-template-columns: 104px 1fr/, "104px image column + flexible text");
-  assert.match(MOBILE, /:only-child \.ai-chat-product-img \{[^}]*width: 104px/, "104px image well");
-  assert.match(MOBILE, /:only-child \.ai-chat-product-img img \{[^}]*max-width: 94px[^}]*max-height: 94px/, "photo capped at 94px");
+  assert.match(MOBILE, /:only-child \{[^}]*grid-template-columns: 88px minmax\(0, 1fr\)/, "88px image column + flexible text");
+  assert.match(MOBILE, /:only-child \{[^}]*grid-template-areas:\s*"img title"\s*"img price"\s*"cta cta"/, "img spans title/price; CTAs full-width bottom row");
+  // info dissolves so its children join the card grid.
+  assert.match(MOBILE, /:only-child \.ai-chat-product-info \{[^}]*display: contents/, "info is display:contents");
+  assert.match(MOBILE, /:only-child \.ai-chat-product-title \{[^}]*grid-area: title/, "title placed");
+  assert.match(MOBILE, /:only-child \.ai-chat-product-price \{[^}]*grid-area: price/, "price placed");
 });
 
-test("the single card image column STRETCHES to the content height (no gap below image)", () => {
-  // align-items:stretch → the white image well matches the info-block height, so
-  // there's never an asymmetric empty area below a top-pinned image.
-  assert.match(MOBILE, /:only-child \{[^}]*align-items: stretch/, "image column matches content height");
-  assert.match(MOBILE, /:only-child \.ai-chat-product-img \{[^}]*align-self: stretch/, "well stretches to the row height");
-  assert.match(MOBILE, /:only-child \.ai-chat-product-img \{[^}]*min-height: 92px/, "floor so a short card doesn't shrink the image");
+test("mobile SINGLE card: BOTH CTAs (View product + See It Styled) occupy the cta row", () => {
+  // With viz → the actions row is the cta area; without viz → the bare CTA is.
+  assert.match(MOBILE, /:only-child \.ai-chat-viz-actions \{[^}]*grid-area: cta/, "actions row spans the bottom");
+  assert.match(MOBILE, /:only-child \.ai-chat-viz-actions \{[^}]*width: 100%/, "full-width row");
+  assert.match(MOBILE, /:only-child \.ai-chat-product-cta \{[^}]*grid-area: cta/, "no-viz View product takes the same row");
+  assert.match(MOBILE, /:only-child \.ai-chat-product-cta \{[^}]*justify-self: start/, "no-viz CTA is content-sized, left-aligned (not a full-width bar)");
 });
 
-test("mobile single-card CTAs are THINNER (minimal vertical padding, no wasted space)", () => {
-  // View product gets tighter padding; the injected See It Styled button too.
-  assert.match(MOBILE, /:only-child \.ai-chat-product-cta \{[^}]*padding: 6px 14px/, "View product CTA is thin");
-  assert.match(MOBILE, /:only-child \.ai-chat-viz-btn \{[^}]*padding: 6px 13px !important/, "See It Styled button is thin (overrides its inline padding)");
+test("mobile SINGLE card: the two CTAs are a MATCHED pair (same height/padding/radius)", () => {
+  assert.match(MOBILE, /:only-child \.ai-chat-product-cta \{[^}]*min-height: 38px[^}]*padding: 8px 16px/, "View product sizing");
+  // See It Styled must override its inline styles to match.
+  assert.match(MOBILE, /:only-child \.ai-chat-viz-btn \{[^}]*min-height: 38px !important[^}]*padding: 8px 16px !important/, "See It Styled matches (overrides inline)");
+  assert.match(MOBILE, /:only-child \.ai-chat-viz-btn \{[^}]*border-radius: 9px !important/, "matched radius");
 });
 
-test("the single card hugs its content (no stretched min-height / dead space)", () => {
+test("mobile SINGLE card: compact image well, no wasted space (88px well, ≤80px photo)", () => {
+  assert.match(MOBILE, /:only-child \.ai-chat-product-img \{[^}]*width: 88px[^}]*height: 88px/, "88px image well");
+  assert.match(MOBILE, /:only-child \.ai-chat-product-img img \{[^}]*max-width: 80px[^}]*max-height: 80px/, "photo capped at 80px, centered");
   assert.match(MOBILE, /:only-child \.ai-chat-product-title \{[^}]*min-height: 0/, "title doesn't reserve dead 2-line height");
-  assert.match(MOBILE, /:only-child \.ai-chat-product-cta \{[^}]*max-width: 160px/, "CTA sized to content, not full-width");
 });
 
 test("DESKTOP product-card sizing is UNCHANGED (rules are mobile-scoped)", () => {
@@ -114,8 +120,8 @@ test("DESKTOP product-card sizing is UNCHANGED (rules are mobile-scoped)", () =>
 test("no horizontal-overflow / viewport-width hacks introduced on mobile", () => {
   assert.doesNotMatch(MOBILE, /overflow-x: (auto|scroll)/, "no horizontal scrollbars");
   assert.doesNotMatch(MOBILE, /100vw/, "no viewport-width rule that could overflow the bubble");
-  // The text column can shrink so a long title can't push the card wide.
-  assert.match(MOBILE, /:only-child \.ai-chat-product-info \{[^}]*min-width: 0/, "info column can shrink");
+  // The text column uses minmax(0, 1fr) so a long title can't push the card wide.
+  assert.match(MOBILE, /:only-child \{[^}]*grid-template-columns: 88px minmax\(0, 1fr\)/, "text column can shrink (minmax 0)");
 });
 
 console.log(`\n${failed === 0 ? "✅" : "❌"}  ${passed} passed, ${failed} failed\n`);

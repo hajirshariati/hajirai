@@ -1502,25 +1502,36 @@ a.ai-chat-welcome__hint--link:hover {
     padding-top: 8px;
   }
 
-  /* Single featured card → compact HORIZONTAL grid (image left, info right) so a
-     lone result isn't a full-bubble-tall image. (Desktop's :only-child row lives
-     in the min-width:601px block and is unaffected.) */
+  /* Single featured card → compact 3-row grid:
+       "img title"
+       "img price"
+       "cta cta"     ← BOTH CTAs (View product + See It Styled) on one full-width
+                       row at the BOTTOM, so the right column only holds title +
+                       price and the whole card is shorter.
+     `info` becomes display:contents so its children (title/price/CTAs) join the
+     CARD grid — no DOM change, and it works for BOTH the with-viz case (the
+     .ai-chat-viz-actions row) and the without-viz case (the bare View product
+     CTA). (Desktop's :only-child row lives in the min-width:601px block and is
+     unaffected.) */
   .ai-chat-products--showcase .ai-chat-product-card:only-child {
     display: grid;
-    grid-template-columns: 104px 1fr;
-    gap: 14px;
-    /* STRETCH the image column to the content height so the white well always
-       matches the info block — no asymmetric empty space below a top-pinned
-       image. The photo is centered inside the white well (white-on-white reads
-       as a clean centered product shot, not a gap). */
-    align-items: stretch;
+    grid-template-columns: 88px minmax(0, 1fr);
+    grid-template-areas:
+      "img title"
+      "img price"
+      "cta cta";
+    column-gap: 14px;
+    row-gap: 2px;
+    align-items: center;
     padding: 14px;
   }
+  /* Compact white image well — fixed, centered, no wasted space around the photo.
+     Spans the title+price rows and centers vertically beside them. */
   .ai-chat-products--showcase .ai-chat-product-card:only-child .ai-chat-product-img {
-    width: 104px;
-    height: auto;
-    min-height: 92px;
-    align-self: stretch;
+    grid-area: img;
+    width: 88px;
+    height: 88px;
+    align-self: center;
     background: #fff;
     display: flex;
     align-items: center;
@@ -1532,36 +1543,81 @@ a.ai-chat-welcome__hint--link:hover {
   .ai-chat-products--showcase .ai-chat-product-card:only-child .ai-chat-product-img img {
     width: auto;
     height: auto;
-    max-width: 94px;
-    max-height: 94px;
+    max-width: 80px;
+    max-height: 80px;
     object-fit: contain;
     display: block;
   }
+  /* Dissolve info so its children become grid items of the card. */
   .ai-chat-products--showcase .ai-chat-product-card:only-child .ai-chat-product-info {
-    padding: 0;
-    min-width: 0;
-    /* Center the text block against the image; thin buttons keep it short. */
-    justify-content: center;
-    gap: 5px;
+    display: contents;
   }
-  /* No reserved 2-line min-height → the card hugs its content (no dead space). */
+  /* Title bottom-aligned, price top-aligned → they sit together as a tight pair
+     vertically centered next to the image (no floating gaps). */
   .ai-chat-products--showcase .ai-chat-product-card:only-child .ai-chat-product-title {
+    grid-area: title;
+    align-self: end;
     min-height: 0;
+    min-width: 0; /* shrink + ellipsize instead of widening the card */
+    margin: 0;
   }
-  /* THINNER CTAs on mobile — minimal vertical padding so the buttons (and the
-     whole card) take less height and waste no space. */
-  .ai-chat-products--showcase .ai-chat-product-card:only-child .ai-chat-product-cta {
-    align-self: flex-start;
-    max-width: 160px;
-    padding: 6px 14px;
-    margin-top: 0;
+  .ai-chat-products--showcase .ai-chat-product-card:only-child .ai-chat-product-price {
+    grid-area: price;
+    align-self: start;
+    min-width: 0;
+    margin: 0;
   }
+  /* CTA row — full width at the bottom; buttons sized to content + left-aligned. */
   .ai-chat-products--showcase .ai-chat-product-card:only-child .ai-chat-viz-actions {
-    margin-top: 4px !important;
-    gap: 6px;
+    grid-area: cta;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: stretch;
+    justify-content: flex-start;
+    width: 100%;
+    margin: 10px 0 0;
   }
+  /* Without See It Styled (screenshot 2): the bare View product CTA takes the
+     same bottom row, content-sized — never a full-width black bar. */
+  .ai-chat-products--showcase .ai-chat-product-card:only-child .ai-chat-product-cta {
+    grid-area: cta;
+    align-self: start;
+    justify-self: start;
+    width: auto;
+    max-width: none;
+    margin: 10px 0 0;
+  }
+  /* Inside the actions row the View product CTA must NOT also carry the row's
+     top margin (the row owns the spacing). */
+  .ai-chat-products--showcase .ai-chat-product-card:only-child .ai-chat-viz-actions .ai-chat-product-cta {
+    margin: 0;
+  }
+  /* Consistent Apple-style button sizing for BOTH CTAs — same height, padding,
+     radius, and font so they read as a matched pair. */
+  .ai-chat-products--showcase .ai-chat-product-card:only-child .ai-chat-product-cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 38px;
+    padding: 8px 16px;
+    border-radius: 9px;
+    font-size: 13px;
+    line-height: 1.2;
+    box-sizing: border-box;
+  }
+  /* See It Styled carries INLINE styles from injectVizButton (padding/radius/
+     font), so its sizing must use !important to match View product exactly. */
   .ai-chat-products--showcase .ai-chat-product-card:only-child .ai-chat-viz-btn {
-    padding: 6px 13px !important;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    min-height: 38px !important;
+    padding: 8px 16px !important;
+    border-radius: 9px !important;
+    font-size: 13px !important;
+    line-height: 1.2;
+    box-sizing: border-box;
   }
 }
 
