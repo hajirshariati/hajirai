@@ -1895,6 +1895,47 @@ await test("loop cap: the same seed question is never emitted a 3rd time", async
   assert.equal(thirdEmit, false, "third identical emission must be blocked by the loop cap");
 });
 
+// ── Shoes-vs-orthotics decision + one-step guided orthotic finder ────────────
+await test("shoes-vs-orthotics decision: explains difference + chips, no products", async () => {
+  const { events, encoder, controller } = makeMockSse();
+  const out = await maybeRunOrthoticFlow({
+    messages: [{ role: "user", content: "I have plantar fasciitis. What Aetrex shoes or orthotics would you recommend?" }],
+    tree, shop: "test.myshopify.com", controller, encoder,
+    turnPlan: { workflow: "multi_recommendation", clarificationAllowed: false },
+  });
+  assert.equal(out.handled, true);
+  assert.equal(out.case, "shoes_vs_orthotics_decision");
+  const textEv = events.find((e) => e?.type === "text");
+  assert.ok(textEv && /built-in arch support/i.test(textEv.text), "must explain the difference");
+  assert.ok(/<<Help me find supportive shoes>>/.test(textEv.text) && /<<Help me choose an orthotic>>/.test(textEv.text), "must offer choose-your-flow chips");
+  const prodEv = events.find((e) => e?.type === "products");
+  assert.deepEqual(prodEv?.products, [], "must NOT show product cards");
+});
+
+await test("guided orthotic finder: gate runs (one-step gender) despite condition_recommendation clarify=false", async () => {
+  const { events, encoder, controller } = makeMockSse();
+  const out = await maybeRunOrthoticFlow({
+    messages: [{ role: "user", content: "Help me choose the right Aetrex orthotic" }],
+    tree, shop: "test.myshopify.com", controller, encoder,
+    turnPlan: { workflow: "condition_recommendation", clarificationAllowed: false },
+  });
+  // Must NOT defer with the condition_recommendation / clarify-disallowed cases —
+  // the explicit guided finder is exactly when the gate should ask gender directly.
+  assert.notEqual(out.case, "turn_plan_owns_condition_recommendation", "guided finder must not defer");
+  assert.notEqual(out.case, "turn_plan_clarify_disallowed", "guided finder must not defer");
+});
+
+await test("regular condition turn STILL defers (no gender clarifier) — guided-finder exception is narrow", async () => {
+  const { events, encoder, controller } = makeMockSse();
+  const out = await maybeRunOrthoticFlow({
+    messages: [{ role: "user", content: "Show me supportive shoes for standing all day" }],
+    tree, shop: "test.myshopify.com", controller, encoder,
+    turnPlan: { workflow: "condition_recommendation", clarificationAllowed: false },
+  });
+  assert.equal(out.handled, false, "a plain supportive-shoes turn must still defer to the LLM");
+  assert.equal(out.case, "turn_plan_owns_condition_recommendation");
+});
+
 console.log("");
 if (failed === 0) {
   console.log(`✅  ${passed} passed, 0 failed\n`);

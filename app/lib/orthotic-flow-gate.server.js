@@ -61,6 +61,7 @@ import { buildStorefrontSearchCTA } from "./storefront-search-cta.server.js";
 import { scrubInternalEnums } from "./chat-postprocessing.js";
 import { detectConversationGoal, detectTurnGoal, INFO_QUESTION_GOALS } from "./turn-intent.server.js";
 import { isShortAmbiguousReply } from "./turn-scope.js";
+import { isShoesVsOrthoticsDecision, buildShoesVsOrthoticsAnswer, isGuidedOrthoticFinderRequest } from "./compatibility-truth.server.js";
 
 // Format a recommender-returned product the same way chat-tools'
 // extractProductCards does. Inlined (rather than imported) to keep
@@ -781,6 +782,30 @@ export async function maybeRunOrthoticFlow({
   }
   if (!Array.isArray(messages) || messages.length === 0) return { handled: false };
 
+  const latestUserText = (() => {
+    for (let i = messages.length - 1; i >= 0; i -= 1) {
+      const mm = messages[i];
+      if (mm?.role === "user" && typeof mm.content === "string") return mm.content;
+    }
+    return "";
+  })();
+
+  // ── SHOES-vs-ORTHOTICS open decision ──────────────────────────────────
+  // "What Aetrex shoes or orthotics would you recommend?" — the customer hasn't
+  // chosen between a supportive shoe and a removable orthotic. Don't dump a random
+  // shoe + a random (often anti-static) orthotic: EXPLAIN the difference and let
+  // them pick the flow with chips. Runs BEFORE the TurnPlan deferrals because the
+  // ask routes to multi_recommendation, which would otherwise own it and dump the
+  // two cards. The chip labels are self-routing into the correct next flow.
+  if (isShoesVsOrthoticsDecision(latestUserText)) {
+    const text = buildShoesVsOrthoticsAnswer();
+    controller.enqueue(encoder.encode(sseChunk({ type: "text", text })));
+    controller.enqueue(encoder.encode(sseChunk({ type: "products", products: [] })));
+    controller.enqueue(encoder.encode(sseChunk({ type: "done" })));
+    console.log(`[orthotic-flow] shoes-vs-orthotics decision — explained difference + offered choose-your-flow chips ("${latestUserText.slice(0, 60)}")`);
+    return { handled: true, case: "shoes_vs_orthotics_decision" };
+  }
+
   // ── HARD TURNPLAN OWNERSHIP OVERRIDE ──────────────────────────────────
   // TurnPlan is the single front-of-turn authority. When it has classified
   // the turn as condition_recommendation with clarification DISALLOWED, the
@@ -790,10 +815,15 @@ export async function maybeRunOrthoticFlow({
   // no clarification, no gate asks a clarification question. The regex advisory
   // guard further down stays as defense-in-depth, but it is NOT the primary
   // protection — this boundary is.
+  // EXCEPTION: an EXPLICIT guided-orthotic-finder request ("help me choose the
+  // right orthotic") is exactly the turn where the gate SHOULD run — it asks the
+  // gender chips directly in ONE step, instead of the LLM first asking a vague
+  // "for you or someone else?" and the gate asking gender on the NEXT turn.
   if (
     turnPlan &&
     turnPlan.workflow === "condition_recommendation" &&
-    turnPlan.clarificationAllowed === false
+    turnPlan.clarificationAllowed === false &&
+    !isGuidedOrthoticFinderRequest(latestUserText)
   ) {
     console.log(
       "[orthotic-flow] turn-plan override: condition_recommendation clarify=false — deferring to LLM",
@@ -822,8 +852,10 @@ export async function maybeRunOrthoticFlow({
     );
     return { handled: false, case: `turn_plan_owns_${turnPlan.workflow}` };
   }
-  // Any workflow that explicitly DISALLOWS clarification: the gate cannot ask.
-  if (turnPlan && turnPlan.clarificationAllowed === false) {
+  // Any workflow that explicitly DISALLOWS clarification: the gate cannot ask —
+  // EXCEPT the explicit guided-orthotic-finder, where the one-step gender chip
+  // IS the right move (see the condition_recommendation exception above).
+  if (turnPlan && turnPlan.clarificationAllowed === false && !isGuidedOrthoticFinderRequest(latestUserText)) {
     console.log(
       `[orthotic-flow] turn-plan override: workflow=${turnPlan.workflow} clarify=false — deferring to LLM`,
     );

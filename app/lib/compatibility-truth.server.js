@@ -119,3 +119,49 @@ const UNSAFE_SUGGESTION_RE = new RegExp(
 export function isUnsafeCompatibilitySuggestion(text) {
   return UNSAFE_SUGGESTION_RE.test(String(text || ""));
 }
+
+// ── SHOES-vs-ORTHOTICS open decision ──────────────────────────────────────────
+// "I have plantar fasciitis. What Aetrex shoes or orthotics would you recommend?"
+// The customer hasn't decided between a supportive SHOE and a removable ORTHOTIC.
+// Dumping a random shoe + a random orthotic (often the unisex ESD anti-static one,
+// the only orthotic that survives the gender filter in a women-heavy catalog) is a
+// poor answer. Explain the difference and let them pick the flow with chips.
+const FOOTWEAR_TERM_RE = /\b(?:shoes?|sneakers?|footwear|sandals?|boots?|loafers?|flats?|heels?|slippers?|clogs?)\b/i;
+const ORTHOTIC_TERM_RE = /\b(?:orthotics?|insoles?|inserts?|footbeds?|arch\s+supports?)\b/i;
+// Open-choice framing: a connector between the two, or a recommend/decision verb.
+const DECISION_FRAME_RE = /\b(?:or|recommend|should\s+i|which|what\s+(?:should|do|would|kind|type)|help\s+me|better|vs\.?|versus|difference\s+between)\b/i;
+
+// True when THIS message asks to choose between supportive shoes and orthotics.
+// Excludes the orthotic↔sandal COMPATIBILITY question ("can I wear orthotics
+// inside sandals, or closed shoes?"), which compatibility-truth owns — that is a
+// product-truth question, not a which-should-I-buy decision.
+export function isShoesVsOrthoticsDecision(text) {
+  const t = String(text || "");
+  if (isOrthoticSandalCompatibilityQuestion(t)) return false;
+  return FOOTWEAR_TERM_RE.test(t) && ORTHOTIC_TERM_RE.test(t) && DECISION_FRAME_RE.test(t);
+}
+
+// The deterministic explain-the-difference answer with choose-your-flow chips.
+// The chip LABELS are self-routing: "supportive shoes" → condition_recommendation,
+// "choose an orthotic" → the guided orthotic finder (which asks gender once).
+export function buildShoesVsOrthoticsAnswer() {
+  return (
+    "Good question! Here's the difference: Aetrex shoes come with built-in arch " +
+    "support — the simplest choice if you want comfort right out of the box. Aetrex " +
+    "orthotics are removable insoles you add to shoes you already own (or new ones) " +
+    "for customized support. Which would you like to explore?\n\n" +
+    "<<Help me find supportive shoes>><<Help me choose an orthotic>>"
+  );
+}
+
+// True when the customer EXPLICITLY wants the guided orthotic finder ("help me
+// choose the right orthotic", "which orthotic should I get") — and is NOT also
+// asking about shoes (that is the shoes-vs-orthotics decision above). Lets the
+// orthotic gate ask the gender chips directly in ONE step instead of the LLM
+// first asking a vague "for you or someone else?".
+export function isGuidedOrthoticFinderRequest(text) {
+  const t = String(text || "");
+  if (!ORTHOTIC_TERM_RE.test(t)) return false;
+  if (FOOTWEAR_TERM_RE.test(t)) return false; // shoes mentioned → decision, not pure finder
+  return /\b(?:help\s+me\s+(?:choose|find|pick|select)|choose|find|pick|recommend|which|what)\b[^.?!]*\borthotics?\b|\borthotics?\b[^.?!]*\b(?:recommend|help|choose|right\s+one|for\s+me)\b/i.test(t);
+}
