@@ -373,6 +373,25 @@ export async function runWithGroundingRetry({
     }
     const text = result?.fullResponseText || "";
     const pool = gatherPoolFromResult(result, messages);
+    // Availability Truth owns the answer text deterministically
+    // (buildAvailabilityAnswer) — the model didn't write it, so the grounding
+    // validator must not "correct" it. Every verdict (AVAILABLE / UNKNOWN /
+    // NOT_FOUND, including the partial width_not_in_options) is a correct,
+    // TERMINAL answer. Short-circuit to ok=true so it never burns retries (live
+    // trace 2026-06-30: Savannah champagne 7-wide → 3 attempts, ok=false).
+    if (result?.answerOwner === "availability-truth") {
+      console.log(
+        `[grounding-retry] availability-truth owns the answer (reason=${result?.availabilityVerdictReason || "-"}) — terminal, no retry`,
+      );
+      if (typeof onAttempt === "function") {
+        onAttempt({ attempt, validation: { ok: true, errors: [], warnings: [] }, textLen: text.length, poolSize: pool.length });
+      }
+      return {
+        ...applyLengthCap(result, [], planWorkflow),
+        totalUsage: { ...accUsage },
+        validation: { ok: true, errors: [], attempts: attempt + 1, availabilityTerminal: true },
+      };
+    }
     const validation = validateGrounding({
       text,
       pool,

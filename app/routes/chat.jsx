@@ -3038,6 +3038,43 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     }
   }
 
+  // ── product_focus / cart_handoff: pin the focused card as a DETERMINISTIC
+  // owner and SEED it into the evidence pool. Without this the focus card is a
+  // prior card (not in this turn's search evidence), so cardOwner=scorer and the
+  // card_not_in_evidence_pool invariant drops it → finalCards=0 after retries
+  // (live trace 2026-06-30: "Molly Lace-Up Sneaker" dropped). Owner=evidence-plan
+  // exempts it from the scorer membership check; seeding it makes membership true
+  // regardless. A stale gender filter can never exclude an explicitly-picked card.
+  if (
+    (ctx.turnPlan?.workflow === "product_focus" || ctx.turnPlan?.workflow === "cart_handoff") &&
+    ctx.focusProduct &&
+    !availabilityPinnedCards && !comparisonPinnedCards && !evidencePinnedCards && !priorEvidencePinnedCards &&
+    !rewriteOnlyRetry
+  ) {
+    evidencePinnedCards = [ctx.focusProduct];
+    const key = String(ctx.focusProduct.handle || ctx.focusProduct.title || "").toLowerCase();
+    if (key && !allProductPool.has(key)) allProductPool.set(key, ctx.focusProduct);
+    evidenceFallbackText = `Great pick — the ${cardDisplayName(ctx.focusProduct)}. Want me to check sizes/colors or compare it with a similar style?`;
+    console.log(`[evidence-plan] ${ctx.turnPlan.workflow} pinnedFinalCards=1 focused="${ctx.focusProduct.title}" (owner=evidence-plan, seeded pool)`);
+  }
+
+  // ── display_recovery: re-pin the PRIOR turn's cards (the customer said they
+  // didn't render). Deterministic owner + seed the pool so the membership
+  // invariant doesn't drop them.
+  if (
+    ctx.turnPlan?.workflow === "display_recovery" &&
+    Array.isArray(ctx.priorProductCards) && ctx.priorProductCards.length > 0 &&
+    !availabilityPinnedCards && !comparisonPinnedCards && !evidencePinnedCards && !priorEvidencePinnedCards &&
+    !rewriteOnlyRetry
+  ) {
+    evidencePinnedCards = ctx.priorProductCards.slice(0, Math.max(1, ctx.productCardCap || 6));
+    for (const c of evidencePinnedCards) {
+      const key = String(c.handle || c.title || "").toLowerCase();
+      if (key && !allProductPool.has(key)) allProductPool.set(key, c);
+    }
+    console.log(`[evidence-plan] display_recovery re-pinned ${evidencePinnedCards.length} prior card(s) (owner=evidence-plan, seeded pool)`);
+  }
+
   // ── Condition / advisory recommendation: deterministic 2-3 card selection ──
   // A condition_recommendation turn ("comfortable shoes for standing all day",
   // "plantar fasciitis walking", "cute but supportive for a wedding") must NOT
@@ -3514,43 +3551,16 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     console.log(`[cta] ${ctx.shop} broad CTA suppressed: comparison turn (pinned cards)`);
   } else if (evidencePinnedCards) {
     // EvidencePlan owns the final cards (multi_recommendation = one per slot;
-    // compatibility = the named product only). Emit verbatim, bypass the scorer
-    // and alignment so category-level answer language can't wipe them.
+    // compatibility / named_product_advisory = the named product; product_focus /
+    // cart_handoff = the focused card; display_recovery = the prior cards). Emit
+    // verbatim, bypass the scorer and alignment so category-level answer language
+    // can't wipe them.
     const { products: deduped } = prepareProductCardsForTurn(evidencePinnedCards);
     finalProductCards = deduped;
-    console.log(`[evidence-plan] finalCards=${deduped.length}`);
+    console.log(`[evidence-plan] finalCards=${deduped.length} (${ctx.turnPlan?.workflow})`);
     if (deduped.length > 0) {
       controller.enqueue(encoder.encode(sseChunk({ type: "products", products: deduped })));
-    }
-    console.log(`[cta] ${ctx.shop} broad CTA suppressed: ${ctx.turnPlan.workflow} turn (pinned evidence)`);
-  } else if (
-    ctx?.turnPlan?.workflow === "display_recovery" &&
-    Array.isArray(ctx.priorProductCards) && ctx.priorProductCards.length > 0 &&
-    pool.length === 0
-  ) {
-    // DISPLAY RECOVERY: the customer said the products didn't render. Re-emit
-    // the SAME cards from the previous turn verbatim (live trace 2026-06-29:
-    // "i can't see any" became a fresh clarification with zero cards).
-    const { products: deduped } = prepareProductCardsForTurn(ctx.priorProductCards);
-    finalProductCards = deduped;
-    console.log(`[display-recovery] re-emitting ${deduped.length} prior card(s)`);
-    if (deduped.length > 0) {
-      controller.enqueue(encoder.encode(sseChunk({ type: "products", products: deduped })));
-    }
-    console.log(`[cta] ${ctx.shop} broad CTA suppressed: display_recovery turn (prior cards)`);
-  } else if (
-    (ctx?.turnPlan?.workflow === "product_focus" || ctx?.turnPlan?.workflow === "cart_handoff") &&
-    ctx.focusProduct
-  ) {
-    // Product SELECTION / CART turn: the customer picked a product they were
-    // just shown ("I like the Drew", "add it to my cart"). Pin THAT product's
-    // card from prior evidence — never a fresh scorer pool, never a new search
-    // (live trace 2026-06-29: "I like the Drew" became a generic browse).
-    const { products: deduped } = prepareProductCardsForTurn([ctx.focusProduct]);
-    finalProductCards = deduped;
-    console.log(`[product-focus] finalCards=${deduped.length} (${ctx.turnPlan.workflow} focused="${ctx.focusProduct.title || "-"}")`);
-    if (deduped.length > 0) {
-      controller.enqueue(encoder.encode(sseChunk({ type: "products", products: deduped })));
+      // A single focused/pinned card can carry the See-It-Styled CTA.
       if (deduped.length === 1) {
         const vizEvent = buildVisualizeCtaEvent({ config: ctx.shopConfig, product: deduped[0], messages: ctx.messages });
         if (vizEvent) {
@@ -3559,7 +3569,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
         }
       }
     }
-    console.log(`[cta] ${ctx.shop} broad CTA suppressed: ${ctx.turnPlan.workflow} turn (focused card)`);
+    console.log(`[cta] ${ctx.shop} broad CTA suppressed: ${ctx.turnPlan.workflow} turn (pinned evidence)`);
   } else if (pool.length > 0 && fullResponseText && !suppressCardsForChips) {
     const textLower = fullResponseText.toLowerCase();
     const saysNoMatch = detectAiNoMatchPhrasing(fullResponseText);
@@ -4305,6 +4315,14 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     // evidence-plan it also drives the deterministic-fallback path.
     cardOwner: resolvedCardOwner,
     evidenceFallbackText,
+    // Availability Truth owns BOTH the cards and the deterministic answer text
+    // for an availability turn (buildAvailabilityAnswer). Surfaced so the
+    // grounding-retry loop treats it as TERMINAL — a partial verdict like
+    // width_not_in_options is a correct final answer, never a retry (live trace
+    // 2026-06-30: Savannah 7-wide UNKNOWN/width_not_in_options burned 3 attempts).
+    answerOwner,
+    availabilityVerdictReason,
+    availabilityVerdictResult,
   };
 }
 

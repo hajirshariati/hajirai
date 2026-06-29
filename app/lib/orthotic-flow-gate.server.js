@@ -801,6 +801,35 @@ export async function maybeRunOrthoticFlow({
     return { handled: false, case: "turn_plan_owns_condition_recommendation" };
   }
 
+  // ── HARD TURNPLAN OWNERSHIP OVERRIDE (product-owning workflows) ──────────
+  // When TurnPlan has classified the turn as one it OWNS deterministically
+  // (re-showing prior cards, a focused/selected product, a cart handoff, an
+  // availability/variant lookup, a comparison, a named-product advisory, …),
+  // the legacy orthotic gate must NEVER hijack it with a gender/orthotic
+  // question (live trace 2026-06-30: workflow=display_recovery, yet the gate
+  // emitted "what kind of shoes? gender first" and took the turn). Defer
+  // immediately. Browse / clarification / sale_browse are NOT here — those can
+  // still legitimately route through the gate when an orthotic intent surfaces.
+  const ORTHOTIC_NON_OWNED_WORKFLOWS = new Set([
+    "display_recovery", "product_focus", "cart_handoff",
+    "availability", "prior_evidence_availability", "comparison",
+    "named_product_advisory", "multi_recommendation", "compatibility",
+    "sizing_help", "policy_account", "customer_service",
+  ]);
+  if (turnPlan && ORTHOTIC_NON_OWNED_WORKFLOWS.has(turnPlan.workflow)) {
+    console.log(
+      `[orthotic-flow] turn-plan override: workflow=${turnPlan.workflow} is TurnPlan-owned — deferring to LLM (no orthotic question)`,
+    );
+    return { handled: false, case: `turn_plan_owns_${turnPlan.workflow}` };
+  }
+  // Any workflow that explicitly DISALLOWS clarification: the gate cannot ask.
+  if (turnPlan && turnPlan.clarificationAllowed === false) {
+    console.log(
+      `[orthotic-flow] turn-plan override: workflow=${turnPlan.workflow} clarify=false — deferring to LLM`,
+    );
+    return { handled: false, case: "turn_plan_clarify_disallowed" };
+  }
+
   // ── LLM-owned engage decision (ORTHOTIC_GATE_LLM_OWNED, default OFF) ──
   // This pre-LLM regex gate decides "run the orthotic finder?" BEFORE the
   // model sees the turn — and it over-engages: a browse hijacked into a

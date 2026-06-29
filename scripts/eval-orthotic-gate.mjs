@@ -1856,6 +1856,26 @@ await test("hostility bypass fires on FIRST occurrence (no parseable prior chips
   assert.equal(events.some((e) => /What kind of shoes/i.test(e?.text || "")), false);
 });
 
+await test("TurnPlan-owned workflows (display_recovery/product_focus/availability) bypass the gate", async () => {
+  // Live trace 2026-06-30: workflow=display_recovery, yet the gate emitted
+  // "gender first?" and took the turn. A TurnPlan-owned product workflow must
+  // make the gate defer immediately.
+  for (const workflow of ["display_recovery", "product_focus", "cart_handoff", "availability", "named_product_advisory"]) {
+    const { events, encoder, controller } = makeMockSse();
+    const out = await maybeRunOrthoticFlow({
+      messages: [
+        { role: "user", content: "I have plantar fasciitis, show me orthotics" },
+        { role: "assistant", content: "Here are some options." },
+        { role: "user", content: "i can't see any" },
+      ],
+      tree, shop: "test.myshopify.com", controller, encoder,
+      turnPlan: { workflow, clarificationAllowed: false },
+    });
+    assert.equal(out.handled, false, `gate must defer for workflow=${workflow}`);
+    assert.equal(events.length, 0, `gate must emit nothing for workflow=${workflow}`);
+  }
+});
+
 await test("loop cap: the same seed question is never emitted a 3rd time", async () => {
   // q_use_case already went out TWICE; a third turn (even plain gibberish, not a
   // confusion/hostility trigger) must defer instead of repeating it again.

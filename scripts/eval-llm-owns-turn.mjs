@@ -178,6 +178,35 @@ test("first attempt grounded → returns immediately, no retry", async () => {
   assert.equal(calls, 1);
 });
 
+test("availability-truth answer is TERMINAL — no retry, attempts=1 (width_not_in_options)", async () => {
+  // Live trace 2026-06-30: Savannah champagne size 7 wide → UNKNOWN/
+  // width_not_in_options. The deterministic answer "I can find Savannah in
+  // Champagne in size 7, but Wide is not listed as a separate width option."
+  // contains no-match-ish phrasing and was retried 3× ok=false. Availability
+  // Truth owns the text — it must be terminal-valid on the first attempt.
+  let calls = 0;
+  const runLoop = async () => {
+    calls += 1;
+    return {
+      fullResponseText: "I can find the Savannah in Champagne in size 7, but Wide isn't listed as a separate width option.",
+      finalProductCards: [{ handle: "savannah-champagne", title: "Savannah Adjustable Quarter Strap Sandal - Champagne" }],
+      messages: [],
+      answerOwner: "availability-truth",
+      availabilityVerdictReason: "width_not_in_options",
+      availabilityVerdictResult: "UNKNOWN",
+    };
+  };
+  const out = await runWithGroundingRetry({
+    runLoop,
+    initialMessages: [{ role: "user", content: "Do you have the Savannah in champagne size 7 wide?" }],
+    turnPlan: { workflow: "availability" },
+  });
+  assert.equal(out.validation.ok, true);
+  assert.equal(out.validation.attempts, 1);
+  assert.equal(calls, 1, "must not retry an availability-truth answer");
+  assert.match(out.fullResponseText, /Savannah/);
+});
+
 test("ungrounded product → retries with error feedback, succeeds on attempt 2", async () => {
   let calls = 0;
   const pool = [{ handle: "jillian-black", title: "Jillian Sandal - Black" }];
