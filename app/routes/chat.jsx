@@ -3412,6 +3412,28 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       controller.enqueue(encoder.encode(sseChunk({ type: "products", products: deduped })));
     }
     console.log(`[cta] ${ctx.shop} broad CTA suppressed: ${ctx.turnPlan.workflow} turn (pinned evidence)`);
+  } else if (
+    (ctx?.turnPlan?.workflow === "product_focus" || ctx?.turnPlan?.workflow === "cart_handoff") &&
+    ctx.focusProduct
+  ) {
+    // Product SELECTION / CART turn: the customer picked a product they were
+    // just shown ("I like the Drew", "add it to my cart"). Pin THAT product's
+    // card from prior evidence — never a fresh scorer pool, never a new search
+    // (live trace 2026-06-29: "I like the Drew" became a generic browse).
+    const { products: deduped } = prepareProductCardsForTurn([ctx.focusProduct]);
+    finalProductCards = deduped;
+    console.log(`[product-focus] finalCards=${deduped.length} (${ctx.turnPlan.workflow} focused="${ctx.focusProduct.title || "-"}")`);
+    if (deduped.length > 0) {
+      controller.enqueue(encoder.encode(sseChunk({ type: "products", products: deduped })));
+      if (deduped.length === 1) {
+        const vizEvent = buildVisualizeCtaEvent({ config: ctx.shopConfig, product: deduped[0], messages: ctx.messages });
+        if (vizEvent) {
+          controller.enqueue(encoder.encode(sseChunk(vizEvent)));
+          console.log(`[chat] ${ctx.shop} visualize_cta emitted for "${vizEvent.productTitle}"`);
+        }
+      }
+    }
+    console.log(`[cta] ${ctx.shop} broad CTA suppressed: ${ctx.turnPlan.workflow} turn (focused card)`);
   } else if (pool.length > 0 && fullResponseText && !suppressCardsForChips) {
     const textLower = fullResponseText.toLowerCase();
     const saysNoMatch = detectAiNoMatchPhrasing(fullResponseText);
@@ -4021,7 +4043,17 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     // search. If it didn't, a downstream gate silently refused a TurnPlan-
     // required search (the workflow never changed to text-only/suppress).
     if (plannedSearchSkippedViolation({ plan: ctx?.turnPlan, searchAttempted: productSearchAttempted })) {
-      recordTurnInvariantViolation("search_required_not_attempted", { workflow });
+      // A search was required but never attempted. If the forced-search layer
+      // DELIBERATELY refused it (no concrete commerce constraint, or the reply
+      // was a clarifying question), that's a legitimate downgrade — log it, do
+      // NOT flag a violation. Only a search that was attemptable yet skipped is
+      // a real breach. ("never ship search_required_not_attempted" on a
+      // deliberate downgrade — live QA 2026-06-29.)
+      if (forcedSearchAllowed({ ctx, text: fullResponseText })) {
+        recordTurnInvariantViolation("search_required_not_attempted", { workflow });
+      } else {
+        console.log(`[chat] turn-plan(${workflow}): search downgraded — required but no concrete basis to search (no violation)`);
+      }
     }
     // multi_recommendation TEXT/CARD ALIGNMENT: never promise both shoes and
     // orthotics while showing only one category.

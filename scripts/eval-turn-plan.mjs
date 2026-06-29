@@ -93,6 +93,30 @@ scenario("'do these run true to size?' no context → sizing_help", { message: "
 scenario("sizing with focus product → advisory (focus that product)", { message: "What size should I get?", focusProduct: { title: "Savannah Sandal - Champagne" } },
   { workflow: W.NAMED_PRODUCT_ADVISORY, searchRequired: true, productDisplayPolicy: "show_focused" });
 
+// ── product SELECTION / FOCUS follow-up → product_focus, NO forced search ──
+// Live trace 2026-06-29: "I like the Drew" after sneaker results routed to
+// browse with searchRequired=true, the forced search was refused, and the turn
+// shipped a search_required_not_attempted violation. A selection picks a shown
+// card: anchor it, show_focused, searchRequired=false (can't trip the invariant).
+scenario("'I like the Drew' (named + prior cards) → product_focus, no forced search", { message: "I like the Drew", namedProduct: true, hasPriorCards: true },
+  { workflow: W.PRODUCT_FOCUS, searchRequired: false, clarificationAllowed: false, productDisplayPolicy: "show_focused" });
+scenario("'I'll take this one' (focus product) → product_focus", { message: "I'll take this one", focusProduct: { title: "Drew Sneaker" }, hasPriorCards: true },
+  { workflow: W.PRODUCT_FOCUS, searchRequired: false });
+scenario("'the second one looks good' (prior cards) → product_focus", { message: "the second one looks good", hasPriorCards: true },
+  { workflow: W.PRODUCT_FOCUS, searchRequired: false });
+// No context to anchor → NOT product_focus (falls through to clarification).
+scenario("'I like the Drew' with no prior cards / not named → not product_focus", { message: "I like the Drew" },
+  { workflow: W.CLARIFICATION });
+
+// ── CART / checkout intent on the focused product → cart_handoff ──────────
+scenario("'add it to my cart' (focus product) → cart_handoff, no search", { message: "add it to my cart", focusProduct: { title: "Drew Sneaker" }, hasPriorCards: true },
+  { workflow: W.CART_HANDOFF, searchRequired: false, productDisplayPolicy: "show_focused" });
+scenario("'I want to buy it' (focus product) → cart_handoff", { message: "I want to buy it", focusProduct: { title: "Drew Sneaker" } },
+  { workflow: W.CART_HANDOFF, searchRequired: false });
+// Cart intent with no product in focus → not a cart handoff.
+scenario("'I want to buy something' (no focus) → not cart_handoff", { message: "I want to buy some sandals" },
+  { workflow: W.BROWSE });
+
 // ── named-product STYLING → advisory (named family dominates, not outfit browse)
 // Live trace 2026-06-29: "wear gabby with a white dress with big red flowers"
 // routed to generic browse and dropped Gabby for red footwear. A named product

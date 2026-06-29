@@ -36,9 +36,39 @@ export const WORKFLOWS = {
   COMPATIBILITY: "compatibility",
   SALE_BROWSE: "sale_browse",
   SIZING_HELP: "sizing_help",
+  PRODUCT_FOCUS: "product_focus",
+  CART_HANDOFF: "cart_handoff",
   BROWSE: "browse",
   CLARIFICATION: "clarification",
 };
+
+// A product SELECTION / focus follow-up: the customer is picking one of the
+// cards they were just shown. "I like the Drew", "I'll take this one", "that
+// one looks good", "go with the second one". This is NOT a generic browse —
+// anchor the chosen product and answer with concise sales copy + a next step.
+const SELECTION_RE = new RegExp(
+  "\\bi\\s+(?:like|love|want|prefer|choose|pick)\\s+(?:the|this|that|these|those)\\b" + "|" +
+  "\\bi'?(?:ll|d)\\s+(?:take|go\\s+with|get)\\b" + "|" +
+  "\\b(?:let'?s|let\\s+me)\\s+(?:go\\s+with|get|take)\\b" + "|" +
+  "\\bgo\\s+with\\s+the\\b" + "|" +
+  "\\b(?:this|that)\\s+one\\s+(?:looks?\\s+(?:good|great|nice|perfect)|works?|it\\s+is)\\b" + "|" +
+  "\\bthe\\s+(?:first|second|third|fourth|fifth|last)\\s+one\\b",
+  "i",
+);
+
+// CART / checkout / purchase intent on the FOCUSED product. A committed action
+// on a deictic object ("add it to my cart", "I want to buy it", "checkout") —
+// NOT a deliberation ("should I buy the Reagan?", that's advisory) and NOT a
+// category shopping intent ("I want to buy some sandals", that's a browse).
+const CART_RE = new RegExp(
+  "\\badd\\s+(?:it|this|that|these|them)?\\s*to\\s+(?:my\\s+)?(?:cart|bag|basket|order)\\b" + "|" +
+  "\\badd\\s+to\\s+(?:cart|bag|basket)\\b" + "|" +
+  "\\bput\\s+(?:it|this|that|these)\\s+in\\s+(?:my\\s+)?(?:cart|bag|basket)\\b" + "|" +
+  "\\b(?:i'?(?:ll|d)|let\\s+me|i\\s+want\\s+to|i\\s+wanna|i'?m\\s+gonna)\\s+(?:buy|purchase|order|get)\\s+(?:it|this|that|these|them|one)\\b" + "|" +
+  "\\b(?:buy|purchase|order)\\s+(?:it|this|that|these|them)\\b" + "|" +
+  "\\bcheck(?:ing)?\\s*out\\b|\\bcheckout\\b|\\bproceed\\s+to\\s+(?:checkout|pay)\\b",
+  "i",
+);
 
 const POLICY_RE =
   /\b(return|returns|refund|exchange(?:s|d)?|warranty|guarantee|ship(?:ping|ped)?|delivery|deliver|track(?:ing)?|order\s+status|my\s+order|where\s+is\s+my|cancel(?:lation)?|account|sign\s+in|log\s+in|password|invoice|receipt)\b/i;
@@ -453,6 +483,45 @@ export function planTurn({
           "First sentence must answer directly: lean one product for the stated need and say why. " +
           "Structure: \"Pick X for Y. Choose Z if A. Here's why…\". At most 3 short facts per side. " +
           "No long paragraphs, no review-style essay. Show one card per product.",
+      ],
+    });
+  }
+
+  // 3b. CART / checkout intent — the customer wants to BUY the focused product.
+  // The chat widget can't add to cart, so hand off to the product page and keep
+  // the focused card. Never a generic browse or clarification.
+  if (CART_RE.test(m) && (hasProductContext || hasPriorCards)) {
+    return finalize({
+      workflow: WORKFLOWS.CART_HANDOFF,
+      requiredEvidence: ["product_facts"],
+      searchRequired: false,
+      clarificationAllowed: false,
+      productDisplayPolicy: "show_focused",
+      answerRequirements: reqs({ answerFirst: true, concise: true }),
+      gender: genderFor(false),
+      directives: [
+        "The customer wants to buy the product in focus. You can't add to cart from chat — say that briefly and point them to the product page to choose a size and add it there. KEEP the focused product's card. Do not start a new search or ask a generic clarifying question.",
+      ],
+    });
+  }
+
+  // 3c. PRODUCT SELECTION / FOCUS — the customer is picking one of the cards
+  // they were just shown ("I like the Drew", "I'll take this one", "the second
+  // one"). Anchor that product; answer with concise sales copy + a next step.
+  // searchRequired=false so it can never trip search_required_not_attempted
+  // (live trace 2026-06-29: "I like the Drew" → browse → forced search refused
+  // → VIOLATION). The card comes from prior evidence / the named family.
+  if (SELECTION_RE.test(m) && (hasProductContext || hasPriorCards || Boolean(focusProduct))) {
+    return finalize({
+      workflow: WORKFLOWS.PRODUCT_FOCUS,
+      requiredEvidence: ["product_facts"],
+      searchRequired: false,
+      clarificationAllowed: false,
+      productDisplayPolicy: "show_focused",
+      answerRequirements: reqs({ answerFirst: true, concise: true }),
+      gender: genderFor(false),
+      directives: [
+        "The customer just SELECTED a product they were shown. Acknowledge it in one warm line of sales copy and offer one concrete next step (check sizes/colors, or compare it with a similar style). KEEP that product's card. Do NOT run a new generic search or ask a generic clarifying question.",
       ],
     });
   }
