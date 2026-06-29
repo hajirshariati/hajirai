@@ -2893,9 +2893,28 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
         // HARD SLOT GUARD: the picked card must match the slot category. A "shoes"
         // slot can never pin an orthotic/insole; an "orthotics" slot only an
         // orthotic. Off-category hits are skipped so text and cards stay aligned.
-        const best = (cards || []).find(
+        let best = (cards || []).find(
           (c) => c?.handle && !seenHandles.has(c.handle) && cardMatchesSlotCategory(c, slot.category),
         );
+        // Per-slot broad fallback: a condition-heavy query ("supportive foot
+        // pain shoes") can still rank only off-category items and leave the slot
+        // EMPTY — then a turn that promises N categories shows N-1 cards
+        // (text/card mismatch, live trace 2026-06-29). Retry once with a broad
+        // category-only query so each slot fills whenever the catalog carries
+        // anything in that category.
+        if (!best && slot.category) {
+          const broadInput = { query: slotSearchCategory(slot.category), filters, limit: 6 };
+          let broadCards = [];
+          try { broadCards = extractProductCards("search_products", await dispatchTool("search_products", broadInput, slotCtx), ctx); }
+          catch (e) { /* best-effort */ }
+          best = (broadCards || []).find(
+            (c) => c?.handle && !seenHandles.has(c.handle) && cardMatchesSlotCategory(c, slot.category),
+          );
+          if (best) {
+            cards = broadCards;
+            console.log(`[evidence-plan] slot=${slot.category} broad-fallback filled with ${best.handle}`);
+          }
+        }
         if (best) {
           picked.push(best); pickedPairs.push({ card: best, category: slot.category }); seenHandles.add(best.handle);
           // Seed the pinned slot card into the evidence pool (mirrors the
