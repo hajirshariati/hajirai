@@ -41,6 +41,7 @@ import {
 } from "./catalog-matcher.server.js";
 import { detectRejectedCategories } from "./chat-postprocessing.js";
 import { conditionFromText } from "./condition-normalize.js";
+import { isPrecededByNegation } from "./chat-helpers.server.js";
 
 // ─── helpers ───────────────────────────────────────────────────
 
@@ -695,6 +696,14 @@ function pickCustomerColor(message) {
     const m = re.exec(messageLower);
     if (!m) continue;
     if (colorMatchIsGarmentAttached(messageLower, key)) continue;
+    // Negation-aware: "sandals but not black or maroon" must NOT capture black
+    // as a positive color. Without this the color is stored in memory and the
+    // auto-search CTA reads "View All Black Women's Sandals" — the opposite of
+    // the request (live trace 2026-06-29). The leading boundary group can add
+    // one char before the color word; offset by it so the negation window is
+    // measured from the color itself.
+    const colorIndex = m.index + (/^[a-z]/i.test(m[0]) ? 0 : 1);
+    if (isPrecededByNegation(messageLower, colorIndex)) continue;
     const footwearAdj = new RegExp(`\\b${escaped}\\b\\s+(?:${FOOTWEAR_NOUNS_RE_SRC})\\b`, "i").test(messageLower);
     matches.push({ key, canonical, index: m.index, attachedToFootwear: footwearAdj });
   }

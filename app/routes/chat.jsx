@@ -9,7 +9,7 @@ import { planTurn, buildTurnPlanPromptBlock, buildPlanClarifierRepair, planForce
 import { recordTurnInvariantViolation } from "../lib/turn-invariant.server";
 import { classifyAvailability, buildAvailabilityAnswer, AVAILABILITY_RESULT, resolveAvailabilityRequest, isAvailabilityFollowUp, familyOfTitle, collectFamilyColors, constraintIntent, parseAvailabilityConstraints, parseRequestedColors, priorAvailabilityMessage, priorAvailabilityConstraints, variantDataDiagnostics, styleKeyOfTitle, styleNameOfTitle } from "../lib/availability-truth";
 import { detectSupportHandoffNeed, buildSupportHandoffText, supportConfigured, normalizedSupportLabel, supportChatLabel } from "../lib/support-handoff";
-import { extractConstraintPlan, cardMatchesSlotCategory, multiRecoTextCardMismatch } from "../lib/constraint-plan";
+import { extractConstraintPlan, cardMatchesSlotCategory, multiRecoTextCardMismatch, slotSearchCategory } from "../lib/constraint-plan";
 import { detectProcessNarration, stripProcessNarration, buildSalesVoiceFallback, SALES_JUDGMENT_WORKFLOWS } from "../lib/sales-voice";
 import { classifyTurnScope, scopeAttributesToTurn, isShortAmbiguousReply } from "../lib/turn-scope";
 import { buildPriorEvidenceAvailabilityText, buildPriorEvidenceMultiColorText, askedConstraintLabel, titleCaseWord } from "../lib/prior-evidence";
@@ -2871,7 +2871,11 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       for (const slot of cplan.slots) {
         const filters = {};
         if (gender && gender !== "kids") filters.gender = gender;
-        if (slot.category) filters.category = slot.category;
+        // Map the umbrella "shoes"/"footwear" to the productType real footwear
+        // shares so the slot search constrains to actual footwear instead of
+        // surfacing orthotics that the slot guard then rejects (leaving the
+        // shoes slot empty). See slotSearchCategory (live trace 2026-06-29).
+        if (slot.category) filters.category = slotSearchCategory(slot.category);
         if (slot.constraints?.color) filters.color = slot.constraints.color;
         const input = { query: slot.query, filters, limit: 4 };
         if (slot.constraints?.priceMax) input.priceMax = slot.constraints.priceMax;

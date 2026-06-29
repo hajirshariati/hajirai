@@ -117,6 +117,19 @@ await test("R0e — rejected categories never become the positive category", () 
   assert.equal(out.category, "boots");
 });
 
+await test("R0e2 — a NEGATED color never becomes a positive color constraint", () => {
+  // Live trace 2026-06-29: "sandals but not black or maroon" captured
+  // color=black, which polluted memory and produced a "View All Black Women's
+  // Sandals" auto-search CTA — the opposite of the request.
+  assert.equal(extractUserConstraints("Show me sandals but not black or maroon.").color, undefined);
+  assert.equal(extractUserConstraints("no black please").color, undefined);
+  assert.equal(extractUserConstraints("I don't want red").color, undefined);
+  // Reaffirmation still wins: "not red but green" → green.
+  assert.equal(extractUserConstraints("not red but green sandals").color, "green");
+  // A plain positive color is still captured.
+  assert.equal(extractUserConstraints("i need black sandals").color, "black");
+});
+
 await test("R0f — product-navigation quick reply extracts both requested color and category", () => {
   assert.deepEqual(
     extractUserConstraints("Can you show me pink sneakers instead?"),

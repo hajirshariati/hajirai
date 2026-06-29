@@ -171,6 +171,20 @@ function cardCategoryText(card) {
   return [card?.title, card?.product_title, card?.category, card?.product_type, card?.productType, card?.type]
     .filter(Boolean).join(" ");
 }
+// The category VALUE a slot search must filter on. The umbrella "shoes"/
+// "footwear" is NOT a catalog category value — products carry
+// productType="Footwear" plus a narrow category (Sandals/Sneakers/…). Filtering
+// on category="shoes" matches nothing by productType, so a condition-heavy slot
+// query ("supportive foot pain shoes") surfaces orthotics, which the slot guard
+// then rejects — leaving the slot EMPTY (live trace 2026-06-29: "shoes or
+// orthotics" showed only an orthotic). Map the umbrella to "footwear" (the
+// productType real footwear shares); every other category passes through.
+export function slotSearchCategory(slotCategory) {
+  const c = String(slotCategory || "").toLowerCase().trim();
+  if (c === "shoes" || c === "footwear") return "footwear";
+  return slotCategory;
+}
+
 export function cardMatchesSlotCategory(card, slotCategory) {
   const text = cardCategoryText(card);
   const cat = String(slotCategory || "").toLowerCase().trim();

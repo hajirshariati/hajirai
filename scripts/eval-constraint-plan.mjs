@@ -11,6 +11,7 @@ import {
   CATEGORY_NOUN_SET,
   cardMatchesSlotCategory,
   multiRecoTextCardMismatch,
+  slotSearchCategory,
 } from "../app/lib/constraint-plan.js";
 
 let pass = 0, fail = 0;
@@ -144,6 +145,22 @@ check("specific footwear slots only accept their own category", () => {
 });
 check("classifies from product_type when the title omits the category word", () => {
   assert.equal(cardMatchesSlotCategory({ title: "Chase", product_type: "Sneakers" }, "sneakers"), true);
+});
+
+// ── 2026-06-29: umbrella "shoes" slot must search productType="Footwear" ──
+// "shoes or orthotics" → the shoes slot used category="shoes", which matches no
+// product's productType, so the condition-heavy query surfaced orthotics that
+// the guard rejected → only an orthotic was shown. The slot search category
+// must be remapped to "footwear".
+check("slotSearchCategory maps the umbrella shoes/footwear to footwear", () => {
+  assert.equal(slotSearchCategory("shoes"), "footwear");
+  assert.equal(slotSearchCategory("footwear"), "footwear");
+  assert.equal(slotSearchCategory("Shoes"), "footwear");
+});
+check("slotSearchCategory passes a narrow category through unchanged", () => {
+  assert.equal(slotSearchCategory("sandals"), "sandals");
+  assert.equal(slotSearchCategory("orthotics"), "orthotics");
+  assert.equal(slotSearchCategory("sneakers"), "sneakers");
 });
 
 // ── text/card alignment invariant ─────────────────────────────────────────

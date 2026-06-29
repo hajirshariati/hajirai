@@ -1784,6 +1784,22 @@ test("does NOT mis-fire on 'not sure if I want sneakers or sandals'", () => {
   assert.equal(detectRejectedCategories("I want sneakers").size, 0);
 });
 
+// Live trace 2026-06-29: a smart/curly apostrophe in "don't look like" left
+// the contraction unmatched, so "sneakers" was NOT rejected and the search
+// hard-guarded TO sneakers. The detector must normalize curly apostrophes.
+test("curly apostrophe (don’t) still rejects the negated category", () => {
+  assert.deepEqual(
+    [...detectRejectedCategories("comfortable shoes that don’t look like sneakers")],
+    ["sneakers"],
+  );
+  assert.deepEqual(
+    [...detectRejectedCategories("I don’t want boots")],
+    ["boots"],
+  );
+  // U+2018 and the modifier-letter apostrophe (U+02BC) too.
+  assert.deepEqual([...detectRejectedCategories("doesnʼt like clogs")], ["clogs"]);
+});
+
 test("dropRejectedCategoryCards removes the rejected category, keeps the rest", () => {
   const pool = [
     { handle: "danika", _category: "Sneakers" },

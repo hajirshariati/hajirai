@@ -248,6 +248,13 @@ export function shouldForceSneakerRelevanceFloor(text) {
 export function detectRejectedCategories(text) {
   const out = new Set();
   if (typeof text !== "string" || !text) return out;
+  // Normalize smart/curly apostrophes (U+2018/U+2019/U+02BC) to ASCII so the
+  // contraction-based rejection words match. Live trace 2026-06-29: "shoes …
+  // that don’t look like sneakers" used a curly apostrophe, so `don'?t` never
+  // matched, "sneakers" was NOT rejected, and the search hard-guarded TO
+  // sneakers — the exact opposite of the request. 1:1 char swap preserves
+  // every match offset used below.
+  text = text.replace(/[‘’ʼ]/g, "'");
   const addRejected = (raw) => {
     const term = String(raw || "").toLowerCase().replace(/\s+/g, " ").trim();
     if (!term) return;
