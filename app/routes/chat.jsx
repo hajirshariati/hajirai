@@ -5,7 +5,7 @@ import { getAttributeMappings } from "../models/AttributeMapping.server";
 import { getCatalogCategories, getAllCatalogCategories, getCategoryGenderAvailability, getCategoryAttributeCoverage } from "../models/Product.server";
 import { getActiveCampaigns, formatCampaignsForCS } from "../models/Campaign.server";
 import { buildSystemPrompt } from "../lib/chat-prompt.server";
-import { planTurn, buildTurnPlanPromptBlock, buildPlanClarifierRepair, planForcesProductDisplay, planRequiresSearch as planRequiresSearchFlag, clarifierGateDecision, isAnswerWorkflow, plannedWorkflowCardOwnerViolation, plannedSearchSkippedViolation, cardsNotInEvidencePool } from "../lib/turn-plan.server";
+import { planTurn, buildTurnPlanPromptBlock, buildPlanClarifierRepair, planForcesProductDisplay, planRequiresSearch as planRequiresSearchFlag, clarifierGateDecision, isAnswerWorkflow, plannedWorkflowCardOwnerViolation, plannedSearchSkippedViolation, cardsNotInEvidencePool, textPresentsProducts } from "../lib/turn-plan.server";
 import { recordTurnInvariantViolation } from "../lib/turn-invariant.server";
 import { classifyAvailability, buildAvailabilityAnswer, AVAILABILITY_RESULT, resolveAvailabilityRequest, isAvailabilityFollowUp, familyOfTitle, collectFamilyColors, constraintIntent, parseAvailabilityConstraints, parseRequestedColors, priorAvailabilityMessage, priorAvailabilityConstraints, variantDataDiagnostics, styleKeyOfTitle, styleNameOfTitle } from "../lib/availability-truth";
 import { detectSupportHandoffNeed, buildSupportHandoffText, supportConfigured, normalizedSupportLabel, supportChatLabel } from "../lib/support-handoff";
@@ -3157,11 +3157,24 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     const wf = ctx?.turnPlan?.workflow;
     const suppressByPlan = ctx?.turnPlan?.productDisplayPolicy === "suppress" || wf === "clarification" || wf === "sizing_help";
     const clarifyingAnswer = looksLikeClarifyingQuestion(fullResponseText);
-    if (!planPinnedProduct && (suppressByPlan || clarifyingAnswer) && pool.length > 0) {
-      console.log(`[chat] clarification card-wipe: workflow=${wf} clarifyingAnswer=${clarifyingAnswer} — dropping ${pool.length} card(s) + CTAs (no pinned product)`);
+    // Real product EVIDENCE must NEVER be wiped: a search ran, the plan required
+    // a search, or the assistant text actually presents products ("here are…",
+    // "I found…"). The wipe is only for a TRUE clarification-only turn that
+    // accidentally carried a stray browse card (live trace 2026-06-29: "how
+    // about mens?" misrouted to clarification, then 5 real men's cards were
+    // dropped under a "Here are…" answer). The misclassification is fixed in
+    // turn-plan; this guard is the safety net so valid cards are never deleted.
+    const hasProductEvidence =
+      productSearchAttempted === true ||
+      ctx?.turnPlan?.searchRequired === true ||
+      textPresentsProducts(fullResponseText);
+    if (!planPinnedProduct && !hasProductEvidence && (suppressByPlan || clarifyingAnswer) && pool.length > 0) {
+      console.log(`[chat] clarification card-wipe: workflow=${wf} clarifyingAnswer=${clarifyingAnswer} — dropping ${pool.length} card(s) + CTAs (no pinned product, no evidence)`);
       pool = [];
       supportCTA = null;
       genericCTA = null;
+    } else if (!planPinnedProduct && (suppressByPlan || clarifyingAnswer) && pool.length > 0) {
+      console.log(`[chat] clarification card-wipe SKIPPED: workflow=${wf} — ${pool.length} card(s) are real evidence (searchAttempted=${productSearchAttempted}, searchRequired=${ctx?.turnPlan?.searchRequired === true}, presentsProducts=${textPresentsProducts(fullResponseText)})`);
     }
   }
 
@@ -3439,6 +3452,21 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       controller.enqueue(encoder.encode(sseChunk({ type: "products", products: deduped })));
     }
     console.log(`[cta] ${ctx.shop} broad CTA suppressed: ${ctx.turnPlan.workflow} turn (pinned evidence)`);
+  } else if (
+    ctx?.turnPlan?.workflow === "display_recovery" &&
+    Array.isArray(ctx.priorProductCards) && ctx.priorProductCards.length > 0 &&
+    pool.length === 0
+  ) {
+    // DISPLAY RECOVERY: the customer said the products didn't render. Re-emit
+    // the SAME cards from the previous turn verbatim (live trace 2026-06-29:
+    // "i can't see any" became a fresh clarification with zero cards).
+    const { products: deduped } = prepareProductCardsForTurn(ctx.priorProductCards);
+    finalProductCards = deduped;
+    console.log(`[display-recovery] re-emitting ${deduped.length} prior card(s)`);
+    if (deduped.length > 0) {
+      controller.enqueue(encoder.encode(sseChunk({ type: "products", products: deduped })));
+    }
+    console.log(`[cta] ${ctx.shop} broad CTA suppressed: display_recovery turn (prior cards)`);
   } else if (
     (ctx?.turnPlan?.workflow === "product_focus" || ctx?.turnPlan?.workflow === "cart_handoff") &&
     ctx.focusProduct
@@ -4002,6 +4030,33 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     // when the LLM didn't name it. If the scorer drops all cards
     // now, that's because none of them actually match — the right
     // answer is text-only, not "show whatever we had."
+  }
+
+  // ── Cards-promised-but-none-shown recovery (display invariant #4) ───────
+  // If the answer TEXT presents products ("here are…", "I found 5…") but the
+  // final cards came out empty while we DO have product evidence (the current
+  // pool, or the prior turn's cards), that's a text/card contradiction — restore
+  // the cards instead of shipping a lying cardless reply (live trace 2026-06-29:
+  // "Here are our men's…" with finalCards=0 after a wrongful card-wipe). This is
+  // narrowly gated (text MUST present products) — not the old blanket fallback
+  // that resurrected cards under any vague "here are some options" text.
+  if (
+    (!Array.isArray(finalProductCards) || finalProductCards.length === 0) &&
+    textPresentsProducts(fullResponseText)
+  ) {
+    const recoverySource = (Array.isArray(pool) && pool.length > 0)
+      ? pool
+      : (Array.isArray(ctx?.priorProductCards) ? ctx.priorProductCards : []);
+    if (recoverySource.length > 0) {
+      const cap = Math.max(1, ctx.productCardCap || 6);
+      const { products: deduped } = prepareProductCardsForTurn(recoverySource.slice(0, cap));
+      if (deduped.length > 0) {
+        finalProductCards = deduped;
+        controller.enqueue(encoder.encode(sseChunk({ type: "products", products: deduped })));
+        recordTurnInvariantViolation("cards_promised_none_shown", { workflow: ctx?.turnPlan?.workflow || "-", recovered: deduped.length });
+        console.log(`[chat] cards-promised recovery: text presents products but finalCards=0 — restored ${deduped.length} card(s) from ${(Array.isArray(pool) && pool.length > 0) ? "pool" : "prior"}`);
+      }
+    }
   }
 
   // ── Turn invariant log (docs/chatbot-ownership-map.md) ────────────────

@@ -38,9 +38,32 @@ export const WORKFLOWS = {
   SIZING_HELP: "sizing_help",
   PRODUCT_FOCUS: "product_focus",
   CART_HANDOFF: "cart_handoff",
+  DISPLAY_RECOVERY: "display_recovery",
   BROWSE: "browse",
   CLARIFICATION: "clarification",
 };
+
+// Does the assistant text PRESENT products to the customer ("here are…", "I
+// found…", "a few options", "5 picks")? Used to (a) protect real product
+// evidence from the clarification card-wipe and (b) detect a
+// cards-promised-but-none-shown display failure. Exported + pure.
+export function textPresentsProducts(text) {
+  const t = String(text || "");
+  return /\b(?:here(?:'s|\s+are|\s+is)|these\s+are|i(?:'ve|\s+have)?\s+found|i\s+found|take\s+a\s+look|check\s+(?:out|these)|below\s+are|a\s+few\s+(?:options|picks|styles|pairs)|some\s+(?:options|picks|great|solid)|\d+\s+(?:options|picks|styles|pairs|great)|my\s+(?:top\s+)?(?:picks|recommendations)|recommend(?:ed)?\s+(?:these|the\s+following)|pulled\s+(?:up|together)|found\s+(?:you\s+)?(?:a\s+few|some|\d+))\b/i.test(t);
+}
+
+// A GENDER-ONLY refinement of a prior shopping turn: "how about mens?", "men's?",
+// "for men", "women's instead", "what about for my husband". On its own it's not
+// a clarification — it re-runs the prior search with the gender swapped.
+const GENDER_REFINE_TOKEN_RE =
+  /\b(men'?s?|man|male|guys?|husband|boyfriend|women'?s?|woman|female|wife|girlfriend|ladies|lady|kids?|child(?:ren)?|boys?|girls?|toddlers?)\b/i;
+const GENDER_REFINE_OTHER_CONTENT_RE =
+  /\b(sandals?|sneakers?|boots?|shoes?|footwear|loafers?|clogs?|slippers?|heels?|wedges?|orthotics?|insoles?|sale|cheap|under|size|color|colour|black|white|navy|tan|pink|red|blue|green|brown|grey|gray|walking|standing|running|hiking|work|wedding|travel|plantar|bunion|arch)\b/i;
+
+// "I can't see any" / "nothing showed up" — a DISPLAY complaint about products
+// the bot said it showed. Recovery, not a fresh clarification.
+const DISPLAY_COMPLAINT_RE =
+  /\b(?:can'?t|cannot|can\s?not|don'?t|do\s+not|couldn'?t|didn'?t)\s+see\s+(?:any|anything|them|it|the|a|product|the\s+product)|nothing\s+(?:is\s+)?(?:show|showed|showing|there|here|load|loaded|appearing)|(?:no|zero)\s+(?:products?|cards?|results?|images?|pictures?)\b|where\s+(?:are|did|is)\s+(?:they|the|it)|not\s+showing|isn'?t\s+showing|didn'?t\s+(?:show|load|appear)|i\s+see\s+nothing|(?:it'?s|its|the\s+\w+\s+is)\s+blank|nothing\s+came\s+up|don'?t\s+see\s+(?:any|the)/i;
 
 // A product SELECTION / focus follow-up: the customer is picking one of the
 // cards they were just shown. "I like the Drew", "I'll take this one", "that
@@ -597,6 +620,57 @@ export function planTurn({
       gender: genderFor(true),
       directives: [
         "Search the catalog for DISCOUNTED products (onSale=true), filtered by any stated category/gender, and show them. If active promo knowledge exists, mention it briefly; otherwise note codes are verified at checkout — but STILL show the sale products. Never say you can't access sales, and never link to Support.",
+      ],
+    });
+  }
+
+  // 5c. DISPLAY RECOVERY — "I can't see any", "nothing showed up" after the bot
+  // said it showed products. This is a rendering complaint, NOT a fresh
+  // clarification: re-show the previous cards with a brief apology. Gated on
+  // real prior product context (cards shown, or the prior reply presented
+  // products) so a genuine "I don't see what I want" stays a browse.
+  if (
+    DISPLAY_COMPLAINT_RE.test(m) && words(m) <= 8 &&
+    (hasPriorCards || textPresentsProducts(priorAssistantText))
+  ) {
+    return finalize({
+      workflow: WORKFLOWS.DISPLAY_RECOVERY,
+      requiredEvidence: ["product_facts"],
+      searchRequired: false,
+      clarificationAllowed: false,
+      productDisplayPolicy: "show",
+      answerRequirements: reqs({ concise: true }),
+      gender: genderFor(false),
+      directives: [
+        "The customer says the products didn't display. Re-show the SAME products from the previous turn with a brief apology ('Sorry about that — here they are again.'). Do NOT ask a new clarifying question and do NOT run a new search.",
+      ],
+    });
+  }
+
+  // 5d. GENDER-ONLY REFINEMENT — "how about mens?", "for men", "women's
+  // instead". After a prior shopping turn this swaps the gender and re-runs the
+  // SAME search; it must NEVER be a clarification (live trace 2026-06-29: "how
+  // about mens?" → clarification → 5 found men's cards wiped). Requires prior
+  // product context and no other query content (a real "men's sandals" browse
+  // has a category and routes to section 6 normally).
+  const isGenderOnlyRefine =
+    GENDER_REFINE_TOKEN_RE.test(m) && words(m) <= 5 && !GENDER_REFINE_OTHER_CONTENT_RE.test(m);
+  if (isGenderOnlyRefine && (hasPriorCards || hasProductContext)) {
+    const refineGender =
+      /\b(men'?s?|man|male|guys?|husband|boyfriend|him|his)\b/i.test(m) ? "men"
+      : /\b(women'?s?|woman|female|wife|girlfriend|ladies|lady|her)\b/i.test(m) ? "women"
+      : /\b(kids?|child(?:ren)?|boys?|girls?|toddlers?)\b/i.test(m) ? "kids"
+      : genderFor(true);
+    return finalize({
+      workflow: WORKFLOWS.BROWSE,
+      requiredEvidence: ["product_facts"],
+      searchRequired: true,
+      clarificationAllowed: false,
+      productDisplayPolicy: "show",
+      answerRequirements: reqs({ concise: true }),
+      gender: refineGender,
+      directives: [
+        "The customer is REFINING the previous search to a different gender. Re-run the SAME kind of search (inherit the prior category/use-case from context) for the new gender and SHOW the matching products. Do NOT ask a clarifying question.",
       ],
     });
   }

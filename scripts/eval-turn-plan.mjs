@@ -9,10 +9,26 @@
 // Run: node scripts/eval-turn-plan.mjs
 
 import assert from "node:assert/strict";
-import { planTurn, WORKFLOWS } from "../app/lib/turn-plan.server.js";
+import { planTurn, WORKFLOWS, textPresentsProducts } from "../app/lib/turn-plan.server.js";
 
 let pass = 0, fail = 0;
 const fails = [];
+
+function check(name, fn) {
+  try { fn(); console.log(`  ✓ ${name}`); pass++; }
+  catch (err) { console.log(`  ✗ ${name} — ${err.message}`); fails.push({ name, err }); fail++; }
+}
+
+// textPresentsProducts — protects real cards from the clarification card-wipe
+// and powers the cards-promised-but-none-shown recovery.
+check("textPresentsProducts detects product-list language", () => {
+  for (const t of ["Here are our men's supportive walking shoes.", "I found a few great options for you:", "Take a look at these:", "Here's a solid pick:", "These are my top picks."]) {
+    assert.equal(textPresentsProducts(t), true, t);
+  }
+  for (const t of ["What size are you looking for?", "Are you shopping for men's or women's?", "I can help with that."]) {
+    assert.equal(textPresentsProducts(t), false, t);
+  }
+});
 
 // A scenario: { name, in, expect } where `expect` is a subset of the plan.
 function scenario(name, input, expect) {
@@ -116,6 +132,27 @@ scenario("'I want to buy it' (focus product) → cart_handoff", { message: "I wa
 // Cart intent with no product in focus → not a cart handoff.
 scenario("'I want to buy something' (no focus) → not cart_handoff", { message: "I want to buy some sandals" },
   { workflow: W.BROWSE });
+
+// ── display-ownership: gender refinement + "I can't see any" recovery ─────
+// Live trace 2026-06-29: "how about mens?" → clarification → 5 found men's
+// cards wiped; "i can't see any" → fresh clarification with zero cards.
+scenario("seed: 'supportive shoes for walking or standing' → search turn (cards)", { message: "Show me supportive shoes for walking or standing all day" },
+  { workflow: W.CONDITION_RECOMMENDATION, searchRequired: true, productDisplayPolicy: "show" });
+scenario("'how about mens?' after cards → browse search (NOT clarification)", { message: "how about mens?", hasPriorCards: true },
+  { workflow: W.BROWSE, searchRequired: true, clarificationAllowed: false, productDisplayPolicy: "show", gender: "men" });
+scenario("'women's instead' after cards → browse search, gender women", { message: "women's instead", hasPriorCards: true },
+  { workflow: W.BROWSE, searchRequired: true, gender: "women" });
+scenario("'for men' after cards → browse search", { message: "for men", hasPriorCards: true },
+  { workflow: W.BROWSE, searchRequired: true, gender: "men" });
+scenario("'i can't see any' after a product reply → display_recovery (re-show)", { message: "i can't see any", hasPriorCards: true, priorAssistantText: "Here are our women's supportive walking shoes." },
+  { workflow: W.DISPLAY_RECOVERY, searchRequired: false, clarificationAllowed: false, productDisplayPolicy: "show" });
+scenario("'nothing showed up' after cards → display_recovery", { message: "nothing showed up", hasPriorCards: true },
+  { workflow: W.DISPLAY_RECOVERY, searchRequired: false });
+// Guards against misfire: a real category browse keeps its category route.
+scenario("'how about mens?' with NO prior context → clarification (nothing to refine)", { message: "how about mens?" },
+  { workflow: W.CLARIFICATION });
+scenario("'show me men's sandals' (category present) → browse, not a bare refinement", { message: "show me men's sandals" },
+  { workflow: W.BROWSE, gender: "men" });
 
 // ── bare "yes" resolves against the prior assistant OFFER ─────────────────
 // Live trace 2026-06-29: a lone "yes" became a generic clarification, the model
