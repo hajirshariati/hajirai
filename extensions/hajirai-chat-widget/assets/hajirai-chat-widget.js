@@ -4,7 +4,7 @@
 /* Build marker — bump on widget changes so a live deploy can be verified
    in DevTools console. If you don't see this line after `shopify app deploy`
    + hard refresh, the new bundle isn't live (stale checkout or CDN cache). */
-try{console.log('[hajirai-widget] build 2026-06-30 viz-stable-bubble-width');}catch(e){}
+try{console.log('[hajirai-widget] build 2026-06-30 viz-width-css-and-js');}catch(e){}
 
 /* Visual config comes from theme editor (liquid-injected as window.__AI_CHAT_CONFIG).
    Chat server URL is handled internally via app proxy at /apps/hajirai/chat. */
@@ -823,6 +823,13 @@ function injectVizStyleOnce(){
     // the image card grows to the same vertical line. The left stack drives the
     // row height (the right column only fills it), so there's no empty area below
     // the left column. Pure CSS — no ResizeObserver / JS height hack.
+    // STABLE WIDTH (belt-and-suspenders for the JS pin in runVisualize): the chat
+    // bubble shrink-wraps to content, so a narrow loading box made the whole grid
+    // narrow, then it JUMPED wider when the big image loaded. Force any message /
+    // bubble that contains the visualizer to its full available width so the 1fr
+    // preview column is the SAME width from loading through the final image.
+    '.ai-chat-msg:has(.ai-chat-viz-host){width:100%}'+
+    '.ai-chat-msg-bubble:has(.ai-chat-viz-host){width:100%;box-sizing:border-box}'+
     '.ai-chat-viz-expanded{display:grid;grid-template-columns:minmax(0,220px) minmax(0,1fr);gap:16px;align-items:stretch;width:100%;margin-top:10px;box-sizing:border-box}'+
     // Left column: a vertical stack at natural content height, pinned to the top
     // (extra row height, if any, stays below — content never stretches weirdly).
