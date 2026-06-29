@@ -96,8 +96,6 @@ export const action = async ({ request }) => {
         productImageUrls,
         productTitle: product.title || "",
         styleContext,
-        // Merchant-configurable brand scene theme (empty ⇒ built-in default).
-        sceneTheme: config.visualizeScenePrompt || "",
       });
     } catch (err) {
       console.error(

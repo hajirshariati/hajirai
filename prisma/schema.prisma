@@ -175,12 +175,6 @@ model ShopConfig {
   imageProvider          String   @default("")
   geminiApiKey           String   @default("")
   visualizeLookLabel     String   @default("Visualize My Look")
-  // Merchant-editable "scene theme" for the AI styling preview — the consistent
-  // brand look applied to EVERY generated image (e.g. the setting fades into a
-  // clean white floor the shopper walks on). Empty string ⇒ the built-in default
-  // theme in image-styling.server.js. The per-turn styleContext still chooses
-  // WHICH setting (vacation/dinner/etc.); this governs the overall treatment.
-  visualizeScenePrompt   String   @default("")
 
   supportUrl          String   @default("")
   supportLabel        String   @default("Contact customer service")
