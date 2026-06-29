@@ -302,6 +302,30 @@ const NAMED_ANCHOR_STOPWORDS = new Set([
   "biorocker", "ultrasky", "lynco",
 ]);
 
+// Resolve an ORDINAL / positional reference to one of the previously shown
+// cards: "the second one", "second pair", "I like the first", "the last one".
+// Returns the card or null. Pure + order-preserving (cards are in display
+// order). Used so selection / cart turns can pin the exact product.
+const ORDINAL_INDEX = {
+  first: 0, "1st": 0, second: 1, "2nd": 1, third: 2, "3rd": 2,
+  fourth: 3, "4th": 3, fifth: 4, "5th": 4, sixth: 5, "6th": 5,
+};
+function resolveOrdinalCard(message, cards) {
+  if (!Array.isArray(cards) || cards.length === 0) return null;
+  const m = String(message || "").toLowerCase();
+  if (/\blast\s+(?:one|pair|option|product|style)?\b/.test(m)) return cards[cards.length - 1] || null;
+  for (const [word, idx] of Object.entries(ORDINAL_INDEX)) {
+    // The ordinal must be a selection reference: followed by one/pair/option/…
+    // or preceded by "the" ("the second", "second pair"). Avoids matching a
+    // stray "first" in unrelated prose.
+    const re = new RegExp(`\\b(?:the\\s+)?${word}\\b(?:\\s+(?:one|pair|option|product|style|shoe|sandal|sneaker|boot|pick))?`, "i");
+    if (re.test(m) && (new RegExp(`\\bthe\\s+${word}\\b`, "i").test(m) || new RegExp(`\\b${word}\\b\\s+(?:one|pair|option|product|style|shoe|sandal|sneaker|boot|pick)`, "i").test(m))) {
+      return cards[idx] || null;
+    }
+  }
+  return null;
+}
+
 function extractLLMNamedAnchors(history) {
   const lastAssistant = [...(history || [])].reverse().find((t) => t?.role === "assistant");
   if (!lastAssistant?.content) return [];
@@ -2444,6 +2468,13 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   // turn: the EXACT, authoritative final card list. When non-null it wins over
   // every downstream card guard/scorer and is emitted verbatim.
   let availabilityPinnedCards = null;
+  // Set by the availability-truth block to the verdict's result+reason. A
+  // PARTIAL verdict (UNKNOWN with a card shown — width/size not in the variant
+  // options, unparsed constraints, no exposed inventory) is a VALID honest
+  // answer, NOT a denial — used to exempt it from the denial_with_products
+  // warning that otherwise burns retries (live QA 2026-06-30).
+  let availabilityVerdictReason = null;
+  let availabilityVerdictResult = null;
   // Set by the workflow=comparison block: ONE representative card per named
   // family (max 4). Like availabilityPinnedCards, it wins over the scorer so a
   // two-product comparison never floods the carousel with 9 cards.
@@ -2762,6 +2793,8 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
         }
         fullResponseText = buildAvailabilityAnswer(verdict);
         answerOwner = "availability-truth";
+        availabilityVerdictReason = verdict.reason || null;
+        availabilityVerdictResult = verdict.result || null;
         if (verdict.result === AVAILABILITY_RESULT.NOT_FOUND) {
           pool = [];
           console.log(`[availability-truth] display=none (not found)`);
@@ -2964,6 +2997,44 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       }
     } catch (compatErr) {
       console.error("[evidence-plan] compatibility failed (non-fatal):", compatErr?.message || compatErr);
+    }
+  }
+
+  // Named-product advisory: the named product IS the card. Pin it from this
+  // turn's evidence (the forced named-family search), the focus product, or
+  // prior cards — so the scorer never takes over a pinned workflow (violation
+  // pinned_workflow_scorer_takeover, live trace 2026-06-30: Gabby rendered but
+  // cardOwner=scorer). Advisory answers about ONE product, so pin singular.
+  if (
+    ctx.turnPlan?.workflow === "named_product_advisory" &&
+    !availabilityPinnedCards && !comparisonPinnedCards && !evidencePinnedCards && !priorEvidencePinnedCards &&
+    !rewriteOnlyRetry
+  ) {
+    try {
+      const fams = Array.isArray(ctx.turnPlan.namedFamilies) ? ctx.turnPlan.namedFamilies : [];
+      const fam = fams[0] || (ctx.focusProduct ? titleStyleFamily(ctx.focusProduct.title || "").toLowerCase() : null);
+      if (fam) {
+        const sources = [
+          pool,
+          Array.from(allProductPool.values()),
+          Array.isArray(ctx.priorProductCards) ? ctx.priorProductCards : [],
+          ctx.focusProduct ? [ctx.focusProduct] : [],
+        ];
+        let card = null;
+        for (const src of sources) {
+          card = (src || []).find((c) => titleStyleFamily(c.title || "").toLowerCase() === fam);
+          if (card) break;
+        }
+        if (card) {
+          evidencePinnedCards = [card];
+          evidenceFallbackText = `The ${cardDisplayName(card)} is a great pick here — take a look.`;
+          console.log(`[evidence-plan] named_product_advisory family=${fam} pinnedFinalCards=1 (owner=evidence-plan)`);
+        } else {
+          console.log(`[evidence-plan] named_product_advisory family=${fam} — named card not in evidence; text-only`);
+        }
+      }
+    } catch (advErr) {
+      console.error("[evidence-plan] named_product_advisory pin failed (non-fatal):", advErr?.message || advErr);
     }
   }
 
@@ -4125,13 +4196,21 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     // search. If it didn't, a downstream gate silently refused a TurnPlan-
     // required search (the workflow never changed to text-only/suppress).
     if (plannedSearchSkippedViolation({ plan: ctx?.turnPlan, searchAttempted: productSearchAttempted })) {
-      // A search was required but never attempted. If the forced-search layer
-      // DELIBERATELY refused it (no concrete commerce constraint, or the reply
-      // was a clarifying question), that's a legitimate downgrade — log it, do
-      // NOT flag a violation. Only a search that was attemptable yet skipped is
-      // a real breach. ("never ship search_required_not_attempted" on a
-      // deliberate downgrade — live QA 2026-06-29.)
-      if (forcedSearchAllowed({ ctx, text: fullResponseText })) {
+      // A search was required but never attempted. Two legitimate (non-violation)
+      // cases:
+      //  1) a REWRITE-ONLY retry that reuses the prior attempt's deterministic
+      //     evidence (pinned availability/comparison/evidence cards) — it
+      //     intentionally does NOT re-search; flagging it burns the retry budget
+      //     on a turn that already has the right cards (live QA 2026-06-30:
+      //     Savannah 7-wide availability rewrite tripped this).
+      //  2) the forced-search layer DELIBERATELY refused (no concrete commerce
+      //     constraint, or the reply was a clarifying question) — a downgrade.
+      // Only a search that was attemptable yet skipped is a real breach.
+      const pinnedThisTurn = availabilityPinnedCards != null || comparisonPinnedCards != null ||
+        evidencePinnedCards != null || priorEvidencePinnedCards != null;
+      if (rewriteOnlyRetry && pinnedThisTurn) {
+        console.log(`[chat] turn-plan(${workflow}): rewrite-only retry reusing pinned evidence — search not re-attempted (no violation)`);
+      } else if (forcedSearchAllowed({ ctx, text: fullResponseText })) {
         recordTurnInvariantViolation("search_required_not_attempted", { workflow });
       } else {
         console.log(`[chat] turn-plan(${workflow}): search downgraded — required but no concrete basis to search (no violation)`);
@@ -4184,7 +4263,14 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       searchAttempted: productSearchAttempted,
     },
   });
-  const turnWarnings = validateTurnResult(turnResult);
+  const turnWarnings = validateTurnResult({
+    ...turnResult,
+    // A partial availability verdict (width/size not in options) shown WITH the
+    // product card is a valid honest answer, not a denial — exempt it from
+    // denial_with_products so it doesn't burn retries (#4, live QA 2026-06-30).
+    availabilityResult: availabilityVerdictResult,
+    availabilityReason: availabilityVerdictReason,
+  });
   if (turnWarnings.length > 0) {
     console.log(
       `[turn-result] ${ctx.shop} warnings=` +
@@ -4740,15 +4826,27 @@ async function handleChatPost({ shop, sessionAccessToken, request, internal = fa
         isSizeWidthFactFollowUp(latestUserMessage) ||
         isColorFactFollowUp(latestUserMessage) ||
         isDirectProductFactQuestion(latestUserMessage);
-      if (isFactFollowup) {
-        // Bind to the product the customer named — by full title or by
-        // its short model-name token ("danika" → "Danika Arch Support
-        // Sneaker"). Falls back to the sole card when only one is shown.
-        const named = resolveFocusedCardByName(latestUserMessage, priorProductCards);
+      // ORDINAL / SELECTION reference ("the second one", "second pair", "I like
+      // the first") binds to that card regardless of goal — selection and cart
+      // turns need the focus too (live trace 2026-06-30: "I like the second one"
+      // shipped with no card). Resolve by ordinal, then by name, then the sole
+      // card for a bare deictic ("it"/"this one").
+      const ordinal = resolveOrdinalCard(latestUserMessage, priorProductCards);
+      const named = resolveFocusedCardByName(latestUserMessage, priorProductCards);
+      if (ordinal) {
+        focusProduct = ordinal;
+        console.log(`[chat] focus-product anchor (ordinal): "${focusProduct.title}"`);
+      } else if (isFactFollowup) {
         focusProduct = named || (priorProductCards.length === 1 ? priorProductCards[0] : null);
         if (focusProduct) {
           console.log(`[chat] focus-product anchor: "${focusProduct.title}" (goal=${convGoal?.type || "fact-followup"})`);
         }
+      } else if (named) {
+        focusProduct = named;
+        console.log(`[chat] focus-product anchor (named selection): "${focusProduct.title}"`);
+      } else if (priorProductCards.length === 1 && /\b(this|that|it|the)\s*(one|pair|product)?\b/i.test(latestUserMessage)) {
+        focusProduct = priorProductCards[0];
+        console.log(`[chat] focus-product anchor (sole card + deictic): "${focusProduct.title}"`);
       }
     }
 

@@ -2663,11 +2663,25 @@ export function resolveProductTurnLink({ categoryCounts, genderCounts, ctx = {} 
   return { link: null, kind: "none", diagnostics: {} };
 }
 
+// Reasons where availability-truth shows the product card but honestly can't
+// confirm the EXACT requested variant (width/size not stamped, constraints
+// unparsed, no exposed inventory). The "I can't confirm that width" phrasing is
+// the correct answer, NOT a product denial — never flag denial_with_products.
+const PARTIAL_AVAILABILITY_REASONS = new Set([
+  "width_not_in_options",
+  "unparsed_requested_constraints",
+  "no_variant_inventory",
+  "size_width_combo_not_stamped",
+]);
+
 export function validateTurnResult(result = {}) {
   const warnings = [];
   const text = String(result.text || "");
   const products = Array.isArray(result.products) ? result.products : [];
   const chips = Array.isArray(result.chips) ? result.chips : [];
+  const availabilityPartial =
+    result.availabilityResult === "UNKNOWN" &&
+    PARTIAL_AVAILABILITY_REASONS.has(String(result.availabilityReason || ""));
 
   if (text.length < 3) {
     warnings.push({
@@ -2693,7 +2707,7 @@ export function validateTurnResult(result = {}) {
     });
   }
 
-  if (products.length > 0 && detectAiNoMatchPhrasing(text)) {
+  if (products.length > 0 && !availabilityPartial && detectAiNoMatchPhrasing(text)) {
     warnings.push({
       code: "denial_with_products",
       message: "Text contains no-match wording while product cards are attached.",

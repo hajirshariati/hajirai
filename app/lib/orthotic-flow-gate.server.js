@@ -1402,34 +1402,38 @@ export async function maybeRunOrthoticFlow({
   }
 
   // ── Conversational-repair veto (loop breaker) ───────────────────────────
-  // The prior turn asked a seed question (priorChipAttribute) and the customer
-  // did NOT answer it. If they're confused, restating a gender we already have,
-  // or frustrated, re-emitting the SAME question verbatim is the worst move
-  // (live trace 2026-06-29: q_use_case asked, customer typed "what?", then "i
-  // said i'm a men", then "are you stupid?" — the gate repeated the identical
-  // bubble three times). Defer so the LLM rephrases / acknowledges / apologizes.
-  if (priorChipAttribute && !latestExtracted?.[priorChipAttribute]) {
-    if (isOrthoticConfusionReply(rawUserText)) {
-      console.log(
-        `[orthotic-flow] confusion reply ("${rawUserText.slice(0, 60)}") on ${priorChipAttribute} — ` +
-          `deferring to LLM for a plain-language rephrase`,
-      );
-      return { handled: false, case: "confusion_repair" };
-    }
-    if (isOrthoticHostileReply(rawUserText)) {
-      console.log(
-        `[orthotic-flow] frustration ("${rawUserText.slice(0, 60)}") on ${priorChipAttribute} — ` +
-          `deferring to LLM to apologize and recover`,
-      );
-      return { handled: false, case: "frustration_repair" };
-    }
-    if (priorChipAttribute !== "gender" && accumulated?.gender && genderRestatement(rawUserText)) {
-      console.log(
-        `[orthotic-flow] gender restatement ("${rawUserText.slice(0, 60)}") while ${priorChipAttribute} pending — ` +
-          `deferring so the LLM acks gender and asks ${priorChipAttribute}`,
-      );
-      return { handled: false, case: "gender_restatement_repair" };
-    }
+  // Confusion ("what?", "huh?", "i don't understand") and frustration ("are you
+  // stupid?", "you're not listening", "i already told you") are NEVER valid chip
+  // answers, so re-emitting the seed question verbatim is always the wrong move.
+  // Defer to the LLM on the FIRST occurrence — NOT gated on whether the prior
+  // bubble parsed to a chip attribute (live trace 2026-06-30: "what?", "i said
+  // i'm a man", "are you stupid?" each repeated the same question because the
+  // prior-chip detection returned null; the loop cap only caught the third).
+  if (isOrthoticConfusionReply(rawUserText)) {
+    console.log(
+      `[orthotic-flow] confusion reply ("${rawUserText.slice(0, 60)}") — ` +
+        `deferring to LLM for a plain-language rephrase (first occurrence)`,
+    );
+    return { handled: false, case: "confusion_repair" };
+  }
+  if (isOrthoticHostileReply(rawUserText)) {
+    console.log(
+      `[orthotic-flow] frustration ("${rawUserText.slice(0, 60)}") — ` +
+        `deferring to LLM to apologize and recover (first occurrence)`,
+    );
+    return { handled: false, case: "frustration_repair" };
+  }
+  // Gender restatement ("i said i'm a man", "i'm men") only when a gender is
+  // already captured and the user is re-stating it instead of answering the
+  // pending slot — defer so the LLM acknowledges and moves on. (A bare "men"
+  // chip answer returns null from genderRestatement, so it still advances.)
+  if (accumulated?.gender && genderRestatement(rawUserText) &&
+      (!priorChipAttribute || priorChipAttribute !== "gender")) {
+    console.log(
+      `[orthotic-flow] gender restatement ("${rawUserText.slice(0, 60)}") with gender already known — ` +
+        `deferring so the LLM acks gender and continues`,
+    );
+    return { handled: false, case: "gender_restatement_repair" };
   }
 
   // Source-challenge / meta-question detection. When the customer

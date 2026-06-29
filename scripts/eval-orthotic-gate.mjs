@@ -1821,6 +1821,41 @@ await test("hostility mid-flow ('are you stupid?') defers — no repeat", async 
   assert.equal(events.some((e) => /What kind of shoes will the orthotics/i.test(e?.text || "")), false);
 });
 
+await test("confusion bypass fires on FIRST occurrence even with no parseable prior chips", async () => {
+  // The prior assistant turn is PLAIN text (no <<chips>>), so prior-chip
+  // detection returns null. The bypass must still fire on the first "what?"
+  // — not wait for the loop cap (live trace 2026-06-30).
+  const { events, encoder, controller } = makeMockSse();
+  const out = await maybeRunOrthoticFlow({
+    messages: [
+      { role: "user", content: "I need orthotics" },
+      { role: "assistant", content: "Who are these orthotics for?" },
+      { role: "user", content: "men" },
+      { role: "assistant", content: "What kind of shoes will the orthotics go in?" },
+      { role: "user", content: "what?" },
+    ],
+    tree, shop: "test.myshopify.com", controller, encoder,
+  });
+  assert.equal(out.handled, false);
+  assert.equal(events.some((e) => /What kind of shoes/i.test(e?.text || "")), false, "must not re-emit on first confusion");
+});
+
+await test("hostility bypass fires on FIRST occurrence (no parseable prior chips)", async () => {
+  const { events, encoder, controller } = makeMockSse();
+  const out = await maybeRunOrthoticFlow({
+    messages: [
+      { role: "user", content: "I need orthotics" },
+      { role: "assistant", content: "Who are these orthotics for?" },
+      { role: "user", content: "men" },
+      { role: "assistant", content: "What kind of shoes will the orthotics go in?" },
+      { role: "user", content: "are you stupid?" },
+    ],
+    tree, shop: "test.myshopify.com", controller, encoder,
+  });
+  assert.equal(out.handled, false);
+  assert.equal(events.some((e) => /What kind of shoes/i.test(e?.text || "")), false);
+});
+
 await test("loop cap: the same seed question is never emitted a 3rd time", async () => {
   // q_use_case already went out TWICE; a third turn (even plain gibberish, not a
   // confusion/hostility trigger) must defer instead of repeating it again.

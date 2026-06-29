@@ -529,12 +529,17 @@ export function planTurn({
       workflow: WORKFLOWS.CART_HANDOFF,
       requiredEvidence: ["product_facts"],
       searchRequired: false,
-      clarificationAllowed: false,
+      // Allow ONE clarification only when no product could be anchored ("add to
+      // cart" with several prior cards and no clear pick) — a focus product or a
+      // named family both anchor the card; otherwise pin it and never ask.
+      clarificationAllowed: !(focusProduct || hasNamed),
       productDisplayPolicy: "show_focused",
       answerRequirements: reqs({ answerFirst: true, concise: true }),
       gender: genderFor(false),
       directives: [
-        "The customer wants to buy the product in focus. You can't add to cart from chat — say that briefly and point them to the product page to choose a size and add it there. KEEP the focused product's card. Do not start a new search or ask a generic clarifying question.",
+        (focusProduct || hasNamed)
+          ? "The customer wants to buy the product in focus. You can't add to cart from chat — say that briefly and point them to the product page to choose a size and add it there. KEEP the focused product's card. Do not start a new search."
+          : "The customer wants to buy a product but it's unclear which one. Ask ONE short question naming the options they just saw. Do not run a new search.",
       ],
     });
   }
@@ -550,12 +555,17 @@ export function planTurn({
       workflow: WORKFLOWS.PRODUCT_FOCUS,
       requiredEvidence: ["product_facts"],
       searchRequired: false,
-      clarificationAllowed: false,
+      // Allow ONE clarification only when the selected product couldn't be
+      // anchored (an ambiguous "I like that one" with several prior cards); a
+      // focus product or a named family both anchor it.
+      clarificationAllowed: !(focusProduct || hasNamed),
       productDisplayPolicy: "show_focused",
       answerRequirements: reqs({ answerFirst: true, concise: true }),
       gender: genderFor(false),
       directives: [
-        "The customer just SELECTED a product they were shown. Acknowledge it in one warm line of sales copy and offer one concrete next step (check sizes/colors, or compare it with a similar style). KEEP that product's card. Do NOT run a new generic search or ask a generic clarifying question.",
+        (focusProduct || hasNamed)
+          ? "The customer just SELECTED a product they were shown. Acknowledge it in one warm line of sales copy and offer one concrete next step (check sizes/colors, or compare it with a similar style). KEEP that product's card. Do NOT run a new generic search or ask a generic clarifying question."
+          : "The customer selected a product but it's unclear which one. Ask ONE short question naming the options they just saw. Do not run a new search.",
       ],
     });
   }
@@ -672,6 +682,30 @@ export function planTurn({
       gender: genderFor(false),
       directives: [
         "The customer is REFINING the previous search to a lower price. Re-run the SAME kind of search (inherit the prior category/gender/use-case) sorted toward more affordable options and SHOW them. Do NOT ask a clarifying question.",
+      ],
+    });
+  }
+  // A CATEGORY refinement ("what about sandals instead?", "boots instead",
+  // "how about sneakers") after a prior shopping turn swaps the category and
+  // re-runs the search, inheriting the prior gender/use-case. Never a
+  // clarification (live trace 2026-06-30: "what about sandals instead?" →
+  // clarification while memory had gender=men category=sandals, candidates=6).
+  const CATEGORY_REFINE_RE =
+    /\b(sandals?|sneakers?|boots?|booties?|loafers?|clogs?|slippers?|oxfords?|wedges?|heels?|flats?|mules?|slides?|mary\s+janes?|slip[-\s]?ons?|orthotics?|insoles?)\b/i;
+  const isCategoryRefine =
+    CATEGORY_REFINE_RE.test(m) && words(m) <= 6 && !hasNamed &&
+    (/\b(instead|how\s+about|what\s+about|actually|rather|switch\s+to|change\s+to|try|maybe)\b/i.test(m) || words(m) <= 2);
+  if (isCategoryRefine && !isGenderOnlyRefine && (hasPriorCards || hasProductContext)) {
+    return finalize({
+      workflow: WORKFLOWS.BROWSE,
+      requiredEvidence: ["product_facts"],
+      searchRequired: true,
+      clarificationAllowed: false,
+      productDisplayPolicy: "show",
+      answerRequirements: reqs({ concise: true }),
+      gender: genderFor(true),
+      directives: [
+        "The customer is REFINING the previous search to a DIFFERENT category. Re-run the search for the new category (inherit the prior gender/use-case from context, REPLACE the category) and SHOW the matching products. Do NOT ask a clarifying question.",
       ],
     });
   }

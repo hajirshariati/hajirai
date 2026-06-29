@@ -16,6 +16,7 @@ import {
   resolveProductTurnLink,
   verifyClaimsAgainstCards,
   detectNamedProductMismatch,
+  validateTurnResult,
 } from "../app/lib/response-contract.server.js";
 import {
   buildProductClaimFacts,
@@ -1968,6 +1969,23 @@ test("R91 — claim verifier DEFERS when LLM_OWNS_ALL_TURNS is active", () => {
   } finally {
     process.env.LLM_OWNS_ALL_TURNS = "false";
   }
+});
+
+test("R92 — partial availability (width_not_in_options + card) is NOT denial_with_products", () => {
+  // Live QA 2026-06-30: Savannah champagne size 7 wide → availability-truth
+  // UNKNOWN/width_not_in_options WITH the Savannah card. The honest "I can't
+  // confirm that width from here" is a valid answer, not a product denial.
+  const text = "I'm not seeing that width in stock for the Savannah — open the product page to check. Here's the Savannah.";
+  const products = [{ title: "Savannah Adjustable Quarter Strap Sandal - Champagne" }];
+  // Without the verdict context, the no-match phrasing flags denial.
+  const bare = validateTurnResult({ text, products }).map((w) => w.code);
+  assert.ok(bare.includes("denial_with_products"), "control: bare partial flags denial");
+  // WITH the partial-availability verdict it must be exempt.
+  const exempt = validateTurnResult({ text, products, availabilityResult: "UNKNOWN", availabilityReason: "width_not_in_options" }).map((w) => w.code);
+  assert.ok(!exempt.includes("denial_with_products"), `partial availability must be exempt; got ${JSON.stringify(exempt)}`);
+  // A genuine no-match (NOT a partial verdict) still flags.
+  const real = validateTurnResult({ text: "I don't see any Savannah in our catalog.", products, availabilityResult: "AVAILABLE", availabilityReason: "-" }).map((w) => w.code);
+  assert.ok(real.includes("denial_with_products"), "a real denial with a card still flags");
 });
 
 if (failed > 0) {
