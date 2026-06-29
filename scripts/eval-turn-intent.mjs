@@ -11,6 +11,8 @@ import {
   TurnIntentLabels as L,
   detectConversationGoal,
   detectTurnGoal,
+  isBroadGenderRequest,
+  broadGenderRequestGender,
 } from "../app/lib/turn-intent.server.js";
 
 let passed = 0;
@@ -91,6 +93,20 @@ await test("P2 — a SPECIFIC 'men's sandals' is a category pivot, not a broad r
     previousScope: { gender: "women", category: "wedges-heels", width: "wide" },
   });
   assert.notEqual(intent.reason, "broad_gender_request");
+});
+
+// P2 RUNTIME — the shared detector the live execution path uses to force a
+// deterministic gender-only search (not just the classifier).
+await test("P2 runtime — isBroadGenderRequest / broadGenderRequestGender", () => {
+  for (const s of ["Show me men's options", "men's options", "what do you have for men", "show me women's stuff", "men's footwear"]) {
+    assert.equal(isBroadGenderRequest(s), true, `broad: ${s}`);
+  }
+  for (const s of ["men's sandals", "show me sandals", "do you have wedges?", "I like the Drew"]) {
+    assert.equal(isBroadGenderRequest(s), false, `not broad: ${s}`);
+  }
+  assert.equal(broadGenderRequestGender("Show me men's options"), "men");
+  assert.equal(broadGenderRequestGender("what do you have for women"), "women");
+  assert.equal(broadGenderRequestGender("show me men's sandals"), null, "specific category is not a broad request");
 });
 
 // ---------------------------------------------------------------------------

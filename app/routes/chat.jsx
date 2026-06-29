@@ -111,7 +111,7 @@ import {
   alignCardsToAnswerText,
   familyFromQuery,
 } from "../lib/emit-finalize.server";
-import { detectConversationGoal, ANCHOR_GOALS } from "../lib/turn-intent.server";
+import { detectConversationGoal, ANCHOR_GOALS, isBroadGenderRequest, broadGenderRequestGender } from "../lib/turn-intent.server";
 import { buildVisualizeCtaEvent } from "../lib/visualize-cta.server";
 import prisma from "../db.server";
 import { recordChatUsage, getTodayMessageCount } from "../models/ChatUsage.server";
@@ -3131,6 +3131,51 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     console.log(`[evidence-plan] display_recovery re-pinned ${evidencePinnedCards.length} prior card(s) (owner=evidence-plan, seeded pool)`);
   }
 
+  // ── BROAD GENDER BROWSE (runtime override) ──────────────────────────────
+  // "Show me men's options" / "what do you have for men" widens to the WHOLE
+  // gender line. The unit-level turn-intent drop wasn't enough at runtime: the
+  // model still re-searched the PRIOR cards' categories for the new gender
+  // (gender=men category="wedges heels"/boots → women-only → gender×category
+  // mismatch → final cards=0, "we don't carry men's footwear"; live trace
+  // 2026-06-30). Fix deterministically: run a GENDER-ONLY search (no stale
+  // category/color/width/condition) and PIN it, so the model's stale-category
+  // searches can never become the final cards. Category is honored ONLY if the
+  // customer names one in THIS message — and a specific category never matches
+  // isBroadGenderRequest, so this fires only on a genuinely broad ask.
+  if (
+    ctx.turnPlan?.workflow === "browse" &&
+    isBroadGenderRequest(ctx.latestUserMessage || "") &&
+    !availabilityPinnedCards && !comparisonPinnedCards && !evidencePinnedCards && !priorEvidencePinnedCards &&
+    !rewriteOnlyRetry
+  ) {
+    try {
+      const bg = broadGenderRequestGender(ctx.latestUserMessage || "") || ctx.turnPlan?.gender || ctx.sessionGender || null;
+      const genderWord = bg === "men" ? "men's" : bg === "women" ? "women's" : bg === "kids" ? "kids" : "";
+      const filters = bg ? { gender: bg } : {};
+      const cap = Math.max(3, ctx.productCardCap || 6);
+      const input = { query: `${genderWord} footwear`.trim() || "footwear", filters, limit: cap };
+      const cards = extractProductCards("search_products", await dispatchTool("search_products", input, ctx), ctx);
+      const picked = (cards || []).slice(0, cap);
+      if (picked.length > 0) {
+        evidencePinnedCards = picked;
+        for (const c of picked) { const k = String(c.handle || c.title || "").toLowerCase(); if (k && !allProductPool.has(k)) allProductPool.set(k, c); }
+        productSearchAttempted = true;
+        evidenceFallbackText = `Here are some ${genderWord || ""} options to get you started.`.replace(/\s+/g, " ").trim();
+        // The model drafted its text BEFORE this turn against the stale context —
+        // if it denied ("we don't carry men's…") or didn't present products,
+        // replace it with the clean framing so text and the pinned cards agree.
+        if (detectAiNoMatchPhrasing(fullResponseText) || !textPresentsProducts(fullResponseText)) {
+          fullResponseText = evidenceFallbackText;
+        }
+        console.log(`[broad-gender-browse] gender=${bg || "-"} pinned ${picked.length} card(s) via gender-only search "${input.query}" (overrode stale-category model searches)`);
+      } else {
+        console.log(`[broad-gender-browse] gender=${bg || "-"} gender-only search returned 0 — leaving to scorer`);
+      }
+    } catch (bgErr) {
+      console.warn("[broad-gender-browse] failed (non-fatal):", bgErr?.message || bgErr);
+    }
+  }
+
   // ── Condition / advisory recommendation: deterministic 2-3 card selection ──
   // A condition_recommendation turn ("comfortable shoes for standing all day",
   // "plantar fasciitis walking", "cute but supportive for a wedding") must NOT
@@ -4287,6 +4332,13 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     if (workflow === "multi_recommendation" &&
         multiRecoTextCardMismatch({ text: fullResponseText, cards: finalProductCards })) {
       recordTurnInvariantViolation("multi_reco_text_card_mismatch", { final: finalCount });
+    }
+    // BROAD GENDER BROWSE: a broad "men's options" ask must end with gender-correct
+    // cards from the deterministic gender-only search — never zero cards from a
+    // stale-category search (live trace 2026-06-30). Zero cards here means the
+    // deterministic pin didn't fire / the gender-only search came back empty.
+    if (workflow === "browse" && isBroadGenderRequest(ctx?.latestUserMessage || "") && finalCount === 0) {
+      recordTurnInvariantViolation("broad_gender_zero_cards", { workflow, gender: ctx?.turnPlan?.gender || "-" });
     }
     // INVARIANT (audit #6): every SHOWN card must be in the evidence pool. The
     // scorer picks FROM the pool, so a scorer-owned card outside it is a leak

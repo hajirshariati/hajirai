@@ -61,6 +61,22 @@ const BROAD_RESET_RE =
 const BROAD_GENDER_REQUEST_RE =
   /\b(?:men'?s?|mens|women'?s?|womens|kids?|guys?|ladies|male|female)\s+(?:options|stuff|styles|selection|things|picks|footwear|shoes|everything|anything)\b|\b(?:what\s+(?:do|have)\s+you\s+(?:have|carry|got)|anything)\s+for\s+(?:men|women|guys|kids|him|her)\b/i;
 
+// Runtime detector (shared with the live execution path in chat.jsx, not just
+// the classifier). True when the CURRENT message is a broad gender browse.
+export function isBroadGenderRequest(text) {
+  return BROAD_GENDER_REQUEST_RE.test(String(text || ""));
+}
+
+// The gender a broad gender request targets — men | women | kids | null.
+export function broadGenderRequestGender(text) {
+  if (!isBroadGenderRequest(text)) return null;
+  const t = String(text || "").toLowerCase();
+  if (/\b(?:men'?s?|mens|guys?|male|\bhim\b|for\s+(?:men|guys|him))\b/.test(t)) return "men";
+  if (/\b(?:women'?s?|womens|ladies|female|\bher\b|for\s+(?:women|her))\b/.test(t)) return "women";
+  if (/\b(?:kids?|children|for\s+kids)\b/.test(t)) return "kids";
+  return null;
+}
+
 // Pronoun back-reference — "all of them", "any of those", "both of
 // them". Looks like a broad reset but is actually referring to a set
 // the assistant already showed. Treat as continue.
