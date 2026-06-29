@@ -654,6 +654,11 @@ const GARMENT_NOUNS = [
   "coat", "coats", "suit", "suits", "tuxedo", "jumpsuit", "romper",
   "outfit", "outfits", "bag", "bags", "purse", "handbag", "clutch",
   "belt", "belts", "scarf", "hat", "tie", "tights", "stockings",
+  // Outfit PATTERNS/prints a color describes — never a footwear color.
+  // Live trace 2026-06-29: "wear Gabby with a short white dress with big red
+  // flowers" extracted color=red from "red flowers" and searched red footwear.
+  "flowers", "flower", "floral", "florals", "print", "prints", "pattern",
+  "patterns", "stripes", "striped", "plaid", "polka", "dots",
 ];
 const GARMENT_NOUNS_RE_SRC = GARMENT_NOUNS.join("|");
 const FOOTWEAR_NOUNS = [

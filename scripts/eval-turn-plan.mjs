@@ -93,6 +93,20 @@ scenario("'do these run true to size?' no context → sizing_help", { message: "
 scenario("sizing with focus product → advisory (focus that product)", { message: "What size should I get?", focusProduct: { title: "Savannah Sandal - Champagne" } },
   { workflow: W.NAMED_PRODUCT_ADVISORY, searchRequired: true, productDisplayPolicy: "show_focused" });
 
+// ── named-product STYLING → advisory (named family dominates, not outfit browse)
+// Live trace 2026-06-29: "wear gabby with a white dress with big red flowers"
+// routed to generic browse and dropped Gabby for red footwear. A named product
+// + styling phrasing must route to named_product_advisory.
+scenario("'wear gabby with a white dress with red flowers' → named_product_advisory", { message: "i want to wear gabby with a short white dress with big red flowers", namedProduct: true },
+  { workflow: W.NAMED_PRODUCT_ADVISORY, searchRequired: true, productDisplayPolicy: "show_focused" });
+scenario("'does Jillian go with jeans?' → named_product_advisory", { message: "does Jillian go with jeans?", namedProduct: true },
+  { workflow: W.NAMED_PRODUCT_ADVISORY, searchRequired: true });
+scenario("'can I wear Savannah to a wedding?' → named_product_advisory", { message: "can I wear Savannah to a wedding?", namedProduct: true },
+  { workflow: W.NAMED_PRODUCT_ADVISORY, searchRequired: true });
+// Styling WITHOUT a named product stays a browse (no family to anchor).
+scenario("'what shoes go with a black dress?' (no named) → browse", { message: "what shoes go with a black dress?" },
+  { workflow: W.BROWSE });
+
 // ── sale_browse (Failure B): shopping a sale is commerce, not support ──
 scenario("'show me current sales and promotions' → sale_browse", { message: "Show me current sales and promotions" },
   { workflow: W.SALE_BROWSE, searchRequired: true, productDisplayPolicy: "show" });

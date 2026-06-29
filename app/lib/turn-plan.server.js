@@ -148,6 +148,21 @@ const ADVISORY_RE = new RegExp(
   "i",
 );
 
+// Outfit/styling advisory: "wear Gabby with a white dress", "does Jillian go
+// with jeans?", "can I wear Savannah to a wedding?", "what shoes go with...".
+// A NAMED product + styling phrasing is advice ABOUT that product (show it,
+// keep it dominant) — NOT a generic color/category browse seeded by the outfit
+// the customer described (live trace 2026-06-29: "wear gabby with a white dress
+// with big red flowers" became a red-footwear browse with Gabby dropped).
+const STYLING_RE = new RegExp(
+  "\\bwear\\b[^.?!\\n]{0,40}\\b(?:with|to|for)\\b" + "|" +
+  "\\b(?:go|goes|pair|pairs|match|matches|work|works)\\b[^.?!\\n]{0,20}\\bwith\\b" + "|" +
+  "\\bgo(?:es)?\\s+(?:well\\s+)?with\\b" + "|" +
+  "\\bwhat\\s+(?:shoes?|sandals?|footwear|heels?|wedges?|boots?|sneakers?)\\s+(?:go|would|to\\s+wear)\\b" + "|" +
+  "\\b(?:match|pair\\s+with)\\s+(?:my|a|an|the)\\b",
+  "i",
+);
+
 // Medical CONDITIONS only — "arch support" is a feature/filter, not a
 // condition, so it is deliberately excluded (otherwise "show me sandals
 // with arch support" misclassifies as a clinical recommendation).
@@ -442,19 +457,24 @@ export function planTurn({
     });
   }
 
-  // 4. Named-product advisory / value / suitability.
-  if (hasNamed && (ADVISORY_RE.test(m) || condition)) {
+  // 4. Named-product advisory / value / suitability / styling.
+  if (hasNamed && (ADVISORY_RE.test(m) || STYLING_RE.test(m) || condition)) {
+    const styling = STYLING_RE.test(m) && !ADVISORY_RE.test(m) && !condition;
     return finalize({
       workflow: WORKFLOWS.NAMED_PRODUCT_ADVISORY,
       requiredEvidence: ["product_facts"],
       searchRequired: true,
       clarificationAllowed: false,
       productDisplayPolicy: "show_focused",
-      answerRequirements: reqs({ answerFirst: true, concise: true, honestTradeoff: true }),
+      answerRequirements: reqs({ answerFirst: true, concise: true, honestTradeoff: !styling }),
       gender: genderFor(true),
-      directives: [
-        "Look up the named product this turn and answer the value/suitability question directly from its real facts — answer first, one honest tradeoff, then the card. Never answer a named-product question from memory alone.",
-      ],
+      directives: styling
+        ? [
+            "This is a STYLING question about the NAMED product. Search for and show the named product — it is the subject and must be the card shown. Give concise styling advice on how it pairs with the outfit the customer described. The colors/patterns in the outfit (e.g. a white dress, red flowers, blue jeans) are NOT product filters — never search a different color/category because of the outfit. If the customer didn't name a product COLOR, don't apply one.",
+          ]
+        : [
+            "Look up the named product this turn and answer the value/suitability question directly from its real facts — answer first, one honest tradeoff, then the card. Never answer a named-product question from memory alone.",
+          ],
     });
   }
 
@@ -501,8 +521,10 @@ export function planTurn({
     });
   }
 
-  // 6. Plain browse / search.
-  if (BROWSE_RE.test(m) || hasNamed) {
+  // 6. Plain browse / search. Unnamed styling ("what shoes go with a black
+  // dress?") is a browse — show footwear — not a dead-end clarification; the
+  // outfit color is already stripped from the product filters upstream (D1).
+  if (BROWSE_RE.test(m) || hasNamed || STYLING_RE.test(m)) {
     const genderUnstated = !statedGender;
     return finalize({
       workflow: WORKFLOWS.BROWSE,

@@ -130,6 +130,17 @@ await test("R0e2 — a NEGATED color never becomes a positive color constraint",
   assert.equal(extractUserConstraints("i need black sandals").color, "black");
 });
 
+await test("R0e3 — OUTFIT colors/patterns are not product color filters", () => {
+  // Live trace 2026-06-29: "wear gabby with a short white dress with big red
+  // flowers" extracted color=red from "red flowers" → searched red footwear.
+  assert.equal(extractUserConstraints("i want to wear gabby with a short white dress with big red flowers").color, undefined);
+  assert.equal(extractUserConstraints("can I wear Savannah with a red dress?").color, undefined);
+  assert.equal(extractUserConstraints("would black Jillian work with blue jeans?").color, "black"); // black is on the product
+  // A color on a footwear noun is STILL a product color.
+  assert.equal(extractUserConstraints("show me red sandals for a white dress").color, "red");
+  assert.equal(extractUserConstraints("Gabby in white").color, "white");
+});
+
 await test("R0f — product-navigation quick reply extracts both requested color and category", () => {
   assert.deepEqual(
     extractUserConstraints("Can you show me pink sneakers instead?"),
