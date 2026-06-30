@@ -2125,15 +2125,21 @@ await test("orthotic target preserved: 3-turn flow stays orthotic, never sneaker
   //     resolver never pins category=sneakers (→ no sneaker search/cards).
   assert.equal(extractUserConstraints(latest).category, "sneakers", "control: raw extractor would pin sneakers");
 
-  // (4) End-to-end: the gate OWNS the turn — captures useCase=athletic_running
-  //     and asks the next orthotic question (condition). No product cards, no
-  //     sneaker handoff, no soft-browse.
+  // (4) End-to-end: the gate OWNS the turn even under the EXACT production
+  //     TurnPlan that caused the leak — workflow=condition_recommendation,
+  //     clarificationAllowed=false (PRD 3263be4: this combo made the gate defer
+  //     to the LLM/resolver, which forced a "walking sneakers" search and
+  //     shipped sneaker cards). Mid-seed-flow ownership must win. The gate
+  //     captures useCase=athletic_running and asks the next orthotic question
+  //     (condition). No product cards, no sneaker handoff, no soft-browse.
   const { events, encoder, controller } = makeMockSse();
   const out = await maybeRunOrthoticFlow({
     messages, tree, shop: "test-shop", controller, encoder,
     classifiedIntent: { intent: "recommend_orthotic", isOrthoticRequest: true, attributes: { gender: "Women", category: "sneakers", useCase: null } },
+    turnPlan: { workflow: "condition_recommendation", clarificationAllowed: false, searchRequired: true, productDisplayPolicy: "show" },
   });
-  assert.equal(out.handled, true, "the orthotic gate must own the turn (not soft_browse_refine)");
+  assert.equal(out.handled, true, "the orthotic gate must own the turn (not defer → soft_browse_refine/resolver)");
+  assert.notEqual(out.case, "turn_plan_owns_condition_recommendation", "must not defer on the condition_recommendation override mid-seed-flow");
   const productEv = events.find((e) => e?.type === "products");
   assert.ok(!productEv || (Array.isArray(productEv.products) && productEv.products.length === 0), "must NOT ship product cards (no sneaker cards)");
   const textEv = events.find((e) => e?.type === "text");

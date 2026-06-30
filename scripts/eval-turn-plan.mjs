@@ -9,7 +9,7 @@
 // Run: node scripts/eval-turn-plan.mjs
 
 import assert from "node:assert/strict";
-import { planTurn, WORKFLOWS, textPresentsProducts, workflowDisablesTools, resolvedFamilyGender } from "../app/lib/turn-plan.server.js";
+import { planTurn, WORKFLOWS, textPresentsProducts, workflowDisablesTools, resolvedFamilyGender, isStrippedFragmentText, isOrthoticProductCard, messageExplicitlyAsksForShoes } from "../app/lib/turn-plan.server.js";
 
 let pass = 0, fail = 0;
 const fails = [];
@@ -492,6 +492,40 @@ scenario("show me clogs under 100", { message: "show me clogs under $100" },
   { workflow: W.BROWSE, searchRequired: true });
 scenario("bare ok is clarification", { message: "ok" },
   { workflow: W.CLARIFICATION });
+
+// ── Orthotic-flow card purity + fragment guard helpers (PRD owner-leak fix) ───
+check("isOrthoticProductCard: orthotics/insoles true; wearable footwear false", () => {
+  // Orthotic by category or productType.
+  assert.equal(isOrthoticProductCard({ title: "Premium Memory Foam Orthotics", category: "Orthotics" }), true);
+  assert.equal(isOrthoticProductCard({ title: "L700 Speed Orthotic", productType: "Insoles" }), true);
+  // Under-tagged insole caught by the TITLE.
+  assert.equal(isOrthoticProductCard({ title: "Men's Speed Orthotics - Insole For Running", productType: "Footwear" }), true);
+  assert.equal(isOrthoticProductCard({ title: "Unisex Thinsoles Orthotics" }), true);
+  // Wearable footwear is NOT an orthotic product — even if "Orthotic" is in the name.
+  assert.equal(isOrthoticProductCard({ title: "Danika Arch Support Sneaker", category: "Sneakers" }), false);
+  assert.equal(isOrthoticProductCard({ title: "Maui Orthotic Flip", category: "Sandals" }), false, "a wearable sandal named 'Orthotic' is footwear");
+  assert.equal(isOrthoticProductCard({ title: "Reagan Ankle Boot", category: "Boots" }), false);
+});
+
+check("messageExplicitlyAsksForShoes: only an explicit footwear REQUEST exempts", () => {
+  for (const m of ["show me shoes and orthotics", "do you have supportive shoes too", "I want shoes or orthotics", "also some sneakers"]) {
+    assert.equal(messageExplicitlyAsksForShoes(m), true, `should be an explicit shoes request: "${m}"`);
+  }
+  // The guided-flow use-case ANSWER mentions a shoe noun but is NOT a request.
+  for (const m of ["I'll use them in Hoka sneakers for walking.", "Women's orthotics.", "plantar fasciitis"]) {
+    assert.equal(messageExplicitlyAsksForShoes(m), false, `not a shoes request: "${m}"`);
+  }
+});
+
+check("isStrippedFragmentText: dangling cleanup fragments flagged; complete answers not", () => {
+  // The exact live fragment (cleanup stripped the clarifier it referred to).
+  assert.equal(isStrippedFragmentText("That one detail will get you to exactly the right pick."), true);
+  assert.equal(isStrippedFragmentText("Once you tell me, I'll narrow it down."), true);
+  assert.equal(isStrippedFragmentText("Sure!"), true);
+  // A complete sales answer is NOT a fragment.
+  assert.equal(isStrippedFragmentText("Here are a few supportive, low-profile options that work great for long clinic shifts."), false);
+  assert.equal(isStrippedFragmentText("The Lynco L420 is a great fit — it has firm arch support and a slim profile so it won't feel bulky in your work shoes."), false);
+});
 
 console.log("");
 if (fail === 0) {

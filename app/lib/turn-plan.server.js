@@ -52,6 +52,61 @@ export function textPresentsProducts(text) {
   return /\b(?:here(?:'s|\s+are|\s+is)|these\s+are|i(?:'ve|\s+have)?\s+found|i\s+found|take\s+a\s+look|check\s+(?:out|these)|below\s+are|a\s+few\s+(?:options|picks|styles|pairs)|some\s+(?:options|picks|great|solid)|\d+\s+(?:options|picks|styles|pairs|great)|my\s+(?:top\s+)?(?:picks|recommendations)|recommend(?:ed)?\s+(?:these|the\s+following)|pulled\s+(?:up|together)|found\s+(?:you\s+)?(?:a\s+few|some|\d+))\b/i.test(t);
 }
 
+// A "stripped fragment" is what safety cleanup can leave behind when it removes
+// a clarifier/narration sentence from the MIDDLE or END of a reply: a short,
+// dangling clause that no longer stands as a complete answer (and often refers
+// to the very question that was removed — "That one detail will get you to the
+// right pick."). Heuristic: very short, OR a short reply that promises a
+// follow-on ("that detail", "once you…", "let me know") without ever presenting
+// the products. Callers only apply this to a turn that actually shows cards.
+const FRAGMENT_DANGLER_RE =
+  /\b(?:that\s+(?:one\s+)?detail|that'?ll|that\s+will\s+get\s+you|once\s+(?:you|i)\b|just\s+(?:that|one)\b|let\s+me\s+know|then\s+i'?ll|from\s+there)\b/i;
+export function isStrippedFragmentText(text) {
+  const t = String(text || "").trim();
+  if (!t) return true;
+  // A complete reply that already presents the products is fine.
+  if (textPresentsProducts(t)) return false;
+  const words = t.split(/\s+/).filter(Boolean).length;
+  if (words <= 6 || t.length < 30) return true;
+  // A short-ish reply (no product pitch) that dangles on a follow-on promise.
+  if (words <= 22 && FRAGMENT_DANGLER_RE.test(t)) return true;
+  return false;
+}
+
+// Is this displayed card an orthotic/insole product (vs wearable footwear)? The
+// orthotic recommender only ever returns these; a footwear card under an
+// orthotic answer is a leak. Matches the category/productType OR the title — the
+// title check catches under-tagged SKUs (same shape as the visualize-CTA insole
+// guard). Bare "orthotic" in a title is allowed only when it isn't paired with a
+// wearable footwear noun (a real sandal can be "Maui Orthotic Flip").
+const ORTHOTIC_CARD_CATEGORY_RE = /\b(?:orthotic|insole|insert|footbed|foot[\s-]*bed|arch[\s-]*support)/i;
+const ORTHOTIC_CARD_TITLE_RE = /\b(?:insole|insert|footbed|foot[\s-]*bed)s?\b/i;
+const WEARABLE_FOOTWEAR_NOUN_RE = /\b(?:sandals?|flip|flop|slides?|sneakers?|shoes?|boots?|loafers?|heels?|wedges?|clogs?|mules?|flats?|pumps?)\b/i;
+export function isOrthoticProductCard(card) {
+  if (!card || typeof card !== "object") return false;
+  const category = String(card.category || card._category || card.productType || "");
+  if (ORTHOTIC_CARD_CATEGORY_RE.test(category)) return true;
+  const title = String(card.title || "");
+  if (ORTHOTIC_CARD_TITLE_RE.test(title)) return true;
+  if (/\borthotics?\b/i.test(title) && !WEARABLE_FOOTWEAR_NOUN_RE.test(title)) return true;
+  return false;
+}
+
+// Does THIS message explicitly request footwear alongside orthotics? Used to
+// exempt the orthotic-flow card-purity invariant — "show me shoes and orthotics"
+// legitimately mixes both. A bare shoe noun that is the use-case ANSWER inside
+// the guided flow ("Hoka sneakers") is NOT a request and must not exempt.
+export function messageExplicitlyAsksForShoes(text = "") {
+  const t = String(text || "");
+  return (
+    /\b(?:also|too|and|plus|with)\s+(?:some\s+)?(?:shoes?|sneakers?|sandals?|boots?|footwear)\b/i.test(t) ||
+    /\b(?:show|find|recommend|want|need|looking\s+for|see|have|got|carry)\b[^.?!]*\b(?:shoes?|sneakers?|sandals?|boots?|footwear)\b/i.test(t) ||
+    /\b(?:shoes?|sneakers?|sandals?|boots?|footwear)\b[^.?!]*\b(?:too|also|as\s+well)\b/i.test(t) ||
+    /\bshoes?\s+(?:or|and)\s+orthotics?\b/i.test(t) ||
+    /\borthotics?\s+(?:or|and)\s+shoes?\b/i.test(t)
+  );
+}
+
 // Workflows whose answer comes from prior evidence / a deterministic re-pin with
 // NO search this turn — the agent loop must run with tools DISABLED so the model
 // can't fire a stray search whose card the deterministic owner then overwrites

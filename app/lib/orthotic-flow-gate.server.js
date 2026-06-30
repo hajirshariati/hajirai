@@ -856,7 +856,15 @@ export async function maybeRunOrthoticFlow({
     turnPlan &&
     turnPlan.workflow === "condition_recommendation" &&
     turnPlan.clarificationAllowed === false &&
-    !isGuidedOrthoticFinderRequest(latestUserText)
+    !isGuidedOrthoticFinderRequest(latestUserText) &&
+    // MID-SEED-FLOW OWNERSHIP: when the customer is answering a pending orthotic
+    // seed question, this turn BELONGS to the gate — the answer text ("Hoka
+    // sneakers for walking") classifies as condition_recommendation clarify=false
+    // but it is the orthotic finder's use-case answer, not a fresh advisory. If
+    // we defer here the turn falls to the LLM/resolver, which runs a forced
+    // "walking sneakers" search and ships sneaker cards under an orthotic
+    // question (live trace 2026-06-30, PRD 3263be4). Stay engaged and own it.
+    !inOrthoticSeedFlow
   ) {
     console.log(
       "[orthotic-flow] turn-plan override: condition_recommendation clarify=false — deferring to LLM",
@@ -888,7 +896,14 @@ export async function maybeRunOrthoticFlow({
   // Any workflow that explicitly DISALLOWS clarification: the gate cannot ask —
   // EXCEPT the explicit guided-orthotic-finder, where the one-step gender chip
   // IS the right move (see the condition_recommendation exception above).
-  if (turnPlan && turnPlan.clarificationAllowed === false && !isGuidedOrthoticFinderRequest(latestUserText)) {
+  if (
+    turnPlan &&
+    turnPlan.clarificationAllowed === false &&
+    !isGuidedOrthoticFinderRequest(latestUserText) &&
+    // Same mid-seed-flow ownership carve-out as the condition_recommendation
+    // case above — a pending-question answer must not fall through to the LLM.
+    !inOrthoticSeedFlow
+  ) {
     console.log(
       `[orthotic-flow] turn-plan override: workflow=${turnPlan.workflow} clarify=false — deferring to LLM`,
     );

@@ -5,7 +5,7 @@ import { getAttributeMappings } from "../models/AttributeMapping.server";
 import { getCatalogCategories, getAllCatalogCategories, getCategoryGenderAvailability, getCategoryAttributeCoverage } from "../models/Product.server";
 import { getActiveCampaigns, formatCampaignsForCS } from "../models/Campaign.server";
 import { buildSystemPrompt } from "../lib/chat-prompt.server";
-import { planTurn, buildTurnPlanPromptBlock, buildPlanClarifierRepair, planForcesProductDisplay, planRequiresSearch as planRequiresSearchFlag, clarifierGateDecision, isAnswerWorkflow, plannedWorkflowCardOwnerViolation, plannedSearchSkippedViolation, cardsNotInEvidencePool, textPresentsProducts, workflowDisablesTools, resolvedFamilyGender } from "../lib/turn-plan.server";
+import { planTurn, buildTurnPlanPromptBlock, buildPlanClarifierRepair, planForcesProductDisplay, planRequiresSearch as planRequiresSearchFlag, clarifierGateDecision, isAnswerWorkflow, plannedWorkflowCardOwnerViolation, plannedSearchSkippedViolation, cardsNotInEvidencePool, textPresentsProducts, workflowDisablesTools, resolvedFamilyGender, isStrippedFragmentText, isOrthoticProductCard, messageExplicitlyAsksForShoes } from "../lib/turn-plan.server";
 import { recordTurnInvariantViolation, logTurnInvariant } from "../lib/turn-invariant.server";
 import { classifyAvailability, buildAvailabilityAnswer, AVAILABILITY_RESULT, resolveAvailabilityRequest, isAvailabilityFollowUp, familyOfTitle, collectFamilyColors, constraintIntent, parseAvailabilityConstraints, parseRequestedColors, priorAvailabilityMessage, priorAvailabilityConstraints, variantDataDiagnostics, styleKeyOfTitle, styleNameOfTitle } from "../lib/availability-truth";
 import { detectSupportHandoffNeed, buildSupportHandoffText, supportConfigured, normalizedSupportLabel, supportChatLabel } from "../lib/support-handoff";
@@ -60,6 +60,7 @@ import {
   createTurnResult,
   rewriteDenialWithProducts,
   dropSiblingCards,
+  buildCodeOwnedProductListingText,
   buildCodeOwnedExactNoMatchText,
   buildSoftBrowseFallbackText,
   ensureProductTurnCards,
@@ -4405,7 +4406,57 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     const workflow = ctx?.turnPlan?.workflow || "-";
     const pinned = availabilityPinnedCards || comparisonPinnedCards || evidencePinnedCards || priorEvidencePinnedCards;
     const pinnedCount = pinned ? pinned.length : null;
+
+    // ORTHOTIC-FLOW CARD PURITY (invariant: orthotic_flow_non_orthotic_cards).
+    // The orthotic recommender (recommend_orthotic) only ever returns orthotics/
+    // insoles. When it drove the turn, every displayed card MUST be an orthotic
+    // product — a footwear card under an orthotic answer is a leak (live trace
+    // 2026-06-30: sneaker cards beneath an orthotic question). Exempt only when
+    // THIS message explicitly asks for shoes too. REPAIR: drop the non-orthotic
+    // cards rather than ship footwear the customer didn't ask for.
+    if (
+      recommenderInvokedThisTurn &&
+      Array.isArray(finalProductCards) && finalProductCards.length > 0 &&
+      !messageExplicitlyAsksForShoes(ctx?.latestUserMessage || "")
+    ) {
+      const nonOrthotic = finalProductCards.filter((c) => !isOrthoticProductCard(c));
+      if (nonOrthotic.length > 0) {
+        recordTurnInvariantViolation("orthotic_flow_non_orthotic_cards", {
+          count: nonOrthotic.length,
+          cards: nonOrthotic.map((c) => c?.title || c?.handle),
+          repaired: "dropped",
+        });
+        const dropKeys = new Set(nonOrthotic.map((c) => String(c?.handle || c?.title || "")));
+        finalProductCards = finalProductCards.filter((c) => !dropKeys.has(String(c?.handle || c?.title || "")));
+        console.log(`[chat] ${ctx.shop} orthotic-flow card purity: dropped ${nonOrthotic.length} non-orthotic card(s) under an orthotic recommendation`);
+      }
+    }
+
     const finalCount = Array.isArray(finalProductCards) ? finalProductCards.length : 0;
+
+    // FRAGMENT GUARD. Safety cleanup (disallowed-clarifier strip, narration
+    // strips) can gut an LLM answer down to a dangling fragment that references
+    // a question it just removed — live trace 2026-06-30: "…What would you pick
+    // first?" shipped "That one detail will get you to exactly the right pick."
+    // ABOVE real product cards. Never ship fragment text over cards: rebuild a
+    // clean, complete sales answer from the displayed cards instead.
+    if (
+      finalCount > 0 &&
+      !recommenderInvokedThisTurn &&
+      isStrippedFragmentText(fullResponseText) &&
+      !looksLikeClarifyingQuestion(fullResponseText)
+    ) {
+      const rebuilt = buildCodeOwnedProductListingText({
+        text: fullResponseText, cards: finalProductCards, ctx, recommenderInvoked: recommenderInvokedThisTurn,
+      });
+      const safeText = rebuilt.changed && rebuilt.text && rebuilt.text.trim().length >= 40
+        ? rebuilt.text
+        : (finalCount === 1
+            ? "Here's a great option to get you started."
+            : "Here are a few great options to get you started.");
+      console.log(`[chat] ${ctx.shop} fragment guard: cleanup left a ${fullResponseText.trim().length}-char fragment over ${finalCount} card(s) — replaced with a complete answer`);
+      fullResponseText = safeText;
+    }
     const cardOwner = priorEvidencePinnedCards != null ? "prior-evidence"
       : availabilityPinnedCards != null ? "availability-truth"
       : comparisonPinnedCards != null ? "comparison"
@@ -4489,6 +4540,15 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
         evidencePinnedCards != null || priorEvidencePinnedCards != null;
       if (rewriteOnlyRetry && pinnedThisTurn) {
         console.log(`[chat] turn-plan(${workflow}): rewrite-only retry reusing pinned evidence — search not re-attempted (no violation)`);
+      } else if (finalCount > 0) {
+        // SEARCH-SATISFIED: the turn displays product cards, so a deterministic
+        // forced/candidate search DID produce evidence this turn even if the
+        // boolean searchAttempted flag wasn't threaded through the path that
+        // attached them (e.g. resolver candidate cards on a condition
+        // recommendation). Cards-shown is the real "search satisfied" signal —
+        // do not falsely flag it (live trace 2026-06-30: forced search ran +
+        // cards attached, yet search_required_not_attempted fired).
+        console.log(`[chat] turn-plan(${workflow}): searchRequired satisfied by ${finalCount} displayed card(s) — no violation`);
       } else if (forcedSearchAllowed({ ctx, text: fullResponseText })) {
         recordTurnInvariantViolation("search_required_not_attempted", { workflow });
       } else {
