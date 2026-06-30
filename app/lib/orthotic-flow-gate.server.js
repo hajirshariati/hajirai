@@ -457,8 +457,11 @@ function humanizeCondition(value) {
 // the gate must DEFER (route to normal footwear) and the accumulated orthotic
 // state is cleared (accumulateAnswers handles the wipe). Mirrors
 // ORTHOTIC_ABANDON_RE in orthotic-flow.server.js.
+// Abandon ONLY on explicit orthotic-rejection or footwear-instead — never on a
+// bare "changed my mind" (which may be a pivot INTO orthotics: "I changed my
+// mind. Help me choose the right Aetrex orthotic.").
 const ORTHOTIC_ABANDON_GATE_RE =
-  /\b(?:changed?\s+my\s+mind|never\s*mind|forget\s+(?:the\s+)?orthotics?|not\s+orthotics?|no\s+orthotics?|don'?t\s+(?:want|need)\s+(?:an?\s+)?orthotics?|instead\s+of\s+(?:an?\s+)?orthotics?)\b/i;
+  /\b(?:not\s+orthotics?|no\s+orthotics?|don'?t\s+(?:want|need)\s+(?:an?\s+)?orthotics?|instead\s+of\s+(?:an?\s+)?orthotics?|forget\s+(?:the\s+)?orthotics?|(?:shoes?|sneakers?|sandals?|boots?|footwear)\s+instead)\b/i;
 export function isOrthoticAbandonment(text) {
   return ORTHOTIC_ABANDON_GATE_RE.test(String(text || ""));
 }

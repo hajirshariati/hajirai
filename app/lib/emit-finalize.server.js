@@ -76,6 +76,10 @@ import {
   umbrellaCategoryTermsFromGroups,
 } from "./catalog-matcher.server.js";
 import { extractUserConstraints } from "./catalog-resolver.server.js";
+import { isPivotResetTurn, pivotSearchScopeLeak } from "./effective-scope.server.js";
+// Re-export so the chat route consumes the pivot-scope boundary helpers through
+// a server module it already imports (avoids adding a new direct route import).
+export { isPivotResetTurn, pivotSearchScopeLeak } from "./effective-scope.server.js";
 import { isAnswerWorkflow, buildAnswerWorkflowExhaustionText, planForcesProductDisplay } from "./turn-plan.server.js";
 
 // Knowledge / info questions — kept in sync with KNOWLEDGE_QUESTION_RE
@@ -228,9 +232,14 @@ export function isCompoundPolicyProductQuestion(text) {
 
 export function scopedProductSearchInput(ctx = {}) {
   const latestMsg = String(ctx.latestUserMessage || "");
-  const scope = currentCatalogScopeFromContext(ctx);
+  // PIVOT/RESET turns are CURRENT-MESSAGE-ONLY: drop the inherited session/
+  // resolver scope entirely so stale category/condition/use-case can't ride
+  // into the forced query (live trace: "show me shoes instead, not orthotics"
+  // → query="women's sneakers walking"). Stable gender still falls back below.
+  const pivot = ctx.turnScope === "new_independent" || isPivotResetTurn(latestMsg);
+  const scope = pivot ? {} : currentCatalogScopeFromContext(ctx);
   const latest = extractUserConstraints(latestMsg);
-  const gender = scope.gender || latest.gender;
+  const gender = scope.gender || latest.gender || (pivot ? ctx.sessionGender : null) || undefined;
   const category = scope.category || latest.category;
   const color = scope.color || latest.color;
   // MEMORY HYGIENE: size/width are variant-level constraints from a prior

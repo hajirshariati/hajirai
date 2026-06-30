@@ -16,6 +16,7 @@ import { negationCorruptedPositiveCategory } from "../app/lib/chat-postprocessin
 import { hardGenderFailOpen } from "../app/lib/turn-plan.server.js";
 import { staleWidthAppliedAcrossProducts, availabilityTextCardColorMismatch } from "../app/lib/availability-truth.js";
 import { handoffOnCatalogBrowse } from "../app/lib/support-handoff.js";
+import { pivotSearchScopeLeak, effectiveScopeForSearch } from "../app/lib/effective-scope.server.js";
 
 let passed = 0, failed = 0;
 const failures = [];
@@ -62,10 +63,31 @@ test("registry lists every new hard invariant code", () => {
     "current_turn_negation_corrupted_positive_category", "hard_gender_fail_open",
     "stale_width_or_color_applied_to_new_product", "availability_text_card_color_mismatch",
     "handoff_on_catalog_browse", "owner_fallthrough_after_required_gate",
-    "shown_card_not_in_active_owner_pool",
+    "shown_card_not_in_active_owner_pool", "pivot_search_scope_leak",
   ]) {
     assert.ok(KNOWN_INVARIANT_CODES.has(code), `registry must list ${code}`);
   }
+});
+
+test("pivot_search_scope_leak: stale 'sneakers/walking' in a pivot query fires; clean query passes", () => {
+  const message = "Wait, show me shoes instead, not orthotics.";
+  // The exact bad case from the PRD log.
+  assert.deepEqual(
+    pivotSearchScopeLeak({ message, query: "women's sneakers walking", filters: { category: "sneakers", gender: "women" }, relevanceFloorCategory: "sneakers" }).sort(),
+    ["sneakers", "walking"],
+  );
+  // A clean, current-message-only query leaks nothing (gender is exempt).
+  assert.deepEqual(pivotSearchScopeLeak({ message, query: "women's shoes", filters: { gender: "women", category: "footwear" } }), []);
+  // The effective scope for this pivot is current-message-only.
+  const scope = effectiveScopeForSearch({ latestUserMessage: message, turnScope: "new_independent", sessionGender: "women" });
+  assert.equal(scope.pivot, true);
+  assert.equal(scope.category, "footwear");
+  assert.deepEqual(scope.rejectedCategories, ["orthotics"]);
+  assert.equal(scope.useCase, null);
+  assert.equal(scope.condition, null);
+  assert.equal(scope.width, null);
+  assert.deepEqual(scope.families, []);
+  assert.equal(scope.gender, "women");
 });
 
 test("current_turn_negation_corrupted_positive_category: false after the fix, never corrupts a positive", () => {

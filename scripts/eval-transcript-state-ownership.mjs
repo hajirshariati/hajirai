@@ -18,6 +18,8 @@ import { detectRejectedCategories, parseCategoryConstraints, negationCorruptedPo
 import { priorAvailabilityConstraints, staleWidthAppliedAcrossProducts, availabilityTextCardColorMismatch } from "../app/lib/availability-truth.js";
 import { detectSupportHandoffNeed, handoffOnCatalogBrowse } from "../app/lib/support-handoff.js";
 import { maybeRunOrthoticFlow, orthoticPendingFlowDecision, isOrthoticAbandonment } from "../app/lib/orthotic-flow-gate.server.js";
+import { effectiveScopeForSearch, pivotSearchScopeLeak } from "../app/lib/effective-scope.server.js";
+import { scopedProductSearchInput } from "../app/lib/emit-finalize.server.js";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const orthoticTree = { intent: "orthotic", definition: JSON.parse(readFileSync(resolve(here, "seeds/aetrex-orthotic-tree.json"), "utf8")) };
@@ -261,6 +263,79 @@ turn("a non-negation browse still extracts its category normally (no false rejec
 
 turn("'no orthotics, just shoes' rejects orthotics, keeps shoes as the footwear intent", () => {
   assert.equal(isOrthoticAbandonment("no orthotics, just shoes"), true);
+});
+
+// ── PIVOT SCOPE BOUNDARY: the exact 5-turn orthotic→shoes pivot ──────────────
+// "I changed my mind. Help me choose the right Aetrex orthotic." → "Women's
+// orthotics." → "I'll use them in sneakers for walking." → "I have low arches
+// and heel pain." → "Wait, show me shoes instead, not orthotics."
+const ortho = [];
+await turnAsync("'I changed my mind. Help me choose the right Aetrex orthotic.' ENTERS the flow (no abandon)", async () => {
+  const m = "I changed my mind. Help me choose the right Aetrex orthotic.";
+  assert.equal(isOrthoticAbandonment(m), false, "'changed my mind' + orthotic must NOT abandon");
+  ortho.push({ role: "user", content: m });
+  const { events, encoder, controller } = mockSse();
+  const out = await maybeRunOrthoticFlow({
+    messages: ortho, tree: orthoticTree, shop: "t.myshopify.com", controller, encoder,
+    classifiedIntent: { intent: "recommend_orthotic", isOrthoticRequest: true, attributes: {} },
+  });
+  assert.equal(out.handled, true, "must ENTER the orthotic flow (ask the first question)");
+  ortho.push({ role: "assistant", content: (events.find((e) => e?.type === "text") || {}).text || "Who are these orthotics for?" });
+});
+
+turn("orthotic flow accumulates gender → use-case → condition across turns", () => {
+  ortho.push({ role: "user", content: "Women's orthotics." });
+  ortho.push({ role: "assistant", content: "What kind of shoes will the orthotics go in?" });
+  ortho.push({ role: "user", content: "I'll use them in sneakers for walking." });
+  ortho.push({ role: "assistant", content: "Any specific foot pain or condition we should match?" });
+  ortho.push({ role: "user", content: "I have low arches and heel pain." });
+  // The condition answer is a continuation (not a fresh ask / not abandonment).
+  assert.equal(isOrthoticAbandonment("I have low arches and heel pain."), false);
+  assert.equal(orthoticPendingFlowDecision({ messages: ortho, tree: orthoticTree }), "continue");
+});
+
+await turnAsync("'Wait, show me shoes instead, not orthotics.' ABANDONS orthotics + pivots to footwear", async () => {
+  ortho.push({ role: "assistant", content: "Here's a great orthotic match for you." });
+  const pivotMsg = "Wait, show me shoes instead, not orthotics.";
+  ortho.push({ role: "user", content: pivotMsg });
+  assert.equal(isOrthoticAbandonment(pivotMsg), true, "explicit 'shoes instead, not orthotics' abandons");
+  const { encoder, controller } = mockSse();
+  const out = await maybeRunOrthoticFlow({ messages: ortho, tree: orthoticTree, shop: "t.myshopify.com", controller, encoder });
+  assert.equal(out.handled, false, "gate defers to footwear routing");
+  assert.equal(out.case, "orthotic_abandoned_pivot_to_footwear");
+});
+
+turn("final PIVOT search scope is CURRENT-MESSAGE-ONLY — no walking/sneakers/heel pain/low arch/orthotics", () => {
+  const pivotMsg = "Wait, show me shoes instead, not orthotics.";
+  // Simulate the stale context the OLD path leaked from (prior useCase/condition).
+  const ctx = {
+    latestUserMessage: pivotMsg,
+    turnScope: "new_independent",
+    sessionGender: "women",
+    // stale inherited scope that must NOT survive the pivot:
+    sessionMemory: { explicit: { category: "orthotics", useCase: "athletic_running", condition: "heel_pain", width: "wide" } },
+    classifiedIntent: { attributes: { category: "sneakers", useCase: "walking", condition: "heel_pain" } },
+  };
+  const scope = effectiveScopeForSearch(ctx);
+  assert.equal(scope.pivot, true);
+  assert.equal(scope.category, "footwear", "current message category=shoes/footwear");
+  assert.deepEqual(scope.rejectedCategories, ["orthotics"]);
+  for (const stale of ["useCase", "condition", "width"]) {
+    assert.equal(scope[stale], null, `stale ${stale} must NOT survive the pivot`);
+  }
+  assert.deepEqual(scope.families, [], "no prior product families");
+
+  // The ACTUAL generated forced query must be clean (uses the pivot path).
+  const built = scopedProductSearchInput(ctx);
+  const q = String(built.input.query || "").toLowerCase();
+  for (const bad of ["walking", "sneaker", "heel", "arch", "orthotic"]) {
+    assert.ok(!q.includes(bad), `pivot query must not contain "${bad}": got "${q}"`);
+  }
+  assert.ok(built.input.filters.category === "footwear" || /shoe|footwear/.test(q), "pivot shows shoes/footwear");
+
+  // The invariant must NOT fire on this fixed query (gender exempt).
+  const leak = pivotSearchScopeLeak({ message: pivotMsg, query: built.input.query, filters: built.input.filters });
+  assert.deepEqual(leak, [], `no scope leak on the fixed path; got ${JSON.stringify(leak)}`);
 });
 
 console.log("");

@@ -67,7 +67,7 @@ export const KNOWN_INVARIANT_CODES = new Set([
   "current_turn_negation_corrupted_positive_category", "hard_gender_fail_open",
   "stale_width_or_color_applied_to_new_product", "availability_text_card_color_mismatch",
   "handoff_on_catalog_browse", "owner_fallthrough_after_required_gate",
-  "shown_card_not_in_active_owner_pool",
+  "shown_card_not_in_active_owner_pool", "pivot_search_scope_leak",
 ]);
 
 // INVARIANT detector (owner_fallthrough_after_required_gate): a REQUIRED gate

@@ -1274,8 +1274,12 @@ export function preExtractAnswers(rawText, tree) {
 // accumulated orthotic answers are stale and must be dropped so the guided flow
 // doesn't silently re-engage with the old state. Kept local (no gate import) to
 // avoid a cycle; the gate exports the same detector for its own defer decision.
+// Abandon ONLY when the current message explicitly rejects orthotics OR asks
+// for footwear INSTEAD. A bare "changed my mind" / "never mind" is NOT
+// abandonment — "I changed my mind. Help me choose the right Aetrex orthotic."
+// must ENTER the flow, not leave it.
 export const ORTHOTIC_ABANDON_RE =
-  /\b(?:changed?\s+my\s+mind|never\s*mind|forget\s+(?:the\s+)?orthotics?|not\s+orthotics?|no\s+orthotics?|don'?t\s+(?:want|need)\s+(?:an?\s+)?orthotics?|instead\s+of\s+(?:an?\s+)?orthotics?)\b/i;
+  /\b(?:not\s+orthotics?|no\s+orthotics?|don'?t\s+(?:want|need)\s+(?:an?\s+)?orthotics?|instead\s+of\s+(?:an?\s+)?orthotics?|forget\s+(?:the\s+)?orthotics?|(?:shoes?|sneakers?|sandals?|boots?|footwear)\s+instead)\b/i;
 
 export function accumulateAnswers(messages, tree) {
   const out = {};

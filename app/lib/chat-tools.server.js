@@ -818,7 +818,13 @@ const searchQuery = detected.gender ? detected.query : q;
     // active use-case forces sneakers ONLY when no "cute / dressy / wedding /
     // vacation / not sneakers" constraint is present (PRD 2026-06-28). When the
     // floor is suppressed the search ranges over sandals/wedges/loafers/etc.
-    if (shouldForceSneakerRelevanceFloor(userIntentText)) {
+    // BOUNDARY: the relevance floor reads the CURRENT message only, never the
+    // (possibly stale) query string `q`. Live trace: a pivot turn "show me shoes
+    // instead, not orthotics" carried a stale q="women's sneakers walking", so
+    // the floor saw "walking" in q and force-set category=sneakers — exactly the
+    // stale-scope leak. The customer's current words are the only valid use-case
+    // signal.
+    if (shouldForceSneakerRelevanceFloor(latestText)) {
       const categories = merchantGroups.flatMap((g) => Array.isArray(g?.categories) ? g.categories : []);
       const sneakerCat = categories.find(
         (c) => /\bsneakers?\b/i.test(String(c || "")) && !isRejectedCategoryValue(c),
@@ -830,7 +836,7 @@ const searchQuery = detected.gender ? detected.query : q;
           `[search]   relevance floor: active/outdoor use-case → category=${effectiveCategory}`,
         );
       }
-    } else if (/\b(?:hiking|trail|outdoor|running|runner|walk(?:ing)?|gym|training|workout|athletic|active)\b/i.test(userIntentText)) {
+    } else if (/\b(?:hiking|trail|outdoor|running|runner|walk(?:ing)?|gym|training|workout|athletic|active)\b/i.test(latestText)) {
       console.log(
         `[search]   relevance floor SUPPRESSED: active use-case but style/dressy constraint present — not forcing sneakers`,
       );

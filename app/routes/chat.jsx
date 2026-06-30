@@ -114,6 +114,8 @@ import {
   buildAnswerWorkflowForcedSearch,
   alignCardsToAnswerText,
   familyFromQuery,
+  isPivotResetTurn,
+  pivotSearchScopeLeak,
 } from "../lib/emit-finalize.server";
 import { detectConversationGoal, ANCHOR_GOALS, isBroadGenderRequest, broadGenderRequestGender } from "../lib/turn-intent.server";
 import { isOrthoticSandalCompatibilityQuestion, buildOrthoticCompatibilityAnswer, hasExplicitOrthoticCompatibleEvidence, isUnsafeCompatibilitySuggestion, SAFE_COMPATIBILITY_SUGGESTIONS } from "../lib/compatibility-truth.server";
@@ -2455,6 +2457,26 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     : scopedProductSearchInput(ctx);
   if (answerWorkflowTurn) {
     console.log(`[chat] turn-plan(${ctx.turnPlan.workflow}): forced-card search locked to current-turn evidence query="${String(forcedSearchInput.input?.query || "").slice(0, 50)}" (no stale memory)`);
+  }
+  // INVARIANT (pivot_search_scope_leak): on a RESET/PIVOT turn, the FINAL
+  // generated search request must not carry a scope constraint the current
+  // message never stated. Checked AFTER the query+filters are built (not just
+  // after TurnPlan) so a stale category/use-case/family in the actual query is
+  // caught — the exact bad case: "Wait, show me shoes instead, not orthotics."
+  // → query "women's sneakers walking".
+  if (ctx.turnScope === "new_independent" || isPivotResetTurn(ctx.latestUserMessage || "")) {
+    const leaked = pivotSearchScopeLeak({
+      message: ctx.latestUserMessage || "",
+      query: forcedSearchInput?.input?.query || "",
+      filters: forcedSearchInput?.input?.filters || {},
+      knownColors: Array.isArray(ctx.catalogColorList) ? ctx.catalogColorList : [],
+    });
+    if (leaked.length > 0) {
+      recordTurnInvariantViolation("pivot_search_scope_leak", {
+        message: String(ctx.latestUserMessage || "").slice(0, 60),
+        leaked, query: String(forcedSearchInput?.input?.query || "").slice(0, 60),
+      });
+    }
   }
   const ensuredCards = await ensureProductTurnCards({
     ctx,
