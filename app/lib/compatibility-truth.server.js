@@ -188,5 +188,14 @@ export function isGuidedOrthoticFinderRequest(text) {
   const t = String(text || "");
   if (!ORTHOTIC_TERM_RE.test(t)) return false;
   if (FOOTWEAR_TERM_RE.test(t)) return false; // shoes mentioned → decision, not pure finder
-  return /\b(?:help\s+me\s+(?:choose|find|pick|select)|choose|find|pick|recommend|which|what)\b[^.?!]*\borthotics?\b|\borthotics?\b[^.?!]*\b(?:recommend|help|choose|right\s+one|for\s+me)\b/i.test(t);
+  // A clear request to GET an orthotic/insole — for anyone — is a guided-finder
+  // request so the gate runs the tree (gender → use-case → condition) instead
+  // of dumping random orthotics. Covers the "choose/find/which orthotic" shapes
+  // AND the plain "I need/want an insole for my dad" (live trace 2026-06-30:
+  // "i need insole for my dad" deferred to browse → 6 random men's orthotics).
+  return (
+    /\b(?:help\s+me\s+(?:choose|find|pick|select)|choose|find|pick|recommend|which|what)\b[^.?!]*\borthotics?\b/i.test(t) ||
+    /\borthotics?\b[^.?!]*\b(?:recommend|help|choose|right\s+one|for\s+me)\b/i.test(t) ||
+    /\b(?:i\s+(?:need|want|am\s+looking\s+for|'?m\s+looking\s+for|would\s+like)|need|want|looking\s+for|get|buy|shopping\s+for)\b[^.?!]{0,30}\b(?:an?\s+|some\s+)?(?:orthotics?|insoles?|inserts?|footbeds?|arch\s+supports?)\b/i.test(t)
+  );
 }

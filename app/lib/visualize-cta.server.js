@@ -103,6 +103,15 @@ export function buildVisualizeCtaEvent({ config, product, messages, isInsoleReco
   // so matching them on the TITLE is safe and catches under-tagged insoles.
   const INSOLE_TITLE_RE = /\b(?:insole|insert|footbed|foot[\s-]*bed)s?\b/i;
   if (INSOLE_TITLE_RE.test(title)) return null;
+  // "Orthotic(s)" in the TITLE blocks too — UNLESS it's paired with a wearable
+  // footwear noun (a real sandal can be named "Maui Orthotic Flip"). Live trace
+  // 2026-06-30: a resolver-candidate card "Men's Orthotics for Overpronation"
+  // was NOT category-tagged Orthotics, so the category check above missed it and
+  // it got a "See It Styled" preview of an insole. "Orthotics for Overpronation"
+  // has no footwear noun → block; "Maui Orthotic Flip" has "flip" → stays eligible.
+  const WEARABLE_FOOTWEAR_NOUN_RE =
+    /\b(?:sandals?|flip|flop|slides?|sneakers?|shoes?|boots?|booties|loafers?|heels?|wedges?|clogs?|mules?|flats?|pumps?|oxfords?|moccasins?|espadrilles?)\b/i;
+  if (/\borthotics?\b/i.test(title) && !WEARABLE_FOOTWEAR_NOUN_RE.test(title)) return null;
   const priceNum = Number(product?.price);
   if (Number.isFinite(priceNum) && priceNum <= 0) return null;
 

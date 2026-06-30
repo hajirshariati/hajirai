@@ -2464,7 +2464,12 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   // after TurnPlan) so a stale category/use-case/family in the actual query is
   // caught — the exact bad case: "Wait, show me shoes instead, not orthotics."
   // → query "women's sneakers walking".
-  if (ctx.turnScope === "new_independent" || isPivotResetTurn(ctx.latestUserMessage || "")) {
+  // Only an EXPLICIT reset/pivot turn ("instead", "actually", "now show me…")
+  // can leak stale scope — a plain fresh browse ("do you have wedges in black")
+  // states its own constraints, so checking it just produces false positives
+  // (the canonical category "wedges-heels" tokenizes to "heels", which the word
+  // "wedges" doesn't literally contain). Restrict the invariant to real pivots.
+  if (isPivotResetTurn(ctx.latestUserMessage || "")) {
     const leaked = pivotSearchScopeLeak({
       message: ctx.latestUserMessage || "",
       query: forcedSearchInput?.input?.query || "",

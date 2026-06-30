@@ -83,6 +83,11 @@ test("pivot_search_scope_leak: stale 'sneakers/walking' in a pivot query fires; 
   // positive that logged an [err]-level violation.
   assert.deepEqual(pivotSearchScopeLeak({ message: "i need insole for my dad", query: "orthotics", filters: { category: "orthotics", gender: "men" } }), []);
   assert.deepEqual(pivotSearchScopeLeak({ message: "do you have arch support inserts", query: "orthotics", filters: { category: "orthotics" } }), []);
+  // CANONICAL CATEGORY: "wedges" → the Aetrex category slug "wedges-heels"; the
+  // "heels" inside it is the category's own name, not a stale constraint (live
+  // trace 2026-06-30 [err] false positive on a normal wedges browse).
+  assert.deepEqual(pivotSearchScopeLeak({ message: "Do you have wedges in black?", query: "black wedges-heels", filters: { category: "wedges-heels", color: "black" } }), []);
+  assert.deepEqual(pivotSearchScopeLeak({ message: "Are there any wedges under $120?", query: "wedges-heels", filters: { category: "wedges-heels" } }), []);
   // The effective scope for this pivot is current-message-only.
   const scope = effectiveScopeForSearch({ latestUserMessage: message, turnScope: "new_independent", sessionGender: "women" });
   assert.equal(scope.pivot, true);

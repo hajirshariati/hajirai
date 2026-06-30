@@ -23,6 +23,7 @@ import {
   cardAssertsOrthoticCompatibility,
   isUnsafeCompatibilitySuggestion,
   SAFE_COMPATIBILITY_SUGGESTIONS,
+  isGuidedOrthoticFinderRequest,
 } from "../app/lib/compatibility-truth.server.js";
 import { validateGrounding } from "../app/lib/grounding-validator.server.js";
 import { validateTurnResult } from "../app/lib/response-contract.server.js";
@@ -180,6 +181,19 @@ test("6. Q2 removable-footbed-sandals question is detected (owner is workflow-ag
     products: [], workflow: "compatibility",
   });
   assert.ok(warn.some((w) => w.code === "unsupported_compatibility_claim"));
+});
+
+// 6b ─ guided-orthotic-finder recognizes a plain "I need an insole for X" ───────
+test("6b. 'i need insole for my dad' is a guided-orthotic-finder request (enters the tree)", () => {
+  // Live trace 2026-06-30: "i need insole for my dad" deferred to browse and
+  // dumped 6 random men's orthotics instead of running the guided tree.
+  assert.ok(isGuidedOrthoticFinderRequest("i need insole for my dad"));
+  assert.ok(isGuidedOrthoticFinderRequest("I want orthotics for my mom"));
+  assert.ok(isGuidedOrthoticFinderRequest("looking for an insole"));
+  assert.ok(isGuidedOrthoticFinderRequest("help me choose the right orthotic"));
+  // A shoes request is NOT a pure orthotic finder.
+  assert.ok(!isGuidedOrthoticFinderRequest("do you have wedges in black"));
+  assert.ok(!isGuidedOrthoticFinderRequest("show me sneakers"));
 });
 
 // 7 ── prior-evidence cards-shown uses POSITIVE wording, no denial flag ─────────

@@ -118,6 +118,16 @@ test("a wearable sandal whose NAME contains 'Orthotic' stays eligible", () => {
   assert.ok(ev && ev.type === "visualize_cta");
 });
 
+test("an ORTHOTIC product (title 'Orthotics', no footwear noun) is blocked even when un-tagged", () => {
+  // Prod trace 2026-06-30: a resolver-candidate "Men's Orthotics for Overpronation"
+  // was NOT category-tagged Orthotics, so the category check missed it and it got
+  // a "See It Styled" preview. The title "Orthotics for …" (no wearable footwear
+  // noun) must block; "Maui Orthotic Flip" (a real sandal) stays eligible.
+  assert.equal(fires({ title: "Men's Orthotics for Overpronation" }), null);
+  assert.equal(fires({ productType: "Footwear", title: "Men's Work Posted Orthotics" }), null);
+  assert.ok(fires({ category: "Sandals", title: "Maui Orthotic Flip" }));
+});
+
 // ── Aetrex polish: scene labels change by product category ──
 test("visualizeSceneGroup maps category → group", () => {
   assert.equal(visualizeSceneGroup("Sandals", "Maui Sandal"), "sandals");

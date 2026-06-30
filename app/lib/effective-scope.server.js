@@ -45,6 +45,10 @@ const SCOPE_LEAK_WORD_RE = new RegExp(
 const SCOPE_SYNONYMS = [
   ["orthotic", "orthotics", "insole", "insoles", "insert", "inserts", "footbed", "footbeds", "arch support"],
   ["sneaker", "sneakers", "trainer", "trainers", "tennis shoe", "athletic shoe"],
+  // Aetrex's canonical category is "Wedges Heels" → slug "wedges-heels", so a
+  // "wedges" request resolves to a filter/query containing "heels". That "heels"
+  // is the category's own name, not a separate constraint — never a leak.
+  ["wedge", "wedges", "heel", "heels", "wedges-heels", "wedges heels"],
 ];
 function msgMentions(msgLower, token) {
   const t = String(token || "").toLowerCase().trim();
