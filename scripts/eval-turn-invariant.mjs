@@ -78,6 +78,11 @@ test("pivot_search_scope_leak: stale 'sneakers/walking' in a pivot query fires; 
   );
   // A clean, current-message-only query leaks nothing (gender is exempt).
   assert.deepEqual(pivotSearchScopeLeak({ message, query: "women's shoes", filters: { gender: "women", category: "footwear" } }), []);
+  // SYNONYM: "i need insole for my dad" → resolver query "orthotics" is CORRECT
+  // (insole/insert/footbed = orthotics), NOT a leak. Live trace 2026-06-30 false
+  // positive that logged an [err]-level violation.
+  assert.deepEqual(pivotSearchScopeLeak({ message: "i need insole for my dad", query: "orthotics", filters: { category: "orthotics", gender: "men" } }), []);
+  assert.deepEqual(pivotSearchScopeLeak({ message: "do you have arch support inserts", query: "orthotics", filters: { category: "orthotics" } }), []);
   // The effective scope for this pivot is current-message-only.
   const scope = effectiveScopeForSearch({ latestUserMessage: message, turnScope: "new_independent", sessionGender: "women" });
   assert.equal(scope.pivot, true);

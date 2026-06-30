@@ -241,7 +241,16 @@ const PROMO_POLICY_RE = new RegExp(
   "\\bcode[s]?\\s+(?:for|to\\s+use|work)\\b" + "|" +
   "\\b(?:military|veteran|teacher|student|nurse|first[-\\s]?responder|senior|healthcare)\\s+discount\\b" + "|" +
   "\\b(?:stack|combine|apply)\\s+(?:a\\s+)?(?:discount|code|coupon|promo)s?\\b" + "|" +
-  "\\bdo\\s+you\\s+(?:have|offer)\\s+(?:a\\s+)?(?:promo|discount|coupon)\\b",
+  "\\bdo\\s+you\\s+(?:have|offer)\\s+(?:a\\s+)?(?:promo|discount|coupon)\\b" + "|" +
+  // ELIGIBILITY / VERIFICATION for a discount program — "how do I verify I'm a
+  // teacher?", "what proof do I need as a student/nurse/military?". This is a
+  // POLICY/account question, NOT a product recommendation. Live trace
+  // 2026-06-30: "What information do I need to provide to verify I'm a teacher?"
+  // matched the occupation in USECASE_RE ("teacher") → condition_recommendation
+  // → 3 random wedge cards. Catch it here (PROMO_POLICY_RE runs before the
+  // condition/recommend branch) so it answers from policy with no product cards.
+  "\\b(?:verif\\w*|verified|prove|proof|eligib\\w*|qualify|how\\s+do\\s+i\\s+(?:get|become))\\b[^.?!\\n]{0,40}\\b(?:teacher|student|nurse|military|veteran|first[-\\s]?responder|senior|healthcare|educator|id\\.me|sheerid)\\b" + "|" +
+  "\\b(?:teacher|student|nurse|military|veteran|first[-\\s]?responder|senior|healthcare|educator)\\b[^.?!\\n]{0,40}\\b(?:verif\\w*|verified|proof|eligib\\w*|qualify|discount|id\\.me|sheerid)\\b",
   "i",
 );
 
@@ -571,8 +580,17 @@ export function planTurn({
   // prior cards). The latter has no named product in the message but is clearly
   // an availability question, so it must not fall through to clarification.
   // Force a fresh product/variant lookup; never answer from prior cards alone.
+  // A SPEC/ATTRIBUTE enumeration question — "what heel heights / heel drop /
+  // materials / weight / sole do they come in?" — asks for a product DATUM, not
+  // an in-stock yes/no. It must NOT route to availability: the availability
+  // owner answers "Yes — all three are available in that.", which is nonsense
+  // for a heel-height question (live trace 2026-06-30). Let it fall through to
+  // the LLM, which answers from product facts / knowledge (or says it doesn't
+  // track that spec) instead of asserting stock.
+  const isSpecAttributeQuestion =
+    /\bwhat\s+(?:kind\s+of\s+|type\s+of\s+|sort\s+of\s+)?(?:heel\s+heights?|heel\s+drops?|heights?|materials?|fabrics?|weights?|drops?|soles?|footbeds?|outsoles?|midsoles?|cushioning|toe\s+box(?:es)?)\b/i.test(m);
   const isDeicticAvailFollowUp = FOLLOWUP_AVAIL_RE.test(m) && words(m) <= 5;
-  const isAvailFollowUpMsg = SIZE_COLOR_STOCK_RE.test(m) || isDeicticAvailFollowUp;
+  const isAvailFollowUpMsg = (SIZE_COLOR_STOCK_RE.test(m) || isDeicticAvailFollowUp) && !isSpecAttributeQuestion;
 
   // 2a. PRIOR-EVIDENCE availability — a color/size/width follow-up applied to a
   // SET of previously displayed products ("do they come in black?",

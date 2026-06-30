@@ -38,12 +38,24 @@ const SCOPE_LEAK_WORD_RE = new RegExp(
   "gi",
 );
 
+// Synonym groups — a query token counts as "in the message" when the message
+// uses ANY member. Critical for orthotics: "i need insole for my dad" → the
+// resolver query "orthotics" is CORRECT (insole/insert/footbed/arch support are
+// the same product family), so it must NOT be flagged as a stale-scope leak.
+const SCOPE_SYNONYMS = [
+  ["orthotic", "orthotics", "insole", "insoles", "insert", "inserts", "footbed", "footbeds", "arch support"],
+  ["sneaker", "sneakers", "trainer", "trainers", "tennis shoe", "athletic shoe"],
+];
 function msgMentions(msgLower, token) {
   const t = String(token || "").toLowerCase().trim();
   if (!t) return false;
-  if (/\s/.test(t)) return msgLower.includes(t); // multi-word phrase
-  const stem = t.endsWith("s") ? t.slice(0, -1) : t;
-  return msgLower.includes(stem);
+  const has = (w) => (/\s/.test(w) ? msgLower.includes(w) : msgLower.includes(w.endsWith("s") ? w.slice(0, -1) : w));
+  if (has(t)) return true;
+  // Any synonym of the token present in the message counts as mentioned.
+  for (const group of SCOPE_SYNONYMS) {
+    if (group.includes(t) && group.some((w) => has(w))) return true;
+  }
+  return false;
 }
 
 // THE effective scope. `ctx.turnScope` ("new_independent" | "follow_up") and

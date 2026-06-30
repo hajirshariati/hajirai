@@ -493,6 +493,25 @@ scenario("show me clogs under 100", { message: "show me clogs under $100" },
 scenario("bare ok is clarification", { message: "ok" },
   { workflow: W.CLARIFICATION });
 
+// ── 2026-06-30 PRD log fixes ─────────────────────────────────────────────────
+// "verify I'm a teacher" is a discount-ELIGIBILITY (policy) question, not a
+// product recommendation. It used to match the occupation "teacher" in
+// USECASE_RE → condition_recommendation → 3 random wedge cards.
+scenario("teacher-verification → policy_account, no product cards", { message: "What information do I need to provide to verify I'm a teacher?" },
+  { workflow: W.POLICY_ACCOUNT, searchRequired: false });
+scenario("nurse discount eligibility → policy_account", { message: "how do I verify I'm a nurse for the discount?" },
+  { workflow: W.POLICY_ACCOUNT, searchRequired: false });
+// But a teacher who is SHOPPING (occupation as a real use-case) still recommends.
+scenario("teacher standing all day + recommend → condition_recommendation", { message: "I'm a teacher on my feet all day, what shoes do you recommend?" },
+  { workflow: W.CONDITION_RECOMMENDATION, searchRequired: true });
+// A SPEC/attribute question ("what heel heights do they come in?") must NOT be
+// answered as availability ("Yes — all three are available in that.").
+check("'what heel heights do your wedges come in?' is NOT availability", () => {
+  const p = planTurn({ message: "What heel heights do your everyday wedges come in?", hasPriorCards: true, priorCardFamilies: ["ashley", "kaia", "anna"], primaryGender: "women" });
+  assert.notEqual(p.workflow, W.PRIOR_EVIDENCE_AVAILABILITY, "a heel-height spec question must not route to availability");
+  assert.notEqual(p.workflow, W.AVAILABILITY);
+});
+
 // ── Orthotic-flow card purity + fragment guard helpers (PRD owner-leak fix) ───
 check("isOrthoticProductCard: orthotics/insoles true; wearable footwear false", () => {
   // Orthotic by category or productType.
