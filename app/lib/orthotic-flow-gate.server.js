@@ -60,7 +60,7 @@ import { executeRecommenderTool, normalizeUseCaseForTree } from "./recommender-t
 import { buildStorefrontSearchCTA } from "./storefront-search-cta.server.js";
 import { scrubInternalEnums } from "./chat-postprocessing.js";
 import { detectConversationGoal, detectTurnGoal, INFO_QUESTION_GOALS } from "./turn-intent.server.js";
-import { isShortAmbiguousReply, detectShoeEnvironmentUseCase } from "./turn-scope.js";
+import { isShortAmbiguousReply, detectShoeEnvironmentUseCase, messageStatesCondition, messageStatesUseCase } from "./turn-scope.js";
 import { isShoesVsOrthoticsDecision, buildShoesVsOrthoticsAnswer, isGuidedOrthoticFinderRequest } from "./compatibility-truth.server.js";
 
 // Format a recommender-returned product the same way chat-tools'
@@ -785,6 +785,86 @@ export function priorTurnWasOrthoticSeedQuestion({ messages = [], tree = null } 
   return seedQuestionTexts.some((q) => prior.includes(q));
 }
 
+// The seed-question node whose question text appears in the most recent
+// assistant message (i.e. the PENDING orthotic question), or null.
+function pendingOrthoticSeedNode({ messages = [], tree = null } = {}) {
+  if (!tree?.definition?.nodes || !Array.isArray(messages)) return null;
+  let prior = "";
+  for (let i = messages.length - 1; i >= 0; i -= 1) {
+    const mm = messages[i];
+    if (mm?.role === "assistant" && typeof mm.content === "string" && mm.content.trim()) { prior = mm.content; break; }
+  }
+  if (!prior) return null;
+  for (const n of tree.definition.nodes) {
+    if (n && n.type === "question" && typeof n.question === "string" && n.question.trim() && prior.includes(n.question.trim())) {
+      return n;
+    }
+  }
+  return null;
+}
+
+const ORTHOTIC_GENDER_ANSWER_RE =
+  /\b(?:men|women|man|woman|male|female|boys?|girls?|kids?|guy|lady|ladies|him|her|unisex|my\s+(?:son|daughter|wife|husband|mom|mother|dad|father|kid|child))\b/i;
+const ORTHOTIC_ARCH_ANSWER_RE = /\b(?:flat|low|high|medium|neutral|normal|fallen)\b|\barch(?:es)?\b|\bi\s+don'?t\s+know\b/i;
+
+// Does the latest message DIRECTLY answer the pending seed question's attribute?
+// Each seed node asks for one attribute; a direct answer names a value in that
+// attribute's vocabulary (or is a short/ambiguous "not sure" the gate accepts).
+function messageAnswersOrthoticSeedAttribute(text, node) {
+  const t = String(text || "");
+  if (!t.trim() || !node?.attribute) return false;
+  if (isShortAmbiguousReply(t)) return true; // "not sure" / "either" is a valid chip answer
+  switch (node.attribute) {
+    case "condition":
+      return messageStatesCondition(t) || /\b(?:none|no\s+(?:pain|specific|particular)|just\s+(?:comfort|want))\b/i.test(t);
+    case "useCase":
+      return detectShoeEnvironmentUseCase(t) != null || messageStatesUseCase(t);
+    case "gender":
+      return ORTHOTIC_GENDER_ANSWER_RE.test(t);
+    case "arch":
+      return ORTHOTIC_ARCH_ANSWER_RE.test(t);
+    default:
+      return false;
+  }
+}
+
+// A FRESH standalone shopping request: the customer pivoted away from the
+// pending question to ask for a NEW recommendation, with its own need context.
+// "I'm on my feet 10 hours in a clinic and want something supportive but not
+// bulky. What would you pick first?" is a footwear ask, not a condition answer.
+const FRESH_REC_REQUEST_RE =
+  /\b(?:what\s+(?:would|should|do)\s+you\s+(?:pick|recommend|suggest|choose)|recommend|suggest|what\s+should\s+i\s+(?:get|buy|wear|look\s+for)|help\s+me\s+(?:find|choose|pick|decide)|looking\s+for|i\s+want\s+(?:something|a\s+pair|shoes|sneakers|sandals)|i\s+need\s+(?:something|a\s+pair|shoes|sneakers|sandals)|which\s+(?:would|do)\s+you|pick\s+first)\b/i;
+const FRESH_NEED_CONTEXT_RE =
+  /\b(?:on\s+my\s+feet|all\s+day|\d+\s*(?:hour|hr)s?|clinic|nurse|nursing|teacher|retail|warehouse|standing|supportive|not\s+bulky|comfortable|comfy|walking|running|sneakers?|shoes?|sandals?|boots?|wide|narrow|arch\s+support|wedding|work|office)\b/i;
+function isFreshStandaloneShoppingRequest(text) {
+  const t = String(text || "");
+  const words = t.trim().split(/\s+/).filter(Boolean).length;
+  return words >= 8 && FRESH_REC_REQUEST_RE.test(t) && FRESH_NEED_CONTEXT_RE.test(t);
+}
+
+// State-handoff decision for a turn that arrives while an orthotic seed question
+// is pending. Pure + deterministic, so the gate and the chat route agree:
+//   "continue" — the message answers the pending question (or is a short reply);
+//                the orthotic gate keeps ownership of the turn.
+//   "cancel"   — the message is a fresh standalone shopping request; clear the
+//                pending orthotic flow and route as a normal product turn.
+//   "none"     — no orthotic seed question is pending.
+export function orthoticPendingFlowDecision({ messages = [], tree = null } = {}) {
+  const node = pendingOrthoticSeedNode({ messages, tree });
+  if (!node) return "none";
+  let latest = "";
+  for (let i = messages.length - 1; i >= 0; i -= 1) {
+    const mm = messages[i];
+    if (mm?.role === "user" && typeof mm.content === "string" && mm.content.trim()) { latest = mm.content; break; }
+  }
+  if (!latest.trim()) return "continue";
+  // A direct answer to the pending attribute always continues — even if it also
+  // carries rec-request words ("I have plantar fasciitis, what would you pick?").
+  if (messageAnswersOrthoticSeedAttribute(latest, node)) return "continue";
+  if (isFreshStandaloneShoppingRequest(latest)) return "cancel";
+  return "continue";
+}
+
 export async function maybeRunOrthoticFlow({
   messages,
   tree,
@@ -821,7 +901,25 @@ export async function maybeRunOrthoticFlow({
   // flow falls off its rails into a verbose free-form LLM clarifier (live trace
   // 2026-06-29: "hoka sneakers for my dad" answering the gender seed question
   // flipped isOrthoticRequest=false → C_resolver_strong_action → LLM 2-part Q).
-  const inOrthoticSeedFlow = priorTurnWasOrthoticSeedQuestion({ messages, tree });
+  // Continue vs cancel the pending guided flow. "continue" = the reply answers
+  // the pending seed question (the gate keeps ownership); "cancel" = the reply
+  // is a FRESH standalone shopping request (clear the flow, route normally).
+  const orthoticFlowDecision = orthoticPendingFlowDecision({ messages, tree });
+  const inOrthoticSeedFlow = orthoticFlowDecision === "continue";
+
+  // CANCEL (deterministic — not relying on the give-up veto below). The customer
+  // pivoted from the pending orthotic question to a fresh standalone shopping
+  // request ("I'm on my feet 10 hours… what would you pick first?"). Defer so the
+  // turn routes as a normal product/footwear turn — no orthotic question, and (in
+  // chat.jsx) no orthotic card-purity ownership, so a legitimate footwear
+  // recommendation isn't dropped (PRD live trace 2026-06-30).
+  if (orthoticFlowDecision === "cancel") {
+    console.log(
+      `[orthotic-flow] pending seed question CANCELLED — latest is a fresh standalone shopping request; ` +
+        `deferring to normal product routing`,
+    );
+    return { handled: false, case: "pending_flow_cancelled_fresh_request" };
+  }
 
   // ── SHOES-vs-ORTHOTICS open decision ──────────────────────────────────
   // "What Aetrex shoes or orthotics would you recommend?" — the customer hasn't

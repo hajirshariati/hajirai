@@ -16,6 +16,7 @@ import {
   genderRestatement,
   seedQuestionEmissionCount,
   priorTurnWasOrthoticSeedQuestion,
+  orthoticPendingFlowDecision,
 } from "../app/lib/orthotic-flow-gate.server.js";
 import { scopeAttributesToTurn, detectShoeEnvironmentUseCase, messageStatesUseCase, messageStatesShoeEnvironment } from "../app/lib/turn-scope.js";
 import { extractUserConstraints } from "../app/lib/catalog-resolver.server.js";
@@ -2144,6 +2145,67 @@ await test("orthotic target preserved: 3-turn flow stays orthotic, never sneaker
   assert.ok(!productEv || (Array.isArray(productEv.products) && productEv.products.length === 0), "must NOT ship product cards (no sneaker cards)");
   const textEv = events.find((e) => e?.type === "text");
   assert.ok(textEv && /pain|condition|arch/i.test(textEv.text), "stays on the orthotic rails (asks the next orthotic question)");
+});
+
+// ── PENDING-FLOW CONTINUE vs CANCEL (state handoff) ──────────────────────────
+await test("orthoticPendingFlowDecision: answers continue, fresh requests cancel", () => {
+  // CONTINUE: the reply answers the pending seed question.
+  const useCaseAnswer = [
+    { role: "user", content: "Help me choose the right Aetrex orthotic." },
+    { role: "assistant", content: "What kind of shoes will the orthotics go in?" },
+    { role: "user", content: "I'll use them in Hoka sneakers for walking." },
+  ];
+  assert.equal(orthoticPendingFlowDecision({ messages: useCaseAnswer, tree }), "continue");
+
+  const conditionAnswer = [
+    { role: "assistant", content: "Any specific foot pain or condition we should match?" },
+    { role: "user", content: "plantar fasciitis" },
+  ];
+  assert.equal(orthoticPendingFlowDecision({ messages: conditionAnswer, tree }), "continue");
+
+  const shortAnswer = [
+    { role: "assistant", content: "Any specific foot pain or condition we should match?" },
+    { role: "user", content: "not sure" },
+  ];
+  assert.equal(orthoticPendingFlowDecision({ messages: shortAnswer, tree }), "continue");
+
+  // CANCEL: a fresh standalone shopping request that does NOT answer the pending
+  // condition question (the live leak — routed as orthotic, then sneaker cards).
+  const freshRequest = [
+    { role: "user", content: "Help me choose the right Aetrex orthotic." },
+    { role: "assistant", content: "Any specific foot pain or condition we should match?" },
+    { role: "user", content: "I'm on my feet 10 hours in a clinic and want something supportive but not bulky. What would you pick first?" },
+  ];
+  assert.equal(orthoticPendingFlowDecision({ messages: freshRequest, tree }), "cancel");
+
+  // NONE: no seed question pending.
+  const noPending = [
+    { role: "assistant", content: "Here are some great options." },
+    { role: "user", content: "do you have Danika in black" },
+  ];
+  assert.equal(orthoticPendingFlowDecision({ messages: noPending, tree }), "none");
+});
+
+await test("fresh request mid-flow CANCELS the gate (defers to normal product routing, no orthotic Q)", async () => {
+  // The exact PRD leak: prior assistant asked the condition seed question, the
+  // customer pivots to a fresh footwear request. The gate must DEFER cleanly
+  // (cancel), not stay engaged and not emit an orthotic question.
+  const messages = [
+    { role: "user", content: "Help me choose the right Aetrex orthotic." },
+    { role: "assistant", content: "Who are these orthotics for?" },
+    { role: "user", content: "Women's orthotics." },
+    { role: "assistant", content: "Any specific foot pain or condition we should match?" },
+    { role: "user", content: "I'm on my feet 10 hours in a clinic and want something supportive but not bulky. What would you pick first?" },
+  ];
+  const { events, encoder, controller } = makeMockSse();
+  const out = await maybeRunOrthoticFlow({
+    messages, tree, shop: "test-shop", controller, encoder,
+    classifiedIntent: { intent: "recommend_orthotic", isOrthoticRequest: true, attributes: { gender: "Women" } },
+    turnPlan: { workflow: "condition_recommendation", clarificationAllowed: false, searchRequired: true, productDisplayPolicy: "show" },
+  });
+  assert.equal(out.handled, false, "the gate must DEFER (cancel) on a fresh standalone request");
+  assert.equal(out.case, "pending_flow_cancelled_fresh_request");
+  assert.equal(events.find((e) => e?.type === "text"), undefined, "must not emit any orthotic question");
 });
 
 console.log("");

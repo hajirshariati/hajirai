@@ -49,7 +49,7 @@ import { fetchCustomerContext } from "../lib/customer-context.server";
 import { fetchKlaviyoEnrichment } from "../lib/klaviyo-enrichment.server";
 import { fetchYotpoLoyalty } from "../lib/yotpo-loyalty.server";
 import { buildRecommenderTools } from "../lib/recommender-tools.server";
-import { maybeRunOrthoticFlow, isOrthoticHostileReply, isOrthoticConfusionReply, priorTurnWasOrthoticSeedQuestion } from "../lib/orthotic-flow-gate.server";
+import { maybeRunOrthoticFlow, isOrthoticHostileReply, isOrthoticConfusionReply, priorTurnWasOrthoticSeedQuestion, orthoticPendingFlowDecision } from "../lib/orthotic-flow-gate.server";
 import { classifyOrthoticTurn, shouldRunOrthoticClassifier } from "../lib/orthotic-classifier.server";
 import { resolveCatalogTurn, buildResolverStatePromptBlock, extractUserConstraints, detectSpecificProduct, mentionsCatalogProductFamily, extractCatalogProductFamilies } from "../lib/catalog-resolver.server";
 import { getCatalogFacetIndex, normalizeGender } from "../lib/catalog-facts.server";
@@ -3328,6 +3328,35 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     }
   }
 
+  // ── ORTHOTIC-FLOW CARD PURITY (pre-emission) ──────────────────────────────
+  // The orthotic recommender (recommend_orthotic) only ever returns orthotics/
+  // insoles. When it drove the turn and we are NOT cancelling into a fresh
+  // footwear request, every candidate card must be an orthotic product BEFORE
+  // anything is pinned or streamed. This runs ahead of the condition_recommend
+  // pin + the scorer + every product SSE, so:
+  //   (a) a CONTINUING orthotic turn whose recommender asked for more info (no
+  //       orthotic cards yet) but whose pool was filled by a footwear search
+  //       drops to 0 cards — the missing-attribute question stands, no sneakers;
+  //   (b) a non-orthotic card can never be emitted on an orthotic-owned turn
+  //       (invariant: orthotic_flow_non_orthotic_cards), repaired here not after.
+  // A CANCEL turn ("…what would you pick first?") is exempt — it is a footwear
+  // request and its footwear cards are the correct answer.
+  if (
+    recommenderInvokedThisTurn &&
+    ctx.orthoticFlowDecision !== "cancel" &&
+    !messageExplicitlyAsksForShoes(ctx?.latestUserMessage || "")
+  ) {
+    const keepOrthotic = (arr) => (Array.isArray(arr) ? arr.filter(isOrthoticProductCard) : arr);
+    const poolBefore = Array.isArray(pool) ? pool.length : 0;
+    pool = keepOrthotic(pool);
+    if (Array.isArray(evidencePinnedCards)) evidencePinnedCards = keepOrthotic(evidencePinnedCards);
+    const dropped = poolBefore - (Array.isArray(pool) ? pool.length : 0);
+    if (dropped > 0) {
+      recordTurnInvariantViolation("orthotic_flow_non_orthotic_cards", { dropped, repaired: "filtered-pre-emission" });
+      console.log(`[chat] ${ctx.shop} orthotic-flow card purity: filtered ${dropped} non-orthotic card(s) from the pool before any pin/emit`);
+    }
+  }
+
   // ── Condition / advisory recommendation: deterministic 2-3 card selection ──
   // A condition_recommendation turn ("comfortable shoes for standing all day",
   // "plantar fasciitis walking", "cute but supportive for a wedding") must NOT
@@ -4406,31 +4435,11 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     const workflow = ctx?.turnPlan?.workflow || "-";
     const pinned = availabilityPinnedCards || comparisonPinnedCards || evidencePinnedCards || priorEvidencePinnedCards;
     const pinnedCount = pinned ? pinned.length : null;
-
-    // ORTHOTIC-FLOW CARD PURITY (invariant: orthotic_flow_non_orthotic_cards).
-    // The orthotic recommender (recommend_orthotic) only ever returns orthotics/
-    // insoles. When it drove the turn, every displayed card MUST be an orthotic
-    // product — a footwear card under an orthotic answer is a leak (live trace
-    // 2026-06-30: sneaker cards beneath an orthotic question). Exempt only when
-    // THIS message explicitly asks for shoes too. REPAIR: drop the non-orthotic
-    // cards rather than ship footwear the customer didn't ask for.
-    if (
-      recommenderInvokedThisTurn &&
-      Array.isArray(finalProductCards) && finalProductCards.length > 0 &&
-      !messageExplicitlyAsksForShoes(ctx?.latestUserMessage || "")
-    ) {
-      const nonOrthotic = finalProductCards.filter((c) => !isOrthoticProductCard(c));
-      if (nonOrthotic.length > 0) {
-        recordTurnInvariantViolation("orthotic_flow_non_orthotic_cards", {
-          count: nonOrthotic.length,
-          cards: nonOrthotic.map((c) => c?.title || c?.handle),
-          repaired: "dropped",
-        });
-        const dropKeys = new Set(nonOrthotic.map((c) => String(c?.handle || c?.title || "")));
-        finalProductCards = finalProductCards.filter((c) => !dropKeys.has(String(c?.handle || c?.title || "")));
-        console.log(`[chat] ${ctx.shop} orthotic-flow card purity: dropped ${nonOrthotic.length} non-orthotic card(s) under an orthotic recommendation`);
-      }
-    }
+    // NOTE: orthotic-flow card purity is enforced PRE-EMISSION (it filters the
+    // pool before the condition_recommendation pin and any product SSE), so by
+    // here finalProductCards is already orthotic-pure on a non-cancel orthotic
+    // turn — no post-emission drop (which would desync emitted cards vs the
+    // evidence-plan finalCards log).
 
     const finalCount = Array.isArray(finalProductCards) ? finalProductCards.length : 0;
 
@@ -5600,17 +5609,24 @@ async function handleChatPost({ shop, sessionAccessToken, request, internal = fa
             console.error("[chat] turn-plan failed (non-fatal):", planErr?.message || planErr);
           }
 
-          // Are we answering a PENDING orthotic guided-flow seed question (e.g.
-          // "What kind of shoes will the orthotics go in?")? When so, the turn
-          // BELONGS to the orthotic gate — a footwear word in the reply
-          // ("Hoka sneakers for walking") is the use-case/shoe-ENVIRONMENT
-          // answer, never a product-category pivot. This single signal keeps
-          // the original orthotic target intact across two routing layers
-          // below: (1) it stops soft-browse-refine from hijacking the turn into
-          // a sneaker browse, and (2) it strips the shoe noun from the resolver
-          // constraints so category never becomes "sneakers".
-          const answeringOrthoticSeedQ =
-            !!orthoticTree && priorTurnWasOrthoticSeedQuestion({ messages, tree: orthoticTree });
+          // Pending orthotic guided-flow state handoff. When an orthotic seed
+          // question is pending ("What kind of shoes will the orthotics go
+          // in?"), the next turn either CONTINUES the flow (it answers the
+          // question — a footwear word like "Hoka sneakers" is the use-case
+          // answer, not a category pivot) or CANCELS it (a fresh standalone
+          // shopping request — "I'm on my feet 10 hours… what would you pick
+          // first?" is a footwear ask, not a condition answer). The decision is
+          // deterministic and shared with the gate so they never disagree.
+          const orthoticFlowDecision = orthoticTree
+            ? orthoticPendingFlowDecision({ messages, tree: orthoticTree })
+            : "none";
+          ctx.orthoticFlowDecision = orthoticFlowDecision;
+          // "continue" keeps the orthotic target intact across the routing layers
+          // below: (1) it stops soft-browse-refine from hijacking the turn into a
+          // sneaker browse, and (2) it strips the shoe noun from the resolver
+          // constraints so category never becomes "sneakers". A "cancel" turn
+          // routes as a normal footwear/product turn (no orthotic ownership).
+          const answeringOrthoticSeedQ = orthoticFlowDecision === "continue";
 
           // STAGE 2: resolver preflight
           try {
