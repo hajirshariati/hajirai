@@ -18,6 +18,7 @@ import {
   priorTurnWasOrthoticSeedQuestion,
 } from "../app/lib/orthotic-flow-gate.server.js";
 import { scopeAttributesToTurn, detectShoeEnvironmentUseCase, messageStatesUseCase, messageStatesShoeEnvironment } from "../app/lib/turn-scope.js";
+import { extractUserConstraints } from "../app/lib/catalog-resolver.server.js";
 import { looksLikeFunctionalQuestion, looksLikeTransactionalQuestion } from "../app/lib/orthotic-flow.server.js";
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -2088,6 +2089,55 @@ await test("genuine footwear browse (no prior seed question) STILL yields to the
     tree, shop: "test.myshopify.com", controller, encoder, classifiedIntent, resolverState,
   });
   assert.equal(out.handled, false, "a real footwear browse must still yield, not get hijacked into the orthotic quiz");
+});
+
+// ── ORTHOTIC TARGET PRESERVATION: the exact 3-turn flow ──────────────────────
+// "Help me choose the right Aetrex orthotic." → "Women's orthotics." → "I'll use
+// them in Hoka sneakers for walking." The 3rd turn answers the pending shoe-
+// environment question. It must recommend ORTHOTICS, never switch to a sneaker
+// browse. Live bug: shouldSoftBrowseRefine hijacked it (prior Q "What KIND OF
+// shoes…" + "walking") into final_path=soft_browse_refine with sneaker cards,
+// and extractUserConstraints pinned category=sneakers. These assertions lock
+// the preconditions the chat.jsx guards key off + prove the gate owns the turn.
+await test("orthotic target preserved: 3-turn flow stays orthotic, never sneaker browse", async () => {
+  const messages = [
+    { role: "user", content: "Help me choose the right Aetrex orthotic." },
+    { role: "assistant", content: "Who are these orthotics for?" },
+    { role: "user", content: "Women's orthotics." },
+    { role: "assistant", content: "What kind of shoes will the orthotics go in?" },
+    { role: "user", content: "I'll use them in Hoka sneakers for walking." },
+  ];
+  const latest = "I'll use them in Hoka sneakers for walking.";
+
+  // (1) The turn is recognized as answering a pending orthotic seed question —
+  //     this is the single signal both chat.jsx guards (soft-browse skip +
+  //     category drop) depend on, so it MUST be true here.
+  assert.equal(priorTurnWasOrthoticSeedQuestion({ messages, tree }), true);
+
+  // (2) The footwear words are a shoe-ENVIRONMENT answer → use-case, not a
+  //     product category.
+  assert.equal(messageStatesShoeEnvironment(latest), true);
+  assert.equal(detectShoeEnvironmentUseCase(latest), "athletic_running");
+
+  // (3) The HAZARD the category-drop guard neutralizes: the raw constraint
+  //     extractor pulls category=sneakers from "Hoka sneakers". Because (1) is
+  //     true and (2) flags a shoe-environment answer, chat.jsx deletes it so the
+  //     resolver never pins category=sneakers (→ no sneaker search/cards).
+  assert.equal(extractUserConstraints(latest).category, "sneakers", "control: raw extractor would pin sneakers");
+
+  // (4) End-to-end: the gate OWNS the turn — captures useCase=athletic_running
+  //     and asks the next orthotic question (condition). No product cards, no
+  //     sneaker handoff, no soft-browse.
+  const { events, encoder, controller } = makeMockSse();
+  const out = await maybeRunOrthoticFlow({
+    messages, tree, shop: "test-shop", controller, encoder,
+    classifiedIntent: { intent: "recommend_orthotic", isOrthoticRequest: true, attributes: { gender: "Women", category: "sneakers", useCase: null } },
+  });
+  assert.equal(out.handled, true, "the orthotic gate must own the turn (not soft_browse_refine)");
+  const productEv = events.find((e) => e?.type === "products");
+  assert.ok(!productEv || (Array.isArray(productEv.products) && productEv.products.length === 0), "must NOT ship product cards (no sneaker cards)");
+  const textEv = events.find((e) => e?.type === "text");
+  assert.ok(textEv && /pain|condition|arch/i.test(textEv.text), "stays on the orthotic rails (asks the next orthotic question)");
 });
 
 console.log("");

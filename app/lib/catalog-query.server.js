@@ -10,6 +10,11 @@ const REQUEST_WORDS = new Set([
   "could", "do", "does", "find", "for", "from", "give", "has", "have",
   "hello", "hey", "hi", "i", "in", "is", "it", "like", "looking", "made", "me", "my", "need",
   "of", "on", "or", "other", "please", "recommend", "show", "some",
+  // PRONOUNS — "I'll use them in Hoka sneakers" must not yield a catalog
+  // requirement phrase "them hoka" (live trace 2026-06-30). "it"/"these"/
+  // "those" were already covered; "them"/"they" leaked through and joined the
+  // following noun into a junk hard term that wiped all products.
+  "them", "they", "we", "us", "he", "she", "her", "him", "his", "its",
   "something", "that", "the", "these", "this", "those", "to", "use",
   "uses", "using", "try", "want", "what", "which", "with", "you", "your",
   "cheap", "cheaper", "budget", "affordable", "good", "great", "top",

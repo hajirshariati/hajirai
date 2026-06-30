@@ -67,6 +67,21 @@ await test("CQ0b — contractions and grammar never become catalog requirements 
   assert.deepEqual(requirements("shoes with removable insoles").requiredTerms, ["removable insoles"]);
 });
 
+await test("CQ0c — pronouns never become catalog requirements (2026-06-30)", () => {
+  // Live trace: "I'll use them in Hoka sneakers for walking." → the pronoun
+  // "them" joined the following noun into a junk hard term "them hoka" that
+  // wiped all products. "them"/"they"/etc. are reference words, never terms.
+  const r = requirements("I'll use them in Hoka sneakers for walking.");
+  for (const term of r.requiredTerms) {
+    assert.ok(!/\bthem\b|\bthey\b/i.test(term), `pronoun leaked into a hard term: "${term}"`);
+  }
+  // The full phrase "them hoka" must not exist as a requirement.
+  assert.ok(!r.requiredTerms.includes("them hoka"), "no 'them hoka' junk requirement");
+  // Other pronoun-led references contribute no hard terms either.
+  assert.deepEqual(requirements("which of these are best").requiredTerms, []);
+  assert.deepEqual(requirements("do they come in black").requiredTerms, []);
+});
+
 await test("CQ2 — named technology works without CamelCase dependence", () => {
   assert.equal(normalizeCatalogText("BioRocker™ Technology"), "bio rocker technology");
   assert.deepEqual(

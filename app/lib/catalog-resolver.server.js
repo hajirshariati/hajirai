@@ -833,6 +833,17 @@ const SPECIFIC_PRODUCT_STOPWORDS = new Set([
   "supination", "supinate", "sesamoiditis", "tendonitis", "tendinitis",
   "heel", "heels", "fallen", "fasciitisis", "swelling", "swell", "swollen",
   "pain", "painful", "ache", "aches", "aching", "fatigue", "kit", "kits",
+  // Generic SHOPPER-INTENT words: ordinals + selection/choice nouns the
+  // customer uses to ask the AI to pick FOR them ("what would you pick first?",
+  // "which option is best?", "another pair"). A catalog SKU that happens to
+  // start with one of these (a "First…"/"Premier…" style) must NEVER make the
+  // word a product family — live trace 2026-06-30: "…What would you pick first?"
+  // logged families=[first] and forced a named search query="first".
+  "first", "second", "third", "fourth", "fifth", "sixth", "last", "next",
+  "pick", "picks", "picked", "picking", "choice", "choices", "choose",
+  "choosing", "chose", "select", "selection", "prefer", "preference",
+  "preferred", "favorite", "favourite", "one", "ones", "option", "options",
+  "pair", "pairs", "another", "other", "others", "either", "both", "any",
   // Occasion / descriptor words customers use that are not product names.
   "wedding", "dinner", "party", "vacation", "cute", "dressy", "comfy",
   "something", "anything", "recommend", "recommendation", "suggest",

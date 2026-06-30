@@ -11,7 +11,7 @@ import { classifyAvailability, buildAvailabilityAnswer, AVAILABILITY_RESULT, res
 import { detectSupportHandoffNeed, buildSupportHandoffText, supportConfigured, normalizedSupportLabel, supportChatLabel } from "../lib/support-handoff";
 import { extractConstraintPlan, cardMatchesSlotCategory, multiRecoTextCardMismatch, slotSearchCategory } from "../lib/constraint-plan";
 import { detectProcessNarration, stripProcessNarration, buildSalesVoiceFallback, SALES_JUDGMENT_WORKFLOWS } from "../lib/sales-voice";
-import { classifyTurnScope, scopeAttributesToTurn, isShortAmbiguousReply } from "../lib/turn-scope";
+import { classifyTurnScope, scopeAttributesToTurn, isShortAmbiguousReply, messageStatesShoeEnvironment } from "../lib/turn-scope";
 import { buildPriorEvidenceAvailabilityText, buildPriorEvidenceMultiColorText, askedConstraintLabel, titleCaseWord, buildWidthSizeFallbackText } from "../lib/prior-evidence";
 import { selectEvidenceCards } from "../lib/evidence-select";
 import { retrieveRelevantChunks } from "../lib/knowledge-chunks.server";
@@ -2539,11 +2539,24 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   if (answerWorkflowTurn && Array.isArray(ctx.turnPlan?.namedFamilies) && ctx.turnPlan.namedFamilies.length > 0) {
     const poolFamilies = () => new Set(Array.from(allProductPool.values()).map((c) => titleStyleFamily(c.title || "").toLowerCase()));
     const namedCards = [];
+    // STALE-GENDER GUARD. A named family identifies the product on its own (the
+    // title-family filter below pins it), so the search must NOT be constrained
+    // by a STALE conversation gender — "Do you have Danika in black size 8.5?"
+    // after a prior men's turn would search gender=men, miss the women's-only
+    // Danika, and force a relaxedFilters.gender retry (live trace 2026-06-30).
+    // Apply the gender filter ONLY when THIS message states a gender ("the
+    // men's Danika"); otherwise leave it off and let resolvedFamilyGender below
+    // adopt the found product's own catalog gender.
+    const genderStatedThisTurn = detectLatestGender(String(ctx.latestUserMessage || ""));
+    const namedSearchGender = genderStatedThisTurn || null;
+    if (ctx.turnPlan.gender && !genderStatedThisTurn) {
+      console.log(`[chat] named-family search: dropping stale gender=${ctx.turnPlan.gender} (not stated this turn) so the resolved family gender can drive`);
+    }
     for (const fam of ctx.turnPlan.namedFamilies) {
       const have = poolFamilies().has(fam);
       if (!have) {
         try {
-          const famInput = { query: fam, filters: ctx.turnPlan.gender ? { gender: ctx.turnPlan.gender } : {}, limit: 6 };
+          const famInput = { query: fam, filters: namedSearchGender ? { gender: namedSearchGender } : {}, limit: 6 };
           const r = await dispatchTool("search_products", famInput, ctx);
           const famCards = extractProductCards("search_products", r, ctx).filter((c) => titleStyleFamily(c.title || "").toLowerCase() === fam);
           console.log(`[chat] turn-plan(${ctx.turnPlan.workflow}): forced named-family search "${fam}" → ${famCards.length} card(s)`);
@@ -5527,6 +5540,18 @@ async function handleChatPost({ shop, sessionAccessToken, request, internal = fa
             console.error("[chat] turn-plan failed (non-fatal):", planErr?.message || planErr);
           }
 
+          // Are we answering a PENDING orthotic guided-flow seed question (e.g.
+          // "What kind of shoes will the orthotics go in?")? When so, the turn
+          // BELONGS to the orthotic gate — a footwear word in the reply
+          // ("Hoka sneakers for walking") is the use-case/shoe-ENVIRONMENT
+          // answer, never a product-category pivot. This single signal keeps
+          // the original orthotic target intact across two routing layers
+          // below: (1) it stops soft-browse-refine from hijacking the turn into
+          // a sneaker browse, and (2) it strips the shoe noun from the resolver
+          // constraints so category never becomes "sneakers".
+          const answeringOrthoticSeedQ =
+            !!orthoticTree && priorTurnWasOrthoticSeedQuestion({ messages, tree: orthoticTree });
+
           // STAGE 2: resolver preflight
           try {
             const latestMsg = String(body.message || "");
@@ -5557,6 +5582,19 @@ async function handleChatPost({ shop, sessionAccessToken, request, internal = fa
                 ...(classifiedAttrs.condition ? { condition: classifiedAttrs.condition } : {}),
                 ...(isOrthoticTurn && classifiedAttrs.useCase ? { useCase: classifiedAttrs.useCase } : {}),
               };
+              // ORTHOTIC TARGET PRESERVATION. When answering the orthotic seed
+              // shoe-environment question, the extracted footwear category
+              // ("sneakers" from "Hoka sneakers") is the use-case answer, not a
+              // product category — keep the target on orthotics so the resolver
+              // never pins category=sneakers and a downstream search can't ship
+              // sneaker cards (live trace 2026-06-30).
+              if (answeringOrthoticSeedQ && userConstraints.category && messageStatesShoeEnvironment(latestMsg)) {
+                console.log(
+                  `[chat] ${ctx.shop} orthotic-flow: dropped category=${userConstraints.category} from a shoe-environment answer ` +
+                    `to the orthotic seed question (it's a use-case/shoe-environment constraint, not a product category)`,
+                );
+                delete userConstraints.category;
+              }
               try {
                 const handle = await detectSpecificProduct(shop, latestMsg);
                 if (handle) userConstraints.specificProduct = handle;
@@ -5637,7 +5675,14 @@ async function handleChatPost({ shop, sessionAccessToken, request, internal = fa
             routerLog.resolver = `error ${resolverErr?.message || "unknown"}`;
           }
 
-          if (shouldSoftBrowseRefine(body.message, history)) {
+          // The orthotic seed question "What KIND OF shoes will the orthotics
+          // go in?" trips shouldSoftBrowseRefine's broad-clarifier heuristic
+          // ("what kind of" + a use-case word like "walking"), which would
+          // short-circuit the orthotic answer into a generic sneaker browse
+          // BEFORE the gate runs (live trace 2026-06-30: final_path=
+          // soft_browse_refine, sneaker cards). When we're answering an
+          // orthotic seed question, skip soft-browse and let the gate own it.
+          if (!answeringOrthoticSeedQ && shouldSoftBrowseRefine(body.message, history)) {
             routerLog.finalPath = "soft_browse_refine";
             console.log(`[router] ${ctx.shop} ${routerLog.classifier}`);
             console.log(`[router] ${ctx.shop} ${routerLog.resolver || "resolver=skip"}`);

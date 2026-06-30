@@ -16,7 +16,7 @@
 import assert from "node:assert/strict";
 import { extractCatalogProductFamilies, detectSpecificProduct } from "../app/lib/catalog-resolver.server.js";
 import { alignCardsToAnswerText } from "../app/lib/emit-finalize.server.js";
-import { planTurn, WORKFLOWS as W } from "../app/lib/turn-plan.server.js";
+import { planTurn, WORKFLOWS as W, resolvedFamilyGender } from "../app/lib/turn-plan.server.js";
 
 let pass = 0, fail = 0;
 const fails = [];
@@ -68,6 +68,60 @@ await run("'sandals'/'sneakers'/'shoes' are not families", async () => {
 });
 await run("generic 'arch support walking dressy' names no family", async () => {
   assert.deepEqual(await families("something dressy with arch support for walking"), []);
+});
+
+// ── 2026-06-30: generic SHOPPER-INTENT words must NOT become families ─────────
+// Even when the catalog has SKUs whose first meaningful token IS a selection /
+// ordinal / choice word, those words are intent markers, not product names.
+// Live trace: "…What would you pick first?" logged families=[first] → named
+// search query="first".
+const INTENT_WORD_FACTS = [
+  ...FACTS,
+  { title: "First Step Comfort Trainer", productHandle: "first-step" },
+  { title: "Premier Option Walking Shoe", productHandle: "premier-option" },
+  { title: "Best Choice Orthotic Insole", productHandle: "best-choice" },
+  { title: "Pairs Perfect Loafer", productHandle: "pairs-perfect" },
+];
+const intentFamilies = (msg) => extractCatalogProductFamilies("aetrex.myshopify.com", msg, { _testFacts: INTENT_WORD_FACTS });
+await run("selection/ordinal words ('first','pick','option','pair','best') are not families", async () => {
+  // The exact reported message.
+  assert.deepEqual(
+    await intentFamilies("I'm on my feet 10 hours in a clinic and want something supportive but not bulky. What would you pick first?"),
+    [],
+    "'first'/'pick' must never become a product family",
+  );
+  for (const msg of [
+    "which option is best?",
+    "what's the best one?",
+    "show me another pair",
+    "which would you pick first or second?",
+    "what are my options?",
+  ]) {
+    assert.deepEqual(await intentFamilies(msg), [], `no families from intent words: "${msg}"`);
+  }
+  // A REAL family alongside the intent words is still found.
+  assert.deepEqual(await intentFamilies("Which would you pick first, Jillian or Savannah?"), ["jillian", "savannah"]);
+});
+
+// ── 2026-06-30: named availability must not search with STALE gender ──────────
+// Prior context gender=men; user asks "Do you have Danika in black size 8.5?"
+// (a women's style). The named-family search must NOT be constrained by the
+// stale men's gender (which would miss the women's-only Danika and force a
+// relaxedFilters.gender retry). chat.jsx applies the gender filter ONLY when
+// the CURRENT message states a gender; otherwise the resolved family gender
+// drives. These assert the two helpers that decision composes from.
+await run("named availability: resolved family gender corrects stale men's gender → women's Danika", async () => {
+  // chat.jsx drops the stale gender from the named-family search (it isn't
+  // stated in "Do you have Danika in black size 8.5?"), so the women's-only
+  // Danika is found rather than filtered out by gender=men. Its catalog gender
+  // is then authoritative for the rest of the turn — the final card is women's.
+  const danikaCards = [
+    { title: "Danika Arch Support Sneaker - Black", _gender: "women" },
+    { title: "Danika Arch Support Sneaker - Navy", _gender: "women" },
+  ];
+  assert.equal(resolvedFamilyGender(danikaCards), "women", "resolved family gender corrects the stale men's gender");
+  // A genuinely mixed family is left to the stated gender (no false override).
+  assert.equal(resolvedFamilyGender([{ title: "X", _gender: "men" }, { title: "Y", _gender: "women" }]), null);
 });
 
 // ── 1. real families extracted ────────────────────────────────────────
