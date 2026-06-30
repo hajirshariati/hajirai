@@ -80,6 +80,11 @@ import { isPivotResetTurn, pivotSearchScopeLeak } from "./effective-scope.server
 // Re-export so the chat route consumes the pivot-scope boundary helpers through
 // a server module it already imports (avoids adding a new direct route import).
 export { isPivotResetTurn, pivotSearchScopeLeak } from "./effective-scope.server.js";
+// Same boundary discipline for the broad-gender-reset + product-spec helpers:
+// route them through this already-imported server module so the chat route never
+// grows new direct `.server` usages the client-build DCE has to eliminate.
+export { isBroadGenderReset, broadGenderFollowUpGender } from "./turn-intent.server.js";
+export { workflowSuppressesCards, specQuestionAnsweredAsAvailability } from "./turn-plan.server.js";
 import { isAnswerWorkflow, buildAnswerWorkflowExhaustionText, planForcesProductDisplay } from "./turn-plan.server.js";
 
 // Knowledge / info questions — kept in sync with KNOWLEDGE_QUESTION_RE

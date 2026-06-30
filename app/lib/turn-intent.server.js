@@ -80,11 +80,47 @@ export function isBroadGenderRequest(text) {
 // The gender a broad gender request targets — men | women | kids | null.
 export function broadGenderRequestGender(text) {
   if (!isBroadGenderRequest(text)) return null;
-  const t = normalizeApostrophes(text).toLowerCase();
-  if (/\b(?:men'?s?|mens|guys?|male|\bhim\b|for\s+(?:men|guys|him))\b/.test(t)) return "men";
-  if (/\b(?:women'?s?|womens|ladies|female|\bher\b|for\s+(?:women|her))\b/.test(t)) return "women";
+  return genderFromGenderText(normalizeApostrophes(text).toLowerCase());
+}
+
+function genderFromGenderText(t) {
+  if (/\b(?:men'?s?|mens|man|male|guys?|husband|boyfriend|\bhim\b|\bhis\b|for\s+(?:men|guys|him))\b/.test(t)) return "men";
+  if (/\b(?:women'?s?|womens|woman|female|ladies|lady|wife|girlfriend|\bher\b|for\s+(?:women|her))\b/.test(t)) return "women";
   if (/\b(?:kids?|children|for\s+kids)\b/.test(t)) return "kids";
   return null;
+}
+
+// A BARE gender pivot follow-up — "how about women's?", "what about mens?",
+// "women's instead", "show men's now". Carries a gender and (almost) nothing
+// else: it RESETS to the whole gender line, dropping the prior turn's
+// category/color/width/condition. Distinct from BROAD_GENDER_REQUEST_RE, which
+// needs an explicit noun ("men's options"). Gated to SHORT messages with no other
+// shopping content so a real "men's sandals in black" browse never matches. The
+// chain that surfaced this: "Show me men's shoes for comfort and arch support." →
+// "How about women's?" must show WOMEN'S cards, not re-search men's
+// comfort/arch-support stale scope (live trace 2026-06-30).
+const GENDER_PIVOT_TOKEN_RE =
+  /\b(?:men'?s?|mens|man|male|guys?|husband|boyfriend|women'?s?|womens|woman|female|wife|girlfriend|ladies|lady|kids?|child(?:ren)?|boys?|girls?)\b/i;
+const GENDER_PIVOT_OTHER_CONTENT_RE =
+  /\b(?:sandals?|sneakers?|trainers?|boots?|booties?|shoes?|footwear|loafers?|clogs?|slippers?|heels?|wedges?|flats?|mules?|slides?|oxfords?|pumps?|orthotics?|insoles?|sale|cheap|cheaper|under|\$\d|size|sized|colou?r|black|white|navy|tan|pink|red|blue|green|brown|grey|gray|walking|standing|running|hiking|gym|work|wedding|travel|comfort|comfortable|arch|support|plantar|bunion|wide|narrow)\b/i;
+export function isBroadGenderFollowUp(text) {
+  const t = normalizeApostrophes(text);
+  if (isBroadGenderRequest(t)) return false; // the noun-bearing case is handled separately
+  const w = t.trim().split(/\s+/).filter(Boolean).length;
+  if (w === 0 || w > 5) return false;
+  return GENDER_PIVOT_TOKEN_RE.test(t) && !GENDER_PIVOT_OTHER_CONTENT_RE.test(t);
+}
+
+// Gender a bare follow-up pivot targets (men|women|kids|null).
+export function broadGenderFollowUpGender(text) {
+  if (!isBroadGenderFollowUp(text)) return null;
+  return genderFromGenderText(normalizeApostrophes(text).toLowerCase());
+}
+
+// EITHER a noun-bearing broad gender request OR a bare gender pivot follow-up:
+// both are deterministic gender-only resets that the runtime pin owns.
+export function isBroadGenderReset(text) {
+  return isBroadGenderRequest(text) || isBroadGenderFollowUp(text);
 }
 
 // Pronoun back-reference — "all of them", "any of those", "both of

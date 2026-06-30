@@ -34,6 +34,7 @@ export const WORKFLOWS = {
   CONDITION_RECOMMENDATION: "condition_recommendation",
   MULTI_RECOMMENDATION: "multi_recommendation",
   COMPATIBILITY: "compatibility",
+  PRODUCT_SPEC: "product_spec",
   SALE_BROWSE: "sale_browse",
   SIZING_HELP: "sizing_help",
   PRODUCT_FOCUS: "product_focus",
@@ -123,9 +124,25 @@ export function messageExplicitlyAsksForShoes(text = "") {
 // NO search this turn — the agent loop must run with tools DISABLED so the model
 // can't fire a stray search whose card the deterministic owner then overwrites
 // (live trace 2026-06-30: display_recovery search=false, model searched anyway).
-const TOOLS_OFF_WORKFLOWS = new Set(["clarification", "display_recovery", "product_focus", "cart_handoff"]);
+// policy_account / customer_service / sizing_help are SUPPORT/HANDOFF turns that
+// answer from knowledge with NO catalog search and MUST show no product cards. If
+// the model keeps tools it fires a stray search whose card then survives the
+// evidence-gated card-wipe (the wipe skips when productSearchAttempted=true) and
+// leaks wedge/sandal cards onto a "how do I verify I'm a teacher?" answer (live
+// trace 2026-06-30). Tools off makes the stray search impossible.
+const TOOLS_OFF_WORKFLOWS = new Set([
+  "clarification", "display_recovery", "product_focus", "cart_handoff",
+  "policy_account", "customer_service", "sizing_help",
+]);
 export function workflowDisablesTools(workflow) {
   return TOOLS_OFF_WORKFLOWS.has(String(workflow || ""));
+}
+
+// SUPPORT / HANDOFF / POLICY workflows that must NEVER ship product cards. A
+// card>0 outcome on one of these is a leak (support_handoff_cards_leak).
+const CARD_SUPPRESS_WORKFLOWS = new Set(["policy_account", "customer_service", "sizing_help"]);
+export function workflowSuppressesCards(workflow) {
+  return CARD_SUPPRESS_WORKFLOWS.has(String(workflow || ""));
 }
 
 // The single authoritative gender of a resolved NAMED family's cards, or null if
@@ -308,6 +325,47 @@ const FOLLOWUP_AVAIL_RE = new RegExp(
   "wide|narrow|\\d{1,2}(?:\\.5)?)\\b",
   "i",
 );
+
+// A PRODUCT SPEC / ATTRIBUTE question — asks for a product DATUM ("what heel
+// heights do your everyday wedges come in?", "what material is the upper?",
+// "are these waterproof?", "do they have a removable footbed?"). This is NOT an
+// availability (in-stock yes/no) question: the availability owner answered it
+// "Yes — all three are available in that." (live trace 2026-06-30), which is
+// nonsense for a heel-height question. It gets its own product_spec workflow that
+// answers the attribute VALUE from product facts, or honestly says the spec isn't
+// listed — never "Yes, available". Color/size/width are deliberately EXCLUDED:
+// those are variant-availability questions the availability owner enumerates
+// correctly ("comes in Rose, Black, Denim").
+const SPEC_ATTRIBUTE_NOUN =
+  "heel\\s+heights?|heel\\s+drops?|platform\\s+heights?|heights?|drops?|" +
+  "materials?|fabrics?|uppers?|linings?|leathers?|suedes?|" +
+  "weights?|" +
+  "soles?|outsoles?|midsoles?|footbeds?|traction|grip|treads?|" +
+  "cushioning|toe\\s+box(?:es)?";
+const SPEC_ATTRIBUTE_RE = new RegExp(
+  // "what/which [kind of] <attribute> …"
+  "\\bwhat(?:'?s)?\\s+(?:kind\\s+of\\s+|type\\s+of\\s+|sort\\s+of\\s+)?(?:" + SPEC_ATTRIBUTE_NOUN + ")\\b" + "|" +
+  "\\bwhich\\s+(?:" + SPEC_ATTRIBUTE_NOUN + ")\\b" + "|" +
+  "\\bhow\\s+(?:tall|high)\\s+(?:is|are)\\b[^.?!\\n]{0,30}\\b(?:heel|platform|wedge)\\b" + "|" +
+  // boolean spec questions: "are these waterproof?", "do they have a removable footbed?"
+  "\\b(?:are|is)\\s+(?:they|these|those|it|the\\s+\\w+)\\s+(?:waterproof|water[-\\s]?resistant|slip[-\\s]?resistant|non[-\\s]?slip|machine\\s+washable|vegan|orthotic[-\\s]?friendly)\\b" + "|" +
+  "\\bdo\\s+(?:they|these|those|the\\s+\\w+)\\s+have\\s+(?:a\\s+)?(?:removable|built[-\\s]?in)\\s+(?:footbed|insole|orthotic|arch\\s+support)\\b" + "|" +
+  "\\b(?:removable|built[-\\s]?in)\\s+(?:footbed|insole)\\b",
+  "i",
+);
+export function isProductSpecQuestion(text) {
+  return SPEC_ATTRIBUTE_RE.test(String(text || "").replace(/[‘’ʼ′＇]/g, "'"));
+}
+
+// INVARIANT detector (spec_question_answered_as_availability): a product_spec
+// turn whose answer leaks availability/stock wording ("Yes, available", "in
+// stock", "comes in that") instead of answering the attribute. Pure + exported.
+const AVAILABILITY_WORDING_RE =
+  /\b(?:yes[,\s—-]+(?:all|both|the|it|they|those|these)\b[^.?!\n]{0,30}\b(?:available|in\s+stock)|are\s+available\b|is\s+available\b|in\s+stock\b|back\s+in\s+stock\b|comes?\s+in\s+that\b|available\s+in\s+that\b)/i;
+export function specQuestionAnsweredAsAvailability({ message = "", text = "" } = {}) {
+  if (!isProductSpecQuestion(message)) return false;
+  return AVAILABILITY_WORDING_RE.test(String(text || ""));
+}
 
 const COMPARISON_RE =
   /\b(?:vs\.?|versus|compare[ds]?|comparison|which\s+is\s+better|better\s+(?:for|than)|difference\s+between|which\s+(?:one\s+)?should\s+i)\b/i;
@@ -575,20 +633,38 @@ export function planTurn({
     });
   }
 
+  // 1f. PRODUCT SPEC / ATTRIBUTE TRUTH — "what heel heights do your everyday
+  // wedges come in?", "what material is the upper?", "are these waterproof?",
+  // "do they have a removable footbed?". Asks for a product DATUM, not an
+  // in-stock yes/no. Routing it to availability produced "Yes — all three are
+  // available in that." (live trace 2026-06-30), which does NOT answer the
+  // question. Its own deterministic workflow: search the referenced products,
+  // answer the attribute VALUE from their facts, or honestly say the spec isn't
+  // listed — and never assert stock. Placed BEFORE availability so the
+  // "come in" / "what colors"-shaped availability regex can't steal it.
+  const isSpecAttributeQuestion = isProductSpecQuestion(m);
+  if (isSpecAttributeQuestion) {
+    return finalize({
+      workflow: WORKFLOWS.PRODUCT_SPEC,
+      requiredEvidence: ["product_facts"],
+      searchRequired: true,
+      clarificationAllowed: false,
+      productDisplayPolicy: hasNamed ? "show_focused" : "show",
+      answerRequirements: reqs({ answerFirst: true, concise: true, answerInText: true }),
+      gender: genderFor(false),
+      directives: [
+        "This is a PRODUCT SPEC / ATTRIBUTE question (e.g. heel height, platform height, material, outsole, removable footbed, waterproof) — NOT an availability/in-stock question. Search the styles in context and answer the actual attribute VALUE from their product facts.",
+        "If the product data does not list that attribute, say so honestly and concretely — e.g. \"I don't see heel height listed for these wedge styles, but here are the wedge options I found. Aetrex support can confirm exact heel height.\" — and STILL show the relevant product cards.",
+        "NEVER answer with stock/availability wording ('Yes, available', 'in stock', 'all three are available in that', 'comes in that') — that does not answer a spec question.",
+      ],
+    });
+  }
+
   // 2. Availability — size / color / stock for a product in context, OR a
   // size/stock FOLLOW-UP after products were shown ("what about size 9?" with
   // prior cards). The latter has no named product in the message but is clearly
   // an availability question, so it must not fall through to clarification.
   // Force a fresh product/variant lookup; never answer from prior cards alone.
-  // A SPEC/ATTRIBUTE enumeration question — "what heel heights / heel drop /
-  // materials / weight / sole do they come in?" — asks for a product DATUM, not
-  // an in-stock yes/no. It must NOT route to availability: the availability
-  // owner answers "Yes — all three are available in that.", which is nonsense
-  // for a heel-height question (live trace 2026-06-30). Let it fall through to
-  // the LLM, which answers from product facts / knowledge (or says it doesn't
-  // track that spec) instead of asserting stock.
-  const isSpecAttributeQuestion =
-    /\bwhat\s+(?:kind\s+of\s+|type\s+of\s+|sort\s+of\s+)?(?:heel\s+heights?|heel\s+drops?|heights?|materials?|fabrics?|weights?|drops?|soles?|footbeds?|outsoles?|midsoles?|cushioning|toe\s+box(?:es)?)\b/i.test(m);
   const isDeicticAvailFollowUp = FOLLOWUP_AVAIL_RE.test(m) && words(m) <= 5;
   const isAvailFollowUpMsg = (SIZE_COLOR_STOCK_RE.test(m) || isDeicticAvailFollowUp) && !isSpecAttributeQuestion;
 

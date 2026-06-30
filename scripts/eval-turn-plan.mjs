@@ -9,7 +9,7 @@
 // Run: node scripts/eval-turn-plan.mjs
 
 import assert from "node:assert/strict";
-import { planTurn, WORKFLOWS, textPresentsProducts, workflowDisablesTools, resolvedFamilyGender, isStrippedFragmentText, isOrthoticProductCard, messageExplicitlyAsksForShoes } from "../app/lib/turn-plan.server.js";
+import { planTurn, WORKFLOWS, textPresentsProducts, workflowDisablesTools, workflowSuppressesCards, resolvedFamilyGender, isStrippedFragmentText, isOrthoticProductCard, messageExplicitlyAsksForShoes, isProductSpecQuestion, specQuestionAnsweredAsAvailability } from "../app/lib/turn-plan.server.js";
 
 let pass = 0, fail = 0;
 const fails = [];
@@ -497,20 +497,75 @@ scenario("bare ok is clarification", { message: "ok" },
 // "verify I'm a teacher" is a discount-ELIGIBILITY (policy) question, not a
 // product recommendation. It used to match the occupation "teacher" in
 // USECASE_RE → condition_recommendation → 3 random wedge cards.
-scenario("teacher-verification → policy_account, no product cards", { message: "What information do I need to provide to verify I'm a teacher?" },
-  { workflow: W.POLICY_ACCOUNT, searchRequired: false });
+scenario("teacher-verification → policy_account, no product cards (tools off, suppress)", { message: "What information do I need to provide to verify I'm a teacher?" },
+  { workflow: W.POLICY_ACCOUNT, searchRequired: false, clarificationAllowed: false, productDisplayPolicy: "suppress" });
 scenario("nurse discount eligibility → policy_account", { message: "how do I verify I'm a nurse for the discount?" },
   { workflow: W.POLICY_ACCOUNT, searchRequired: false });
+scenario("student ID.me verification → policy_account", { message: "How do I qualify for the student discount with ID.me?" },
+  { workflow: W.POLICY_ACCOUNT, searchRequired: false, productDisplayPolicy: "suppress" });
 // But a teacher who is SHOPPING (occupation as a real use-case) still recommends.
 scenario("teacher standing all day + recommend → condition_recommendation", { message: "I'm a teacher on my feet all day, what shoes do you recommend?" },
   { workflow: W.CONDITION_RECOMMENDATION, searchRequired: true });
-// A SPEC/attribute question ("what heel heights do they come in?") must NOT be
-// answered as availability ("Yes — all three are available in that.").
-check("'what heel heights do your wedges come in?' is NOT availability", () => {
-  const p = planTurn({ message: "What heel heights do your everyday wedges come in?", hasPriorCards: true, priorCardFamilies: ["ashley", "kaia", "anna"], primaryGender: "women" });
-  assert.notEqual(p.workflow, W.PRIOR_EVIDENCE_AVAILABILITY, "a heel-height spec question must not route to availability");
-  assert.notEqual(p.workflow, W.AVAILABILITY);
+
+// SUPPORT / HANDOFF / POLICY workflows show NO product cards + run tools-off so a
+// stray search can't leak a card onto a verification/policy answer.
+check("policy/support/sizing workflows are tools-off and card-suppressing", () => {
+  for (const w of ["policy_account", "customer_service", "sizing_help"]) {
+    assert.equal(workflowDisablesTools(w), true, `${w} must be tools-off`);
+    assert.equal(workflowSuppressesCards(w), true, `${w} must suppress cards`);
+  }
+  for (const w of ["browse", "availability", "condition_recommendation", "comparison", "product_spec"]) {
+    assert.equal(workflowSuppressesCards(w), false, `${w} must NOT suppress cards`);
+  }
 });
+
+// ── PRODUCT SPEC / ATTRIBUTE TRUTH (Task 4) ──────────────────────────────────
+// "What heel heights do your everyday wedges come in?" was answered like
+// availability — "Yes — all three are available in that." (live trace 2026-06-30).
+// It must route to its own product_spec workflow (search + show), NEVER availability.
+scenario("heel-height spec question → product_spec (not availability)",
+  { message: "What heel heights do your everyday wedges come in?", hasPriorCards: true, priorCardFamilies: ["ashley", "kaia", "anna"], primaryGender: "women" },
+  { workflow: W.PRODUCT_SPEC, searchRequired: true, clarificationAllowed: false, productDisplayPolicy: "show" });
+scenario("material spec question → product_spec", { message: "What material is the upper on the Jillian?", namedProduct: true },
+  { workflow: W.PRODUCT_SPEC, searchRequired: true, productDisplayPolicy: "show_focused" });
+scenario("waterproof spec question → product_spec", { message: "Are these waterproof?", hasPriorCards: true },
+  { workflow: W.PRODUCT_SPEC, searchRequired: true });
+scenario("removable-footbed spec question → product_spec", { message: "Do they have a removable footbed?", hasPriorCards: true },
+  { workflow: W.PRODUCT_SPEC, searchRequired: true });
+scenario("outsole/traction spec question → product_spec", { message: "What kind of outsole do these have?", hasPriorCards: true },
+  { workflow: W.PRODUCT_SPEC, searchRequired: true });
+// But a plain color/size availability question is STILL availability (not spec).
+scenario("'what colors does the Jillian come in?' stays availability (variant data)", { message: "What colors does the Jillian come in?", namedProduct: true },
+  { workflow: W.AVAILABILITY, productDisplayPolicy: "show_availability" });
+
+check("isProductSpecQuestion: physical specs true; color/size availability false", () => {
+  for (const m of ["What heel heights do your wedges come in?", "what material is it?", "are these waterproof?", "do they have a removable footbed?", "what outsole do they use?", "how tall is the heel on these?"]) {
+    assert.equal(isProductSpecQuestion(m), true, `should be a spec question: "${m}"`);
+  }
+  for (const m of ["what colors does the Jillian come in?", "do you have it in size 9?", "is it in stock?", "what sizes do you carry?"]) {
+    assert.equal(isProductSpecQuestion(m), false, `should NOT be a spec question: "${m}"`);
+  }
+});
+
+check("specQuestionAnsweredAsAvailability fires on stock wording over a spec question", () => {
+  const message = "What heel heights do your everyday wedges come in?";
+  assert.equal(specQuestionAnsweredAsAvailability({ message, text: "Yes — all three are available in that." }), true);
+  assert.equal(specQuestionAnsweredAsAvailability({ message, text: "These wedges have a 2-inch heel height." }), false);
+  // Not a spec question → never fires even with availability wording.
+  assert.equal(specQuestionAnsweredAsAvailability({ message: "is it in stock?", text: "Yes, it's available." }), false);
+});
+
+// ── BROAD GENDER FOLLOW-UP (Task 2) ──────────────────────────────────────────
+// Chain: "Show me men's shoes for comfort and arch support." → "How about
+// women's?". The bare gender pivot must re-run a GENDER-ONLY search (women),
+// dropping the prior comfort/arch-support scope — handled at runtime by the
+// gender-only pin, planned here as a browse with the swapped gender.
+scenario("'How about women's?' after a men's turn → browse, gender women", { message: "How about women's?", hasPriorCards: true },
+  { workflow: W.BROWSE, searchRequired: true, clarificationAllowed: false, gender: "women" });
+scenario("'what about mens?' after cards → browse, gender men", { message: "what about mens?", hasPriorCards: true },
+  { workflow: W.BROWSE, searchRequired: true, gender: "men" });
+scenario("'show men's now' after cards → browse, gender men", { message: "show men's now", hasPriorCards: true },
+  { workflow: W.BROWSE, searchRequired: true, gender: "men" });
 
 // ── Orthotic-flow card purity + fragment guard helpers (PRD owner-leak fix) ───
 check("isOrthoticProductCard: orthotics/insoles true; wearable footwear false", () => {

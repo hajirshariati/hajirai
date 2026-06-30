@@ -13,6 +13,9 @@ import {
   detectTurnGoal,
   isBroadGenderRequest,
   broadGenderRequestGender,
+  isBroadGenderFollowUp,
+  broadGenderFollowUpGender,
+  isBroadGenderReset,
 } from "../app/lib/turn-intent.server.js";
 
 let passed = 0;
@@ -107,6 +110,27 @@ await test("P2 runtime — isBroadGenderRequest / broadGenderRequestGender", () 
   assert.equal(broadGenderRequestGender("Show me men's options"), "men");
   assert.equal(broadGenderRequestGender("what do you have for women"), "women");
   assert.equal(broadGenderRequestGender("show me men's sandals"), null, "specific category is not a broad request");
+});
+
+// Task 2 — BARE gender pivot follow-ups ("how about women's?") with no category
+// noun. BROAD_GENDER_REQUEST_RE needs a noun, so these missed it and the runtime
+// gender-only pin never fired — the model re-searched the prior turn's stale
+// scope for the new gender (live trace 2026-06-30).
+await test("bare gender pivot follow-ups are a broad gender RESET", () => {
+  for (const s of ["How about women's?", "what about mens?", "women's instead", "show men's now", "for men", "how about men's"]) {
+    assert.equal(isBroadGenderFollowUp(s), true, `bare gender follow-up: ${s}`);
+    assert.equal(isBroadGenderReset(s), true, `reset: ${s}`);
+  }
+  // NOT bare follow-ups: a specific category browse, the seed turn, non-gender pivots.
+  for (const s of ["Show me men's shoes for comfort and arch support.", "men's sandals", "what about sandals instead?", "anything cheaper?", "how about size 9?"]) {
+    assert.equal(isBroadGenderFollowUp(s), false, `not a bare gender follow-up: ${s}`);
+  }
+  assert.equal(broadGenderFollowUpGender("How about women's?"), "women");
+  assert.equal(broadGenderFollowUpGender("what about mens?"), "men");
+  assert.equal(broadGenderFollowUpGender("show men's now"), "men");
+  // curly apostrophe behaves the same.
+  assert.equal(isBroadGenderFollowUp("how about women’s?"), true);
+  assert.equal(broadGenderFollowUpGender("how about women’s?"), "women");
 });
 
 // P2 PRD regression — the widget sends a CURLY apostrophe (U+2019). The

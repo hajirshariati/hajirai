@@ -116,6 +116,10 @@ import {
   familyFromQuery,
   isPivotResetTurn,
   pivotSearchScopeLeak,
+  isBroadGenderReset,
+  broadGenderFollowUpGender,
+  workflowSuppressesCards,
+  specQuestionAnsweredAsAvailability,
 } from "../lib/emit-finalize.server";
 import { detectConversationGoal, ANCHOR_GOALS, isBroadGenderRequest, broadGenderRequestGender } from "../lib/turn-intent.server";
 import { isOrthoticSandalCompatibilityQuestion, buildOrthoticCompatibilityAnswer, hasExplicitOrthoticCompatibleEvidence, isUnsafeCompatibilitySuggestion, SAFE_COMPATIBILITY_SUGGESTIONS } from "../lib/compatibility-truth.server";
@@ -3302,7 +3306,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   // customer names one in THIS message — and a specific category never matches
   // isBroadGenderRequest, so this fires only on a genuinely broad ask.
   const broadGenderMsg = ctx.latestUserMessage || "";
-  const broadGenderDetected = isBroadGenderRequest(broadGenderMsg);
+  const broadGenderDetected = isBroadGenderReset(broadGenderMsg);
   const broadGenderBlocked =
     !!availabilityPinnedCards || !!comparisonPinnedCards || !!evidencePinnedCards ||
     !!priorEvidencePinnedCards || rewriteOnlyRetry;
@@ -3321,7 +3325,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     !broadGenderBlocked
   ) {
     try {
-      const bg = broadGenderRequestGender(ctx.latestUserMessage || "") || ctx.turnPlan?.gender || ctx.sessionGender || null;
+      const bg = broadGenderRequestGender(ctx.latestUserMessage || "") || broadGenderFollowUpGender(ctx.latestUserMessage || "") || ctx.turnPlan?.gender || ctx.sessionGender || null;
       const genderWord = bg === "men" ? "men's" : bg === "women" ? "women's" : bg === "kids" ? "kids" : "";
       const filters = bg ? { gender: bg } : {};
       const cap = Math.max(3, ctx.productCardCap || 6);
@@ -3341,7 +3345,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
         // ask cleared that scope, so any stale term NOT in the current message is
         // a leak. Scrub it: replace the whole draft with the clean framing.
         const curMsg = String(ctx.latestUserMessage || "").toLowerCase();
-        const STALE_LEAK_RE = /\b(?:heel\s+pain|plantar|flat\s+feet|fasciitis|wide(?:\s+width|\s+feet)?|narrow|wedges?|heels?|boots?|sandals?|women'?s?|footwear)\b/i;
+        const STALE_LEAK_RE = /\b(?:heel\s+pain|plantar|flat\s+feet|fasciitis|wide(?:\s+width|\s+feet)?|narrow|wedges?|heels?|boots?|sandals?|sneakers?|loafers?|men'?s?|women'?s?|footwear|comfort|arch\s+support|walking|standing|running|hiking)\b/i;
         const leaks = (fullResponseText.match(new RegExp(STALE_LEAK_RE.source, "gi")) || [])
           .filter((m) => !curMsg.includes(m.toLowerCase()));
         if (detectAiNoMatchPhrasing(fullResponseText) || !textPresentsProducts(fullResponseText) || leaks.length > 0) {
@@ -3615,6 +3619,29 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       : null;
     qualitySignals.supportHandoffApplied = true;
     console.log(`[customer-service] handoff support=${Boolean(supportHandoffCta)} cards=0`);
+  }
+
+  // ── Support / policy / verification card suppression (deterministic) ──────
+  // policy_account (incl. promo/discount-eligibility like "how do I verify I'm a
+  // teacher?") and the cardless sizing_help clarification answer from knowledge —
+  // they must NEVER carry product cards. Tools are forced off for these
+  // workflows, but if a stale prior-turn card slipped into the pool, drop it here
+  // so a verification/policy answer can't show wedge cards (live trace
+  // 2026-06-30: "What information do I need to provide to verify I'm a teacher?"
+  // → 3 random wedge cards). customer_service is handled above.
+  if (
+    ctx.turnPlan?.workflow !== "customer_service" &&
+    workflowSuppressesCards(ctx.turnPlan?.workflow) &&
+    (Array.isArray(pool) ? pool.length : 0) > 0
+  ) {
+    console.log(`[support-suppress] ${ctx.turnPlan?.workflow}: dropping ${pool.length} card(s) — policy/support/handoff turn shows no products`);
+    pool = [];
+    availabilityPinnedCards = null;
+    comparisonPinnedCards = null;
+    evidencePinnedCards = null;
+    priorEvidencePinnedCards = null;
+    genericCTA = null;
+    supportCTA = null;
   }
 
   // ── Support-handoff safety gate ───────────────────────────────────────
@@ -4634,8 +4661,24 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     // cards from the deterministic gender-only search — never zero cards from a
     // stale-category search (live trace 2026-06-30). Zero cards here means the
     // deterministic pin didn't fire / the gender-only search came back empty.
-    if (workflow === "browse" && isBroadGenderRequest(ctx?.latestUserMessage || "") && finalCount === 0) {
+    if (workflow === "browse" && isBroadGenderReset(ctx?.latestUserMessage || "") && finalCount === 0) {
       recordTurnInvariantViolation("broad_gender_zero_cards", { workflow, gender: ctx?.turnPlan?.gender || "-" });
+    }
+    // SUPPORT / HANDOFF / POLICY card leak: a policy_account / customer_service /
+    // sizing_help turn answers from knowledge and must show NO product cards. Any
+    // surviving card is a leak (live trace 2026-06-30: teacher-verification →
+    // wedge cards). The deterministic suppression above already drops them; this
+    // fires + repairs as the backstop if a card reached finalProductCards anyway.
+    if (workflowSuppressesCards(workflow) && finalCount > 0) {
+      recordTurnInvariantViolation("support_handoff_cards_leak", { workflow, final: finalCount });
+      finalProductCards = [];
+    }
+    // PRODUCT SPEC answered as availability: a product_spec turn ("what heel
+    // heights do your wedges come in?") whose text leaked stock wording ("Yes —
+    // all three are available in that.") instead of answering the attribute.
+    if (workflow === "product_spec" &&
+        specQuestionAnsweredAsAvailability({ message: ctx?.latestUserMessage || "", text: fullResponseText })) {
+      recordTurnInvariantViolation("spec_question_answered_as_availability", { workflow });
     }
     // INVARIANT (audit #6): every SHOWN card must be in the evidence pool. The
     // scorer picks FROM the pool, so a scorer-owned card outside it is a leak

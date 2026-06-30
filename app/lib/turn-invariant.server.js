@@ -68,6 +68,8 @@ export const KNOWN_INVARIANT_CODES = new Set([
   "stale_width_or_color_applied_to_new_product", "availability_text_card_color_mismatch",
   "handoff_on_catalog_browse", "owner_fallthrough_after_required_gate",
   "shown_card_not_in_active_owner_pool", "pivot_search_scope_leak",
+  // 2026-07 support-handoff card-leak + product-spec truth
+  "support_handoff_cards_leak", "spec_question_answered_as_availability",
 ]);
 
 // INVARIANT detector (owner_fallthrough_after_required_gate): a REQUIRED gate

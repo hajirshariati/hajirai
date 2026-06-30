@@ -2232,6 +2232,44 @@ await test("fresh request mid-flow CANCELS the gate (defers to normal product ro
   assert.equal(events.find((e) => e?.type === "text"), undefined, "must not emit any orthotic question");
 });
 
+// ── Task 3 (2026-06-30): guided orthotic flow ENTRY + use-case capture ───────
+// "i need insole for my dad" must ENTER the guided flow, capture gender from
+// "dad" (→ Men), and ask the NEXT useful question (q_use_case) — NOT dump a
+// random orthotic grid. Live trace 2026-06-30: it showed random orthotics, then
+// an orthotic without asking the tree questions, then a "Style it" CTA.
+await test("'i need insole for my dad' ENTERS the guided flow, captures gender, asks the next Q (no random grid)", async () => {
+  const { events, encoder, controller } = makeMockSse();
+  const out = await maybeRunOrthoticFlow({
+    messages: [{ role: "user", content: "i need insole for my dad" }],
+    tree, shop: "test-shop", controller, encoder,
+  });
+  assert.equal(out.handled, true, "must enter the guided orthotic flow, not fall through to a grid");
+  const q = events.find((e) => e?.type === "text");
+  assert.ok(q, "must emit a guided question");
+  // Gender already captured from 'dad' → the NEXT question is the use-case one,
+  // never the gender one again and never a product grid.
+  assert.match(q.text, /what kind of shoes will the orthotics go in/i, "next question is q_use_case (gender already known)");
+  assert.doesNotMatch(q.text, /who are these orthotics for/i, "gender was captured from 'dad' — don't re-ask it");
+  const productEvent = events.find((e) => e?.type === "products");
+  assert.ok(!productEvent || !productEvent.products || productEvent.products.length === 0 || productEvent.text === "" || productEvent.text == null,
+    "no random orthotic grid on the entry question");
+});
+
+await test("'Casual' inside the guided flow STAYS in the flow (use-case answer, not a footwear pivot)", async () => {
+  const { events, encoder, controller } = makeMockSse();
+  const out = await maybeRunOrthoticFlow({
+    messages: [
+      { role: "user", content: "i need insole for my dad" },
+      { role: "assistant", content: "What kind of shoes will the orthotics go in? <<Dress shoes>> <<Everyday / casual shoes>> <<Athletic — running>>" },
+      { role: "user", content: "Casual" },
+    ],
+    tree, shop: "test-shop", controller, encoder,
+  });
+  assert.equal(out.handled, true, "'Casual' is a use-case chip answer — the flow must continue, not pivot to casual footwear");
+  const q = events.find((e) => e?.type === "text");
+  assert.ok(q && /foot pain or condition/i.test(q.text), "advances to the condition question after capturing useCase=casual");
+});
+
 console.log("");
 if (failed === 0) {
   console.log(`✅  ${passed} passed, 0 failed\n`);
