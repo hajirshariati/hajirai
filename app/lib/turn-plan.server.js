@@ -92,6 +92,18 @@ export function isOrthoticProductCard(card) {
   return false;
 }
 
+// INVARIANT detector (hard_gender_fail_open): a HARD gender request must never
+// surface the OPPOSITE gender's products. Fires when the requested gender is
+// men/women yet a shown card carries the other gender. Pure + testable.
+export function hardGenderFailOpen({ requestedGender = null, shownCardGenders = [] } = {}) {
+  const want = String(requestedGender || "").toLowerCase();
+  if (want !== "men" && want !== "women") return false;
+  const opposite = want === "men" ? "women" : "men";
+  return (Array.isArray(shownCardGenders) ? shownCardGenders : [])
+    .map((g) => String(g || "").toLowerCase())
+    .some((g) => g === opposite);
+}
+
 // Does THIS message explicitly request footwear alongside orthotics? Used to
 // exempt the orthotic-flow card-purity invariant — "show me shoes and orthotics"
 // legitimately mixes both. A bare shoe noun that is the use-case ANSWER inside
@@ -275,7 +287,12 @@ const SIZE_COLOR_STOCK_RE = new RegExp(
 // product context so it never steals a longer advisory ("is the Jillian good in
 // black?") or a plain browse ("show me shoes in black").
 const FOLLOWUP_AVAIL_RE = new RegExp(
-  "\\b(?:and\\s+)?(?:in|how\\s+about|what\\s+about)\\s+(?:an?\\s+|it\\s+in\\s+|the\\s+)?(?:" +
+  // Lead-ins: "and in …", "how/what about …", AND the imperative refinements
+  // "make it …", "change/switch (it) to …", "actually …" — a color/size pivot on
+  // a product already in context ("Actually make it black" must stay availability
+  // refinement, not fall to clarification/browse). Still gated to ≤5 words WITH
+  // product context below, so it never steals an advisory or a plain browse.
+  "\\b(?:and\\s+)?(?:in|how\\s+about|what\\s+about|make\\s+it|change\\s+(?:it\\s+)?to|switch\\s+(?:it\\s+)?to|actually)\\s+(?:an?\\s+|it\\s+in\\s+|the\\s+)?(?:" +
   "black|white|ivory|cream|navy|blue|red|burgundy|wine|maroon|pink|blush|rose|fuchsia|coral|" +
   "green|olive|sage|tan|beige|nude|taupe|khaki|brown|chocolate|cognac|camel|bronze|copper|gold|" +
   "silver|pewter|grey|gray|charcoal|slate|champagne|mauve|lavender|purple|plum|yellow|mustard|orange|" +

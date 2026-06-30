@@ -10,6 +10,9 @@ const REQUEST_WORDS = new Set([
   "could", "do", "does", "find", "for", "from", "give", "has", "have",
   "hello", "hey", "hi", "i", "in", "is", "it", "like", "looking", "made", "me", "my", "need",
   "of", "on", "or", "other", "please", "recommend", "show", "some",
+  // Negation / framing words — never a catalog requirement themselves
+  // ("sandals, not shoes" / "only sandals now" / "sandals instead").
+  "not", "no", "only", "now", "instead", "just", "rather", "without",
   // PRONOUNS — "I'll use them in Hoka sneakers" must not yield a catalog
   // requirement phrase "them hoka" (live trace 2026-06-30). "it"/"these"/
   // "those" were already covered; "them"/"they" leaked through and joined the
@@ -101,6 +104,9 @@ const PREFIX_BLOCKERS = new Set([
   "about", "after", "all", "any", "at", "besides", "except", "excluding",
   "for", "from", "into", "like", "more", "my", "of", "other", "some",
   "than", "the", "their", "these", "this", "those", "to", "your",
+  // Negation / framing words must never glue onto a category as a hard
+  // requirement ("sandals, not shoes" → never term "sandals not"). Live trace.
+  "not", "no", "only", "now", "instead", "just", "rather", "without",
 ]);
 
 function escapeRegex(value) {

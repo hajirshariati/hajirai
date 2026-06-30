@@ -253,6 +253,42 @@ export function colorFromTitle(title) {
   return parts[parts.length - 1].trim().toLowerCase();
 }
 
+// INVARIANT detector (availability_text_card_color_mismatch): the answer text
+// and the shown cards must be the SAME truth owner. Returns the first color the
+// answer ASSERTS available (inside an "available in …" / "comes in …" clause)
+// for which NO shown card matches — i.e. text says "available in Rose" while
+// the card shown is "Jillian Denim". null when consistent. Negated/denied
+// colors elsewhere in the sentence are ignored (only the availability clause
+// counts). Pure + testable.
+const AVAIL_COLOR_CLAUSE_RE = /\b(?:available|comes?|come|in\s+stock)\b[^.?!]*?\bin\b([^.?!]*)/gi;
+export function availabilityTextCardColorMismatch({ text = "", cards = [], knownColors = [] } = {}) {
+  const t = String(text || "");
+  const cardArr = Array.isArray(cards) ? cards.filter(Boolean) : [];
+  if (!t.trim() || cardArr.length === 0) return null;
+  const colorList = [...BUILTIN_COLORS, ...(knownColors || []).map((c) => String(c).toLowerCase())];
+  const claimed = new Set();
+  AVAIL_COLOR_CLAUSE_RE.lastIndex = 0;
+  for (let cm; (cm = AVAIL_COLOR_CLAUSE_RE.exec(t)) !== null; ) {
+    const clause = cm[1] || "";
+    for (const c of colorList) {
+      if (new RegExp(`\\b${escapeRe(c)}\\b`, "i").test(clause)) claimed.add(c.toLowerCase());
+    }
+  }
+  if (claimed.size === 0) return null;
+  const shownHas = (color) => cardArr.some((card) => {
+    const title = String(card?.title || "").toLowerCase();
+    return (
+      colorFromTitle(card?.title || "") === color ||
+      title.includes(color) ||
+      String(card?.color || card?._color || "").toLowerCase() === color
+    );
+  });
+  for (const color of claimed) {
+    if (!shownHas(color)) return color;
+  }
+  return null;
+}
+
 // Loose intent: did the customer's message MENTION a color / size / width at
 // all? Used to refuse a false AVAILABLE when a requested constraint couldn't be
 // normalized ("size 7 wide" present but unparsed → UNKNOWN, not AVAILABLE).
@@ -366,24 +402,50 @@ export function resolveAvailabilityRequest({ message = "", priorMessage = "", pr
   return { family, color, size, width };
 }
 
-// Accumulate the most-recent prior availability constraints across ALL prior
-// user turns (most-recent value wins per field). A color-only follow-up
-// ("and in black?") must still inherit the size set two turns ago
-// ("what about size 8?") — a single-prior-message lookup loses it when the
-// immediately-prior turn restated only one field. The current (last) user
-// message is excluded.
+// Prior availability constraints for the active product. Color/size accumulate
+// across prior turns (most-recent wins per field) so a color-only follow-up
+// ("and in black?") still inherits the size set a couple turns back. WIDTH is
+// PRODUCT-SCOPED: it carries ONLY from the IMMEDIATE prior availability turn,
+// never accumulated from an older, unrelated turn. Live trace: a "wide" asked
+// many turns ago on a different product leaked into "Does Jillian come in rose?
+// → what about size 8?" and falsely constrained Jillian to wide. The current
+// (last) user message is excluded.
 export function priorAvailabilityConstraints(messages = [], knownColors = []) {
   const users = (Array.isArray(messages) ? messages : []).filter((m) => m?.role === "user").map(messageText).filter(Boolean);
   const priors = users.slice(0, -1);
   const acc = { color: null, size: null, width: null };
+  // The immediate prior availability turn = the most recent prior user message
+  // that stated ANY availability constraint. Width may only come from it.
+  let immediateAvailIdx = -1;
+  for (let i = priors.length - 1; i >= 0; i--) {
+    const c = parseAvailabilityConstraints(priors[i], knownColors);
+    if (c.color || c.size || c.width) { immediateAvailIdx = i; break; }
+  }
   for (let i = priors.length - 1; i >= 0; i--) {
     const c = parseAvailabilityConstraints(priors[i], knownColors);
     if (!acc.color && c.color) acc.color = c.color;
     if (!acc.size && c.size) acc.size = c.size;
-    if (!acc.width && c.width) acc.width = c.width;
+    if (!acc.width && c.width && i === immediateAvailIdx) acc.width = c.width;
     if (acc.color && acc.size && acc.width) break;
   }
   return acc;
+}
+
+// INVARIANT detector (stale_width_or_color_applied_to_new_product): true when a
+// width/color appears in the inherited constraints that was NOT stated in the
+// immediate prior availability turn (i.e. it leaked from an older, unrelated
+// turn). After the scoping fix above, width can never leak this way.
+export function staleWidthAppliedAcrossProducts(messages = [], knownColors = []) {
+  const users = (Array.isArray(messages) ? messages : []).filter((m) => m?.role === "user").map(messageText).filter(Boolean);
+  const priors = users.slice(0, -1);
+  let immediate = { color: null, size: null, width: null };
+  for (let i = priors.length - 1; i >= 0; i--) {
+    const c = parseAvailabilityConstraints(priors[i], knownColors);
+    if (c.color || c.size || c.width) { immediate = c; break; }
+  }
+  const inherited = priorAvailabilityConstraints(messages, knownColors);
+  // width leaked if inherited has a width the immediate prior turn did not state.
+  return Boolean(inherited.width && !immediate.width);
 }
 
 // Pull the customer-facing text out of a conversation message (string content

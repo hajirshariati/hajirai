@@ -245,50 +245,111 @@ export function shouldForceSneakerRelevanceFloor(text) {
   return true;
 }
 
-export function detectRejectedCategories(text) {
-  const out = new Set();
-  if (typeof text !== "string" || !text) return out;
-  // Normalize smart/curly apostrophes (U+2018/U+2019/U+02BC) to ASCII so the
-  // contraction-based rejection words match. Live trace 2026-06-29: "shoes …
-  // that don’t look like sneakers" used a curly apostrophe, so `don'?t` never
-  // matched, "sneakers" was NOT rejected, and the search hard-guarded TO
-  // sneakers — the exact opposite of the request. 1:1 char swap preserves
-  // every match offset used below.
-  text = text.replace(/[‘’ʼ]/g, "'");
-  const addRejected = (raw) => {
-    const term = String(raw || "").toLowerCase().replace(/\s+/g, " ").trim();
-    if (!term) return;
-    out.add(term);
-    if (term === "shoes" || term === "shoe" || term === "footwear") {
-      FOOTWEAR_UMBRELLA_MEMBERS.forEach((c) => out.add(c));
-    }
-  };
+// Surface forms of footwear categories — used to find POSITIVE category
+// mentions (a category named OUTSIDE a rejection clause). A positive category
+// must never be rejected, and its presence suppresses the footwear-umbrella
+// expansion so "show me sandals, not shoes" keeps sandals.
+const CATEGORY_SURFACE_RE =
+  /\b(sandals?|sneakers?|trainers?|shoes?|boots?|booties|clogs?|loafers?|slippers?|oxfords?|wedges?|heels?|flats?|mules?|mary[\s-]?janes?|slip[\s-]?ons?|footwear)\b/gi;
+function categoryStem(word) {
+  const t = String(word || "").toLowerCase().replace(/[\s-]+/g, " ").trim();
+  if (!t) return "";
+  // "footwear"/"shoes" are the generic umbrella — never a positive that
+  // suppresses expansion (only a SPECIFIC category like sandals does that).
+  return t.endsWith("s") ? t.slice(0, -1) : t;
+}
+const GENERIC_FOOTWEAR_STEMS = new Set(["shoe", "footwear"]);
+
+// Positive (non-rejected) SPECIFIC footwear category stems stated in the text:
+// every CATEGORY_SURFACE_RE hit whose position is NOT inside a rejection span.
+function positiveFootwearCategoryStems(text, rejectSpans) {
+  const stems = new Set();
+  CATEGORY_SURFACE_RE.lastIndex = 0;
+  let cm;
+  while ((cm = CATEGORY_SURFACE_RE.exec(text)) !== null) {
+    const pos = cm.index;
+    const inReject = rejectSpans.some(([s, e]) => pos >= s && pos < e);
+    if (inReject) continue;
+    const stem = categoryStem(cm[1]);
+    if (stem && !GENERIC_FOOTWEAR_STEMS.has(stem)) stems.add(stem);
+  }
+  return stems;
+}
+
+// Collect every REJECTED category mention with its absolute span — the primary
+// REJECT_RE match plus any trailing conjunctions ("besides sneakers and
+// sandals"). Spans let the caller tell a positively-named category from a
+// negated one. Normalizes curly apostrophes first so contraction-based
+// rejection words match (live trace 2026-06-29: "don’t look like sneakers").
+function collectRejectedCategoryHits(text) {
+  const t = String(text || "").replace(/[‘’ʼ]/g, "'");
+  const hits = []; // { term, start, end }
+  if (!t) return { text: t, hits };
   REJECT_RE.lastIndex = 0;
   let m;
-  while ((m = REJECT_RE.exec(text)) !== null) {
-    const term = m[1].toLowerCase().replace(/\s+/g, " ").trim();
-    // Skip when the captured category sits inside an inclusive
-    // context — "any/all type of <category>" is the customer
-    // saying ANY of those is acceptable, not rejecting them.
+  while ((m = REJECT_RE.exec(t)) !== null) {
     const matchEnd = m.index + m[0].length;
     const termStart = matchEnd - m[1].length;
-    const before = text.substring(m.index, termStart);
-    if (INCLUSIVE_CONTEXT_BEFORE_CATEGORY_RE.test(before)) continue;
-    addRejected(term);
-
-    // A single rejection clause can name several categories:
-    // "besides sneakers and sandals". The primary regex intentionally
-    // captures the first category; continue through conjunctions in the
-    // same clause so later categories cannot become positive constraints.
-    let cursor = m.index + m[0].length;
-    while (cursor < text.length) {
-      const next = text.slice(cursor).match(FOLLOWING_REJECTED_CATEGORY_RE);
+    // Skip an inclusive context — "any/all type of <category>" accepts, not rejects.
+    if (INCLUSIVE_CONTEXT_BEFORE_CATEGORY_RE.test(t.substring(m.index, termStart))) continue;
+    hits.push({ term: m[1].toLowerCase().replace(/\s+/g, " ").trim(), start: termStart, end: matchEnd });
+    let cursor = matchEnd;
+    while (cursor < t.length) {
+      const next = t.slice(cursor).match(FOLLOWING_REJECTED_CATEGORY_RE); // anchored ^ → next.index === 0
       if (!next) break;
-      addRejected(next[1]);
+      hits.push({ term: next[1].toLowerCase().replace(/\s+/g, " ").trim(), start: cursor, end: cursor + next[0].length });
       cursor += next[0].length;
     }
   }
-  return out;
+  return { text: t, hits };
+}
+
+// Parse a turn's category intent into POSITIVE (specific categories named
+// OUTSIDE any rejection) and REJECTED (negated categories, positive-aware).
+// THE single source of truth for the negation fix + its invariant. A positive
+// category is never rejected, and its presence suppresses the "shoes"/"footwear"
+// umbrella expansion so "Now only show me sandals, not shoes" keeps sandals.
+export function parseCategoryConstraints(text) {
+  const { text: t, hits } = collectRejectedCategoryHits(text);
+  const positive = positiveFootwearCategoryStems(t, hits.map((h) => [h.start, h.end]));
+  const expandUmbrella = positive.size === 0;
+  const rejected = new Set();
+  for (const { term } of hits) {
+    if (!term || positive.has(categoryStem(term))) continue; // never reject a positive category
+    rejected.add(term);
+    // "shoes" rejects the generic umbrella TOKEN "footwear" too, so the resolver
+    // can't pick category=footwear from the word "shoes" while the customer
+    // positively asked for sandals ("not shoes" → category must resolve to
+    // sandals, never footwear). This is NOT the member-expansion (sandals etc.)
+    // — only the umbrella canonical, which never collides with a specific
+    // positive category.
+    if (term === "shoes" || term === "shoe") rejected.add("footwear");
+    if (expandUmbrella && (term === "shoes" || term === "shoe" || term === "footwear")) {
+      FOOTWEAR_UMBRELLA_MEMBERS.forEach((c) => {
+        if (!positive.has(categoryStem(c))) rejected.add(c);
+      });
+    }
+  }
+  return { positive, rejected };
+}
+
+export function detectRejectedCategories(text) {
+  if (typeof text !== "string" || !text) return new Set();
+  return parseCategoryConstraints(text).rejected;
+}
+
+// INVARIANT detector (current_turn_negation_corrupted_positive_category): true
+// when a category the customer named POSITIVELY this turn also ended up in the
+// rejected set — i.e. negation parsing corrupted a positive constraint. After
+// the positive-aware fix above this must be false for "show me sandals, not
+// shoes".
+export function negationCorruptedPositiveCategory(text) {
+  const { positive, rejected } = parseCategoryConstraints(text);
+  if (positive.size === 0) return false;
+  for (const r of rejected) {
+    if (positive.has(categoryStem(r))) return true;
+  }
+  return false;
 }
 
 /**

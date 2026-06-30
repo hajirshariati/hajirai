@@ -1269,6 +1269,14 @@ export function preExtractAnswers(rawText, tree) {
  * message first, latest user message last — so the latest signal
  * wins on conflict (matches "the customer just said X" semantics).
  */
+// Explicit ABANDONMENT of the orthotic flow ("changed my mind", "not
+// orthotics", "shoes instead, not orthotics"). When this appears, all
+// accumulated orthotic answers are stale and must be dropped so the guided flow
+// doesn't silently re-engage with the old state. Kept local (no gate import) to
+// avoid a cycle; the gate exports the same detector for its own defer decision.
+export const ORTHOTIC_ABANDON_RE =
+  /\b(?:changed?\s+my\s+mind|never\s*mind|forget\s+(?:the\s+)?orthotics?|not\s+orthotics?|no\s+orthotics?|don'?t\s+(?:want|need)\s+(?:an?\s+)?orthotics?|instead\s+of\s+(?:an?\s+)?orthotics?)\b/i;
+
 export function accumulateAnswers(messages, tree) {
   const out = {};
   if (!tree || !Array.isArray(tree.nodes)) return out;
@@ -1277,6 +1285,11 @@ export function accumulateAnswers(messages, tree) {
     if (!msg || msg.role !== "user") continue;
     const text = typeof msg.content === "string" ? msg.content : "";
     if (!text) continue;
+    // Pivot AWAY from orthotics: wipe accumulated state (unless later restated).
+    if (ORTHOTIC_ABANDON_RE.test(text)) {
+      for (const k of Object.keys(out)) delete out[k];
+      continue;
+    }
     const turn = preExtractAnswers(text, tree);
     // Pivot watermark. When this turn names a NEW subject (different
     // gender from what we accumulated up to here), the prior subject's

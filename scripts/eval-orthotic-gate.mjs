@@ -17,6 +17,7 @@ import {
   seedQuestionEmissionCount,
   priorTurnWasOrthoticSeedQuestion,
   orthoticPendingFlowDecision,
+  isOrthoticAbandonment,
 } from "../app/lib/orthotic-flow-gate.server.js";
 import { scopeAttributesToTurn, detectShoeEnvironmentUseCase, messageStatesUseCase, messageStatesShoeEnvironment } from "../app/lib/turn-scope.js";
 import { extractUserConstraints } from "../app/lib/catalog-resolver.server.js";
@@ -1880,9 +1881,11 @@ await test("TurnPlan-owned workflows (display_recovery/product_focus/availabilit
   }
 });
 
-await test("loop cap: the same seed question is never emitted a 3rd time", async () => {
-  // q_use_case already went out TWICE; a third turn (even plain gibberish, not a
-  // confusion/hostility trigger) must defer instead of repeating it again.
+await test("loop cap: 3rd time → safe general orthotic recommendation, NOT a resolver fallthrough", async () => {
+  // q_use_case already went out TWICE; a third turn (even plain gibberish) must
+  // NOT repeat the question. Class 4: instead of deferring to the LLM/resolver
+  // (which surfaces sneakers/stale products), the gate OWNS the turn with a safe
+  // general orthotic recommendation + caveat — no third question, no fallthrough.
   const { events, encoder, controller } = makeMockSse();
   const messages = [
     { role: "user", content: "I need orthotics" },
@@ -1894,9 +1897,30 @@ await test("loop cap: the same seed question is never emitted a 3rd time", async
     { role: "user", content: "qwerty zzz" },
   ];
   const out = await maybeRunOrthoticFlow({ messages, tree, shop: "test.myshopify.com", controller, encoder });
-  assert.equal(out.handled, false);
+  assert.equal(out.handled, true, "gate must OWN the turn (no resolver fallthrough)");
+  assert.equal(out.case, "seed_loop_cap_safe_recommendation");
   const thirdEmit = events.some((e) => e?.type === "text" && /What kind of shoes will the orthotics go in/i.test(e.text || ""));
-  assert.equal(thirdEmit, false, "third identical emission must be blocked by the loop cap");
+  assert.equal(thirdEmit, false, "third identical question emission must be blocked by the loop cap");
+  const reco = events.find((e) => e?.type === "text");
+  assert.ok(reco && /orthotic/i.test(reco.text) && /general suggestion|not a medical/i.test(reco.text), "must give a safe general orthotic recommendation with caveat");
+  const products = events.find((e) => e?.type === "products");
+  assert.ok(!products || (products.products || []).length === 0, "must not surface any (sneaker/stale) product cards");
+});
+
+await test("orthotic abandonment ('shoes instead, not orthotics') defers + clears state", async () => {
+  const { events, encoder, controller } = makeMockSse();
+  const messages = [
+    { role: "user", content: "I need orthotics" },
+    { role: "assistant", content: "Who are these orthotics for? <<Men>><<Women>><<Kids>>" },
+    { role: "user", content: "men" },
+    { role: "assistant", content: useCaseQ },
+    { role: "user", content: "show me shoes instead, not orthotics" },
+  ];
+  const out = await maybeRunOrthoticFlow({ messages, tree, shop: "test.myshopify.com", controller, encoder });
+  assert.equal(out.handled, false, "must defer to footwear routing");
+  assert.equal(out.case, "orthotic_abandoned_pivot_to_footwear");
+  assert.equal(isOrthoticAbandonment("show me shoes instead, not orthotics"), true);
+  assert.equal(isOrthoticAbandonment("I'll use them in Hoka sneakers for walking"), false);
 });
 
 // ── Shoes-vs-orthotics decision + one-step guided orthotic finder ────────────

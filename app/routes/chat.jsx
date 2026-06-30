@@ -7,7 +7,7 @@ import { getActiveCampaigns, formatCampaignsForCS } from "../models/Campaign.ser
 import { buildSystemPrompt } from "../lib/chat-prompt.server";
 import { planTurn, buildTurnPlanPromptBlock, buildPlanClarifierRepair, planForcesProductDisplay, planRequiresSearch as planRequiresSearchFlag, clarifierGateDecision, isAnswerWorkflow, plannedWorkflowCardOwnerViolation, plannedSearchSkippedViolation, cardsNotInEvidencePool, textPresentsProducts, workflowDisablesTools, resolvedFamilyGender, isStrippedFragmentText, isOrthoticProductCard, messageExplicitlyAsksForShoes } from "../lib/turn-plan.server";
 import { recordTurnInvariantViolation, logTurnInvariant } from "../lib/turn-invariant.server";
-import { classifyAvailability, buildAvailabilityAnswer, AVAILABILITY_RESULT, resolveAvailabilityRequest, isAvailabilityFollowUp, familyOfTitle, collectFamilyColors, constraintIntent, parseAvailabilityConstraints, parseRequestedColors, priorAvailabilityMessage, priorAvailabilityConstraints, variantDataDiagnostics, styleKeyOfTitle, styleNameOfTitle } from "../lib/availability-truth";
+import { classifyAvailability, buildAvailabilityAnswer, AVAILABILITY_RESULT, resolveAvailabilityRequest, isAvailabilityFollowUp, familyOfTitle, collectFamilyColors, constraintIntent, parseAvailabilityConstraints, parseRequestedColors, priorAvailabilityMessage, priorAvailabilityConstraints, variantDataDiagnostics, styleKeyOfTitle, styleNameOfTitle, availabilityTextCardColorMismatch } from "../lib/availability-truth";
 import { detectSupportHandoffNeed, buildSupportHandoffText, supportConfigured, normalizedSupportLabel, supportChatLabel } from "../lib/support-handoff";
 import { extractConstraintPlan, cardMatchesSlotCategory, multiRecoTextCardMismatch, slotSearchCategory } from "../lib/constraint-plan";
 import { detectProcessNarration, stripProcessNarration, buildSalesVoiceFallback, SALES_JUDGMENT_WORKFLOWS } from "../lib/sales-voice";
@@ -99,6 +99,8 @@ import {
   dropNonShoppableItems,
   detectComparisonIntent,
   resolveFocusedCardByName,
+  parseCategoryConstraints,
+  negationCorruptedPositiveCategory,
 } from "../lib/chat-postprocessing";
 import {
   finalizeOutboundReply,
@@ -4473,11 +4475,42 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       : finalCount > 0 ? "scorer" : "none";
     resolvedCardOwner = cardOwner;
     const textCleanupChanged = ownedTextSnapshot != null && ownedTextSnapshot !== fullResponseText;
-    console.log(
-      `[turn-invariant] workflow=${workflow} answerOwner=${answerOwner} cardOwner=${cardOwner} ` +
-      `pinnedCards=${pinnedCount == null ? "-" : pinnedCount} finalCards=${finalCount} ` +
-      `textCleanupChanged=${textCleanupChanged ? "yes" : "no"} path=agentic-loop`,
-    );
+
+    // STATE / SCOPE OWNERSHIP OBSERVABILITY (Class 1-5). Parse this turn's
+    // positive vs negative category constraints + active product context, run
+    // the new hard invariants, and emit one self-explanatory turn record.
+    const firedInvariants = [];
+    const catConstraints = parseCategoryConstraints(ctx?.latestUserMessage || "");
+    if (negationCorruptedPositiveCategory(ctx?.latestUserMessage || "")) {
+      recordTurnInvariantViolation("current_turn_negation_corrupted_positive_category", {
+        positive: [...catConstraints.positive], rejected: [...catConstraints.rejected],
+      });
+      firedInvariants.push("current_turn_negation_corrupted_positive_category");
+    }
+    // availability text ↔ shown-card color truth.
+    if ((workflow === "availability" || workflow === "prior_evidence_availability") && finalCount > 0) {
+      const mismatchColor = availabilityTextCardColorMismatch({
+        text: fullResponseText, cards: finalProductCards,
+        knownColors: Array.isArray(ctx?.catalogColorList) ? ctx.catalogColorList : [],
+      });
+      if (mismatchColor) {
+        recordTurnInvariantViolation("availability_text_card_color_mismatch", { color: mismatchColor });
+        firedInvariants.push("availability_text_card_color_mismatch");
+      }
+    }
+    const activeProductCtx = ctx?.focusProduct
+      ? { family: titleStyleFamily(ctx.focusProduct.title || ""), title: ctx.focusProduct.title }
+      : null;
+    logTurnInvariant({
+      workflow, answerOwner, cardOwner, finalCards: finalCount, path: "agentic-loop",
+      activeOwner: answerOwner,
+      activeProductContext: activeProductCtx,
+      positiveConstraints: [...catConstraints.positive],
+      negativeConstraints: [...catConstraints.rejected],
+      finalCardOwner: cardOwner,
+      invariantFired: firedInvariants,
+      extra: `pinnedCards=${pinnedCount == null ? "-" : pinnedCount} textCleanupChanged=${textCleanupChanged ? "yes" : "no"}`,
+    });
     if ((workflow === "availability" || workflow === "comparison") && pinnedCount != null && finalCount !== pinnedCount) {
       recordTurnInvariantViolation("pinned_cards_mutated", { workflow, pinned: pinnedCount, final: finalCount });
     }

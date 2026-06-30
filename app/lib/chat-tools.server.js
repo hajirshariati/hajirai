@@ -1553,22 +1553,24 @@ const isExcludedByRule = (p) => {
     } else if (
       afterGender.length === 0 &&
       beforeGenderFilter > 0 &&
-      (wantedCatalogTerms.length > 0 || !effectiveCategory)
+      wantedCatalogTerms.length > 0
     ) {
-      // Fail-open for term/informational queries. Live trace 2026-06-10:
-      // "Tell me about BioRocker" carried a stale gender=men from the
-      // prior turn; 15 products had literal "bio rocker" evidence in
-      // their descriptions — ALL women's — and the gender filter wiped
-      // them to zero, so the bot denied a technology the catalog
-      // documents. When the customer asked about a TERM (catalog
-      // requirement evidence) or gave no category at all, wrong-gender
-      // evidence beats no evidence. relaxedFilters tells the model to
-      // frame it honestly ("BioRocker appears in our women's styles").
-      // Category-constrained product requests (e.g. "men's boots") keep
-      // the hard wipe — showing the opposite gender's boots is worse.
+      // Fail-open ONLY for catalog-TERM/informational lookups. Live trace
+      // 2026-06-10: "Tell me about BioRocker" carried a stale gender=men; 15
+      // products had literal "bio rocker" evidence — ALL women's — and the
+      // gender filter wiped them to zero, so the bot denied a technology the
+      // catalog documents. For a TERM-evidence question, wrong-gender evidence
+      // beats no evidence (relaxedFilters frames it honestly: "BioRocker
+      // appears in our women's styles").
+      //
+      // PRODUCT browses (no catalog term) NEVER fail open — a hard gender
+      // filter must not surface the opposite gender's products (Class 1 fix):
+      // "women's sandals" that wipe to zero return 0 gender-correct products so
+      // the caller offers closest matches / refine, never men's sandals. This
+      // is the `else` branch below (filtered = afterGender = []).
       console.log(
         `[search]   gender filter ${eg}: WIPED ALL ${beforeGenderFilter} → fail-open ` +
-          `(${wantedCatalogTerms.length > 0 ? "catalog-term evidence" : "no category constraint"}); flagging relaxedFilters.gender`,
+          `(catalog-term evidence); flagging relaxedFilters.gender`,
       );
       relaxedFilters = {
         ...(relaxedFilters || {}),

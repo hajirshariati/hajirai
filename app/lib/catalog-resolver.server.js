@@ -543,13 +543,18 @@ export const RESOLVER_COLOR_LEX = {
   black: "black", negro: "black", negra: "black", negros: "black", negras: "black",
   brown: "brown", chocolate: "brown", walnut: "brown", chestnut: "brown", marron: "brown", "marrón": "brown", marrones: "brown", cafe: "brown", "café": "brown", cafes: "brown", "cafés": "brown",
   red: "red", rojo: "red", roja: "red", rojos: "red", rojas: "red",
-  pink: "pink", rose: "pink", coral: "pink", rosa: "pink", rosas: "pink",
-  blue: "blue", denim: "blue", azul: "blue", azules: "blue",
+  pink: "pink", rose: "pink", coral: "pink", rosa: "pink", rosas: "pink", blush: "pink", fuchsia: "pink", magenta: "pink",
+  blue: "blue", denim: "blue", azul: "blue", azules: "blue", teal: "blue", turquoise: "blue", cobalt: "blue",
   green: "green", olive: "green", sage: "green", verde: "green", verdes: "green",
   yellow: "yellow", mustard: "yellow", honey: "yellow", amarillo: "yellow", amarilla: "yellow", amarillos: "yellow", amarillas: "yellow",
-  orange: "orange", naranja: "orange", naranjas: "orange",
-  purple: "purple", violet: "purple", morado: "purple", morada: "purple", morados: "purple", moradas: "purple", violeta: "purple", violetas: "purple",
-  gold: "gold", silver: "silver", bronze: "bronze", taupe: "taupe",
+  orange: "orange", naranja: "orange", naranjas: "orange", rust: "orange",
+  purple: "purple", violet: "purple", morado: "purple", morada: "purple", morados: "purple", moradas: "purple", violeta: "purple", violetas: "purple", lavender: "purple", plum: "purple", mauve: "purple",
+  // Metallics / neutrals / specialty Aetrex finishes. "champagne" was a live
+  // bug: absent from the lexicon, it slipped through as a named PRODUCT FAMILY
+  // ("Does Jillian come in champagne?" → search query="champagne").
+  gold: "gold", silver: "silver", bronze: "bronze", taupe: "taupe", pewter: "silver",
+  champagne: "champagne", nude: "nude", beige: "beige", khaki: "khaki", stone: "stone",
+  metallic: "metallic", leopard: "leopard", animal: "leopard", snake: "snake",
 };
 const RESOLVER_GENDER_LEX = {
   "men's": "men", mens: "men", men: "men", male: "men", man: "men", guy: "men", guys: "men",
@@ -780,8 +785,13 @@ export function extractUserConstraints(message) {
 // Returns the matching product handle, or null when zero or
 // multiple candidates survive.
 const SPECIFIC_PRODUCT_STOPWORDS = new Set([
-  // colors
+  // colors — BOTH the canonical values AND every surface key (rose, denim,
+  // champagne, blush, …). A color word must NEVER read as a named product
+  // family: live trace — "Does Jillian come in rose or champagne?" extracted
+  // families=[champagne] (champagne wasn't a known color) and searched it as a
+  // product, surfacing the wrong "Jillian Denim" card under a "Rose" answer.
   ...Object.values(RESOLVER_COLOR_LEX),
+  ...Object.keys(RESOLVER_COLOR_LEX),
   // genders
   ...Object.values(RESOLVER_GENDER_LEX),
   // categories — BOTH the singular/plural surface forms (keys: "sneaker",

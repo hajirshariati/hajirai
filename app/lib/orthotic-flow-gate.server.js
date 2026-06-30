@@ -452,6 +452,37 @@ function humanizeCondition(value) {
   return key.replace(/_/g, " ");
 }
 
+// Explicit ABANDONMENT of the orthotic flow ("changed my mind", "not
+// orthotics", "shoes instead, not orthotics"). When the customer pivots away
+// the gate must DEFER (route to normal footwear) and the accumulated orthotic
+// state is cleared (accumulateAnswers handles the wipe). Mirrors
+// ORTHOTIC_ABANDON_RE in orthotic-flow.server.js.
+const ORTHOTIC_ABANDON_GATE_RE =
+  /\b(?:changed?\s+my\s+mind|never\s*mind|forget\s+(?:the\s+)?orthotics?|not\s+orthotics?|no\s+orthotics?|don'?t\s+(?:want|need)\s+(?:an?\s+)?orthotics?|instead\s+of\s+(?:an?\s+)?orthotics?)\b/i;
+export function isOrthoticAbandonment(text) {
+  return ORTHOTIC_ABANDON_GATE_RE.test(String(text || ""));
+}
+
+// A safe, GENERAL orthotic recommendation with an explicit caveat — emitted at
+// the seed-question loop cap so a stuck flow stays ORTHOTIC-OWNED instead of
+// falling through to the resolver/LLM (which would surface sneakers/stale
+// products). Text-only (no card) by design: we never resolved a specific SKU.
+function buildSafeGeneralOrthoticText(answers = {}) {
+  const a = answers || {};
+  const bits = [];
+  const g = humanizeGender(a.gender);
+  if (g) bits.push(g);
+  const u = humanizeUseCase(a.useCase);
+  if (u) bits.push(u);
+  const ctx = bits.filter(Boolean).join(" / ");
+  return (
+    `No problem — based on what you've shared${ctx ? ` (${ctx})` : ""}, a versatile full-length ` +
+    `orthotic with medium arch support is a safe starting point: it suits most foot types and fits ` +
+    `everyday footwear with a removable insole. If you can tell me your arch type or any specific ` +
+    `foot pain, I'll narrow it to the best exact match. (This is a general suggestion, not a medical fitting.)`
+  );
+}
+
 function humanizeUseCase(value) {
   const map = {
     athletic: "athletic shoes",
@@ -919,6 +950,18 @@ export async function maybeRunOrthoticFlow({
         `deferring to normal product routing`,
     );
     return { handled: false, case: "pending_flow_cancelled_fresh_request" };
+  }
+
+  // ABANDONMENT: the customer explicitly pivoted away from orthotics ("shoes
+  // instead, not orthotics", "changed my mind"). Clear the flow (accumulateAnswers
+  // wipes the accumulated state) and defer so the turn routes as normal footwear.
+  // Re-engages only if the customer later restates an orthotic intent.
+  if (isOrthoticAbandonment(latestUserText)) {
+    console.log(
+      `[orthotic-flow] orthotic flow ABANDONED ("${String(latestUserText).slice(0, 50)}") — ` +
+        `clearing orthotic state, deferring to footwear routing`,
+    );
+    return { handled: false, case: "orthotic_abandoned_pivot_to_footwear" };
   }
 
   // ── SHOES-vs-ORTHOTICS open decision ──────────────────────────────────
@@ -2613,11 +2656,18 @@ export async function maybeRunOrthoticFlow({
     // than the old "asked twice in a row" detector that was removed for being
     // too aggressive: it allows two emissions and only blocks the third.
     if (seedQuestionEmissionCount(messages, step.node) >= 2) {
+      // Owns end-to-end: rather than deferring to the LLM/resolver (which would
+      // surface sneakers/stale products), give a SAFE GENERAL orthotic
+      // recommendation with a caveat and stay orthotic-owned (Class 4 fix).
+      const safeText = buildSafeGeneralOrthoticText(answers);
       console.log(
-        `[orthotic-flow] loop cap: seed question ${step.node.id} already emitted 2× — ` +
-          `deferring to LLM rather than repeating it a third time`,
+        `[orthotic-flow] loop cap: seed question ${step.node.id} emitted 2× — ` +
+          `safe general orthotic recommendation (orthotic-owned, no resolver fallthrough)`,
       );
-      return { handled: false, case: "seed_loop_cap" };
+      controller.enqueue(encoder.encode(sseChunk({ type: "text", text: safeText })));
+      controller.enqueue(encoder.encode(sseChunk({ type: "products", products: [] })));
+      controller.enqueue(encoder.encode(sseChunk({ type: "done" })));
+      return { handled: true, case: "seed_loop_cap_safe_recommendation" };
     }
 
     const text = renderQuestionText(step.node, answers, tree, {

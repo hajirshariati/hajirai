@@ -76,6 +76,25 @@ export function supportChatLabel(ctx) {
 // explicitly asked for a human (handled before this guard).
 const CLARIFY_WORKFLOWS = new Set(["clarification", "sizing_help"]);
 
+// Catalog discovery workflows. A 0-card result here is a NO-MATCH to refine
+// (closest matches / "tell me more"), NEVER a support handoff. Only true
+// order/support/policy turns or repeated unrecoverable failures reach a human.
+// Class 5 fix: "show me sandals, not shoes" returned 0 cards (over-rejection,
+// now fixed in Class 1) and hard-handed-off to support — wrong for a browse.
+const CATALOG_BROWSE_WORKFLOWS = new Set([
+  "browse", "sale_browse", "condition_recommendation", "multi_recommendation",
+]);
+
+// INVARIANT detector (handoff_on_catalog_browse): a HARD support handoff must
+// never be the answer to a normal catalog browse/search turn (other than the
+// always-valid explicit-human / repeated-frustration / validation-failed
+// reasons, which are intent-driven not browse-driven).
+export function handoffOnCatalogBrowse({ mode = null, reason = "", workflow = "" } = {}) {
+  if (mode !== "hard") return false;
+  if (["explicit_human_request", "repeated_frustration", "validation_failed"].includes(reason)) return false;
+  return CATALOG_BROWSE_WORKFLOWS.has(String(workflow || ""));
+}
+
 // Decide whether this turn needs a handoff, and which mode.
 //   { mode: "hard", reason }  — no reliable answer / no useful cards → replace
 //   { mode: "soft", reason }  — partial answer with a card → keep card, add line
@@ -133,7 +152,15 @@ export function detectSupportHandoffNeed({
   // detail (width not tracked, can't verify size from the data). Keep the card.
   if (hasCards && PARTIAL_RE.test(t)) return { mode: "soft", reason: "partial_availability" };
 
+  // 4b. Catalog browse/search with no cards is a NO-MATCH to REFINE, never a
+  // hard support handoff (Class 5). The explicit-human / repeated-frustration /
+  // validation-failed escalations above already covered the real support cases.
+  if (!hasCards && CATALOG_BROWSE_WORKFLOWS.has(wf)) {
+    return { mode: null, reason: "catalog_no_match_refine" };
+  }
+
   // 2/4. Hard dead-end: non-answer text AND no useful cards to fall back on.
+  // (Reached only for non-browse workflows now — policy_account, customer_service, …)
   if (!hasCards && DEAD_END_RE.test(t)) {
     return { mode: "hard", reason: wf === "policy_account" ? "policy_no_answer" : "dead_end_no_answer" };
   }
