@@ -2437,6 +2437,72 @@ export function repairProductResponseText({ text, pool = [], ctx = {}, relaxedFi
   };
 }
 
+// A cards-shown denial is ACCEPTABLE only when the reply explicitly pivots the
+// shown cards into alternatives ("I couldn't find an exact red one, but here are
+// similar styles."). The pivot words below mark that framing; without one, a
+// no-match sentence sitting above real product cards just reads as a broken
+// contradiction ("I'm not seeing any options" → 4 cards underneath).
+const ALTERNATIVES_FRAME_RE =
+  /\b(?:but|instead|however|that said|alternativ\w*|similar|closest|comparable|in the meantime|you\s+might\s+(?:also\s+)?(?:like|enjoy|consider)|here\s+are\s+some\s+other|how\s+about\s+(?:these|this|those)|as\s+an?\s+alternative|in\s+(?:its|their)\s+place|other\s+options?\s+(?:you|to))\b/i;
+
+// True when a no-match reply frames the shown cards as explicit alternatives.
+export function denialIsAlternativesFramed(text) {
+  const t = String(text || "");
+  if (!detectAiNoMatchPhrasing(t)) return false;
+  return ALTERNATIVES_FRAME_RE.test(t);
+}
+
+// Deterministic POSITIVE rewrite for the denial_with_products contract breach.
+// When product cards ARE shown, the reply must not say "I couldn't find" /
+// "I'm not seeing" unless those cards are explicitly framed as alternatives.
+// This runs on the live (LLM-owns-turn) path — where repairProductResponseText
+// deliberately bails — so a contradictory denial is rewritten to positive
+// framing instead of merely warned about. Returns { text, changed, reason }.
+//
+// Exemptions (these are HONEST cards-shown denials, left untouched):
+//   - availabilityPartial: a width/size partial verdict shown with its card.
+//   - cardOwner === "prior-evidence": the closest-match broaden owns positive
+//     wording already (and is exempt from the contract warning too).
+//   - answerOwner is a terminal deterministic owner (availability-truth /
+//     compatibility-truth) that authored intentional honest text.
+//   - the denial is explicitly alternatives-framed.
+const TERMINAL_DENIAL_SAFE_OWNERS = new Set(["availability-truth", "compatibility-truth", "prior-evidence"]);
+export function rewriteDenialWithProducts({
+  text,
+  products = [],
+  cardOwner = null,
+  answerOwner = null,
+  availabilityResult = null,
+  availabilityReason = null,
+} = {}) {
+  const t = String(text || "");
+  const cards = Array.isArray(products) ? products.filter(Boolean) : [];
+  if (cards.length === 0 || !detectAiNoMatchPhrasing(t)) {
+    return { text: t, changed: false, reason: "no_denial_or_no_cards" };
+  }
+  const availabilityPartial =
+    availabilityResult === "UNKNOWN" && PARTIAL_AVAILABILITY_REASONS.has(String(availabilityReason || ""));
+  if (availabilityPartial) return { text: t, changed: false, reason: "availability_partial" };
+  if (cardOwner === "prior-evidence") return { text: t, changed: false, reason: "prior_evidence_owner" };
+  if (answerOwner && TERMINAL_DENIAL_SAFE_OWNERS.has(answerOwner)) {
+    return { text: t, changed: false, reason: `terminal_owner_${answerOwner}` };
+  }
+  if (denialIsAlternativesFramed(t)) return { text: t, changed: false, reason: "alternatives_framed" };
+
+  // Strip the contradictory no-match sentence(s), keep the rest of the reply.
+  const cleaned = stripAvailabilityDenialSentences(t);
+  let out = cleaned;
+  if (cleaned === t || detectAiNoMatchPhrasing(cleaned) || cleaned.trim().length < 20) {
+    // Nothing substantive survived (the whole reply was the denial) — replace it
+    // with a positive code-owned lead-in keyed to the card count.
+    out = cards.length === 1
+      ? "Here's the closest match I found for you:"
+      : "Here are the closest matches I found for you:";
+  }
+  out = out.trim();
+  return { text: out, changed: out !== t.trim(), reason: "rewritten_positive" };
+}
+
 // Lightweight check — same env-flag rule as
 // app/lib/llm-owns-turn.server.js's isLlmOwnsTurnEnabled(), inlined
 // here to avoid importing the orchestrator into the response-contract

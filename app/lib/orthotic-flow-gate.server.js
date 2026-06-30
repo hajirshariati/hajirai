@@ -60,7 +60,7 @@ import { executeRecommenderTool, normalizeUseCaseForTree } from "./recommender-t
 import { buildStorefrontSearchCTA } from "./storefront-search-cta.server.js";
 import { scrubInternalEnums } from "./chat-postprocessing.js";
 import { detectConversationGoal, detectTurnGoal, INFO_QUESTION_GOALS } from "./turn-intent.server.js";
-import { isShortAmbiguousReply } from "./turn-scope.js";
+import { isShortAmbiguousReply, detectShoeEnvironmentUseCase } from "./turn-scope.js";
 import { isShoesVsOrthoticsDecision, buildShoesVsOrthoticsAnswer, isGuidedOrthoticFinderRequest } from "./compatibility-truth.server.js";
 
 // Format a recommender-returned product the same way chat-tools'
@@ -1300,6 +1300,29 @@ export async function maybeRunOrthoticFlow({
       // For now we keep the original behavior here; the live
       // failure was on the GENDER side, not condition.
       latestExtracted.condition = a.condition;
+    }
+  }
+
+  // Deterministic shoe-environment → use-case capture.
+  // The q_use_case seed question ("What kind of shoes will the orthotics go
+  // in?") is answered in plain footwear language — "Hoka sneakers for
+  // walking", "my work boots", "dress shoes", "closed shoes with
+  // non-removable insoles". Haiku returns useCase=null for all of these
+  // (they aren't in its abstract use-case vocabulary), so without this the
+  // answer reads as content-free and the gate re-asks the same question (and
+  // the turn-scope wipe upstream drops it as a fresh ask). A footwear term is
+  // unambiguously a use-case answer inside the orthotic flow — map it to the
+  // tree's q_use_case vocabulary and treat it as the answer. We only fill
+  // when useCase is still unknown (not already accumulated or classifier-
+  // extracted) so an explicit classifier/chip value always wins.
+  if (!latestExtracted.useCase && !accumulated.useCase) {
+    const envUseCase = detectShoeEnvironmentUseCase(rawUserText);
+    if (envUseCase) {
+      latestExtracted.useCase = envUseCase;
+      console.log(
+        `[orthotic-flow] shoe-environment answer: "${String(rawUserText).slice(0, 48)}" → useCase=${envUseCase} ` +
+          `(deterministic; classifier returned no useCase)`,
+      );
     }
   }
 

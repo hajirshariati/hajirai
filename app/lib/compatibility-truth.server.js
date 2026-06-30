@@ -46,18 +46,43 @@ const UNSUPPORTED_COMPAT_CLAIM_RE = new RegExp(
     "\\borthotics?\\s+(?:in|inside|into|in\\s+to)\\s+(?:open\\s+|your\\s+)?sandals?",
     "\\bsandals?\\s+(?:with|that\\s+have|featuring)\\s+(?:a\\s+)?removable\\s+foot\\s?beds?",
     "\\bremovable\\s+foot\\s?beds?\\b",
-    "\\bdrops?\\s+(?:right\\s+)?in\\b",
+    "\\bdrops?\\s+(?:right\\s+)?in(?:to)?\\b",
     "\\blift[s]?\\s+out\\b",
     "\\bmake[s]?\\s+room\\s+for\\s+(?:the\\s+|an?\\s+|your\\s+)?orthotics?",
     "\\borthotic[-\\s]compatible\\s+sandals?",
     "\\bpop\\s+(?:the\\s+)?orthotics?\\s+in(?:to)?\\b",
+    // VERB phrasings: orthotic … {drop/slide/slip/fit/go/put/insert/place/tuck/set}
+    //   … {in/into/inside} … sandal/open footwear. The literal "orthotics in
+    //   sandals" rule above misses these because a verb sits between the noun and
+    //   the preposition (live miss: "the orthotic drops into the sandal", "slip
+    //   your orthotic into these sandals").
+    "\\borthotics?\\b[^.?!]{0,40}\\b(?:drops?|slides?|slips?|fits?|go(?:es)?|put|inserts?|places?|tucks?|sets?)\\b[^.?!]{0,20}\\b(?:in|into|inside)\\b[^.?!]{0,30}\\b(?:sandals?|slides?|flip[-\\s]?flops?|open[-\\s]?toe[ds]?)\\b",
+    // Same shape, verb BEFORE the noun ("slip your orthotic into these sandals").
+    "\\b(?:drops?|slides?|slips?|fits?|put|inserts?|places?|tucks?|sets?|pops?|wear)\\b[^.?!]{0,20}\\borthotics?\\b[^.?!]{0,20}\\b(?:in|into|inside)\\b[^.?!]{0,30}\\b(?:sandals?|slides?|flip[-\\s]?flops?|open[-\\s]?toe[ds]?)\\b",
+    // Reverse: sandal/open footwear … {take/hold/fit/accommodate/has room for} … orthotic.
+    "\\b(?:sandals?|slides?|flip[-\\s]?flops?|open[-\\s]?toe[ds]?)\\b[^.?!]{0,40}\\b(?:takes?|holds?|fits?|accommodates?|has\\s+room\\s+for|make[s]?\\s+room\\s+for)\\b[^.?!]{0,20}\\borthotics?\\b",
   ].join("|"),
   "i",
 );
 
-// True when the reply contains an unsupported compatibility claim phrase.
+// Negators that flip an otherwise-positive compatibility claim into the CORRECT
+// Aetrex statement ("I would NOT put orthotics in sandals", "these sandals do
+// NOT have a removable footbed"). Such clauses must never be flagged.
+const COMPAT_NEGATOR_RE =
+  /\b(?:not|n['’]t|never|avoid|without|cannot|can['’]?t|won['’]?t|don['’]?t|doesn['’]?t|shouldn['’]?t|wouldn['’]?t|isn['’]?t|aren['’]?t)\b/i;
+
+// True when the reply ASSERTS an unsupported compatibility claim. Evaluated per
+// clause so a negated clause doesn't license a positive-claim rule living in a
+// different clause of the same reply, and so a correctly-negated answer ("I
+// wouldn't put orthotics in sandals") is never blocked.
 export function containsUnsupportedCompatibilityClaim(text) {
-  return UNSUPPORTED_COMPAT_CLAIM_RE.test(String(text || ""));
+  const clauses = String(text || "").split(/[.?!;\n]+|\bbut\b|\bhowever\b|\binstead\b/i);
+  for (const clause of clauses) {
+    if (!clause.trim()) continue;
+    if (COMPAT_NEGATOR_RE.test(clause)) continue; // negated → correct statement, not a violation
+    if (UNSUPPORTED_COMPAT_CLAIM_RE.test(clause)) return true;
+  }
+  return false;
 }
 
 // EXPLICIT catalog/product evidence that a SPECIFIC product really is

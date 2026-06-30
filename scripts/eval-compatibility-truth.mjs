@@ -72,6 +72,40 @@ test("2. unsupported-claim phrases caught; safe answer is clean", () => {
   assert.ok(!containsUnsupportedCompatibilityClaim(buildOrthoticCompatibilityAnswer()), "safe answer must be clean");
 });
 
+// 2b ─ VERB-phrasing claims ("orthotics drop into sandals") + negation guard ────
+test("2b. verb-phrasing 'drop/slide/slip into sandals' caught; negated statements allowed", () => {
+  // The user-reported shape the literal "orthotics in sandals" rule missed —
+  // a verb sits between the noun and the preposition. The model must NOT be able
+  // to claim "orthotics drop into sandals" unsupported.
+  const asserts = [
+    "Yes — the orthotics drop into the sandals easily.",
+    "The orthotic slides into the sandal.",
+    "You can slip your orthotic into these sandals.",
+    "Orthotics fit into our sandals.",
+    "Just wear your orthotic in a sandal.",
+    "These sandals take an orthotic.",
+    "Our sandals accommodate an orthotic.",
+  ];
+  for (const t of asserts) assert.ok(containsUnsupportedCompatibilityClaim(t), `must catch: ${t}`);
+
+  // Negated / correct statements must NOT be flagged (the deterministic owner
+  // and a careful LLM both say these — blocking them would force needless retries).
+  const correct = [
+    "I would not put orthotics inside sandals.",
+    "These sandals do not have a removable footbed for an orthotic.",
+    "Orthotics belong in closed shoes, not sandals.",
+    "For a sandal, choose built-in arch support instead of inserting an orthotic.",
+    "I wouldn't recommend slipping an orthotic into a sandal.",
+    buildOrthoticCompatibilityAnswer(),
+  ];
+  for (const t of correct) assert.ok(!containsUnsupportedCompatibilityClaim(t), `must NOT flag (negated/correct): ${t}`);
+
+  // End-to-end through the grounding validator: the verb-phrasing claim blocks.
+  const blocked = validateGrounding({ text: "Yes, the orthotics drop into our sandals.", pool: [], workflow: "compatibility" });
+  assert.equal(blocked.ok, false);
+  assert.ok(blocked.errors.some((e) => e.kind === "unsupported_compatibility_claim"));
+});
+
 // 3 ── explicit per-SANDAL evidence unlocks the claim; closed shoes never do ────
 test("3. removable-footbed evidence counts only on a SANDAL, never a closed shoe", () => {
   const sandalEvidence = { title: "Maui Slide", description: "Features a removable footbed that accommodates an orthotic." };

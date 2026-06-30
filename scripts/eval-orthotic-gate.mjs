@@ -17,7 +17,7 @@ import {
   seedQuestionEmissionCount,
   priorTurnWasOrthoticSeedQuestion,
 } from "../app/lib/orthotic-flow-gate.server.js";
-import { scopeAttributesToTurn } from "../app/lib/turn-scope.js";
+import { scopeAttributesToTurn, detectShoeEnvironmentUseCase, messageStatesUseCase, messageStatesShoeEnvironment } from "../app/lib/turn-scope.js";
 import { looksLikeFunctionalQuestion, looksLikeTransactionalQuestion } from "../app/lib/orthotic-flow.server.js";
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -1955,11 +1955,93 @@ await test("seed-question answer ('hoka sneakers') keeps use-case — no fresh-a
   const attrs = { gender: "women", category: "orthotics", useCase: "athletic_running", condition: null };
   const keptFollowUp = scopeAttributesToTurn(attrs, "hoka sneakers", { isFollowUp: true });
   assert.equal(keptFollowUp.useCase, "athletic_running", "use-case must survive when answering the seed question");
-  // Control: WITHOUT the follow-up signal (a true fresh ask), the same message
-  // would wipe the use-case — proving the regex alone is insufficient and the
-  // pending-seed signal is what prevents the loop.
-  const wipedFresh = scopeAttributesToTurn(attrs, "hoka sneakers", { isFollowUp: false });
-  assert.equal(wipedFresh.useCase, null, "without the seed signal the regex wipes it (the original bug)");
+  // Defense in depth: the deterministic shoe-environment detector now also
+  // recognizes "hoka sneakers" as a use-case statement, so even a TRUE fresh
+  // ask (no seed signal) keeps the use-case rather than wiping it. Two
+  // independent guards now prevent the original loop — the pending-seed signal
+  // AND the shoe-environment word coverage in messageStatesUseCase.
+  const keptFresh = scopeAttributesToTurn(attrs, "hoka sneakers", { isFollowUp: false });
+  assert.equal(keptFresh.useCase, "athletic_running", "shoe-environment detector keeps the use-case even on a fresh ask");
+});
+
+// ── Deterministic shoe-environment → use-case detector ───────────────────────
+await test("detectShoeEnvironmentUseCase maps the required footwear terms to tree use-cases", () => {
+  // Every value returned must be a real q_use_case chip value in the tree.
+  const useCaseNode = definition.nodes.find((n) => n.attribute === "useCase");
+  const validValues = new Set((useCaseNode.chips || []).map((c) => c.value));
+  const cases = [
+    ["hoka sneakers for walking", "athletic_running"],
+    ["I'll use them in Hoka sneakers for walking", "athletic_running"],
+    ["running shoes", "athletic_running"],
+    ["my Nike sneakers", "athletic_general"],
+    ["just sneakers", "athletic_general"],
+    ["at the gym", "athletic_training"],
+    ["my work boots", "work_all_day"],
+    ["I'm on my feet all day at work", "work_all_day"],
+    ["winter boots", "winter_boots"],
+    ["just boots", "winter_boots"],
+    ["dress shoes", "dress"],
+    ["premium dress shoes", "dress_premium"],
+    ["closed shoes", "casual"],
+    ["everyday casual shoes", "casual"],
+    ["dress shoes with non-removable insoles", "dress_no_removable"],
+    ["glued-in insoles", "dress_no_removable"],
+    ["soccer cleats", "cleats"],
+    ["hockey skates", "skates"],
+  ];
+  for (const [text, expected] of cases) {
+    const got = detectShoeEnvironmentUseCase(text);
+    assert.equal(got, expected, `"${text}" → ${got} (expected ${expected})`);
+    assert.ok(validValues.has(got), `"${got}" must be a real q_use_case chip value`);
+  }
+});
+
+await test("detectShoeEnvironmentUseCase returns null for non-footwear text", () => {
+  for (const text of ["", "women's orthotics", "I have plantar fasciitis", "how much do they cost", "thanks"]) {
+    assert.equal(detectShoeEnvironmentUseCase(text), null, `"${text}" should not be a shoe-environment answer`);
+  }
+});
+
+await test("messageStatesUseCase now recognizes shoe-environment terms (no scope wipe)", () => {
+  assert.equal(messageStatesShoeEnvironment("hoka sneakers"), true);
+  assert.equal(messageStatesUseCase("hoka sneakers"), true);
+  assert.equal(messageStatesUseCase("dress shoes"), true);
+  assert.equal(messageStatesUseCase("non-removable insoles"), true);
+  // And the legacy use-case words still match.
+  assert.equal(messageStatesUseCase("for the gym"), true);
+  assert.equal(messageStatesUseCase("women's orthotics"), false);
+});
+
+await test("gate captures a free-text shoe-type answer to q_use_case and advances (no re-ask loop)", async () => {
+  // Full flow: gender already collected, assistant asked the shoe-type seed
+  // question, customer answers "I'll use them in Hoka sneakers for walking".
+  // The gate must set useCase=athletic_running deterministically and move ON
+  // to the next unanswered question (condition/arch) — NOT re-ask q_use_case.
+  const messages = [
+    { role: "user", content: "Help me choose the right Aetrex orthotic." },
+    { role: "assistant", content: "Who are these orthotics for?" },
+    { role: "user", content: "Women's orthotics." },
+    { role: "assistant", content: "What kind of shoes will the orthotics go in?" },
+    { role: "user", content: "I'll use them in Hoka sneakers for walking." },
+  ];
+  const { encoder, controller } = makeMockSse();
+  const cap = captureConsoleLogs();
+  try {
+    await maybeRunOrthoticFlow({
+      messages,
+      tree,
+      shop: "test-shop",
+      controller,
+      encoder,
+      classifiedIntent: { intent: "recommend_orthotic", attributes: { gender: "Women" } },
+    });
+  } finally {
+    cap.restore();
+  }
+  const captured = cap.lines.join("\n");
+  assert.match(captured, /shoe-environment answer.*useCase=athletic_running/, "should deterministically capture the use-case");
+  // It must NOT re-emit the shoe-type question.
+  assert.ok(!/emitted seed question q_use_case/.test(captured), "must not re-ask q_use_case after capturing it");
 });
 
 await test("priorTurnWasOrthoticSeedQuestion is false after a normal product reply", () => {

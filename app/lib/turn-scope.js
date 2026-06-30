@@ -69,11 +69,71 @@ const USECASE_WORD_RE =
 const COLOR_WORD_RE =
   /\b(?:black|white|ivory|cream|navy|blue|red|burgundy|wine|pink|blush|rose|fuchsia|coral|green|olive|sage|tan|beige|nude|taupe|khaki|brown|chocolate|cognac|camel|bronze|copper|gold|silver|pewter|grey|gray|charcoal|champagne|mauve|lavender|purple|plum|yellow|mustard|orange)\b/i;
 
+// ── Deterministic shoe-environment → use-case detector ──
+// A guided orthotic flow asks "What kind of shoes will the orthotics go in?".
+// The customer answers in plain footwear language ("Hoka sneakers for
+// walking", "my work boots", "dress shoes", "closed shoes with non-removable
+// insoles"). The Haiku classifier returns useCase=null for these — none of
+// them are in its abstract use-case vocabulary — so the answer was being
+// treated as a fresh independent ask: scope-wiped and the same question
+// re-asked. These terms ARE the use-case/shoe-environment answer; map them
+// deterministically to the orthotic tree's q_use_case vocabulary so the gate
+// captures the answer and advances instead of looping.
+//
+// Ordered specific → general; the FIRST match wins. Canonical values match
+// scripts/seeds/aetrex-orthotic-tree.json q_use_case chip values.
+const SHOE_ENV_RULES = [
+  // Non-removable / glued-in insole → the dress chip variant that flags it.
+  [/\b(?:non[\s-]?removable|not?\s+removable|glued[\s-]?in|sewn[\s-]?in|fixed|built[\s-]?in)\s+(?:insole|footbed|foot[\s-]?bed|insert)s?\b/i, "dress_no_removable"],
+  [/\b(?:can'?t|cannot|unable\s+to)\s+(?:remove|take\s+out|pull\s+out)\b/i, "dress_no_removable"],
+  // Work / on-my-feet-all-day.
+  [/\b(?:work\s+(?:shoes?|boots?|footwear)|on\s+my\s+feet\s+all\s+day|standing\s+all\s+day|all[\s-]?day\s+(?:on\s+my\s+feet|standing|shift)|nursing|nurse|retail\s+job|warehouse|server|waitress|waiter)\b/i, "work_all_day"],
+  // Cleats.
+  [/\b(?:cleats?|soccer\s+cleats?|football\s+cleats?|baseball\s+cleats?)\b/i, "cleats"],
+  // Skates.
+  [/\b(?:hockey\s+skates?|ice\s+skates?|roller\s+skates?|skates?)\b/i, "skates"],
+  // Gym / training.
+  [/\b(?:gym|training|workout|work[\s-]?out|cross[\s-]?fit|weight[\s-]?lifting|lifting|hiit)\b/i, "athletic_training"],
+  // Running (incl. running-shoe brands).
+  [/\b(?:running\s+shoes?|runners?|running|jog(?:ging)?|marathon|hoka|brooks|asics|saucony|new\s+balance)\b/i, "athletic_running"],
+  // Court / general athletic.
+  [/\b(?:tennis\s+shoes?|court\s+shoes?|basketball|volleyball|pickleball|tennis|on\s+the\s+court)\b/i, "athletic_general"],
+  // Generic sneakers / athletic brands → general athletic bucket.
+  [/\b(?:sneakers?|trainers?|athletic\s+shoes?|gym\s+shoes?|nike|adidas|reebok|puma|skechers)\b/i, "athletic_general"],
+  // Winter / general boots (work boots handled above).
+  [/\b(?:winter\s+boots?|snow\s+boots?|hiking\s+boots?|boots?)\b/i, "winter_boots"],
+  // Premium dress shoes.
+  [/\b(?:premium|fine|expensive|leather)\s+dress\s+shoes?\b/i, "dress_premium"],
+  // Dress / formal shoes.
+  [/\b(?:dress\s+shoes?|oxfords?|loafers?|heels?|pumps?|formal\s+shoes?|wingtips?|brogues?)\b/i, "dress"],
+  // Closed / everyday / casual shoes.
+  [/\b(?:closed[\s-]?(?:toe\s+)?shoes?|closed[\s-]?toe|everyday\s+shoes?|casual\s+shoes?|walking\s+shoes?|comfort\s+shoes?|slip[\s-]?ons?|flats?|mary\s+janes?|day[\s-]?to[\s-]?day\s+shoes?)\b/i, "casual"],
+];
+
+// Returns the canonical q_use_case value for a free-text shoe-environment
+// answer, or null when the message names no recognizable footwear context.
+export function detectShoeEnvironmentUseCase(message) {
+  const m = String(message || "");
+  if (!m.trim()) return null;
+  for (const [re, value] of SHOE_ENV_RULES) {
+    if (re.test(m)) return value;
+  }
+  return null;
+}
+
+// Does the message name a shoe environment (sneakers, boots, dress shoes,
+// Hoka, closed shoes, non-removable insoles, …)? Such an answer is a
+// use-case/shoe-environment statement and must NOT be scope-wiped.
+export function messageStatesShoeEnvironment(message) {
+  return detectShoeEnvironmentUseCase(message) !== null;
+}
+
 export function messageStatesCondition(message) {
   return CONDITION_WORD_RE.test(String(message || ""));
 }
 export function messageStatesUseCase(message) {
-  return USECASE_WORD_RE.test(String(message || ""));
+  const m = String(message || "");
+  return USECASE_WORD_RE.test(m) || messageStatesShoeEnvironment(m);
 }
 export function messageStatesColor(message) {
   return COLOR_WORD_RE.test(String(message || ""));

@@ -58,6 +58,7 @@ import { buildSessionMemory, detectClarifyingQuestionType, memorySummary, buildS
 import {
   SKU_PATTERN,
   createTurnResult,
+  rewriteDenialWithProducts,
   dropSiblingCards,
   buildCodeOwnedExactNoMatchText,
   buildSoftBrowseFallbackText,
@@ -4514,6 +4515,32 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
         });
         finalProductCards = finalProductCards.filter((c) => !strayKeys.has(c?.handle || c?.title));
       }
+    }
+  }
+
+  // DENIAL-WITH-PRODUCTS positive rewrite. When cards ARE shown, the reply must
+  // not read as "I couldn't find" / "I'm not seeing" unless those cards are
+  // explicitly framed as alternatives. The contract below only WARNS; here we
+  // deterministically rewrite the contradiction to positive framing on the live
+  // path (repairProductResponseText bails under LLM_OWNS_ALL_TURNS). Honest
+  // cards-shown denials — partial availability verdicts, prior-evidence
+  // closest-match broadens, terminal deterministic owners, and explicit
+  // alternatives framing — are exempt and left untouched.
+  {
+    const denialRewrite = rewriteDenialWithProducts({
+      text: fullResponseText,
+      products: finalProductCards,
+      cardOwner: resolvedCardOwner,
+      answerOwner,
+      availabilityResult: availabilityVerdictResult,
+      availabilityReason: availabilityVerdictReason,
+    });
+    if (denialRewrite.changed) {
+      console.log(
+        `[denial-with-products] ${ctx.shop} rewrote contradictory denial → positive ` +
+          `(cards=${finalProductCards.length}, owner=${resolvedCardOwner || answerOwner || "scorer"}, reason=${denialRewrite.reason})`,
+      );
+      fullResponseText = denialRewrite.text;
     }
   }
 

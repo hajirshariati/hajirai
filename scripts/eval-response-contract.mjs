@@ -17,6 +17,8 @@ import {
   verifyClaimsAgainstCards,
   detectNamedProductMismatch,
   validateTurnResult,
+  rewriteDenialWithProducts,
+  denialIsAlternativesFramed,
 } from "../app/lib/response-contract.server.js";
 import {
   buildProductClaimFacts,
@@ -1986,6 +1988,67 @@ test("R92 — partial availability (width_not_in_options + card) is NOT denial_w
   // A genuine no-match (NOT a partial verdict) still flags.
   const real = validateTurnResult({ text: "I don't see any Savannah in our catalog.", products, availabilityResult: "AVAILABLE", availabilityReason: "-" }).map((w) => w.code);
   assert.ok(real.includes("denial_with_products"), "a real denial with a card still flags");
+});
+
+// ── denial_with_products POSITIVE REWRITE (live LLM-owns-turn path) ──────────
+// repairProductResponseText bails when LLM_OWNS_ALL_TURNS is ON (the PRD
+// default), so the deterministic positive rewrite below is what keeps a
+// contradictory "I couldn't find" / "I'm not seeing" off a cards-shown turn.
+test("R-denial: contradictory denial above cards is rewritten to positive framing", () => {
+  const cards = [{ title: "Maui Sandal", handle: "maui" }, { title: "Reagan Boot", handle: "reagan" }];
+  // Denial sentence + positive content → strip the denial, keep the pitch.
+  const mixed = rewriteDenialWithProducts({
+    text: "I couldn't find an exact match. Here are some great supportive sandals: the Maui and the Reagan are both excellent.",
+    products: cards,
+  });
+  assert.equal(mixed.changed, true);
+  assert.ok(!/couldn'?t find|not seeing|don'?t see/i.test(mixed.text), `denial must be gone: ${mixed.text}`);
+  assert.match(mixed.text, /Maui|Reagan|supportive sandals/i);
+
+  // Pure denial (nothing substantive survives) → positive code-owned lead-in.
+  const pure = rewriteDenialWithProducts({ text: "I'm not seeing any options for that.", products: cards });
+  assert.equal(pure.changed, true);
+  assert.match(pure.text, /closest matches I found/i);
+  assert.ok(!/not seeing|couldn'?t find/i.test(pure.text));
+
+  // Single card → singular lead-in.
+  const one = rewriteDenialWithProducts({ text: "I couldn't find that.", products: [cards[0]] });
+  assert.match(one.text, /closest match I found/i);
+});
+
+test("R-denial: honest cards-shown denials are exempt (no rewrite)", () => {
+  const cards = [{ title: "Savannah Sandal", handle: "savannah" }];
+  // (a) explicit alternatives framing — the denial is legitimate.
+  const alt = rewriteDenialWithProducts({
+    text: "I couldn't find an exact red one, but here are similar styles you might like.",
+    products: cards,
+  });
+  assert.equal(alt.changed, false);
+  assert.equal(alt.reason, "alternatives_framed");
+  assert.ok(denialIsAlternativesFramed("I couldn't find it, but here are some similar options."));
+  assert.ok(!denialIsAlternativesFramed("I couldn't find any options."));
+
+  // (b) partial availability verdict shown with its card.
+  const partial = rewriteDenialWithProducts({
+    text: "I'm not seeing that width in stock for the Savannah — open the product page to check.",
+    products: cards,
+    availabilityResult: "UNKNOWN",
+    availabilityReason: "width_not_in_options",
+  });
+  assert.equal(partial.changed, false);
+  assert.equal(partial.reason, "availability_partial");
+
+  // (c) prior-evidence closest-match broaden owns its positive wording.
+  const prior = rewriteDenialWithProducts({ text: "I'm not seeing those exact styles.", products: cards, cardOwner: "prior-evidence" });
+  assert.equal(prior.changed, false);
+
+  // (d) terminal deterministic owners (availability/compatibility-truth) authored honest text.
+  const avail = rewriteDenialWithProducts({ text: "I'm not seeing that exact size.", products: cards, answerOwner: "availability-truth" });
+  assert.equal(avail.changed, false);
+
+  // (e) no cards / no denial → untouched.
+  assert.equal(rewriteDenialWithProducts({ text: "I couldn't find it.", products: [] }).changed, false);
+  assert.equal(rewriteDenialWithProducts({ text: "Here are some sandals.", products: cards }).changed, false);
 });
 
 if (failed > 0) {
