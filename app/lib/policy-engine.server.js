@@ -55,6 +55,12 @@ const POLICY_INTENT_PATTERNS = {
   //   "what's on sale?"  "show me sale items"  "anything on sale"
   //   "sale shoes"  "on-sale wedges"  "clearance shoes"
   discounts:     /\b(?:promo(?:tion)?s?\s+code|coupons?\b|first[\s-]?(?:time\s+)?(?:order|customer)\s+(?:discount|off)|discount\s+(?:policy|code|details|window)|do\s+you\s+(?:offer|have)\s+(?:any\s+)?(?:discounts?|promos?|coupons?)|how\s+(?:do\s+i|can\s+i|to)\s+(?:get|use|apply|enter)\s+(?:a\s+|the\s+)?(?:discount|coupon|promo)|what(?:'s|\s+is)\s+your\s+discount)\b/i,
+  // Discount-program VERIFICATION REQUIREMENTS — "what info do I need to verify
+  // I'm a teacher?", "how do I qualify for the student discount?". Answerable
+  // from FAQ/discount knowledge (NOT a private OUTCOME — those route to handoff
+  // upstream). Listed before `discounts` in priority so a verification question
+  // gets verification follow-ups.
+  verification:  /\b(?:verif\w*|prove|proof|eligib\w*|qualif\w*|how\s+do\s+i\s+(?:get|become|sign\s+up|apply))\b[^.?!\n]{0,40}\b(?:teacher|student|nurse|military|veteran|first[-\s]?responder|senior|healthcare|educator|id\.me|sheerid)\b|\b(?:teacher|student|nurse|military|educator)\b[^.?!\n]{0,40}\b(?:verif\w*|eligib\w*|qualif\w*|id\.me|sheerid)\b/i,
   services:      /\b(?:do\s+you\s+(?:offer|have)\s+(?:fitting|measurement|consultation|service|in[\s-]store)|services?\b|fittings?|consultation|in[\s-]store\s+(?:experience|visit|pickup))\b/i,
   terms:         /\b(?:terms\s+(?:of\s+(?:service|use)|and\s+conditions)|privacy\s+policy|cookie\s+policy|legal)\b/i,
 };
@@ -86,7 +92,7 @@ export function detectPolicyIntent(message) {
   // Most specific first when multiple match (e.g. "return fee"
   // also matches return_policy). Order via the keys array so the
   // more-specific intents win.
-  const priority = ["return_fee", "return_policy", "exchanges", "tracking", "support_contact", "discounts", "shipping", "warranty", "services", "terms"];
+  const priority = ["return_fee", "return_policy", "exchanges", "tracking", "support_contact", "verification", "discounts", "shipping", "warranty", "services", "terms"];
   const primary = priority.find((k) => matches.includes(k)) || matches[0];
   return { primary, matches };
 }
@@ -214,6 +220,11 @@ const POLICY_FOLLOW_UPS = {
     "Is there a sale or clearance section?",
     "Do you offer free shipping?",
   ],
+  verification: [
+    "Do you offer teacher discounts?",
+    "How do I apply a discount code?",
+    "What's your return policy?",
+  ],
   services: [
     "Do you offer fitting consultations?",
     "Where are your stores located?",
@@ -266,6 +277,7 @@ function intentMatchesTitle(intentKey, lowerTitle) {
     exchanges:     /exchange/,
     tracking:      /track|order\s+status/,
     support_contact: /support|customer\s+service|contact/,
+    verification:  /verif|eligib|qualif|discount|id\.me|sheerid|teacher|student|military|nurse/,
     discounts:     /discount|promo|coupon|sale/,
     services:      /service|fitting|in[\s-]?store/,
     terms:         /terms|privacy|legal/,
@@ -451,6 +463,7 @@ function humanizeIntent(intentKey) {
     exchanges:     "exchanges",
     tracking:      "order tracking",
     support_contact: "customer support",
+    verification:  "discount verification",
     discounts:     "discounts and promotions",
     services:      "our services",
     terms:         "terms of service",

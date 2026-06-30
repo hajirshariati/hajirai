@@ -97,6 +97,17 @@ await test("PE-5 — 'do you offer discounts?' detects discounts", () => {
   assert.equal(i?.primary, "discounts");
 });
 
+await test("PE-5b — discount-VERIFICATION requirements detect the verification intent", () => {
+  // Answerable from FAQ/discount knowledge (RAG-first), not a support handoff.
+  for (const q of [
+    "What information do I need to provide to verify I'm a teacher?",
+    "How do I verify a student discount?",
+    "how do I qualify for the nurse discount?",
+  ]) {
+    assert.equal(detectPolicyIntent(q)?.primary, "verification", q);
+  }
+});
+
 await test("PE-6 — 'do you have returns?' (yes/no shape) still detects return_policy", () => {
   const i = detectPolicyIntent("do you have returns?");
   assert.equal(i?.primary, "return_policy");

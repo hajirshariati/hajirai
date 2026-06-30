@@ -25,6 +25,13 @@ import { isCompatibilityAsk, isMultiRecommendationAsk } from "./constraint-plan.
 //   7. clarification        — genuinely ambiguous / no actionable signal
 
 export const WORKFLOWS = {
+  // Answer-source split (2026-07): a policy/FAQ/discount/verification/brand/tech/
+  // sizing-guide question is ANSWERABLE from knowledge (RAG-first) — it is NOT a
+  // support handoff. A private account/order/verification-OUTCOME issue needs a
+  // human. POLICY_ACCOUNT / CUSTOMER_SERVICE are kept as legacy aliases so older
+  // callers/tests still resolve; planTurn now emits the explicit names below.
+  POLICY_KNOWLEDGE: "policy_knowledge",
+  ACCOUNT_PRIVATE_HANDOFF: "account_private_handoff",
   POLICY_ACCOUNT: "policy_account",
   CUSTOMER_SERVICE: "customer_service",
   AVAILABILITY: "availability",
@@ -132,17 +139,62 @@ export function messageExplicitlyAsksForShoes(text = "") {
 // trace 2026-06-30). Tools off makes the stray search impossible.
 const TOOLS_OFF_WORKFLOWS = new Set([
   "clarification", "display_recovery", "product_focus", "cart_handoff",
+  "policy_knowledge", "account_private_handoff",
   "policy_account", "customer_service", "sizing_help",
 ]);
 export function workflowDisablesTools(workflow) {
   return TOOLS_OFF_WORKFLOWS.has(String(workflow || ""));
 }
 
-// SUPPORT / HANDOFF / POLICY workflows that must NEVER ship product cards. A
-// card>0 outcome on one of these is a leak (support_handoff_cards_leak).
-const CARD_SUPPRESS_WORKFLOWS = new Set(["policy_account", "customer_service", "sizing_help"]);
+// SUPPORT / HANDOFF / POLICY / KNOWLEDGE workflows that must NEVER ship product
+// cards. A card>0 outcome on one of these is a leak (policy_cards_leak).
+const CARD_SUPPRESS_WORKFLOWS = new Set([
+  "policy_knowledge", "account_private_handoff",
+  "policy_account", "customer_service", "sizing_help",
+]);
 export function workflowSuppressesCards(workflow) {
   return CARD_SUPPRESS_WORKFLOWS.has(String(workflow || ""));
+}
+
+// ── Answer-source classes (the explicit routing this audit makes first-class) ──
+// KNOWLEDGE workflows answer from RAG / static knowledge (policy, FAQ, discount,
+// verification requirements, brand, technology, sizing guide) — RAG-first, never
+// a product search, never product cards, support handoff ONLY when no knowledge
+// answers. PRIVATE-HANDOFF workflows are private account/order/verification-
+// OUTCOME issues that need a human — deterministic support CTA, no knowledge
+// answer attempted. Legacy names included for back-compat.
+const KNOWLEDGE_WORKFLOWS = new Set(["policy_knowledge", "policy_account"]);
+const PRIVATE_HANDOFF_WORKFLOWS = new Set(["account_private_handoff", "customer_service"]);
+export function isKnowledgeWorkflow(workflow) {
+  return KNOWLEDGE_WORKFLOWS.has(String(workflow || ""));
+}
+export function isPrivateHandoffWorkflow(workflow) {
+  return PRIVATE_HANDOFF_WORKFLOWS.has(String(workflow || ""));
+}
+
+// THE explicit answer-source matrix: for a workflow, which sources are allowed.
+// Drives the [source-plan] log and documents the contract per requirement #2.
+//   productSearch — may run a catalog/semantic product search
+//   rag           — may retrieve + answer from knowledge/RAG
+//   accountTool   — may call private account/order tools
+//   handoff       — "no" (never) | "fallback" (only if no answer) | "primary"
+//   productCards  — may show product cards
+export function answerSourceMatrix(workflow) {
+  const wf = String(workflow || "");
+  if (isKnowledgeWorkflow(wf)) {
+    return { productSearch: false, rag: true, accountTool: false, handoff: "fallback", productCards: false };
+  }
+  if (isPrivateHandoffWorkflow(wf)) {
+    return { productSearch: false, rag: false, accountTool: true, handoff: "primary", productCards: false };
+  }
+  if (wf === "sizing_help") {
+    return { productSearch: false, rag: true, accountTool: false, handoff: "no", productCards: false };
+  }
+  if (wf === "product_spec" || wf === "availability" || wf === "prior_evidence_availability") {
+    return { productSearch: true, rag: false, accountTool: false, handoff: "no", productCards: true };
+  }
+  // All other commerce workflows: product truth first, no RAG, no handoff.
+  return { productSearch: true, rag: false, accountTool: false, handoff: "no", productCards: true };
 }
 
 // The single authoritative gender of a resolved NAMED family's cards, or null if
@@ -256,7 +308,8 @@ const CUSTOMER_SERVICE_RE = new RegExp(
 const PROMO_POLICY_RE = new RegExp(
   "\\b(?:promo|discount|coupon|voucher)\\s*code[s]?\\b" + "|" +
   "\\bcode[s]?\\s+(?:for|to\\s+use|work)\\b" + "|" +
-  "\\b(?:military|veteran|teacher|student|nurse|first[-\\s]?responder|senior|healthcare)\\s+discount\\b" + "|" +
+  "\\b(?:military|veteran|teacher|student|nurse|first[-\\s]?responder|senior|healthcare|educator)\\s+discounts?\\b" + "|" +
+  "\\bdo\\s+you\\s+(?:have|offer|give|do)\\b[^.?!\\n]{0,30}\\b(?:teacher|student|nurse|military|veteran|first[-\\s]?responder|senior|healthcare|educator)\\b" + "|" +
   "\\b(?:stack|combine|apply)\\s+(?:a\\s+)?(?:discount|code|coupon|promo)s?\\b" + "|" +
   "\\bdo\\s+you\\s+(?:have|offer)\\s+(?:a\\s+)?(?:promo|discount|coupon)\\b" + "|" +
   // ELIGIBILITY / VERIFICATION for a discount program — "how do I verify I'm a
@@ -268,6 +321,52 @@ const PROMO_POLICY_RE = new RegExp(
   // condition/recommend branch) so it answers from policy with no product cards.
   "\\b(?:verif\\w*|verified|prove|proof|eligib\\w*|qualify|how\\s+do\\s+i\\s+(?:get|become))\\b[^.?!\\n]{0,40}\\b(?:teacher|student|nurse|military|veteran|first[-\\s]?responder|senior|healthcare|educator|id\\.me|sheerid)\\b" + "|" +
   "\\b(?:teacher|student|nurse|military|veteran|first[-\\s]?responder|senior|healthcare|educator)\\b[^.?!\\n]{0,40}\\b(?:verif\\w*|verified|proof|eligib\\w*|qualify|discount|id\\.me|sheerid)\\b",
+  "i",
+);
+
+// PRIVATE verification / application OUTCOME — "why was my teacher verification
+// rejected?", "my discount application was declined", "what's the status of my
+// verification?". Unlike the REQUIREMENTS question (answerable from knowledge),
+// this is about THIS customer's private record and needs a human. Checked BEFORE
+// PROMO_POLICY_RE so "verification" here routes to a human, not a generic answer.
+const PRIVATE_VERIFICATION_RE = new RegExp(
+  "\\b(?:why\\s+(?:was|were|is|did|won'?t)|what'?s?\\s+(?:the\\s+)?status\\s+of)\\b[^.?!\\n]{0,40}\\b(?:my\\s+)?(?:verification|verif\\w*|application|discount|account|eligibility)\\b" + "|" +
+  "\\bmy\\b[^.?!\\n]{0,30}\\b(?:verification|application|discount|eligibility|id\\.me|sheerid)\\b[^.?!\\n]{0,25}\\b(?:reject\\w*|declin\\w*|denied|failed|not\\s+work\\w*|isn'?t\\s+work\\w*|won'?t\\s+work|pending|stuck|expired)\\b" + "|" +
+  "\\b(?:reject\\w*|declin\\w*|denied|failed)\\b[^.?!\\n]{0,30}\\b(?:my\\s+)?(?:verification|application|discount\\s+(?:code|request))\\b",
+  "i",
+);
+
+// PRIVATE account access / help — "can someone help me with my account?", "I
+// need help with my account", "I can't get into my account". These are about
+// THIS customer's account and need a human, not a knowledge answer. (Account-
+// access verbs also live in CUSTOMER_SERVICE_RE, but its "help with" pattern
+// misses "help me with my account" — this closes that gap.)
+const ACCOUNT_ACCESS_RE = new RegExp(
+  "\\b(?:help|access|issue|problem|trouble|get\\s+into|locked\\s+out\\s+of)\\b[^.?!\\n]{0,25}\\bmy\\s+account\\b" + "|" +
+  "\\bmy\\s+account\\b[^.?!\\n]{0,20}\\b(?:help|access|issue|problem|locked|password|wrong)\\b" + "|" +
+  "\\bcan\\s+(?:someone|anyone|you)\\s+help\\s+me\\b[^.?!\\n]{0,25}\\b(?:account|order|with\\s+my)\\b",
+  "i",
+);
+
+// BRAND / TECHNOLOGY / company-info knowledge — "what is Aetrex arch support
+// technology?", "tell me about your brand", "how does Lynco work?". Answerable
+// from brand.txt / technology.txt, NEVER a product search. Routed to
+// policy_knowledge (RAG-first, no cards unless the customer asks to shop).
+const BRAND_TECH_KNOWLEDGE_RE = new RegExp(
+  "\\b(?:what\\s+is|what'?s|tell\\s+me\\s+about|explain|how\\s+does|what\\s+makes|why\\s+(?:is|are)|history\\s+of|who\\s+(?:is|are|founded)|when\\s+(?:was|were))\\b[^.?!\\n]{0,40}\\b(?:technolog\\w*|arch[\\s-]support|lynco|metatarsal|memory\\s+foam|cobble|the\\s+brand|your\\s+(?:brand|company)|founded|aetrex)\\b" + "|" +
+  "\\b(?:arch[\\s-]support|lynco|orthotic|cushioning)\\s+technolog\\w*\\b" + "|" +
+  "\\bwhat\\s+(?:other\\s+)?technolog\\w*\\s+(?:do|does|is|are)\\b",
+  "i",
+);
+
+// SIZING-GUIDE knowledge — general fit GUIDANCE ("how do Aetrex sizes usually
+// fit?", "do they run true to size?", "what's the sizing like?"). Answered from
+// the sizing knowledge file, NOT a per-product stock check, NOT a clarifier.
+const SIZING_GUIDE_RE = new RegExp(
+  "\\bhow\\s+do\\b[^.?!\\n]{0,30}\\bsizes?\\b[^.?!\\n]{0,20}\\b(?:fit|run)\\b" + "|" +
+  "\\b(?:do|does)\\b[^.?!\\n]{0,30}\\b(?:run|fit)\\s+(?:true\\s+to\\s+size|small|large|big)\\b" + "|" +
+  "\\b(?:sizing|fit)\\s+(?:guide|chart|advice|generally|usually|like\\b)\\b" + "|" +
+  "\\bhow'?s?\\s+the\\s+sizing\\b|\\bwhat'?s?\\s+the\\s+sizing\\s+like\\b",
   "i",
 );
 
@@ -502,13 +601,14 @@ export function planTurn({
   const statedGender = resolveStatedGender(m, attrs);
   const genderFor = (allowDefault) => statedGender || (allowDefault ? primaryGender : null);
 
-  // 0. Customer-service ISSUE — a problem with a specific order / shipment /
-  // delivery / payment / account that needs a HUMAN. Routed BEFORE policy and
-  // browse so "an order that says delivered but I didn't get it" never falls
-  // through to a product search. No search, no cards — emit the live-chat CTA.
-  if (CUSTOMER_SERVICE_RE.test(m) && !POLICY_QUESTION_RE.test(m)) {
+  // 0. PRIVATE account / order / verification-OUTCOME issue — a problem with a
+  // specific order, shipment, payment, account, or THIS customer's own discount
+  // verification record ("why was my teacher verification rejected?") that needs
+  // a HUMAN. Routed BEFORE the answerable knowledge branches so a private outcome
+  // never gets a generic policy answer. No search, no cards — live-chat CTA.
+  if (PRIVATE_VERIFICATION_RE.test(m) || ACCOUNT_ACCESS_RE.test(m) || (CUSTOMER_SERVICE_RE.test(m) && !POLICY_QUESTION_RE.test(m))) {
     return finalize({
-      workflow: WORKFLOWS.CUSTOMER_SERVICE,
+      workflow: WORKFLOWS.ACCOUNT_PRIVATE_HANDOFF,
       requiredEvidence: ["policy_or_order_data"],
       searchRequired: false,
       clarificationAllowed: false,
@@ -516,43 +616,83 @@ export function planTurn({
       answerRequirements: reqs({ answerFirst: true, concise: true }),
       gender: null,
       directives: [
-        "This is a customer-service issue with a specific order, shipment, delivery, payment, or account — it needs a human. Reply with ONE friendly, specific sentence acknowledging the problem and saying our customer service team can look it up and help. Do NOT search the catalog, do NOT show product cards, and do NOT invent order details. A live-chat button is attached for you.",
+        "This is a PRIVATE customer-service issue with a specific order, shipment, delivery, payment, account, or this customer's own discount-verification record — it needs a human. Reply with ONE friendly, specific sentence acknowledging the problem and saying our customer service team can look it up and help. Do NOT search the catalog, do NOT show product cards, and do NOT invent order or account details. A live-chat button is attached for you.",
       ],
     });
   }
 
-  // 1. Policy / order / account — never a product turn. Also catches a return/
-  // refund POLICY QUESTION ("are they returnable?", "what if I need to return
-  // them?") even when POLICY_RE's word boundary misses it (e.g. "returnable").
+  // 1. Policy / FAQ knowledge — answerable from the merchant's knowledge files
+  // (RAG-first), NEVER a product search and NEVER a default support handoff.
+  // Covers return/refund/exchange/shipping/warranty policy questions, including
+  // "are they returnable?" / "what if I need to return them?".
   if (POLICY_RE.test(m) || POLICY_QUESTION_RE.test(m)) {
     return finalize({
-      workflow: WORKFLOWS.POLICY_ACCOUNT,
-      requiredEvidence: ["policy_or_order_data"],
+      workflow: WORKFLOWS.POLICY_KNOWLEDGE,
+      requiredEvidence: ["knowledge_or_policy_data"],
       searchRequired: false,
       clarificationAllowed: false,
       productDisplayPolicy: "suppress",
       answerRequirements: reqs({ answerFirst: true, concise: true }),
       gender: null,
       directives: [
-        "Answer the policy/order/account question directly from knowledge or order data. Do NOT search the catalog or show product cards.",
+        "Answer the policy/FAQ question DIRECTLY from the Relevant knowledge in your context (the merchant's knowledge files). Do NOT search the catalog or show product cards. Only suggest contacting support if the knowledge doesn't cover it.",
       ],
     });
   }
 
-  // 1b. Promo / discount MECHANICS (codes, military/teacher discount, stacking)
-  // → answered from policy/promotion knowledge, never a product search. Checked
-  // before SALE_BROWSE so "do you have a promo code?" doesn't trigger a search.
+  // 1b. Promo / discount MECHANICS + discount-program VERIFICATION REQUIREMENTS
+  // ("do you offer teacher discounts?", "what info do I provide to verify I'm a
+  // teacher?") — answerable from the merchant's knowledge files (RAG-first),
+  // never a product search. The REQUIREMENTS are knowledge; a private OUTCOME
+  // ("why was MY verification rejected") was already routed to handoff in 0.
   if (PROMO_POLICY_RE.test(m)) {
     return finalize({
-      workflow: WORKFLOWS.POLICY_ACCOUNT,
-      requiredEvidence: ["policy_or_order_data"],
+      workflow: WORKFLOWS.POLICY_KNOWLEDGE,
+      requiredEvidence: ["knowledge_or_policy_data"],
       searchRequired: false,
       clarificationAllowed: false,
       productDisplayPolicy: "suppress",
       answerRequirements: reqs({ answerFirst: true, concise: true }),
       gender: null,
       directives: [
-        "Answer the promo/discount-code question from active promotion knowledge or policy docs. If no active code exists, say codes are verified at checkout. Do NOT search the catalog or show product cards unless the customer ALSO explicitly asked to shop sale items.",
+        "Answer the promo/discount/verification-requirements question DIRECTLY from the Relevant knowledge in your context (FAQs / discount policy). If the knowledge covers how to qualify or verify (e.g. via SheerID/ID.me), say so. If no active code or detail exists, say codes are verified at checkout. Do NOT search the catalog or show product cards. Only suggest contacting support if the knowledge doesn't cover it.",
+      ],
+    });
+  }
+
+  // 1b2. BRAND / TECHNOLOGY / company info ("what is Aetrex arch support
+  // technology?", "tell me about your brand") — answerable from brand.txt /
+  // technology.txt (RAG-first), never a product search. Placed before the
+  // condition/browse branches so an info question never becomes a product grid.
+  if (BRAND_TECH_KNOWLEDGE_RE.test(m) && !hasNamed) {
+    return finalize({
+      workflow: WORKFLOWS.POLICY_KNOWLEDGE,
+      requiredEvidence: ["knowledge_or_policy_data"],
+      searchRequired: false,
+      clarificationAllowed: false,
+      productDisplayPolicy: "suppress",
+      answerRequirements: reqs({ answerFirst: true, concise: true }),
+      gender: null,
+      directives: [
+        "Answer this brand/technology/company question DIRECTLY from the Relevant knowledge in your context (brand and technology files). Explain the concept clearly. Do NOT search the catalog or show product cards unless the customer explicitly asks to shop.",
+      ],
+    });
+  }
+
+  // 1b3. SIZING-GUIDE knowledge ("how do Aetrex sizes usually fit?", "do they run
+  // true to size?") — general fit GUIDANCE answered from the sizing knowledge,
+  // not a per-product stock check. No product context required; never cards.
+  if (SIZING_GUIDE_RE.test(m) && !hasProductContext) {
+    return finalize({
+      workflow: WORKFLOWS.POLICY_KNOWLEDGE,
+      requiredEvidence: ["knowledge_or_policy_data"],
+      searchRequired: false,
+      clarificationAllowed: false,
+      productDisplayPolicy: "suppress",
+      answerRequirements: reqs({ answerFirst: true, concise: true }),
+      gender: null,
+      directives: [
+        "Answer this general sizing/fit-guidance question DIRECTLY from the Relevant knowledge (sizing guide). Do NOT search the catalog or show product cards unless the customer names a product or category to shop.",
       ],
     });
   }

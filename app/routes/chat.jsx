@@ -8,7 +8,7 @@ import { buildSystemPrompt } from "../lib/chat-prompt.server";
 import { planTurn, buildTurnPlanPromptBlock, buildPlanClarifierRepair, planForcesProductDisplay, planRequiresSearch as planRequiresSearchFlag, clarifierGateDecision, isAnswerWorkflow, plannedWorkflowCardOwnerViolation, plannedSearchSkippedViolation, cardsNotInEvidencePool, textPresentsProducts, workflowDisablesTools, resolvedFamilyGender, isStrippedFragmentText, isOrthoticProductCard, messageExplicitlyAsksForShoes } from "../lib/turn-plan.server";
 import { recordTurnInvariantViolation, logTurnInvariant } from "../lib/turn-invariant.server";
 import { classifyAvailability, buildAvailabilityAnswer, AVAILABILITY_RESULT, resolveAvailabilityRequest, isAvailabilityFollowUp, familyOfTitle, collectFamilyColors, constraintIntent, parseAvailabilityConstraints, parseRequestedColors, priorAvailabilityMessage, priorAvailabilityConstraints, variantDataDiagnostics, styleKeyOfTitle, styleNameOfTitle, availabilityTextCardColorMismatch } from "../lib/availability-truth";
-import { detectSupportHandoffNeed, buildSupportHandoffText, supportConfigured, normalizedSupportLabel, supportChatLabel, applySupportHandoffContract } from "../lib/support-handoff";
+import { detectSupportHandoffNeed, buildSupportHandoffText, supportConfigured, normalizedSupportLabel, supportChatLabel, applyAnswerSourceContract } from "../lib/support-handoff";
 import { extractConstraintPlan, cardMatchesSlotCategory, multiRecoTextCardMismatch, slotSearchCategory } from "../lib/constraint-plan";
 import { detectProcessNarration, stripProcessNarration, buildSalesVoiceFallback, SALES_JUDGMENT_WORKFLOWS } from "../lib/sales-voice";
 import { classifyTurnScope, scopeAttributesToTurn, isShortAmbiguousReply, messageStatesShoeEnvironment } from "../lib/turn-scope";
@@ -120,6 +120,9 @@ import {
   broadGenderFollowUpGender,
   workflowSuppressesCards,
   specQuestionAnsweredAsAvailability,
+  answerSourceMatrix,
+  isKnowledgeWorkflow,
+  isPrivateHandoffWorkflow,
 } from "../lib/emit-finalize.server";
 import { detectConversationGoal, ANCHOR_GOALS, isBroadGenderRequest, broadGenderRequestGender } from "../lib/turn-intent.server";
 import { isOrthoticSandalCompatibilityQuestion, buildOrthoticCompatibilityAnswer, hasExplicitOrthoticCompatibleEvidence, isUnsafeCompatibilitySuggestion, SAFE_COMPATIBILITY_SUGGESTIONS } from "../lib/compatibility-truth.server";
@@ -3601,40 +3604,12 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     }
   }
 
-  // ── Customer-service handoff (deterministic) ──────────────────────────
-  // workflow=customer_service: an order/shipment/delivery/payment/account ISSUE
-  // that needs a human. No product cards (suppress the pool), and ALWAYS attach
-  // the live-chat CTA when support is configured — the LLM owns the friendly
-  // acknowledgement text. This is a deterministic CTA, not the dead-end gate.
-  if (ctx.turnPlan?.workflow === "customer_service") {
-    pool = [];
-    availabilityPinnedCards = null;
-    comparisonPinnedCards = null;
-    evidencePinnedCards = null;
-    priorEvidencePinnedCards = null;
-    genericCTA = null;
-    supportCTA = null;
-    supportHandoffCta = supportConfigured(ctx)
-      ? { label: supportChatLabel(ctx), fallbackUrl: ctx.supportUrl }
-      : null;
-    qualitySignals.supportHandoffApplied = true;
-    console.log(`[customer-service] handoff support=${Boolean(supportHandoffCta)} cards=0`);
-  }
-
-  // ── Support / policy / verification card suppression (deterministic) ──────
-  // policy_account (incl. promo/discount-eligibility like "how do I verify I'm a
-  // teacher?") and the cardless sizing_help clarification answer from knowledge —
-  // they must NEVER carry product cards. Tools are forced off for these
-  // workflows, but if a stale prior-turn card slipped into the pool, drop it here
-  // so a verification/policy answer can't show wedge cards (live trace
-  // 2026-06-30: "What information do I need to provide to verify I'm a teacher?"
-  // → 3 random wedge cards). customer_service is handled above.
-  if (
-    ctx.turnPlan?.workflow !== "customer_service" &&
-    workflowSuppressesCards(ctx.turnPlan?.workflow) &&
-    (Array.isArray(pool) ? pool.length : 0) > 0
-  ) {
-    console.log(`[support-suppress] ${ctx.turnPlan?.workflow}: dropping ${pool.length} card(s) — policy/support/handoff turn shows no products`);
+  // ── Card suppression for knowledge / support / sizing turns ───────────────
+  // policy_knowledge / account_private_handoff / sizing_help (+ legacy
+  // policy_account / customer_service) answer from knowledge or hand off — they
+  // NEVER show product cards. Drop any stale prior-turn card that slipped in.
+  if (workflowSuppressesCards(ctx.turnPlan?.workflow) && (Array.isArray(pool) ? pool.length : 0) > 0) {
+    console.log(`[support-suppress] ${ctx.turnPlan?.workflow}: dropping ${pool.length} card(s) — knowledge/support turn shows no products`);
     pool = [];
     availabilityPinnedCards = null;
     comparisonPinnedCards = null;
@@ -3644,33 +3619,26 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     supportCTA = null;
   }
 
-  // ── Support / policy / handoff TEXT CONTRACT (deterministic) ──────────────
-  // On a support/policy/verification/account/order handoff turn the LLM must
-  // NEVER describe widget UI ("[Support Hub button is available above]") and the
-  // real support CTA must be attached (live trace 2026-06-30: a teacher-
-  // verification answer shipped bracketed UI meta text and no reliable button).
-  //   (a) handoff_meta_text_leak fires for any bracket/UI-meta text on these
-  //       workflows — and forces the deterministic replacement below.
-  //   (b) An account/verification/order support request gets clean deterministic
-  //       copy instead of an LLM answer that invents verification steps.
-  //   (c) The live-chat support CTA is attached deterministically (Zendesk/
-  //       Intercom/Gorgias, Support Hub URL fallback) whenever support is set.
-  // A plain INFORMATIONAL policy answer ("what's your return policy?") with no
-  // UI-meta leak keeps its informative text — only its product CTAs are cleared.
+  // ── ANSWER-SOURCE CONTRACT (the explicit product-truth / RAG / handoff fix) ─
+  // KNOWLEDGE workflow (policy_knowledge): answer from the model's RAG/knowledge
+  // reply (UI-meta stripped); hand off ONLY when it couldn't answer (requirement
+  // #5: A. try RAG → B. answer from it → C. else friendly handoff). PRIVATE
+  // workflow (account_private_handoff / customer_service): deterministic support
+  // handoff + live-chat CTA (Zendesk/Intercom/Gorgias, Support Hub URL fallback).
+  // Either way: no product cards, no product quick replies, no UI-meta text. This
+  // replaces the prior contract that force-handed-off every verification/account-
+  // shaped message and discarded the RAG-grounded answer (the root bug here).
   {
     const wf = ctx.turnPlan?.workflow;
-    const contract = applySupportHandoffContract({
+    const contract = applyAnswerSourceContract({
       workflow: wf,
       msg: ctx.latestUserMessage || "",
       text: fullResponseText,
       ctx,
+      retrievedChunks: ctx.retrievedChunks,
     });
     if (contract.applies) {
-      if (contract.metaLeak) {
-        recordTurnInvariantViolation("handoff_meta_text_leak", { workflow: wf });
-        console.log(`[handoff-contract] ${wf}: UI-meta text leak detected — replacing with deterministic handoff copy`);
-      }
-      // Always: no product cards, no product CTAs on a support/policy turn.
+      // No product cards / product CTAs on any knowledge or handoff turn.
       pool = [];
       availabilityPinnedCards = null;
       comparisonPinnedCards = null;
@@ -3678,15 +3646,34 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       priorEvidencePinnedCards = null;
       genericCTA = null;
       supportCTA = null;
-      // Deterministic clean text for account/verification/order handoffs (and any
-      // UI-meta leak); informational policy answers keep their text.
       fullResponseText = contract.text;
-      if (contract.engaged) {
+      if (contract.handoff) {
         evidenceFallbackText = null;
         supportHandoffCta = contract.supportCta;
         qualitySignals.supportHandoffApplied = true;
+      } else {
+        // Knowledge answer kept verbatim (meta stripped) — no forced support CTA.
+        supportHandoffCta = null;
       }
-      console.log(`[handoff-contract] ${wf}: engaged=${contract.engaged} metaLeak=${contract.metaLeak} cta=${Boolean(supportHandoffCta)} (product quick replies suppressed)`);
+      // INVARIANTS (requirement #6).
+      if (contract.metaLeak) {
+        recordTurnInvariantViolation("support_meta_text_leak", { workflow: wf });
+      }
+      if (contract.isKnowledge && contract.source === "support_handoff") {
+        if (contract.ragHit) {
+          // RAG found relevant snippets but the answer still handed off.
+          recordTurnInvariantViolation("policy_rag_hit_handoff", { workflow: wf });
+        } else if (!contract.ragAttempted && ctx.knowledgeRagEnabled) {
+          // A knowledge query went to support without RAG being attempted.
+          recordTurnInvariantViolation("policy_rag_skipped", { workflow: wf });
+        }
+      }
+      console.log(
+        `[answer-source] source=${contract.source}` +
+        `${contract.handoffReason ? ` reason=${contract.handoffReason}` : ""} ` +
+        `workflow=${wf} ragAttempted=${contract.ragAttempted} ragHit=${contract.ragHit} ` +
+        `metaLeak=${contract.metaLeak} cta=${Boolean(supportHandoffCta)}`,
+      );
     }
   }
 
@@ -3698,7 +3685,14 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   // handled in the LLM-owns runner where the validation result is known. NEVER
   // fires on a successful product/sale/comparison turn or a normal clarification
   // (the detector excludes those).
-  if (ctx.turnPlan?.workflow !== "customer_service") {
+  // Knowledge + private-handoff workflows are already owned by the answer-source
+  // contract above — skip this generic gate so it can't wipe a kept RAG answer
+  // (e.g. a knowledge reply that mentions "contact support" matching DEAD_END_RE).
+  if (
+    !isKnowledgeWorkflow(ctx.turnPlan?.workflow) &&
+    !isPrivateHandoffWorkflow(ctx.turnPlan?.workflow) &&
+    ctx.turnPlan?.workflow !== "customer_service"
+  ) {
     const handoffPool = availabilityPinnedCards || comparisonPinnedCards || evidencePinnedCards || priorEvidencePinnedCards || pool;
     // Repeated bot-directed frustration → escalate to a human instead of
     // looping. Count user turns that read as confused/hostile across the
@@ -4717,6 +4711,10 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     // fires + repairs as the backstop if a card reached finalProductCards anyway.
     if (workflowSuppressesCards(workflow) && finalCount > 0) {
       recordTurnInvariantViolation("support_handoff_cards_leak", { workflow, final: finalCount });
+      // policy/FAQ/account/knowledge turns must never show product cards.
+      if (isKnowledgeWorkflow(workflow) || isPrivateHandoffWorkflow(workflow)) {
+        recordTurnInvariantViolation("policy_cards_leak", { workflow, final: finalCount });
+      }
       finalProductCards = [];
     }
     // PRODUCT SPEC answered as availability: a product_spec turn ("what heel
@@ -5344,12 +5342,19 @@ async function handleChatPost({ shop, sessionAccessToken, request, internal = fa
             limit: 5,
             onEmbeddingUsage: addEmbeddingUsage,
           });
-          console.log(`[rag] retrieved ${retrievedChunks?.length || 0} chunk(s) for query="${ragQuery.slice(0, 60)}"`);
+          const topChunk = Array.isArray(retrievedChunks) && retrievedChunks.length > 0 ? retrievedChunks[0] : null;
+          console.log(
+            `[rag] attempted=true hits=${retrievedChunks?.length || 0}` +
+            (topChunk ? ` topCategory=${topChunk.fileType || "-"} topScore=${Number(topChunk.similarity).toFixed(2)}` : "") +
+            ` query="${ragQuery.slice(0, 60)}"`,
+          );
         } catch (err) {
           console.error("[rag] retrieval failed, falling back to full dump:", err?.message || err);
           retrievedChunks = null;
         }
       }
+    } else {
+      console.log(`[rag] attempted=false reason=${config.knowledgeRagEnabled === true ? "empty_query" : "rag_disabled"}`);
     }
 
     // Focus-product anchor. When the customer asks a fact/sizing
@@ -5471,6 +5476,11 @@ async function handleChatPost({ shop, sessionAccessToken, request, internal = fa
       aftershipApiKey: config.aftershipApiKey || "",
       supportUrl: body.support_url || config.supportUrl || "",
       supportLabel: body.support_label || config.supportLabel || "",
+      // RAG result for THIS turn (null=not run, []=ran no hits, [..]=hits). The
+      // answer-source contract in the emit/finalize stage reads this to decide
+      // whether a knowledge turn answers from RAG or hands off.
+      retrievedChunks,
+      knowledgeRagEnabled: config.knowledgeRagEnabled === true,
       accessToken,
       loggedInCustomerId,
       vipModeEnabled: config.vipModeEnabled === true,
@@ -5742,6 +5752,20 @@ async function handleChatPost({ shop, sessionAccessToken, request, internal = fa
             // uses this so the named product is searched BEFORE alternatives.
             turnPlan.namedFamilies = namedFamilies;
             ctx.turnPlan = turnPlan;
+            // Explicit answer-source plan for this turn (requirement #3). Logs
+            // which sources the workflow may use BEFORE the answer is produced —
+            // if RAG is skipped on a knowledge turn, the log says why.
+            {
+              const srcM = answerSourceMatrix(turnPlan.workflow);
+              const ragHit = Array.isArray(retrievedChunks) && retrievedChunks.length > 0;
+              const ragState = !srcM.rag ? "off"
+                : retrievedChunks == null ? (ctx.knowledgeRagEnabled ? "unavailable" : "disabled")
+                : ragHit ? "hit" : "miss";
+              console.log(
+                `[source-plan] workflow=${turnPlan.workflow} productSearch=${srcM.productSearch} ` +
+                `rag=${ragState} accountTool=${srcM.accountTool} handoff=${srcM.handoff} cards=${srcM.productCards}`,
+              );
+            }
             // Expose the anchored focus product so the availability-truth flow
             // can inherit family/color on a deictic follow-up ("what about 9?").
             ctx.focusProduct = focusProduct || null;
@@ -6075,8 +6099,11 @@ async function handleChatPost({ shop, sessionAccessToken, request, internal = fa
             // day?") — those are wrong on a teacher-verification / order / account
             // answer (live trace 2026-06-30). Emit no quick replies on these turns.
             const handoffWf = ctx?.turnPlan?.workflow;
-            if (handoffWf === "policy_account" || handoffWf === "customer_service" || handoffWf === "sizing_help") {
-              console.log(`[chat] ${ctx.shop} follow-ups suppressed: ${handoffWf} is a support/handoff turn (no product quick replies)`);
+            if (
+              handoffWf === "policy_knowledge" || handoffWf === "account_private_handoff" ||
+              handoffWf === "policy_account" || handoffWf === "customer_service" || handoffWf === "sizing_help"
+            ) {
+              console.log(`[chat] ${ctx.shop} follow-ups suppressed: ${handoffWf} is a knowledge/support turn (no product quick replies)`);
               return null;
             }
             // Orthotic↔sandal compatibility class: emit DETERMINISTIC Aetrex-safe

@@ -171,15 +171,15 @@ runClass("8. orthotic guidance", [
 
 // 9. POLICY / ORDER / SUPPORT — no product search, no cards.
 runClass("9. policy/order/support", [
-  { msg: "what is your return policy?", wf: "policy_account", search: false, cards: false },
-  { msg: "can I get a refund?", wf: "policy_account", search: false, cards: false },
-  { msg: "how long does shipping take?", wf: "policy_account", search: false, cards: false },
-  { msg: "do you do exchanges?", wf: "policy_account", search: false, cards: false },
-  { msg: "can I use two promo codes?", wf: "policy_account", search: false, cards: false },
-  { msg: "I need help with an order that says delivered but I didn't get it", wf: "customer_service", search: false, cards: false },
-  { msg: "my package never arrived", wf: "customer_service", search: false, cards: false },
-  { msg: "I got the wrong item", wf: "customer_service", search: false, cards: false },
-  { msg: "where is my order?", wf: ["customer_service", "policy_account"], search: false, cards: false },
+  { msg: "what is your return policy?", wf: "policy_knowledge", search: false, cards: false },
+  { msg: "can I get a refund?", wf: "policy_knowledge", search: false, cards: false },
+  { msg: "how long does shipping take?", wf: "policy_knowledge", search: false, cards: false },
+  { msg: "do you do exchanges?", wf: "policy_knowledge", search: false, cards: false },
+  { msg: "can I use two promo codes?", wf: "policy_knowledge", search: false, cards: false },
+  { msg: "I need help with an order that says delivered but I didn't get it", wf: "account_private_handoff", search: false, cards: false },
+  { msg: "my package never arrived", wf: "account_private_handoff", search: false, cards: false },
+  { msg: "I got the wrong item", wf: "account_private_handoff", search: false, cards: false },
+  { msg: "where is my order?", wf: ["account_private_handoff", "policy_knowledge"], search: false, cards: false },
 ]);
 
 // 10. CORRECTION / FRUSTRATION — not a product turn; recover, don't search.

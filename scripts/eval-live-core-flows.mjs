@@ -83,10 +83,10 @@ function expectedAvailabilityCards(v) {
 // turn must act (search/answer), not stall with a question.
 const PLAN = [
   // policy / account
-  { name: "return policy → policy_account, no search", in: { message: "What's your return policy?" }, wf: WORKFLOWS.POLICY_ACCOUNT, search: false, clarify: false },
-  { name: "where is my order → customer_service (order issue, no search)", in: { message: "Where is my order #1234?" }, wf: WORKFLOWS.CUSTOMER_SERVICE, search: false },
-  { name: "do you offer exchanges → policy_account", in: { message: "Do you offer exchanges?" }, wf: WORKFLOWS.POLICY_ACCOUNT, search: false },
-  { name: "shipping cost → policy_account", in: { message: "How much is shipping?" }, wf: WORKFLOWS.POLICY_ACCOUNT, search: false },
+  { name: "return policy → policy_account, no search", in: { message: "What's your return policy?" }, wf: WORKFLOWS.POLICY_KNOWLEDGE, search: false, clarify: false },
+  { name: "where is my order → customer_service (order issue, no search)", in: { message: "Where is my order #1234?" }, wf: WORKFLOWS.ACCOUNT_PRIVATE_HANDOFF, search: false },
+  { name: "do you offer exchanges → policy_account", in: { message: "Do you offer exchanges?" }, wf: WORKFLOWS.POLICY_KNOWLEDGE, search: false },
+  { name: "shipping cost → policy_account", in: { message: "How much is shipping?" }, wf: WORKFLOWS.POLICY_KNOWLEDGE, search: false },
 
   // availability (named product in message)
   { name: "Jillian black size 8 → availability, search", in: { message: "Do you have the Jillian in black size 8?", namedProduct: true }, wf: WORKFLOWS.AVAILABILITY, search: true, clarify: false },
@@ -124,7 +124,7 @@ const PLAN = [
   // sizing help (Failure A) — generic sizing must NOT search or show cards
   { name: "generic 'help choosing the right size' → sizing_help, no search", in: { message: "I need help choosing the right size" }, wf: WORKFLOWS.SIZING_HELP, search: false },
   { name: "'what size should I get?' no context → sizing_help, no search", in: { message: "What size should I get?" }, wf: WORKFLOWS.SIZING_HELP, search: false },
-  { name: "'do these run true to size?' no context → sizing_help", in: { message: "Do these run true to size?" }, wf: WORKFLOWS.SIZING_HELP, search: false },
+  { name: "'do these run true to size?' no context → policy_knowledge (sizing guide)", in: { message: "Do these run true to size?" }, wf: WORKFLOWS.POLICY_KNOWLEDGE, search: false },
   { name: "'what size should I get in Jillian?' → advisory, search", in: { message: "What size should I get in Jillian?", namedProduct: true }, wf: WORKFLOWS.NAMED_PRODUCT_ADVISORY, search: true },
   { name: "sizing after a shown product (focus) → advisory", in: { message: "What size should I get?", focusProduct: { title: "Savannah Sandal - Champagne" } }, wf: WORKFLOWS.NAMED_PRODUCT_ADVISORY, search: true },
 
@@ -134,8 +134,8 @@ const PLAN = [
   { name: "'women's sneakers on sale' → sale_browse women", in: { message: "Show me women's sneakers on sale" }, wf: WORKFLOWS.SALE_BROWSE, search: true, gender: "women" },
   { name: "'discounted sandals under $100' → sale_browse", in: { message: "Show me discounted sandals under $100" }, wf: WORKFLOWS.SALE_BROWSE, search: true },
   // promo mechanics → policy, no search/cards
-  { name: "'military discount?' → policy_account, no search", in: { message: "Do you have a military discount?" }, wf: WORKFLOWS.POLICY_ACCOUNT, search: false },
-  { name: "'promo code on sale sandals?' → policy_account, no search", in: { message: "Can I use a promo code on sale sandals?" }, wf: WORKFLOWS.POLICY_ACCOUNT, search: false },
+  { name: "'military discount?' → policy_account, no search", in: { message: "Do you have a military discount?" }, wf: WORKFLOWS.POLICY_KNOWLEDGE, search: false },
+  { name: "'promo code on sale sandals?' → policy_account, no search", in: { message: "Can I use a promo code on sale sandals?" }, wf: WORKFLOWS.POLICY_KNOWLEDGE, search: false },
 
   // clarification / non-product / bad input
   { name: "'hi' → clarification, no search", in: { message: "hi" }, wf: WORKFLOWS.CLARIFICATION, search: false },
@@ -160,7 +160,7 @@ for (const t of PLAN) {
 // ── same-session pivots: each turn re-planned independently ───────────
 check("pivot: condition turn then a fresh policy turn re-classifies", () => {
   assert.equal(planTurn({ message: "what helps plantar fasciitis?" }).workflow, WORKFLOWS.CONDITION_RECOMMENDATION);
-  assert.equal(planTurn({ message: "what's your return policy?" }).workflow, WORKFLOWS.POLICY_ACCOUNT);
+  assert.equal(planTurn({ message: "what's your return policy?" }).workflow, WORKFLOWS.POLICY_KNOWLEDGE);
 });
 check("pivot: browse then availability follow-up re-classifies", () => {
   assert.equal(planTurn({ message: "show me women's sandals" }).workflow, WORKFLOWS.BROWSE);

@@ -146,7 +146,7 @@ endToEnd("condition rec + vague stall with no products is flagged",
 endToEnd("policy turn never forces display or search",
   { message: "What is your return policy?" },
   "We accept returns within 30 days.", false,
-  { workflow: W.POLICY_ACCOUNT, searchRequired: false, forcesDisplay: false });
+  { workflow: W.POLICY_KNOWLEDGE, searchRequired: false, forcesDisplay: false });
 
 console.log("");
 if (fail === 0) {

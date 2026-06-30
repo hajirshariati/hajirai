@@ -71,17 +71,51 @@ export function handoffMetaTextLeak(text) {
   return HANDOFF_META_TEXT_RE.test(String(text || ""));
 }
 
-// A SUPPORT / VERIFICATION / ACCOUNT / ORDER request that the bot can't answer
-// from catalog or policy knowledge and must deterministically hand to a human:
-// discount-program verification/eligibility (teacher/student/nurse/military/
-// ID.me), account access/help, or an order problem. These get clean deterministic
-// copy + the real support CTA (never an LLM-authored answer that invents
-// verification steps or narrates the UI). A plain INFORMATIONAL policy question
-// ("what's your return policy?") is NOT this — it keeps its informative answer.
+// Strip UI-meta text out of an otherwise-good answer WITHOUT discarding the
+// answer. Removes [bracketed] UI references and whole sentences that are pure UI
+// directions ("The Support Hub button is available above."). Used on a KNOWLEDGE
+// answer so a RAG-grounded reply survives even if the model appended a UI line.
+const UI_INSTRUCTION_SENTENCE_RE = new RegExp(
+  "\\b(?:button|link|cta)\\s+(?:is\\s+available|above|below)" + "|" +
+  "\\b(?:click|tap|use|press|hit|see)\\s+(?:the|this)\\s+(?:button|link|cta|chat\\s+button)" + "|" +
+  "\\b(?:available|shown|located)\\s+(?:above|below)\\b" + "|" +
+  "\\bsupport\\s+hub\\s+button\\b",
+  "i",
+);
+export function stripHandoffMetaText(text) {
+  let t = String(text || "");
+  t = t.replace(/\s*\[[^\]]*\]\s*/g, " ");          // drop [bracketed] UI refs
+  const sentences = t.split(/(?<=[.!?])\s+/);
+  const kept = sentences.filter((s) => !UI_INSTRUCTION_SENTENCE_RE.test(s));
+  return kept.join(" ").replace(/\s{2,}/g, " ").trim();
+}
+
+// A knowledge answer that didn't actually answer — "I don't have that info",
+// "I can't find that". Triggers the support fallback. Deliberately strict so a
+// real answer that merely MENTIONS support ("…otherwise contact support") is NOT
+// treated as a dead end.
+const KNOWLEDGE_DEADEND_RE = new RegExp(
+  "\\bi\\s+don'?t\\s+(?:have|know|see)\\b[^.?!\\n]{0,45}\\b(?:that|the\\s+specific|any\\s+(?:info|information|detail)|in\\s+my\\s+(?:notes|knowledge|info))" + "|" +
+  "\\bi\\s+can'?t\\s+(?:find|locate|answer|help\\s+with\\s+that)\\b" + "|" +
+  "\\bi'?m\\s+not\\s+(?:able\\s+to\\s+(?:find|answer)|sure)\\b[^.?!\\n]{0,30}\\bthat\\b" + "|" +
+  "\\bno\\s+(?:info|information|details?)\\s+(?:on|about)\\s+(?:that|this)\\b",
+  "i",
+);
+export function isDeadEndAnswer(text) {
+  const t = String(text || "").trim();
+  if (t.length < 24) return true;
+  return KNOWLEDGE_DEADEND_RE.test(t);
+}
+
+// PRIVATE account / order / verification-OUTCOME request — needs a human, not a
+// knowledge answer. Order problems, account access, and a customer's OWN
+// verification record ("why was my teacher verification rejected"). NOTE: a
+// discount-REQUIREMENTS question ("how do I verify I'm a teacher") is NOT here —
+// that is answerable knowledge (policy_knowledge), handled before the handoff.
 const ACCOUNT_SUPPORT_RE = new RegExp(
-  // discount / program eligibility & verification
-  "\\b(?:verif\\w*|verified|prove|proof|eligib\\w*|qualif\\w*|provide|how\\s+do\\s+i\\s+(?:get|become|sign\\s+up|apply))\\b[^.?!\\n]{0,40}\\b(?:teacher|student|nurse|military|veteran|first[-\\s]?responder|senior|healthcare|educator|id\\.me|sheerid|discount)\\b" + "|" +
-  "\\b(?:teacher|student|nurse|military|veteran|first[-\\s]?responder|senior|healthcare|educator)\\b[^.?!\\n]{0,40}\\b(?:verif\\w*|verified|proof|eligib\\w*|qualif\\w*|discount|id\\.me|sheerid)\\b" + "|" +
+  // private verification / application OUTCOME
+  "\\bmy\\b[^.?!\\n]{0,30}\\b(?:verification|application|discount|eligibility)\\b[^.?!\\n]{0,25}\\b(?:reject\\w*|declin\\w*|denied|failed|not\\s+work\\w*|won'?t\\s+work|pending|stuck|expired)\\b" + "|" +
+  "\\b(?:why\\s+(?:was|were|is|did|won'?t))\\b[^.?!\\n]{0,40}\\b(?:my\\s+)?(?:verification|application|discount|account)\\b" + "|" +
   // account help / access
   "\\b(?:help|issue|problem|trouble)\\b[^.?!\\n]{0,20}\\bmy\\s+account\\b" + "|" +
   "\\bcan\\s+(?:someone|anyone|you)\\s+help\\s+me\\b[^.?!\\n]{0,25}\\b(?:account|order)\\b" + "|" +
@@ -95,42 +129,71 @@ export function isAccountSupportHandoffRequest(text) {
   return ACCOUNT_SUPPORT_RE.test(String(text || ""));
 }
 
-// THE deterministic support/policy/handoff TEXT CONTRACT (pure). Given the
-// workflow, the customer message, the LLM's drafted text, and ctx (for support
-// config), decides the final customer-facing shape for policy_account /
-// customer_service turns:
-//   - applies:false   → not a support/policy turn; caller leaves it alone.
-//   - cards:[]                       → these turns never show product cards.
-//   - suppressProductQuickReplies    → never "Show me sneakers" chips here.
-//   - supportCta                     → the live-chat CTA when ENGAGED + support
-//                                      is configured (else null).
-//   - text                           → deterministic handoff copy when the turn
-//     is an account/verification/order request OR the LLM leaked UI-meta text;
-//     otherwise the LLM's (informational) text is kept verbatim.
-//   - metaLeak                       → true when the draft contained bracket/UI
-//                                      meta text (caller fires handoff_meta_text_leak).
-export function applySupportHandoffContract({ workflow = "", msg = "", text = "", ctx = {} } = {}) {
-  if (workflow !== "customer_service" && workflow !== "policy_account") {
-    return { applies: false };
-  }
+// Workflow classes (mirror turn-plan.server's sets; duplicated here so this plain
+// .js module stays import-free of the .server graph). KNOWLEDGE answers from RAG;
+// PRIVATE hands off to a human.
+const KNOWLEDGE_WF = new Set(["policy_knowledge", "policy_account"]);
+const PRIVATE_WF = new Set(["account_private_handoff", "customer_service"]);
+
+// THE answer-source contract (pure). Given the workflow, the customer message,
+// the LLM's drafted text, ctx (support config), and the RAG result for this turn,
+// decides the final customer-facing shape for KNOWLEDGE and PRIVATE-HANDOFF
+// workflows. The core rule this audit enforces:
+//   KNOWLEDGE workflow → answer from the model's RAG/knowledge reply (UI-meta
+//     stripped); hand off to support ONLY when the model couldn't answer.
+//   PRIVATE-HANDOFF workflow → deterministic support handoff + CTA.
+// Returns: { applies, source, text, cards:[], supportCta, suppressProductQuickReplies,
+//            handoff, metaLeak, ragAttempted, ragHit, handoffReason }.
+// `retrievedChunks`: the request's RAG result — null/undefined = RAG not run,
+// [] = ran but nothing relevant, [..] = relevant hits.
+export function applyAnswerSourceContract({ workflow = "", msg = "", text = "", ctx = {}, retrievedChunks } = {}) {
+  const isKnowledge = KNOWLEDGE_WF.has(workflow);
+  const isPrivate = PRIVATE_WF.has(workflow);
+  if (!isKnowledge && !isPrivate) return { applies: false };
+
   const metaLeak = handoffMetaTextLeak(text);
-  const isAccountSupport = workflow === "customer_service" || isAccountSupportHandoffRequest(msg);
-  const engaged = metaLeak || isAccountSupport;
-  // Deterministic copy when the turn is an account/verification/order handoff,
-  // OR whenever the draft leaked UI-meta text (we must replace it). A plain
-  // informational policy answer with no leak keeps its text.
-  const useDeterministicText = metaLeak || (engaged && workflow === "policy_account");
+  const cleaned = stripHandoffMetaText(text);
+  const ragAttempted = Array.isArray(retrievedChunks);
+  const ragHit = ragAttempted && retrievedChunks.length > 0;
+  const supportCta = supportConfigured(ctx)
+    ? { label: supportChatLabel(ctx), fallbackUrl: ctx.supportUrl }
+    : null;
+  const base = {
+    applies: true, isKnowledge, isPrivate, metaLeak, ragAttempted, ragHit,
+    cards: [], suppressProductQuickReplies: true,
+  };
+
+  // PRIVATE account/order/verification-outcome → always a human handoff.
+  if (isPrivate) {
+    return {
+      ...base,
+      source: "support_handoff",
+      handoff: true,
+      handoffReason: "private_account_or_order",
+      text: buildAccountSupportHandoffText({ msg }),
+      supportCta,
+    };
+  }
+
+  // KNOWLEDGE workflow → RAG-first. Keep the model's knowledge answer (meta
+  // stripped) when it actually answered; hand off only when it couldn't.
+  if (!isDeadEndAnswer(cleaned)) {
+    return {
+      ...base,
+      source: ragHit ? "rag" : "static_knowledge",
+      handoff: false,
+      handoffReason: null,
+      text: cleaned,
+      supportCta: null,
+    };
+  }
   return {
-    applies: true,
-    engaged,
-    metaLeak,
-    isAccountSupport,
-    cards: [],
-    suppressProductQuickReplies: true,
-    supportCta: engaged && supportConfigured(ctx)
-      ? { label: supportChatLabel(ctx), fallbackUrl: ctx.supportUrl }
-      : null,
-    text: useDeterministicText ? buildAccountSupportHandoffText({ msg }) : String(text || ""),
+    ...base,
+    source: "support_handoff",
+    handoff: true,
+    handoffReason: ragAttempted && !ragHit ? "no_knowledge_match" : "no_answer",
+    text: buildAccountSupportHandoffText({ msg }),
+    supportCta,
   };
 }
 
@@ -141,6 +204,16 @@ export function applySupportHandoffContract({ workflow = "", msg = "", text = ""
 export function buildAccountSupportHandoffText({ msg = "" } = {}) {
   const m = String(msg).toLowerCase();
   const team = "Aetrex support";
+  // PRIVATE verification OUTCOME ("why was my teacher verification rejected") —
+  // about THIS customer's record, not the general requirements.
+  const rejected = /\b(reject\w*|declin\w*|denied|failed|won'?t\s+work|isn'?t\s+work\w*|pending|stuck|why\s+(?:was|were|is|did))\b/.test(m);
+  if (rejected && /\b(verif\w*|application|discount|eligibility)\b/.test(m)) {
+    const who = /\bteacher|educator\b/.test(m) ? "teacher "
+      : /\bstudent\b/.test(m) ? "student "
+      : /\b(nurse|healthcare|medical)\b/.test(m) ? "healthcare "
+      : /\b(military|veteran|first[-\s]?responder)\b/.test(m) ? "" : "";
+    return `${team} can look into your ${who}verification and help sort out why it didn't go through.`;
+  }
   const verifyish = /\b(verif\w*|verified|eligib\w*|qualif\w*|discount|proof|prove|provide|id\.me|sheerid|requirement)\b/.test(m);
   if (verifyish && /\b(teacher|educator)\b/.test(m)) {
     return `${team} can help confirm the exact verification requirements for teacher discounts.`;

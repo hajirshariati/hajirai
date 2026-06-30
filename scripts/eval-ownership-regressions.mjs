@@ -188,7 +188,7 @@ test("5. engine scope reset — stale orthotics memory cleared for broad sale br
 test("6. 'delivered but not received' → customer-service/policy, no product search", () => {
   const plan = planTurn({ message: "My order says delivered but I never received it." });
   assert.ok(
-    plan.workflow === "customer_service" || plan.workflow === "policy_account",
+    plan.workflow === "account_private_handoff" || plan.workflow === "customer_service" || plan.workflow === "policy_knowledge" || plan.workflow === "policy_account",
     `support turn, got ${plan.workflow}`,
   );
   assert.equal(plan.searchRequired, false, "no product search");

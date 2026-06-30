@@ -83,44 +83,44 @@ const W = WORKFLOWS;
 
 // ── 1. policy / order / account ───────────────────────────────────
 scenario("return policy", { message: "What is your return policy if they don't work for my feet?" },
-  { workflow: W.POLICY_ACCOUNT, searchRequired: false, clarificationAllowed: false, productDisplayPolicy: "suppress" });
+  { workflow: W.POLICY_KNOWLEDGE, searchRequired: false, clarificationAllowed: false, productDisplayPolicy: "suppress" });
 scenario("refund question", { message: "Can I get a refund if the size is wrong?" },
-  { workflow: W.POLICY_ACCOUNT, searchRequired: false });
+  { workflow: W.POLICY_KNOWLEDGE, searchRequired: false });
 scenario("shipping time", { message: "How long does shipping take to California?" },
-  { workflow: W.POLICY_ACCOUNT, searchRequired: false });
+  { workflow: W.POLICY_KNOWLEDGE, searchRequired: false });
 scenario("exchange", { message: "Do you do exchanges for a different size?" },
-  { workflow: W.POLICY_ACCOUNT });
+  { workflow: W.POLICY_KNOWLEDGE });
 
 // P3 — a return/refund POLICY question is policy_account, NOT a human handoff.
 scenario("'What if I need to return them?' → policy_account", { message: "What if I need to return them?" },
-  { workflow: W.POLICY_ACCOUNT, searchRequired: false, productDisplayPolicy: "suppress" });
+  { workflow: W.POLICY_KNOWLEDGE, searchRequired: false, productDisplayPolicy: "suppress" });
 scenario("'are they returnable?' → policy_account", { message: "are they returnable?" },
-  { workflow: W.POLICY_ACCOUNT, searchRequired: false });
+  { workflow: W.POLICY_KNOWLEDGE, searchRequired: false });
 scenario("'can I return these if they don't fit?' → policy_account", { message: "can I return these if they don't fit?" },
-  { workflow: W.POLICY_ACCOUNT });
+  { workflow: W.POLICY_KNOWLEDGE });
 // A genuine return ACTION on an order is still customer_service.
 scenario("'I need to return my order' → customer_service (action, not policy)", { message: "I need to return my order" },
-  { workflow: W.CUSTOMER_SERVICE });
+  { workflow: W.ACCOUNT_PRIVATE_HANDOFF });
 
 // ── 1a. customer-service ISSUES (order/delivery/refund/account) → human handoff,
 // no search, no cards. Routed BEFORE browse so an order problem never searches.
 scenario("'order says delivered but I didn't get it' → customer_service", { message: "I need help with an order that says delivered but I didn't get it." },
-  { workflow: W.CUSTOMER_SERVICE, searchRequired: false, clarificationAllowed: false, productDisplayPolicy: "suppress" });
+  { workflow: W.ACCOUNT_PRIVATE_HANDOFF, searchRequired: false, clarificationAllowed: false, productDisplayPolicy: "suppress" });
 scenario("'my package never arrived' → customer_service", { message: "my package never arrived" },
-  { workflow: W.CUSTOMER_SERVICE, searchRequired: false, productDisplayPolicy: "suppress" });
+  { workflow: W.ACCOUNT_PRIVATE_HANDOFF, searchRequired: false, productDisplayPolicy: "suppress" });
 scenario("'I got the wrong item' → customer_service", { message: "I got the wrong item" },
-  { workflow: W.CUSTOMER_SERVICE, searchRequired: false });
+  { workflow: W.ACCOUNT_PRIVATE_HANDOFF, searchRequired: false });
 scenario("'where is my order?' → customer_service", { message: "Where is my order? I ordered last week." },
-  { workflow: W.CUSTOMER_SERVICE, searchRequired: false, productDisplayPolicy: "suppress" });
+  { workflow: W.ACCOUNT_PRIVATE_HANDOFF, searchRequired: false, productDisplayPolicy: "suppress" });
 scenario("'I want a refund' → customer_service", { message: "I want a refund" },
-  { workflow: W.CUSTOMER_SERVICE, searchRequired: false });
+  { workflow: W.ACCOUNT_PRIVATE_HANDOFF, searchRequired: false });
 scenario("'I was double-charged' → customer_service", { message: "I think I was double-charged for my order" },
-  { workflow: W.CUSTOMER_SERVICE, searchRequired: false });
+  { workflow: W.ACCOUNT_PRIVATE_HANDOFF, searchRequired: false });
 // Informational policy questions still answer from knowledge (NOT customer_service).
 scenario("'what's your return policy?' stays policy_account", { message: "What is your return policy?" },
-  { workflow: W.POLICY_ACCOUNT });
+  { workflow: W.POLICY_KNOWLEDGE });
 scenario("'how long does shipping take?' stays policy_account", { message: "How long does shipping take to California?" },
-  { workflow: W.POLICY_ACCOUNT });
+  { workflow: W.POLICY_KNOWLEDGE });
 
 // ── 2. availability (size / color / stock) ────────────────────────
 scenario("Jillian black size 8 (named)", { message: "Do you have the Jillian in black size 8?", namedProduct: true },
@@ -148,8 +148,8 @@ scenario("'help me pick my size' → sizing_help", { message: "Help me pick my s
   { workflow: W.SIZING_HELP, searchRequired: false });
 scenario("'how do I know my Aetrex size?' → sizing_help", { message: "How do I know my Aetrex size?" },
   { workflow: W.SIZING_HELP, searchRequired: false });
-scenario("'do these run true to size?' no context → sizing_help", { message: "Do these run true to size?" },
-  { workflow: W.SIZING_HELP, searchRequired: false });
+scenario("'do these run true to size?' no context → policy_knowledge (sizing guide)", { message: "Do these run true to size?" },
+  { workflow: W.POLICY_KNOWLEDGE, searchRequired: false });
 scenario("sizing with focus product → advisory (focus that product)", { message: "What size should I get?", focusProduct: { title: "Savannah Sandal - Champagne" } },
   { workflow: W.NAMED_PRODUCT_ADVISORY, searchRequired: true, productDisplayPolicy: "show_focused" });
 
@@ -250,11 +250,11 @@ scenario("single-category condition stays condition_recommendation (not multi)",
 
 // ── promo MECHANICS → policy, never a product search ──
 scenario("'do you have a military discount?' → policy_account, no cards", { message: "Do you have a military discount?" },
-  { workflow: W.POLICY_ACCOUNT, searchRequired: false, productDisplayPolicy: "suppress" });
+  { workflow: W.POLICY_KNOWLEDGE, searchRequired: false, productDisplayPolicy: "suppress" });
 scenario("'can I use a promo code on sale sandals?' → policy_account", { message: "Can I use a promo code on sale sandals?" },
-  { workflow: W.POLICY_ACCOUNT, searchRequired: false });
+  { workflow: W.POLICY_KNOWLEDGE, searchRequired: false });
 scenario("'can I stack discounts?' → policy_account", { message: "Can I stack discounts?" },
-  { workflow: W.POLICY_ACCOUNT, searchRequired: false });
+  { workflow: W.POLICY_KNOWLEDGE, searchRequired: false });
 // Size/stock FOLLOW-UP after products were shown — no named product in the
 // message, but prior cards → availability, not clarification.
 scenario("'what about size 9?' after products → availability (not clarification)", { message: "What about size 9?", hasPriorCards: true },
@@ -381,19 +381,19 @@ scenario("explicit women keeps women", { message: "women's sandals for plantar f
 
 // ── 1b. policy / order / account variants ─────────────────────────
 scenario("track my order → customer_service", { message: "track my order please" },
-  { workflow: W.CUSTOMER_SERVICE, searchRequired: false, productDisplayPolicy: "suppress" });
+  { workflow: W.ACCOUNT_PRIVATE_HANDOFF, searchRequired: false, productDisplayPolicy: "suppress" });
 scenario("return these → customer_service", { message: "I want to return these, they pinch." },
-  { workflow: W.CUSTOMER_SERVICE, productDisplayPolicy: "suppress" });
+  { workflow: W.ACCOUNT_PRIVATE_HANDOFF, productDisplayPolicy: "suppress" });
 scenario("free shipping", { message: "Do you offer free shipping?" },
-  { workflow: W.POLICY_ACCOUNT, searchRequired: false });
+  { workflow: W.POLICY_KNOWLEDGE, searchRequired: false });
 scenario("reset password → customer_service", { message: "How do I reset my password?" },
-  { workflow: W.CUSTOMER_SERVICE });
+  { workflow: W.ACCOUNT_PRIVATE_HANDOFF });
 scenario("cancel order → customer_service", { message: "Can I cancel my order?" },
-  { workflow: W.CUSTOMER_SERVICE });
+  { workflow: W.ACCOUNT_PRIVATE_HANDOFF });
 scenario("warranty on shoes (policy beats browse)", { message: "what's your warranty on these shoes?" },
-  { workflow: W.POLICY_ACCOUNT, productDisplayPolicy: "suppress" });
+  { workflow: W.POLICY_KNOWLEDGE, productDisplayPolicy: "suppress" });
 scenario("invoice", { message: "Can you resend my receipt?" },
-  { workflow: W.POLICY_ACCOUNT });
+  { workflow: W.POLICY_KNOWLEDGE });
 
 // ── 2b. availability variants ─────────────────────────────────────
 scenario("Lina available size 9", { message: "Is the Lina available in size 9?", namedProduct: true },
@@ -477,9 +477,9 @@ scenario("husband+wife conflict stays ambiguous", { message: "sandals for my hus
 
 // ── Extra real-world phrasings to clear the ≥75 bar ───────────────
 scenario("where is my order number → customer_service", { message: "where is my order #1234?" },
-  { workflow: W.CUSTOMER_SERVICE, searchRequired: false });
+  { workflow: W.ACCOUNT_PRIVATE_HANDOFF, searchRequired: false });
 scenario("returns after 30 days", { message: "do you accept returns after 30 days?" },
-  { workflow: W.POLICY_ACCOUNT });
+  { workflow: W.POLICY_KNOWLEDGE });
 scenario("Savannah in stock", { message: "is the Savannah in stock?", namedProduct: true },
   { workflow: W.AVAILABILITY, searchRequired: true, productDisplayPolicy: "show_availability" });
 scenario("compare vs explicit", { message: "compare Jillian vs Lina", namedProduct: true },
@@ -498,11 +498,11 @@ scenario("bare ok is clarification", { message: "ok" },
 // product recommendation. It used to match the occupation "teacher" in
 // USECASE_RE → condition_recommendation → 3 random wedge cards.
 scenario("teacher-verification → policy_account, no product cards (tools off, suppress)", { message: "What information do I need to provide to verify I'm a teacher?" },
-  { workflow: W.POLICY_ACCOUNT, searchRequired: false, clarificationAllowed: false, productDisplayPolicy: "suppress" });
+  { workflow: W.POLICY_KNOWLEDGE, searchRequired: false, clarificationAllowed: false, productDisplayPolicy: "suppress" });
 scenario("nurse discount eligibility → policy_account", { message: "how do I verify I'm a nurse for the discount?" },
-  { workflow: W.POLICY_ACCOUNT, searchRequired: false });
+  { workflow: W.POLICY_KNOWLEDGE, searchRequired: false });
 scenario("student ID.me verification → policy_account", { message: "How do I qualify for the student discount with ID.me?" },
-  { workflow: W.POLICY_ACCOUNT, searchRequired: false, productDisplayPolicy: "suppress" });
+  { workflow: W.POLICY_KNOWLEDGE, searchRequired: false, productDisplayPolicy: "suppress" });
 // But a teacher who is SHOPPING (occupation as a real use-case) still recommends.
 scenario("teacher standing all day + recommend → condition_recommendation", { message: "I'm a teacher on my feet all day, what shoes do you recommend?" },
   { workflow: W.CONDITION_RECOMMENDATION, searchRequired: true });
@@ -566,6 +566,42 @@ scenario("'what about mens?' after cards → browse, gender men", { message: "wh
   { workflow: W.BROWSE, searchRequired: true, gender: "men" });
 scenario("'show men's now' after cards → browse, gender men", { message: "show men's now", hasPriorCards: true },
   { workflow: W.BROWSE, searchRequired: true, gender: "men" });
+
+// ── ANSWER-SOURCE ROUTING AUDIT (2026-07): knowledge vs private handoff ──────
+// Every turn must use the best source first: product truth → RAG knowledge →
+// account tool → handoff. KNOWLEDGE questions (policy/FAQ/discount/verification-
+// requirements/brand/technology/sizing-guide) route to policy_knowledge (RAG-
+// first, no cards, no search). PRIVATE outcomes (verification REJECTED, order
+// issue, account access) route to account_private_handoff (support CTA).
+const KNOWLEDGE_ROUTES = [
+  "What information do I need to provide to verify I'm a teacher?",  // verification requirements
+  "Do you offer teacher discounts?",                                 // discount offer
+  "What is your return policy?",                                     // policy
+  "What is Aetrex arch support technology?",                         // brand/technology
+  "How do Aetrex sizes usually fit?",                                // sizing guide
+];
+for (const msg of KNOWLEDGE_ROUTES) {
+  scenario(`answer-source: "${msg.slice(0, 40)}…" → policy_knowledge (RAG, no cards/search)`,
+    { message: msg },
+    { workflow: W.POLICY_KNOWLEDGE, searchRequired: false, productDisplayPolicy: "suppress" });
+}
+const PRIVATE_ROUTES = [
+  "Why was my teacher verification rejected?",                       // private verification outcome
+  "My order says delivered but I didn't get it.",                    // order issue
+  "Can someone help me with my account?",                            // account access
+];
+for (const msg of PRIVATE_ROUTES) {
+  scenario(`answer-source: "${msg.slice(0, 40)}…" → account_private_handoff (support CTA)`,
+    { message: msg },
+    { workflow: W.ACCOUNT_PRIVATE_HANDOFF, searchRequired: false, productDisplayPolicy: "suppress" });
+}
+// Knowledge + private-handoff workflows are tools-off and card-suppressing.
+check("answer-source: knowledge + private workflows are tools-off + card-suppressing", () => {
+  for (const w of ["policy_knowledge", "account_private_handoff"]) {
+    assert.equal(workflowDisablesTools(w), true, `${w} tools-off`);
+    assert.equal(workflowSuppressesCards(w), true, `${w} card-suppress`);
+  }
+});
 
 // ── Orthotic-flow card purity + fragment guard helpers (PRD owner-leak fix) ───
 check("isOrthoticProductCard: orthotics/insoles true; wearable footwear false", () => {

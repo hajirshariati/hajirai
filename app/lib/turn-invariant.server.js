@@ -72,6 +72,8 @@ export const KNOWN_INVARIANT_CODES = new Set([
   "support_handoff_cards_leak", "spec_question_answered_as_availability",
   // 2026-07 support-handoff UI-meta-text leak
   "handoff_meta_text_leak",
+  // 2026-07 answer-source routing (RAG-first for knowledge turns)
+  "policy_rag_skipped", "policy_rag_hit_handoff", "support_meta_text_leak", "policy_cards_leak",
 ]);
 
 // INVARIANT detector (owner_fallthrough_after_required_gate): a REQUIRED gate

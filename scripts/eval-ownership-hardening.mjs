@@ -108,14 +108,14 @@ await test("4. named_product_advisory styling keeps the named card (show_focused
 // 5 ── policy/account turn suppresses cards (+ customer_service hands off) ──────
 await test("5. policy/account suppresses cards; customer_service routes to handoff", () => {
   const policy = planTurn({ message: "What is your return policy?" });
-  assert.equal(policy.workflow, "policy_account");
+  assert.equal(policy.workflow, "policy_knowledge");
   assert.equal(policy.productDisplayPolicy, "suppress");
   assert.equal(planForcesProductDisplay(policy), false, "policy turn must NOT force product cards");
 
   const cs = planTurn({ message: "I need to cancel my order" });
-  assert.equal(cs.workflow, "customer_service");
+  assert.equal(cs.workflow, "account_private_handoff");
   assert.equal(cs.productDisplayPolicy, "suppress");
-  assert.equal(planForcesProductDisplay(cs), false, "customer_service must suppress cards (deterministic handoff owns the turn)");
+  assert.equal(planForcesProductDisplay(cs), false, "account_private_handoff must suppress cards (deterministic handoff owns the turn)");
 });
 
 // 6 ── every turn ends with a canonical [turn-invariant] log ───────────────────
